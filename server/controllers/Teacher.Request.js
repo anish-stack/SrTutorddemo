@@ -12,18 +12,19 @@ const { check } = require('express-validator')
 exports.MakeARequestForTeacher = CatchAsync(async (req, res) => {
     try {
         const {
-            ClassName,
-            Subjects,
-            InterestedInTypeOfClass,
-            TeacherGenderPreference,
-            NumberOfSessions,
-            minBudget,
-            maxBudget,
-            Locality,
-            StartDate,
-            SpecificRequirement,
-            longitude,
-            latitude
+            ClassName,  //done
+            Subjects,  //done
+            teacherId,  //done
+            InterestedInTypeOfClass,  //done
+            TeacherGenderPreference,  //done
+            NumberOfSessions,   //un-done
+            minBudget,  //done
+            maxBudget,  //done
+            Locality,  //done
+            StartDate,  //done
+            SpecificRequirement,  //done
+            longitude,  //done
+            latitude //done
         } = req.body;
 
         // Validate required fields

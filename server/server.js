@@ -11,8 +11,7 @@ const AdminRouter = require('./routes/Admin.routes');
 const TeacherRouter = require('./routes/Teacher.routes');
 const redis = require('redis');
 const redisClient = redis.createClient(process.env.REDIS_PORT || 6379);
-// const { IPinfoWrapper } = require("node-ipinfo");
-// const ipinfo = new IPinfoWrapper("083f4556775434");
+
 
 (async () => {
     redisClient.on('error', (err) => {
@@ -28,7 +27,7 @@ const redisClient = redis.createClient(process.env.REDIS_PORT || 6379);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 const corsOptions = {
-    origin: 'http://localhost:3000',
+    origin: ['http://localhost:3000','http://localhost:3001'],
     credentials: true,
     redirect: true
 };
@@ -39,28 +38,11 @@ app.use(cookieParser());
 
 // Connect to database
 connectDb();
-
-// Connect to Redis
-// ipinfo.lookupIp("172.22.128.1").then((response) => {
-//     console.log(response);
-// });
 // Routes
 app.get('/', (req, res) => {
     res.send('Hello World I am From Sr Tutors 📖📖!');
 });
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', 'http://localhost:3000'); // Your frontend origin
-    res.header('Access-Control-Allow-Credentials', 'true'); // Allow credentials
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
-    // Preflight request handling
-    if (req.method === 'OPTIONS') {
-        return res.sendStatus(200);
-    }
-
-    next();
-});
 app.get('/Flush-all-Redis-Cached', async (req, res) => {
     try {
         const redisClient = req.app.locals.redis;

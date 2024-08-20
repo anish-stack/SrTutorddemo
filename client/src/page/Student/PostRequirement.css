@@ -1,0 +1,77 @@
+.form-title {
+    color: #003873;
+  }
+  
+  .form-description {
+    color: #666;
+  }
+  
+  .custom-form-check {
+    display: flex;
+    align-items: center;
+  }
+  
+  .custom-checkbox {
+    margin-right: 10px;
+  }
+  
+  .custom-label {
+    font-weight: 500;
+  }
+  
+  .custom-select {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  
+  .custom-input {
+    border-radius: 5px;
+  }
+  
+  .custom-location-suggestions {
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  
+  .custom-subject-badges {
+    position: relative;
+  }
+  
+  .custom-badge {
+    border-radius: 12px;
+  }
+  
+  .custom-button {
+    background-color: #00aaa9;
+    border-color: #00aaa9;
+  }
+  
+  .custom-button:hover {
+    background-color: #003873;
+    border-color: #003873;
+  }
+  
+  @media (max-width: 576px) {
+    .container {
+      padding: 1rem;
+    }
+  
+    .custom-location-suggestions {
+      width: calc(100% - 2rem);
+      left: 1rem;
+    }
+  }
+  
+  .box {
+
+    border-radius: 0.375rem; /* Bootstrap's rounded */
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); /* Bootstrap's shadow-sm */
+    background-color: #ffffff; /* Bootstrap's bg-white */
+  }
+  /* Add this CSS to your stylesheet */
+.custom-textarea {
+    height: 200px; /* Adjust the height as needed */
+    resize: vertical; /* Allows vertical resizing only */
+  }
+  

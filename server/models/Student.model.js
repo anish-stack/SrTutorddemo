@@ -3,6 +3,9 @@ const bcrypt = require('bcrypt');
 
 // Define the Student schema
 const StudentSchema = new mongoose.Schema({
+    sid:{
+        type: String,
+    },
     StudentName: {
         type: String,
         required: true,
@@ -10,16 +13,18 @@ const StudentSchema = new mongoose.Schema({
     },
     PhoneNumber: {
         type: String,
-        required: true,
-        unique: true
+        required: true
+    },
+    AltPhoneNumber: {
+        type: String,
     },
     Email: {
         type: String,
         required: true,
-        unique: true,
+        // unique: true,
         lowercase: true,
         trim: true,
-        match: [/.+@.+\..+/, 'Please enter a valid email address']
+        // match: [/.+@.+\..+/, 'Please enter a valid email address']
     },
     Password: {
         type: String,

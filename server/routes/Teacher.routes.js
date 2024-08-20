@@ -1,9 +1,10 @@
 const express = require('express')
-const { TeacherRegister, TeacherVerifyOtp, TeacherResendOtp, TeacherPasswordChangeRequest, TeacherPasswordOtpResent, TeacherVerifyPasswordOtp, TeacherLogin, AddProfileDetailsOfVerifiedTeacher, TeacherProfileResendOtp, TeacherVerifyProfileOtp, updateTeacherProfile, GetTeacherProfileId, GetAllTeacherProfile, GetAllTeacher, AdvancedQueryForFindingTeacher } = require('../controllers/Teacher.registration')
+const { TeacherRegister, TeacherVerifyOtp, TeacherResendOtp, TeacherPasswordChangeRequest, TeacherPasswordOtpResent, TeacherVerifyPasswordOtp, TeacherLogin, AddProfileDetailsOfVerifiedTeacher, TeacherProfileResendOtp, TeacherVerifyProfileOtp, updateTeacherProfile, GetTeacherProfileId, GetAllTeacherProfile, GetAllTeacher, AdvancedQueryForFindingTeacher, SearchByMinimumCondition } = require('../controllers/Teacher.registration')
 const Protect = require('../middlewares/Auth')
 const TeacherRouter = express.Router()
-
-
+const multer = require('multer');
+const { UploadXlsxFileAndExtractData, UploadXlsxFileAndExtractDataStudent } = require('../controllers/TeacherUpload');
+const upload = multer({ dest: 'files/' });
 //User Actions With 
 TeacherRouter.post('/Create-teacher', TeacherRegister)
 TeacherRouter.post('/Verify-teacher', TeacherVerifyOtp)
@@ -20,7 +21,10 @@ TeacherRouter.get('/Get-Teacher/:id', Protect, GetTeacherProfileId)
 TeacherRouter.get('/Get-Teacher-Profile', Protect, GetAllTeacherProfile)
 TeacherRouter.get('/Get-Teacher', Protect, GetAllTeacher)
 TeacherRouter.post('/Get-Advanced-search', AdvancedQueryForFindingTeacher)
+TeacherRouter.get('/Get-Min-search/:Location/:ClassId/:Subject', SearchByMinimumCondition)
+TeacherRouter.post('/upload-xlsx', upload.single('file'), UploadXlsxFileAndExtractData)
 
+TeacherRouter.post('/upload-xlsxs', upload.single('file'), UploadXlsxFileAndExtractDataStudent)
 
 
 

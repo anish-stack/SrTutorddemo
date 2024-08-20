@@ -191,7 +191,7 @@ exports.StudentResendOtp = CatchAsync(async (req, res) => {
     res.status(200).json({ message: 'OTP resent Successful' });
 });
 
-//Student And Teacher Login
+//Student And 
 exports.StudentLogin = CatchAsync(async (req, res) => {
     try {
         const { Email, Password } = req.body;
@@ -213,7 +213,7 @@ exports.StudentLogin = CatchAsync(async (req, res) => {
         }
 
         // Determine user type and compare password
-        if (CheckUser.Role === 'Student' || CheckUser.Role === 'admin') {
+        if (CheckUser.Role === 'Student') {
             const isPasswordMatch = await CheckUser.comparePassword(Password);
             if (!isPasswordMatch) {
                 return res.status(403).json({
@@ -238,7 +238,55 @@ exports.StudentLogin = CatchAsync(async (req, res) => {
         });
     }
 });
+exports.AdminLogin = CatchAsync(async (req, res) => {
+    try {
+        // console.log("i am hit")
+        const { Email, Password } = req.body;
+        // console.log(req.body)
+        if (!Email || !Password) {
+            return res.status(403).json({
+                Success: false,
+                message: "Please fill all required fields"
+            });
+        }
 
+        // Check if user exists (either Student or Teacher)
+        const CheckUser = await Student.findOne({ Email }) 
+        if (!CheckUser) {
+            return res.status(403).json({
+                Success: false,
+                message: "User not found"
+            });
+        }
+        // console.log(CheckUser)
+        // Determine user type and compare password
+        if (CheckUser.Role === 'admin') {
+            const isPasswordMatch = await CheckUser.comparePassword(Password);
+            // console.log(isPasswordMatch)
+            if (!isPasswordMatch) {
+                return res.status(403).json({
+                    Success: false,
+                    message: "Invalid password"
+                });
+            }
+            await sendToken(CheckUser, res, 201);
+
+        } else {
+            return res.status(403).json({
+                Success: false,
+                message: "Invalid role"
+            });
+        }
+
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            Success: false,
+            message: "Server error",
+            error: error.message
+        });
+    }
+});
 //Student Password Change Request
 exports.StudentPasswordChangeRequest = CatchAsync(async (req, res) => {
     const { Email } = req.body;

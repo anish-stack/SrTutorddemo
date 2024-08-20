@@ -11,10 +11,13 @@ const BannerSchema = new mongoose.Schema({
     ButtonText: {
         type: String,
     },
+    Para:{
+        type: String,
+    },
     RedirectPageUrl: {
         type: String
     },
-    Position:{
+    Position: {
         type: String
     },
     isActive: {

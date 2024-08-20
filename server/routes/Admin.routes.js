@@ -2,10 +2,15 @@ const express = require('express')
 const { singleUploadImage } = require('../middlewares/multer')
 const { CreateClass, EditClassName, EditSubjectName, deleteAnySubject, deleteClass, GetAllClass, GetSubjectsWithClassIds, AddSubjectInClass, GetUniqueAllSubjects } = require('../controllers/ClassController')
 const isAdmin = require('../middlewares/admin')
-const { AddTestimonial, GetAllActiveTestimonial, ToggleTestimonialStatus, DeleteTestimonial, UpdateTestimonial } = require('../controllers/Student.registration')
+const { AddTestimonial, GetAllActiveTestimonial, ToggleTestimonialStatus, DeleteTestimonial, UpdateTestimonial, AdminLogin } = require('../controllers/Student.registration')
 const { createBlog, DeleteBlog, UpdateBlog, getAllBlog, getSingleBlog } = require('../controllers/Blog.controller')
 const { createBanner, getAllBanner, deleteBanner, ChangePosition, updateBanner } = require('../controllers/WebPage.controller')
 const AdminRouter = express.Router()
+
+
+AdminRouter.post('/Admin-login',AdminLogin)
+
+
 
 //Routes For Only Admin Class Controllers
 AdminRouter.post('/Create-Class', isAdmin, CreateClass)
@@ -51,6 +56,8 @@ AdminRouter.get('/Get-All-Subject', GetUniqueAllSubjects)
 //Routes For All User,Teacher,Admin For Testimonials
 AdminRouter.post('/Add-Review', singleUploadImage, AddTestimonial)
 AdminRouter.get('/Get-All-Active-Testimonials', GetAllActiveTestimonial)
+
+
 
 
 

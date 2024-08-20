@@ -4,7 +4,7 @@ const CatchAsync = require('../utils/CatchAsync');
 
 exports.CreateClass = CatchAsync(async (req, res) => {
     try {
-        const { Class, Subjects } = req.body;
+        const { Class, Subjects,InnerClasses } = req.body;
         const iconsFile = req.file;
 
         // Check if a class with the same name already exists
@@ -40,6 +40,7 @@ exports.CreateClass = CatchAsync(async (req, res) => {
                 url: iconUrl || 'No-image',
                 Public_id: publicId || 'No_id',
             },
+            InnerClasses,
             Subjects: Subjects,
         });
 
@@ -332,12 +333,21 @@ exports.GetSubjectsWithClassIds = CatchAsync(async (req, res) => {
     try {
         const { ClassId } = req.params;
         const redisClient = req.app.locals.redis;
-        // console.log(req.app.locals)
+
         if (!redisClient) {
             return res.status(500).json({
                 success: false,
                 status: 'error',
                 message: 'Redis client is not available.',
+            });
+        }
+
+        // Validate ClassId if needed
+        if (!ClassId) {
+            return res.status(400).json({
+                success: false,
+                status: 'fail',
+                message: 'ClassId is required.',
             });
         }
 
@@ -349,19 +359,53 @@ exports.GetSubjectsWithClassIds = CatchAsync(async (req, res) => {
             return res.status(200).json({
                 success: true,
                 status: 'success',
-                message: "data from cache",
-
+                message: "Data retrieved from cache",
                 data: JSON.parse(cachedSubjects),
             });
         } else {
-            // Fetch classes by ID
-            const classes = await Classes.findById(ClassId);
+            // First attempt: Find class by ID
+            let classes = await Classes.findById(ClassId);
 
+            // If not found, search all classes for a matching InnerClass
             if (!classes) {
+                classes = await Classes.findOne({ 
+                    'InnerClasses._id': ClassId 
+                });
+
+                if (classes) {
+                    // Find the specific InnerClass with the matching ID
+                    const innerClass = classes.InnerClasses.find(inner => inner._id.toString() === ClassId);
+
+                    if (!innerClass) {
+                        return res.status(404).json({
+                            success: false,
+                            status: 'fail',
+                            message: 'No InnerClass found with the provided ID.',
+                        });
+                    }
+
+                    // Return data for the found InnerClass
+                    const Subjects = {
+                        Class: classes.Class,
+                        Subjects: classes.Subjects,
+                    };
+
+                    // Cache the result for future requests
+                    await redisClient.setEx(cacheKey, 3600, JSON.stringify(Subjects));
+
+                    // Respond with the list of subjects
+                    return res.status(200).json({
+                        success: true,
+                        message: "Data retrieved from database",
+                        status: 'success',
+                        data: Subjects,
+                    });
+                }
+
                 return res.status(404).json({
                     success: false,
                     status: 'fail',
-                    message: 'No classes found with the provided ID.',
+                    message: 'No classes or InnerClasses found with the provided ID.',
                 });
             }
 
@@ -379,18 +423,18 @@ exports.GetSubjectsWithClassIds = CatchAsync(async (req, res) => {
             };
 
             // Cache the result for future requests
-            await redisClient.setEx(cacheKey, 15, JSON.stringify(Subjects));
+            await redisClient.setEx(cacheKey, 3600, JSON.stringify(Subjects));
 
             // Respond with the list of subjects
             return res.status(200).json({
                 success: true,
-                message: "data from db",
+                message: "Data retrieved from database",
                 status: 'success',
                 data: Subjects,
             });
         }
     } catch (error) {
-        console.log(error)
+        console.error('Error fetching subjects:', error.message);
         return res.status(500).json({
             success: false,
             status: 'error',
@@ -399,7 +443,6 @@ exports.GetSubjectsWithClassIds = CatchAsync(async (req, res) => {
         });
     }
 });
-
 
 
 exports.AddSubjectInClass = CatchAsync(async (req, res) => {

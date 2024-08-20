@@ -10,21 +10,22 @@ const TeacherSchema = new mongoose.Schema({
     },
     PhoneNumber: {
         type: String,
-        required: true,
-        unique: true
+        required: true
     },
     Email: {
         type: String,
         required: true,
-        unique: true,
         lowercase: true,
         trim: true,
-        match: [/.+@.+\..+/, 'Please enter a valid email address']
+       
+    },
+    Age:{
+        type: String
     },
     Password: {
         type: String,
         required: true,
-        minlength: 6
+        minlength: 4
     },
     isTeacherVerified: {
         type: Boolean,

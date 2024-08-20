@@ -21,6 +21,7 @@ const SearchResult = () => {
     // Function to handle closing the modal
     const closeModal = () => setSelectedTeacher(null);
 
+    
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error: {error}</div>;
 

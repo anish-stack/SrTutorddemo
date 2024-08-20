@@ -4,7 +4,7 @@ import { toast } from 'react-hot-toast';
 
 axios.defaults.withCredentials = true;
 const Token = localStorage.getItem('Sr-token');
-
+console.log(Token)
 // Async action to handle fetching all teachers using Axios
 
 export const AllTeacher = createAsyncThunk(

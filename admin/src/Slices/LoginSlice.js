@@ -9,8 +9,8 @@ export const loginUser = createAsyncThunk(
     'login/loginUser',
     async (credentials, thunkAPI) => {
         try {
-            const response = await axios.post('http://localhost:7000/api/v1/student/login', credentials);
-            console.log(response.data.user.Role)
+            const response = await axios.post('http://localhost:7000/api/v1/admin/Admin-login', credentials);
+            console.log(response.data)
             if (response.data.user.Role === 'admin') {
                 localStorage.setItem('Sr-token', response.data.token);
             } else {

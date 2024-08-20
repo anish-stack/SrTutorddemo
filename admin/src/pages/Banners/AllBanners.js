@@ -19,6 +19,7 @@ const AllBanners = () => {
     const [formValues, setFormValues] = useState({
         ButtonText: '',
         Position: '',
+        Para: '',
         RedirectPageUrl: '',
         BannerUrl: '',
         file: null // Use single file for handling one image
@@ -45,6 +46,7 @@ const AllBanners = () => {
             setFormValues({
                 ButtonText: banner.ButtonText,
                 Position: banner.Position,
+                Para: banner.Para,
                 RedirectPageUrl: banner.RedirectPageUrl,
                 BannerUrl: banner.Banner.url
             });
@@ -52,6 +54,7 @@ const AllBanners = () => {
             setFormValues({
                 ButtonText: '',
                 Position: '',
+                Para: '',
                 RedirectPageUrl: '',
                 BannerUrl: ''
             });
@@ -86,6 +89,8 @@ const AllBanners = () => {
                 formDataToSubmit.append('ButtonText', formValues.ButtonText);
                 formDataToSubmit.append('Position', formValues.Position);
                 formDataToSubmit.append('RedirectPageUrl', formValues.RedirectPageUrl);
+                formDataToSubmit.append('Para', formValues.Para);
+
 
                 if (formValues.file) {
                     formDataToSubmit.append('image', formValues.file?.imageFile?.file);
@@ -102,6 +107,9 @@ const AllBanners = () => {
                 formDataToSubmit.append('ButtonText', formValues.ButtonText);
                 formDataToSubmit.append('Position', formValues.Position);
                 formDataToSubmit.append('RedirectPageUrl', formValues.RedirectPageUrl);
+                formDataToSubmit.append('Para', formValues.Para);
+
+
 
                 if (formValues.file) {
                     formDataToSubmit.append('image', formValues.file?.imageFile?.file);
@@ -140,6 +148,9 @@ const AllBanners = () => {
 
                 <div className="px-6 py-4">
                     <div className="font-bold text-xl mb-2">{banner.ButtonText}</div>
+                    <p className="text-gray-700 text-base">
+                        Para: {banner.Para}
+                    </p>
                     <p className="text-gray-700 text-base">
                         Position: {banner.Position}
                     </p>
@@ -219,6 +230,19 @@ const AllBanners = () => {
                                     id="ButtonText"
                                     name="ButtonText"
                                     value={formValues.ButtonText}
+                                    onChange={handleChange}
+                                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    required
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="ButtonText">
+                                    Write Some Para
+                                </label>
+                                <textarea
+
+                                    name="Para"
+                                    value={formValues.Para}
                                     onChange={handleChange}
                                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                     required

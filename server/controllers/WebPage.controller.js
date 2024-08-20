@@ -14,7 +14,7 @@ Cloudinary.config({
 
 exports.createBanner = async (req, res) => {
     try {
-        const { ButtonText, active, RedirectPageUrl, Position } = req.body;
+        const { ButtonText, active, RedirectPageUrl, Para,Position } = req.body;
         const file = req.file;
 
         if (!file) {
@@ -51,6 +51,7 @@ exports.createBanner = async (req, res) => {
             const newBanner = new bannerModel({
                 ButtonText,
                 active,
+                Para,
                 RedirectPageUrl,
                 Position,
                 Banner: {
