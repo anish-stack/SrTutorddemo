@@ -38,7 +38,7 @@ const AllTestinomial = () => {
     const handleDeleteTest = async (id) => {
         try {
             await toast.promise(
-                axios.delete(`http://localhost:7000/api/v1/admin/Delete-Testimonial/${id}`, {
+                axios.delete(`https://www.sr.apnipaathshaala.in/api/v1/admin/Delete-Testimonial/${id}`, {
                     headers: {
                         Authorization: `Bearer ${Token}`
                     }
@@ -57,7 +57,7 @@ const AllTestinomial = () => {
 
     const toggleStatusOfReview = async (id) => {
         try {
-            await axios.post(`http://localhost:7000/api/v1/admin/Toggle-Testimonial-Status/${id}`, {}, {
+            await axios.post(`https://www.sr.apnipaathshaala.in/api/v1/admin/Toggle-Testimonial-Status/${id}`, {}, {
                 headers: {
                     Authorization: `Bearer ${Token}`
                 }

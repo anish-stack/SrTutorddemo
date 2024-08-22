@@ -1,27 +1,54 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import axios from 'axios';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
 
+import { Autoplay } from 'swiper/modules';
 function Workarea() {
+    const [location, setLocation] = useState([]);
+    const [slidesPerView, setSlidesPerView] = useState('4');
+    const handleResize = () => {
+        const windowWidth = window.innerWidth;
 
-    const location=[
-        {
-            location_img: "assets/img/others/delhi.webp",
-            location_name: "DELHI",
-        },
-        {
-            location_img: "assets/img/others/mumbai.webp",
-            location_name: "MUMBAI",
-        },
-        {
-            location_img: "assets/img/others/jaipur.webp",
-            location_name: "JAIPUR",
-        },
-        {
-            location_img: "assets/img/others/ahmdabad.webp",
-            location_name: "AHMEDABAD",
+        // Adjust slidesPerView based on window width
+        if (windowWidth < 400) {
+            setSlidesPerView(1);
+        } else if (windowWidth >= 400 && windowWidth < 768) {
+            setSlidesPerView(2);
+        } else {
+            setSlidesPerView(4);
         }
+    };
 
-    ]
+    useEffect(() => {
+
+        handleResize();
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get('https://www.sr.apnipaathshaala.in/api/v1/admin/get-City');
+                if (response.data.success) {
+                    const locations = response.data.data.map(city => ({
+                        location_img: city.CityImage.url,
+                        location_name: city.CityName
+                    }));
+                    setLocation(locations);
+                }
+            } catch (error) {
+                console.error("Error fetching cities:", error);
+            }
+        };
+
+        fetchData();
+    }, []);
 
     return (
         <>
@@ -38,37 +65,47 @@ function Workarea() {
                             </div>
 
                             <div className="row city_padding" align="center" style={{ paddingBottom: 10 }} >
+                                <Swiper
+                                    slidesPerView={slidesPerView}
+                                    spaceBetween={30}
+                                    autoplay={{
+                                        delay: 700,
+                                        disableOnInteraction: false,
+                                    }}
 
-                            {
-                                location.map((item, index)=>(
+                                    modules={[Autoplay]}
+                                    className="mySwiper"
+                                >
 
-                                    <div className="col-md-3 py-3">
-                                    <div className="city-box">
-                                        <Link to="#">
-                                            <div className="row citytxt-row">
-                                                <div className="col-md-4">
-                                                <img className="cityimg rounded-circle" src={item.location_img} alt="delhi" />
-                                                  
-                                                </div>
-                                                <div className="col-md-8">
-                                                    <h5 className="citytxt">{item.location_name}</h5>
+                                    {location.map((item, index) => (
+                                        <SwiperSlide key={index}>
+
+                                            <div className=" py-3" >
+                                                <div className="city-box">
+                                                    <Link to="#">
+                                                        <div className="row citytxt-row">
+                                                            <div className="col-md-4">
+                                                                <img className=" img-fluid city-image" src={item.location_img} alt={item.location_name} />
+                                                            </div>
+                                                            <div className="col-md-8">
+                                                                <h5 className="citytxt">{item.location_name}</h5>
+                                                            </div>
+                                                        </div>
+                                                    </Link>
                                                 </div>
                                             </div>
-                                        </Link>
-                                    </div>
-                                </div>
+                                        </SwiperSlide>
+                                    ))}
 
-                                ))
-                            }
+                                </Swiper>
 
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
-
         </>
-    )
+    );
 }
 
 export default Workarea;

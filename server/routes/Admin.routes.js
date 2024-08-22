@@ -5,6 +5,8 @@ const isAdmin = require('../middlewares/admin')
 const { AddTestimonial, GetAllActiveTestimonial, ToggleTestimonialStatus, DeleteTestimonial, UpdateTestimonial, AdminLogin } = require('../controllers/Student.registration')
 const { createBlog, DeleteBlog, UpdateBlog, getAllBlog, getSingleBlog } = require('../controllers/Blog.controller')
 const { createBanner, getAllBanner, deleteBanner, ChangePosition, updateBanner } = require('../controllers/WebPage.controller')
+const { createCity, getAllCities, deleteCity, updateCity } = require('../controllers/City.Controller')
+const { GetTopTeacher } = require('../controllers/Teacher.registration')
 const AdminRouter = express.Router()
 
 
@@ -38,7 +40,11 @@ AdminRouter.delete('/delete-Banner/:id', deleteBanner)
 AdminRouter.post('/Change-Position/:id',isAdmin, ChangePosition)
 AdminRouter.put('/update-Banner/:id', isAdmin, singleUploadImage, updateBanner)
 
-
+//For City Banners
+AdminRouter.post('/Create-City', singleUploadImage, createCity)
+AdminRouter.get('/get-City', getAllCities)
+AdminRouter.delete('/delete-City/:id', deleteCity)
+AdminRouter.put('/update-City/:id', singleUploadImage, updateCity)
 
 
 //Routes For All user,teacher,Student And Admin For Blogs
@@ -56,6 +62,8 @@ AdminRouter.get('/Get-All-Subject', GetUniqueAllSubjects)
 //Routes For All User,Teacher,Admin For Testimonials
 AdminRouter.post('/Add-Review', singleUploadImage, AddTestimonial)
 AdminRouter.get('/Get-All-Active-Testimonials', GetAllActiveTestimonial)
+AdminRouter.get('/Get-top-teacher', GetTopTeacher)
+
 
 
 

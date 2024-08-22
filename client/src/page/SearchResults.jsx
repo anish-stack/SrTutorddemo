@@ -34,7 +34,7 @@ const SearchResults = () => {
       const fetchResults = async () => {
         try {
           const response = await axios.get(
-            `http://localhost:7000/api/v1/teacher/Get-Min-search/${locationParam}/${classIdParam}/${subjectParam}`
+            `https://www.sr.apnipaathshaala.in/api/v1/teacher/Get-Min-search/${locationParam}/${classIdParam}/${subjectParam}`
           );
           setResults(response.data.results);
           setCount(response.data.count);

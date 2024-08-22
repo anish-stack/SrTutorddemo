@@ -10,6 +10,8 @@ import TeacherPost from "./page/TeacherPost";
 import SearchResults from "./page/SearchResults";
 import StudentProfile from "./page/Student/StudentProfile";
 import PostRequirement from "./page/Student/PostRequirement";
+import TeacherRegsitration from "./page/Teacher/TeacherRegsitration";
+import TeacherDashboard from "./page/Teacher/TeacherDashboard";
 
 function App() {
   return (
@@ -24,6 +26,10 @@ function App() {
         <Route path="/Search-result" element={<SearchResults />} />
         <Route path="/Student-dashboard" element={<StudentProfile />} />
         <Route path="/Student-Post-For-Teacher" element={<PostRequirement />} />
+        <Route path="/teacher-register" element={<TeacherRegsitration />} />
+        <Route path="/Teacher-dashboard" element={<TeacherDashboard />} />
+
+       
       </Routes>
       <Footer />
     </>

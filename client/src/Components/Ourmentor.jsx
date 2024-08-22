@@ -1,46 +1,64 @@
-import React from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
 function Ourmentor() {
 
-    const mentor = [
-        {
-            mentors_img: "assets/img/mentors/mentors-dummy.webp",
-            mentor_name: "Mentor 1",
-            mentor_subject: "All Subject",
-            student_icon: "flaticon-user-1",
-            mentor_totalstudent: "1,135 Students",
-            rating_icon: "fas fa-star",
-            mentor_rating: "(5.0)"
-        },
-        {
-            mentors_img: "assets/img/mentors/mentors-dummy.webp",
-            mentor_name: "Mentor 2",
-            mentor_subject: "All Subject",
-            student_icon: "flaticon-user-1",
-            mentor_totalstudent: "1,135 Students",
-            rating_icon: "fas fa-star",
-            mentor_rating: "(5.0)"
-        },
-        {
-            mentors_img: "assets/img/mentors/mentors-dummy.webp",
-            mentor_name: "Mentor 3",
-            mentor_subject: "All Subject",
-            student_icon: "flaticon-user-1",
-            mentor_totalstudent: "1,135 Students",
-            rating_icon: "fas fa-star",
-            mentor_rating: "(5.0)"
-        },
-        {
-            mentors_img: "assets/img/mentors/mentors-dummy.webp",
-            mentor_name: "Mentor 4",
-            mentor_subject: "All Subject",
-            student_icon: "flaticon-user-1",
-            mentor_totalstudent: "1,135 Students",
-            rating_icon: "fas fa-star",
-            mentor_rating: "(5.0)"
+    const [mentor, setMentors] = useState([]);
+
+    const fetchteacher = async () => {
+        try {
+            const response = await axios.get('https://www.sr.apnipaathshaala.in/api/v1/admin/Get-top-teacher');
+            console.log(response.data)
+            setMentors(response.data.data);
+        } catch (error) {
+            console.error("Failed to fetch testimonials", error);
         }
-    ]
+    };
+
+    useEffect(() => {
+        fetchteacher();
+    }, []);
+
+    // const mentor = [
+    //     {
+    //         mentors_img: "assets/img/mentors/mentors-dummy.webp",
+    //         mentor_name: "Mentor 1",
+    //         mentor_subject: "All Subject",
+    //         student_icon: "flaticon-user-1",
+    //         mentor_totalstudent: "1,135 Students",
+    //         rating_icon: "fas fa-star",
+    //         mentor_rating: "(5.0)"
+    //     },
+    //     {
+    //         mentors_img: "assets/img/mentors/mentors-dummy.webp",
+    //         mentor_name: "Mentor 2",
+    //         mentor_subject: "All Subject",
+    //         student_icon: "flaticon-user-1",
+    //         mentor_totalstudent: "1,135 Students",
+    //         rating_icon: "fas fa-star",
+    //         mentor_rating: "(5.0)"
+    //     },
+    //     {
+    //         mentors_img: "assets/img/mentors/mentors-dummy.webp",
+    //         mentor_name: "Mentor 3",
+    //         mentor_subject: "All Subject",
+    //         student_icon: "flaticon-user-1",
+    //         mentor_totalstudent: "1,135 Students",
+    //         rating_icon: "fas fa-star",
+    //         mentor_rating: "(5.0)"
+    //     },
+    //     {
+    //         mentors_img: "assets/img/mentors/mentors-dummy.webp",
+    //         mentor_name: "Mentor 4",
+    //         mentor_subject: "All Subject",
+    //         student_icon: "flaticon-user-1",
+    //         mentor_totalstudent: "1,135 Students",
+    //         rating_icon: "fas fa-star",
+    //         mentor_rating: "(5.0)"
+    //     }
+    // ]
 
     return (
         <>
@@ -73,12 +91,17 @@ function Ourmentor() {
                     </div>
                     <div className="row justify-content-center">
                         {
-                            mentor.map((item,index) =>(
+                            mentor && mentor.map((item, index) => (
 
-                                <div className="col-xl-3 col-lg-4 col-sm-6">
+                                <div key={index} className="col-xl-3 col-lg-4 col-md-5 col-sm-6">
                                     <div className="mentors__item">
                                         <div className="mentors__img">
-                                            <Link to="#"><img src={item.mentors_img} alt="mentor" /></Link>
+                                            <Link to="#">
+                                                <img
+                                                    src={item.gender === 'Female' ? 'https://i.ibb.co/THt3vk2/girl.jpg' : 'https://i.ibb.co/fkvB73W/boy.jpg'}
+                                                    alt="mentor"
+                                                />
+                                            </Link>
                                             <div className="mentors__social">
                                                 <span className="share"><i className="flaticon-share" /></span>
                                                 <ul className="social-list list-wrap">
@@ -91,14 +114,17 @@ function Ourmentor() {
                                         <div className="mentors__content">
                                             <div className="mentors__content-top">
                                                 <h4 className="name">
-                                                    <Link to="#">{item.mentor_name}</Link>
+                                                    <Link to="#">{item.TeacherName}</Link>
                                                 </h4>
                                                 <span className="designation">{item.mentor_subject}</span>
                                             </div>
                                             <div className="mentors__content-bottom">
                                                 <ul className="list-wrap">
-                                                    <li className="students"><i className={item.student_icon} /> {item.mentor_totalstudent}</li>
-                                                    <li className="rating"><i className={item.rating_icon} /><span className="rating-count">{item.mentor_rating}</span></li>
+                                                    <li className="students">
+                                                        <i className="flaticon-user-1" /> {item.totalStudent ? ` +` : `${Math.floor(Math.random() * 81) + 20} +`}
+                                                    </li>
+
+                                                    <li className="rating"><i className={"flaticon-user-1"} /><span className="rating-count">{item.mentor_rating}</span></li>
                                                 </ul>
                                             </div>
                                         </div>
@@ -107,7 +133,7 @@ function Ourmentor() {
 
                             ))
                         }
-  
+
                     </div>
                 </div>
                 <div className="mentors__shapes">

@@ -15,7 +15,7 @@ async function formatData(data) {
   for (let i = 1; i < data.length; i++) {
     const row = data[i];
 
-    if (row.length >= 8) {
+    if (row.length >= 10) {
       // Adjust based on the expected columns
       const tid = row[1];
       const TeacherName = row[2];
@@ -26,7 +26,10 @@ async function formatData(data) {
       const address = row[6];
       const password = row[7];
       const isTeacherVerified = row[8] === true; // Convert to Boolean
+      const gender = row[10]; 
+    
       const isTopTeacher = true; // Convert to Boolean
+
       formattedData.push({
         tid: tid,
         TeacherName: TeacherName,
@@ -37,6 +40,7 @@ async function formatData(data) {
         Password: hashPassword || password, // Use default password if not provided
         isTeacherVerified: isTeacherVerified,
         isTopTeacher: isTopTeacher,
+        gender:gender
       });
     }
   }

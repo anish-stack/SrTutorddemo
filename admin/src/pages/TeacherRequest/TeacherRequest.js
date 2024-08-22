@@ -21,7 +21,7 @@ const TeacherRequests = () => {
     useEffect(() => {
         const fetchRequests = async () => {
             try {
-                const response = await axios.get('http://localhost:7000/api/v1/student/Get-All-Post');
+                const response = await axios.get('https://www.sr.apnipaathshaala.in/api/v1/student/Get-All-Post');
                 if (response.data.success) {
                     setRequests(response.data.data);
                     setFilteredData(response.data.data);
@@ -97,7 +97,7 @@ const TeacherRequests = () => {
         console.log(comment)
         console.log(selectedRequest)
         try {
-            const response = await axios.post(`http://localhost:7000/api/v1/student/Add-Comment`, {
+            const response = await axios.post(`https://www.sr.apnipaathshaala.in/api/v1/student/Add-Comment`, {
                 id: selectedRequest._id,
                 Comment: comment
             })

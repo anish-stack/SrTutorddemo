@@ -42,7 +42,7 @@ const CreateReview = () => {
         try {
             const token = localStorage.getItem('Sr-token');
             await toast.promise(
-                axios.post('http://localhost:7000/api/v1/admin/Add-review', formDataToSubmit, {
+                axios.post('https://www.sr.apnipaathshaala.in/api/v1/admin/Add-review', formDataToSubmit, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                         'Authorization': `Bearer ${token}`,

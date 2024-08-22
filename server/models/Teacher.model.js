@@ -12,9 +12,13 @@ const TeacherSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    AltNumber:{
+        type: String,
+    },
     Email: {
         type: String,
         required: true,
+        unique:true,
         lowercase: true,
         trim: true,
        
@@ -22,10 +26,17 @@ const TeacherSchema = new mongoose.Schema({
     Age:{
         type: String
     },
+    DOB: {
+        type: String,
+        required: true
+    },
     Password: {
         type: String,
         required: true,
         minlength: 4
+    },
+    gender:{
+        type: String,
     },
     isTeacherVerified: {
         type: Boolean,

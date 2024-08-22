@@ -1,20 +1,23 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-
+import axios from 'axios'
 function Homeblog() {
-    const hblog=[
-        {
-          blog_image:"assets/img/blog/blog_thumb04.jpg",
-          blog_cat:"Education",
-          Blog_title:"when aeunkno printer took galley of scrambled",
-          author_icon:"flaticon-account",
-          author:"Admin",
-          post_dateicon:"flaticon-calendar-date",
-          post_date:"23 Aug, 2023"
 
-        },
-    ]
+    const [blog, setBlog] = useState([])
 
+    const fetchBlog = async () => {
+        try {
+
+            const response = await axios.get('https://www.sr.apnipaathshaala.in/api/v1/admin/get-Blogs');
+            console.log(response.data.data)
+            setBlog(response.data.data)
+        } catch (error) {
+
+        }
+    }
+    useEffect(() => {
+        fetchBlog()
+    }, [])
     return (
         <>
             <section className="blog-area-two section-pt-120 section-pb-90">
@@ -43,90 +46,65 @@ function Homeblog() {
                         </div>
                     </div>
                     <div className="row justify-content-center">
-                        {
-                                hblog.map((item,index) =>(
-
-                                <div className="col-lg-6">
-                            <div className="blog__post-item-two shine__animate-item">
-                                <div className="blog__post-thumb-two">
-                                    <Link to="#!" className="shine__animate-link">
-                                        <img src={item.blog_image} alt="img" />
-                                    </Link>
-                                </div>
-                                <div className="blog__post-content-two">
-                                    <Link to="#!" className="cat">{item.blog_cat}</Link>
-                                    <h4 className="title">
-                                        <Link to="#!">{item.Blog_title}</Link>
-                                    </h4>
-                                    <ul className="list-wrap blog__post-meta">
-                                        <li>
-                                            <i className="flaticon-account" /> by <Link to="#!">Admin</Link>
-                                        </li>
-                                        <li>
-                                            <i className="flaticon-calendar-date" /> 23 Aug, 2023
-                                        </li>
-                                    </ul>
+                        {blog && blog.slice(0, 1).map((item, index) => (
+                            <div key={item.id || index} className="col-lg-6">
+                                <div className="blog__post-item-two shine__animate-item">
+                                    <div className="blog__post-thumb-two">
+                                        <Link to={`/blog/${item._id}`} className="shine__animate-link">
+                                            <img src={item.ImageOfBlog} alt={item.Headline} />
+                                        </Link>
+                                    </div>
+                                    <div className="blog__post-content-two">
+                                        <Link  className="cat">{item.Tag}</Link>
+                                        <h4 className="title">
+                                            <Link to={`/blog/${item._id}`}>{item.Headline}</Link>
+                                        </h4>
+                                        <ul className="list-wrap blog__post-meta">
+                                            <li>
+                                                <i className="flaticon-account" /> By <Link >Admin</Link>
+                                            </li>
+                                            <li>
+                                                <i className="flaticon-calendar-date" /> {new Date(item.DateOfBlog).toLocaleDateString()}
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                            ))
-                        }
+                        ))}
 
                         <div className="col-lg-6">
-                            <div className="blog__post-item-three shine__animate-item">
-                                <div className="blog__post-thumb-three">
-                                    <a href="#!" className="shine__animate-link">
-                                        <img src="assets/img/blog/blog_thumb05.jpg" alt="img" />
-                                    </a>
-                                </div>
-                                <div className="blog__post-content-three">
-                                    <a href="#!" className="cat">
-                                        Course
-                                    </a>
-                                    <h4 className="title">
-                                        <a href="#!">
-                                            When aeunkno printer get galley crambled
+                            {blog && blog.reverse().slice(0,2).map((item, index) => (
+                                <div key={item.id || index} className="blog__post-item-three shine__animate-item">
+                                    <div className="blog__post-thumb-three">
+                                        <Link to={`/blog/${item._id}`} className="shine__animate-link">
+                                            <img src={item.ImageOfBlog} alt={item.Headline} />
+                                        </Link>
+                                    </div>
+                                    <div className="blog__post-content-three">
+                                        <a  className="cat">
+                                            {item.Tag}
                                         </a>
-                                    </h4>
-                                    <ul className="list-wrap blog__post-meta">
-                                        <li>
-                                            <i className="flaticon-account" /> by <a href="#!">Admin</a>
-                                        </li>
-                                        <li>
-                                            <i className="flaticon-calendar-date" /> 23 Aug, 2023
-                                        </li>
-                                    </ul>
+                                        <h4 className="title">
+                                            <Link to={`/blog/${item._id}`}>
+                                                {item.Headline}
+                                            </Link>
+                                        </h4>
+                                        <ul className="list-wrap blog__post-meta">
+                                            <li>
+                                                <i className="flaticon-account" /> By <a href="#!">Admin</a>
+                                            </li>
+                                            <li>
+                                                <i className="flaticon-calendar-date" /> {new Date(item.DateOfBlog).toLocaleDateString()}
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="blog__post-item-three shine__animate-item">
-                                <div className="blog__post-thumb-three">
-                                    <a href="#!" className="shine__animate-link">
-                                        <img src="assets/img/blog/blog_thumb06.jpg" alt="img" />
-                                    </a>
-                                </div>
-                                <div className="blog__post-content-three">
-                                    <a href="#!" className="cat">
-                                        Skill Development
-                                    </a>
-                                    <h4 className="title">
-                                        <a href="#!">
-                                            Bhen aeunkno printer galley aewcram.
-                                        </a>
-                                    </h4>
-                                    <ul className="list-wrap blog__post-meta">
-                                        <li>
-                                            <i className="flaticon-account" /> by <a href="#!">Admin</a>
-                                        </li>
-                                        <li>
-                                            <i className="flaticon-calendar-date" /> 23 Aug, 2023
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
+                            ))}
                         </div>
                     </div>
+
                 </div>
-                <img className="object" src="assets/img/objects/blog_shape03.png" width={76} style={{ left: "8%", top: "32%" }}  alt="Object" />
+                <img className="object" src="assets/img/objects/blog_shape03.png" width={76} style={{ left: "8%", top: "32%" }} alt="Object" />
                 <img className="object rotateme" src="assets/img/objects/blog_shape04.png" width={66} style={{ right: "9%", bottom: "23%" }} alt="Object" />
             </section>
 

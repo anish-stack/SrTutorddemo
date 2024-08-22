@@ -118,7 +118,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
 
   const fetchSubjects = async (classId) => {
     try {
-      const response = await axios.get(`http://localhost:7000/api/v1/admin/Get-Class-Subject/${classId}`);
+      const response = await axios.get(`https://www.sr.apnipaathshaala.in/api/v1/admin/Get-Class-Subject/${classId}`);
       const fetchedSubjects = response.data.data.Subjects;
 
       if (fetchedSubjects) {
@@ -294,7 +294,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
 
     try {
       await axios.post(
-        "http://localhost:7000/api/v1/contact-teacher",
+        "https://www.sr.apnipaathshaala.in/api/v1/contact-teacher",
         formData,
         {
           headers: {

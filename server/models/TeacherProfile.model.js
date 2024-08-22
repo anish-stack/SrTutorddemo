@@ -76,6 +76,7 @@ const TeacherProfileSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    
     TeachingMode: {
         type: String,
         enum: [

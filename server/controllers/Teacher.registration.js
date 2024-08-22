@@ -9,7 +9,17 @@ const crypto = require("crypto");
 //Teacher New Register
 exports.TeacherRegister = CatchAsync(async (req, res) => {
   try {
-    const { TeacherName, PhoneNumber, Email, Password } = req.body;
+    // console.log(req.body);
+    const {
+      TeacherName,
+      PhoneNumber,
+      Email,
+      Password,
+      DOB,
+      Age,
+      gender,
+      AltNumber,
+    } = req.body;
 
     // Check for missing fields
     const missingFields = [];
@@ -17,6 +27,9 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
     if (!PhoneNumber) missingFields.push("Phone Number");
     if (!Email) missingFields.push("Email");
     if (!Password) missingFields.push("Password");
+    if (!DOB) missingFields.push("Date of Birth");
+    if (!gender) missingFields.push("Gender");
+    if (!AltNumber) missingFields.push("Alternate Number");
 
     if (missingFields.length > 0) {
       return res.status(400).json({
@@ -28,7 +41,6 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
     // Check if the Teacher already exists
     const existingTeacher = await Teacher.findOne({ Email });
     if (existingTeacher) {
-      // Check if the Teacher is verified
       if (existingTeacher.isTeacherVerified) {
         return res
           .status(400)
@@ -45,7 +57,7 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
           subject: "OTP Verification",
           message: `<div style="font-family: Arial, sans-serif; padding: 20px; color: #000000; border: 1px solid #E21C1C;">
                                 <h2 style="color: #E21C1C; text-align: center;">OTP Verification</h2>
-                                <p>Dear ${existingTeacher.TeacherName}</p>
+                                <p>Dear ${existingTeacher.TeacherName},</p>
                                 <p>We are pleased to inform you that your OTP for verification is:</p>
                                 <p style="font-size: 24px; font-weight: bold; color: #E21C1C; text-align: center; margin: 20px 0;">
                                     ${existingTeacher.SignInOtp}
@@ -61,9 +73,10 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
 
         await sendEmail(Options);
 
-        return res
-          .status(200)
-          .json({ message: "OTP resent. Please verify your email." });
+        return res.status(200).json({
+          message:
+            "Already have this email ID. OTP resent. Please verify your email.",
+        });
       }
     }
 
@@ -77,11 +90,15 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
       PhoneNumber,
       Email,
       Password,
+      Age,
+      gender,
+      AltNumber,
+      DOB,
       isTeacherVerified: false,
       SignInOtp: otp,
       OtpExpiresTime: otpExpiresTime,
     });
-
+    console.log(newTeacher);
     const Options = {
       email: Email,
       subject: "OTP Verification",
@@ -110,21 +127,21 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
       throw new Error("Redis client is not available.");
     }
 
-    // Check if Teacher is cached
-    await redisClient.del(`Teacher`);
+    // Clear cache
+    await redisClient.del("Teacher");
     await sendEmail(Options);
+
     res.status(201).json({
       success: true,
-      message: "Please verify Otp For Complete Registration",
+      message: "Please verify OTP to complete registration.",
       data: newTeacher,
     });
   } catch (error) {
-    return res
+    res
       .status(500)
       .json({ message: "Internal server error", error: error.message });
   }
 });
-
 //Teacher Verify Otp
 exports.TeacherVerifyOtp = CatchAsync(async (req, res) => {
   try {
@@ -175,9 +192,25 @@ exports.TeacherResendOtp = CatchAsync(async (req, res) => {
     return res.status(400).json({ message: "Teacher already verified" });
   }
 
+  // Check if the OTP resend request is within the 2-minute window
+  const now = Date.now();
+  const otpExpiresTime = Teachers.OtpExpiresTime || 0;
+  const resendDelay = 2 * 60 * 60; // 2 minutes in milliseconds
+  console.log(resendDelay)
+  if (now - otpExpiresTime < resendDelay) {
+    const remainingTime = Math.ceil(
+      (resendDelay - (now - otpExpiresTime)) / 1000
+    );
+    return res.status(429).json({
+      message: `Please wait 2 Minutes before requesting a new OTP.`,
+    });
+  }
+
+  // Generate a new OTP and set expiration time
   Teachers.SignInOtp = crypto.randomInt(100000, 999999);
-  Teachers.OtpExpiresTime = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
+  Teachers.OtpExpiresTime = now + 10 * 60 * 1000; // OTP expires in 10 minutes
   await Teachers.save();
+
   const Options = {
     email: Email,
     subject: "Resent OTP For Verification",
@@ -199,8 +232,9 @@ exports.TeacherResendOtp = CatchAsync(async (req, res) => {
                     </div>
                             `,
   };
+
   await sendEmail(Options);
-  res.status(200).json({ message: "OTP resent Successful" });
+  res.status(200).json({ message: "OTP resent successfully" });
 });
 
 //Teacher And Teacher Login
@@ -366,13 +400,13 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
     const FetchProfileExist = await TeacherProfile.findOne({
       TeacherUserId: userId,
     });
-    // console.log(FetchProfileExist)
-    if (FetchProfileExist) {
-      return res.status(403).json({
-        success: false,
-        message: "Profile Already Updated",
-      });
-    }
+    // // console.log(FetchProfileExist)
+    // if (FetchProfileExist) {
+    //   return res.status(403).json({
+    //     success: false,
+    //     message: "Profile Already Updated",
+    //   });
+    // }
     const {
       FullName,
       DOB,
@@ -446,32 +480,41 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
     }
 
     // Validate AcademicInformation
-   // Validate AcademicInformation
-// Validate AcademicInformation
-for (const element of AcademicInformation) {
-  let classExists = await Class.findById(element.ClassId);
-  if (!classExists) {
-    // Check if the class ID exists in inner classes
-    const classInInnerClasses = await Class.findOne({ 'InnerClasses._id': element.ClassId });
-    if (!classInInnerClasses) {
-      return res.status(400).json({ message: `Class with ID ${element.ClassId} does not exist` });
+    // Validate AcademicInformation
+    // Validate AcademicInformation
+    for (const element of AcademicInformation) {
+      let classExists = await Class.findById(element.ClassId);
+      if (!classExists) {
+        // Check if the class ID exists in inner classes
+        const classInInnerClasses = await Class.findOne({
+          "InnerClasses._id": element.ClassId,
+        });
+        if (!classInInnerClasses) {
+          return res.status(400).json({
+            message: `Class with ID ${element.ClassId} does not exist`,
+          });
+        }
+        classExists = classInInnerClasses;
+      }
+
+      // Extract subject names from the found class
+      const classSubjects = classExists.Subjects.map(
+        (subject) => subject.SubjectName
+      );
+
+      // Check if all subjects in AcademicInformation are included in classSubjects
+      const allSubjectsValid = element.SubjectNames.every((subject) =>
+        classSubjects.some((classSubject) =>
+          classSubject.toLowerCase().includes(subject.toLowerCase())
+        )
+      );
+
+      if (!allSubjectsValid) {
+        return res.status(400).json({
+          message: "Some subjects in Academic Information are invalid",
+        });
+      }
     }
-    classExists = classInInnerClasses;
-  }
-
-  // Extract subject names from the found class
-  const classSubjects = classExists.Subjects.map(subject => subject.SubjectName);
-
-  // Check if all subjects in AcademicInformation are included in classSubjects
-  const allSubjectsValid = element.SubjectNames.every(subject => 
-    classSubjects.some(classSubject => classSubject.toLowerCase().includes(subject.toLowerCase()))
-  );
-
-  if (!allSubjectsValid) {
-    return res.status(400).json({ message: "Some subjects in Academic Information are invalid" });
-  }
-}
-
 
     // Generate OTP and its expiration time
     const SubmitOtp = crypto.randomInt(100000, 999999); // Generate a 6-digit OTP
@@ -554,7 +597,7 @@ for (const element of AcademicInformation) {
 `,
     };
 
-    await sendEmail(emailOptions);
+    // await sendEmail(emailOptions);
     await teacherProfile.save();
     await CheckTeacher.save();
 
@@ -685,6 +728,8 @@ exports.TeacherVerifyProfileOtp = CatchAsync(async (req, res) => {
       });
     }
     await redisClient.del("Teacher");
+    await redisClient.del("Top-Teacher");
+
     await sendEmail(emailOptions);
     await Teachers.save();
     res.status(200).json({ message: "Profile details saved successfully" });
@@ -931,6 +976,35 @@ exports.GetAllTeacher = CatchAsync(async (req, res) => {
       success: true,
       message: "teacher fetched successfully From Db",
       data: teacher.reverse(),
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching teacher",
+      error: error.message,
+    });
+  }
+});
+
+exports.GetTopTeacher = CatchAsync(async (req, res) => {
+  try {
+    const teachers = await Teacher.find({ isTopTeacher: true });
+    if (!teachers || teachers.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No top teachers available",
+      });
+    }
+
+    // Randomly select 10 teachers
+    const randomTeachers = teachers
+      .sort(() => 0.5 - Math.random())
+      .slice(0, 12);
+
+    res.status(200).json({
+      success: true,
+      message: "Teacher fetched successfully from DB",
+      data: randomTeachers,
     });
   } catch (error) {
     res.status(500).json({

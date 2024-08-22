@@ -10,6 +10,11 @@
     background-size: cover;
     border-radius: 8px 8px 0 0;
   }
+  .student-back-sides {
+    min-height: 100dvh;
+    background-size: cover;
+    border-radius: 8px 8px 0 0;
+  }
   .student-image{
     position: absolute;
     top: 40%;

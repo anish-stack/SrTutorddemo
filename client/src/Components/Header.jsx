@@ -64,14 +64,14 @@ function Header() {
       if (modalType === "student") {
         setLoading(true);
         response = await axios.post(
-          "http://localhost:7000/api/v1/student/login",
+          "https://www.sr.apnipaathshaala.in/api/v1/student/login",
           formData
         );
         userPrefix = "student";
       } else if (modalType === "teacher") {
         setLoading(true);
         response = await axios.post(
-          "http://localhost:7000/api/v1/teacher/Teacher-Login",
+          "https://www.sr.apnipaathshaala.in/api/v1/teacher/Teacher-Login",
           formData
         );
         userPrefix = "teacher";

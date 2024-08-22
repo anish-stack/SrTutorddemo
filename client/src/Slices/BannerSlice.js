@@ -10,7 +10,7 @@ export const FetchBanner = createAsyncThunk(
     async (_, thunkAPI) => {
         try {
             // Make the request with the token in the headers
-            const response = await axios.get('http://localhost:7000/api/v1/admin/get-Banner', {
+            const response = await axios.get('https://www.sr.apnipaathshaala.in/api/v1/admin/get-Banner', {
              
             });
             return response.data.data;
