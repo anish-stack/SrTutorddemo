@@ -93,7 +93,7 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
     setLocationSuggestions([]);
   };
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const submittedData = {
@@ -108,12 +108,12 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
         }
       })
       console.log(response)
-    
-      window.location.href="/thankYou"
+
+      window.location.href = "/thankYou"
     } catch (error) {
       console.log(error)
       toast.error("Server Error Exist Please try After Sometimes")
- 
+
 
     }
 
