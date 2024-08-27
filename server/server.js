@@ -24,7 +24,7 @@ const redisClient = redis.createClient(process.env.REDIS_PORT || 6379);
 })();
 
 // CORS Configuration
-const allowedOrigins = ["https://www.srtutors.hoverbusinessservices.com","https://www.sradmin.hoverbusinessservices.com","https://srtutors.hoverbusinessservices.com","https://sradmin.hoverbusinessservices.com"]; // Update with your allowed origin(s)
+const allowedOrigins = ["https://www.srtutors.hoverbusinessservices.com","https://www.sradmin.hoverbusinessservices.com","https://srtutors.hoverbusinessservices.com","https://sradmin.hoverbusinessservices.com",'http://localhost:3001']; // Update with your allowed origin(s)
 
 app.use(cors({
   origin: (origin, callback) => {

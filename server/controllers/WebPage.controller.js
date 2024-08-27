@@ -1,6 +1,15 @@
 const bannerModel = require('../models/Banners.model')
 const HeroBanner = require('../models/Hero.Banner.model')
+const Blogs = require('../models/Blog.model');
+const ParticularTeacher = require('../models/Particular.model')
+const Student = require('../models/Student.model')
+const cityModel = require("../models/City.model"); // Assuming the model is named 'City.model'
+const Classes = require('../models/ClassModel');
+const SubjectTeacherRequest = require("../models/SubjectRequest");
+const Testimonial = require('../models/Testinomial.mode')
+
 const streamifier = require('streamifier');
+const CatchAsync = require('../utils/CatchAsync');
 const Cloudinary = require('cloudinary').v2;
 require('dotenv').config();
 
@@ -269,3 +278,71 @@ exports.updateBanner = async (req, res) => {
         });
     }
 };
+
+
+exports.AnalyticalData = CatchAsync(async (req, res) => {
+    try {
+        // Fetching counts from various models
+        const bannerCount = await bannerModel.countDocuments();
+        const heroBannerCount = await HeroBanner.countDocuments();
+        const blogCount = await Blogs.countDocuments();
+        const ParticularTeacherRequest = await ParticularTeacher.countDocuments();
+        const studentCount = await Student.countDocuments();
+        const cityCount = await cityModel.countDocuments();
+        const classCount = await Classes.countDocuments();
+        const subjectTeacherRequestCount = await SubjectTeacherRequest.countDocuments();
+        const Testimonials = await Testimonial.countDocuments();
+
+
+        const classes = await Classes.find();
+        if (!classes || classes.length === 0) {
+            return res.status(404).json({
+                success: false,
+                status: 'fail',
+                message: 'No classes found.',
+            });
+        }
+
+        // Initialize a set to store unique subjects
+        const subjectsSet = new Set();
+
+        // Iterate over all classes and collect subjects
+        classes.forEach(classDoc => {
+            classDoc.Subjects.forEach(subject => {
+                subjectsSet.add(subject.SubjectName);
+            });
+        });
+
+        // Convert the set to an array
+        const uniqueSubjects = Array.from(subjectsSet).map(subjectName => ({ SubjectName: subjectName }));
+
+
+        // Collecting data
+        const data = {
+            bannerCount,
+            heroBannerCount,
+            blogCount,
+            ParticularTeacherRequest,
+            studentCount,
+            cityCount,
+            classCount,
+            Testimonials,
+            Subjects:uniqueSubjects.length,
+            subjectTeacherRequestCount,
+        };
+
+        // Sending response
+        res.status(200).json({
+            success: true,
+            data,
+        });
+    } catch (error) {
+        // Error handling
+        console.error("Error fetching analytical data:", error);
+        res.status(500).json({
+            success: false,
+            message: "An error occurred while fetching analytical data.",
+            error: error.message,
+        });
+    }
+});

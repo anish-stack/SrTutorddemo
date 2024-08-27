@@ -4,7 +4,7 @@ const { CreateClass, EditClassName, EditSubjectName, deleteAnySubject, deleteCla
 const isAdmin = require('../middlewares/admin')
 const { AddTestimonial, GetAllActiveTestimonial, ToggleTestimonialStatus, DeleteTestimonial, UpdateTestimonial, AdminLogin } = require('../controllers/Student.registration')
 const { createBlog, DeleteBlog, UpdateBlog, getAllBlog, getSingleBlog } = require('../controllers/Blog.controller')
-const { createBanner, getAllBanner, deleteBanner, ChangePosition, updateBanner } = require('../controllers/WebPage.controller')
+const { createBanner, getAllBanner, deleteBanner, ChangePosition, updateBanner, AnalyticalData } = require('../controllers/WebPage.controller')
 const { createCity, getAllCities, deleteCity, updateCity } = require('../controllers/City.Controller')
 const { GetTopTeacher } = require('../controllers/Teacher.registration')
 const AdminRouter = express.Router()
@@ -63,6 +63,8 @@ AdminRouter.get('/Get-All-Subject', GetUniqueAllSubjects)
 AdminRouter.post('/Add-Review', singleUploadImage, AddTestimonial)
 AdminRouter.get('/Get-All-Active-Testimonials', GetAllActiveTestimonial)
 AdminRouter.get('/Get-top-teacher', GetTopTeacher)
+AdminRouter.get('/Get-Dashboard', AnalyticalData)
+
 
 
 

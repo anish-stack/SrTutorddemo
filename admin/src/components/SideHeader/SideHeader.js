@@ -10,10 +10,7 @@ const SideHeader = () => {
     const navigate = useNavigate();
     // const { isLogin } = useSelector((state) => state.login);
 
-    const handleLogout = (e) => {
-        e.preventDefault();
-
-    };
+   
     const [data, setData] = useState([]);
     const [pdata, setPData] = useState([]);
 
@@ -56,7 +53,7 @@ const SideHeader = () => {
 
         fetchData();
     }, [token]);
-    console.log(data)
+
     return (
         <div className="w-full h-full border lg:w-64">
             <div className="bg-white h-full">
@@ -122,11 +119,7 @@ const SideHeader = () => {
                                 <i className="fa-solid fa-user-cog mr-3"></i>
                                 <Link to={'/Manage-Profile'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Manage Profile</Link>
                             </li>
-                            <li className="flex items-center">
-
-                                <a href="/" onClick={handleLogout} className="whitespace-nowrap gap-1 mt-2  flex items-center justify-center rounded border text-sm border-red-400 bg-gradient-to-r from-red-100 to-red-200 px-8 py-1 font-semibold text-black hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-offset-2 active:opacity-100 transition duration-150"
-                                >Logout <i className="fa-solid fa-sign-out-alt mr-3"></i></a>
-                            </li>
+                           
                         </ul>
                     </nav>
                 </div>
