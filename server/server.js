@@ -25,12 +25,8 @@ const redisClient = redis.createClient(process.env.REDIS_PORT || 6379);
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-const corsOptions = {
-  origin: ["srtutors.hoverbusinessservices.com/", "www.srtutors.hoverbusinessservices.com/","https://www.srtutors.hoverbusinessservices.com/","https://srtutors.hoverbusinessservices.com/"],
-  credentials: true,
-  redirect: true,
-};
-app.use(cors(corsOptions));
+
+app.use(cors());
 app.use(cookieParser());
 
 // Connect to database
