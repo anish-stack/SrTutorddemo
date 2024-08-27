@@ -102,7 +102,7 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
     };
 
     try {
-      const response = await axios.post('http://localhost:7000/api/v1/student/Subject-teacher-Request', submittedData, {
+      const response = await axios.post('https://www.sr.apnipaathshaala.in/api/v1/student/Subject-teacher-Request', submittedData, {
         headers: {
           Authorization: `Bearer ${token}`
         }
