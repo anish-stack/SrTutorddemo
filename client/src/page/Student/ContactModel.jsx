@@ -326,6 +326,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
           Authorization: `Bearer ${studentToken}`
         }
       })
+      window.location.href="/thankYou"
       console.log(response.data)
     } catch (error) {
       console.log(error)
@@ -559,9 +560,9 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
                     Specific Requirement <span className="text-danger">(Optional)</span>
                   </label>
                   <textarea
-                
+
                     id="SpecificRequirement"
-                    
+
                     name="SpecificRequirement"
                     value={formData.SpecificRequirement}
                     onChange={handleInputChange}

@@ -165,7 +165,7 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
             })
             console.log(response)
             setLoading(false)
-            // window.location.href="/thankYou"
+            window.location.href="/thankYou"
         } catch (error) {
             console.log(error)
             toast.error("Server Error Exist Please try After Sometimes")
