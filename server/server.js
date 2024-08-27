@@ -26,7 +26,7 @@ const redisClient = redis.createClient(process.env.REDIS_PORT || 6379);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 const corsOptions = {
-  origin: ["http://localhost:3000", "http://localhost:3001"],
+  origin: ["srtutors.hoverbusinessservices.com/", "www.srtutors.hoverbusinessservices.com/","https://www.srtutors.hoverbusinessservices.com/","https://srtutors.hoverbusinessservices.com/"],
   credentials: true,
   redirect: true,
 };
