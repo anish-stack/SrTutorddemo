@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import logo from './logo.webp';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../../Slices/LoginSlice';
 import './sideHeader.css'
+import axios from 'axios';
 const SideHeader = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -11,14 +12,51 @@ const SideHeader = () => {
 
     const handleLogout = (e) => {
         e.preventDefault();
-        // if (isLogin) {
-        //     dispatch(logout());
-        //     navigate('/login'); // Redirect to login page after logout
-        // } else {
-        //     alert("You are not logged in to perform this action.");
-        // }
-    };
 
+    };
+    const [data, setData] = useState([]);
+    const [pdata, setPData] = useState([]);
+
+    const token = localStorage.getItem('Sr-token');
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get('http://localhost:7000/api/v1/student/admin-teacher-Request', {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                const PendingData = response.data.data
+                const filterData = PendingData.filter((item) => item.statusOfRequest === "pending")
+                console.log(filterData)
+                setData(filterData.length)
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        const fetchDataParticular = async () => {
+            try {
+                const response = await axios.get('http://localhost:7000/api/v1/student/admin-particular-Request', {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                console.log(response.data.data)
+                const PendingPData = response.data.data
+                const filterPData = PendingPData.filter((item) => item.statusOfRequest === "pending")
+
+                setPData(filterPData.length);
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        fetchDataParticular();
+
+        fetchData();
+    }, [token]);
+    console.log(data)
     return (
         <div className="w-full h-full border lg:w-64">
             <div className="bg-white h-full">
@@ -66,7 +104,15 @@ const SideHeader = () => {
                             </li>
                             <li className="flex items-center">
                                 <i className="fa-solid fa-user-edit mr-3"></i>
+
                                 <Link to={'/Manage-Teacher-Requests'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Manage Teacher Requests</Link>
+                                <span className='bg-red-500 text-white text-center w-5 text-sm rounded-[50%] '>{pdata || 0}</span>
+
+                            </li>
+                            <li className="flex items-center ">
+                                <i className="fa-solid fa-user-edit  z-20 mr-3"></i>
+                                <Link to={'/Subject-Teacher-Requests'} className="text-lg relative truncate lg:text-base hover:text-red-600 transition-colors">Subject Teacher Requests</Link>
+                                <span className='bg-red-500 text-white text-center w-5 text-sm rounded-[50%] '>{data || 0}</span>
                             </li>
                             <li className="flex items-center">
                                 <i className="fa-solid fa-city mr-3"></i>

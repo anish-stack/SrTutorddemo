@@ -1,0 +1,17 @@
+
+    Gender: 'Male',
+    TeachingExperience: '2 years',
+    VehicleOwned: 'Yes',
+    TeachingMode: 'Institute or Group Tuition',
+    Location: 'Rohini Sector 13, Sector 13, Rohini, Delhi, India',
+    Subject: 'Mathematics',
+    MinRange: 600,
+    StartDate: '2024-09-20',
+    MaxRange: 1800,
+    SpecificRequirement: '',
+    ClassId: '66c2cc78e14938da64e9b438',
+    className: 'VII',
+    teacherId: '66c733db3fb0dd188470e344',
+    latitude: 28.6909294,
+    longitude: 77.151844,
+    isBestFaculty: false

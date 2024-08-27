@@ -3,13 +3,12 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { CiEdit } from 'react-icons/ci';
 import { ImBin } from 'react-icons/im';
-import { FaCalendarAlt, FaComments, FaEye, FaRegComments, FaRegThumbsDown, FaRegThumbsUp, FaThumbsUp, FaTimes } from 'react-icons/fa';
+import { FaCalendarAlt, FaComments, FaEye, FaRegComments, FaTimes } from 'react-icons/fa';
 import { PiEyeClosed } from 'react-icons/pi';
-import toast from 'react-hot-toast';
 
 const PAGE_SIZE_OPTIONS = [5, 10, 20];
 
-const TeacherRequest = () => {
+const SubjectTeacherTable = () => {
     const [data, setData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [globalFilter, setGlobalFilter] = useState('');
@@ -25,21 +24,20 @@ const TeacherRequest = () => {
     const token = localStorage.getItem('Sr-token');
     const [comment, setComment] = useState('');
 
-    const fetchData = async () => {
-        try {
-            const response = await axios.get('http://localhost:7000/api/v1/student/admin-particular-Request', {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            console.log(response.data.data)
-            setData(response.data.data);
-            setFilteredData(response.data.data);
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        }
-    };
-
-
     useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get('http://localhost:7000/api/v1/student/admin-teacher-Request', {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                console.log(response.data.data)
+                setData(response.data.data);
+                setFilteredData(response.data.data);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
         fetchData();
     }, [token]);
 
@@ -83,6 +81,7 @@ const TeacherRequest = () => {
             console.error('Error updating status:', error);
         }
     };
+
     const handleOpen = (id) => {
         setSelectedId(id); // Capture the ID of the row
         setIsModelOpen(true);
@@ -96,16 +95,15 @@ const TeacherRequest = () => {
     const handleAddComment = async () => {
         setLoading(true)
         try {
-            const response = await axios.post('http://localhost:7000/api/v1/student/admin-do-comment', {
+            const response = await axios.post('http://localhost:7000/api/v1/student/admin-make-comment', {
                 requestId: selectedId, comment
             });
             console.log(response.data);
             setIsModelOpen(false);
-            setLoading(false)
-            window.location.reload()
+            setLoading(true)
         } catch (error) {
             console.error(error);
-            setLoading(false)
+            setLoading(true)
             setIsModelOpen(false);
         }
     };
@@ -120,50 +118,18 @@ const TeacherRequest = () => {
 
     const pageCount = Math.ceil(filteredData.length / pageSize);
     const paginatedData = sortedData.slice(currentPage * pageSize, (currentPage + 1) * pageSize);
-    const handleDealDone = async (id) => {
-        try {
-            const response = await axios.post(`http://localhost:7000/api/v1/student/ToggleDealDone/${id}`)
-            fetchData()
-            toast.success("Congratulations Deal is Done 🎉🎉")
-
-        } catch (error) {
-
-            toast.error(error.response.data.message)
-        }
-    }
 
     return (
         <div className="p-4">
-            <h1 className="text-xl font-bold mb-4">Particular Teacher Requests</h1>
+            <h1 className="text-xl font-bold mb-4">Subject Teacher Requests</h1>
 
             {/* Search Input */}
-            <div className="grid w-full grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                {/* Search Field */}
-                <div className="w-full">
-                    <input
-                        value={globalFilter}
-                        onChange={(e) => setGlobalFilter(e.target.value)}
-                        placeholder="Search by: studentId, className, Subject, location, interested, howManyClassYouWant, minimumBudget, maximumBudget, startDate, isDealDone, teacherGender"
-
-                        className="py-3 px-4 border border-gray-300 rounded-lg shadow-sm w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 ease-in-out"
-                    />
-                </div>
-
-                {/* Page Size Dropdown */}
-                <div className="w-full">
-                    <select
-                        value={pageSize}
-                        onChange={(e) => setPageSize(Number(e.target.value))}
-                        className="py-3 px-4 border border-gray-300 rounded-lg shadow-sm w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 ease-in-out"
-                    >
-                        {PAGE_SIZE_OPTIONS.map((size) => (
-                            <option key={size} value={size}>
-                                {size} per page
-                            </option>
-                        ))}
-                    </select>
-                </div>
-            </div>
+            <input
+                value={globalFilter}
+                onChange={(e) => setGlobalFilter(e.target.value)}
+                placeholder="Search..."
+                className="py-3 px-2 border w-full border-gray-900 rounded mb-4"
+            />
 
             {/* Table */}
             <div className="overflow-x-auto">
@@ -172,18 +138,18 @@ const TeacherRequest = () => {
                         <tr className="bg-gray-100">
                             {[
                                 'Student Id',
-                                'Classes/Week',
+                                'Name',
+                                'Contact Number',
                                 'Class',
                                 'Subject',
                                 'Location',
                                 'Interested',
+                                'Classes/Week',
                                 'Budget Range',
                                 'Start Date',
                                 'Teacher Gender',
                                 'isDealDone',
                                 'Action',
-                                'Deal Done',
-
                                 'Add Comment',
                                 'View Comment',
                             ].map((header, idx) => (
@@ -195,8 +161,9 @@ const TeacherRequest = () => {
                                         handleSort(
                                             [
                                                 'studentId',
-                                                'className',
-                                                'Subject',
+                                                'userContactInfo.name',
+                                                'userContactInfo.contactNumber',
+                                                'subject',
                                                 'location',
                                                 'interested',
                                                 'howManyClassYouWant',
@@ -204,7 +171,7 @@ const TeacherRequest = () => {
                                                 'maximumBudget',
                                                 'startDate',
                                                 'isDealDone',
-                                                'Gender',
+                                                'teacherGender',
                                             ][idx]
                                         )
                                     }
@@ -213,8 +180,9 @@ const TeacherRequest = () => {
                                     {sortConfig.key ===
                                         [
                                             'studentId',
-                                            'className',
-                                            'Subject',
+                                            'userContactInfo.name',
+                                            'userContactInfo.contactNumber',
+                                            'subject',
                                             'location',
                                             'interested',
                                             'howManyClassYouWant',
@@ -222,7 +190,7 @@ const TeacherRequest = () => {
                                             'maximumBudget',
                                             'startDate',
                                             'isDealDone',
-                                            'Gender',
+                                            'teacherGender',
                                         ][idx] &&
                                         (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
                                 </th>
@@ -241,33 +209,37 @@ const TeacherRequest = () => {
                                     </a>
                                 </td>
                                 <td className="px-4 py-1 text-xs text-gray-700">
-                                    {row.HowManyClassYouWant || "Not-Sure"}
+                                    {row.userContactInfo.name}
                                 </td>
                                 <td className="px-4 py-1 text-xs text-gray-700">
-                                    {row.className}
+                                    {row.userContactInfo.contactNumber}
                                 </td>
                                 <td className="px-4 py-1 text-xs text-gray-700">
-                                    {row.Subject.join(', ')}
-                                </td>
-
-                                <td className="px-4 py-1 text-xs text-gray-700">
-                                    {row.Location}
+                                    {row.class}
                                 </td>
                                 <td className="px-4 py-1 text-xs text-gray-700">
-                                    {row.TeachingMode}
-                                </td>
-
-                                <td className="px-4 py-1 text-xs text-gray-700">
-                                    {row.MinRange} - {row.MaxRange}
+                                    {row.subject}
                                 </td>
                                 <td className="px-4 py-1 text-xs text-gray-700">
-                                    {new Date(row.StartDate).toLocaleDateString('es-gd')}
+                                    {row.location}
                                 </td>
                                 <td className="px-4 py-1 text-xs text-gray-700">
-                                    {row.Gender}
+                                    {row.interested}
                                 </td>
                                 <td className="px-4 py-1 text-xs text-gray-700">
-                                    {row.isDealDone ? 'Yes' : 'No'}
+                                    {row.howManyClassYouWant}
+                                </td>
+                                <td className="px-4 py-1 text-xs text-gray-700">
+                                    {row.minimumBudget} - {row.maximumBudget}
+                                </td>
+                                <td className="px-4 py-1 text-xs text-gray-700">
+                                    {new Date(row.startDate).toLocaleDateString()}
+                                </td>
+                                <td className="px-4 py-1 text-xs text-gray-700">
+                                    {row.teacherGender}
+                                </td>
+                                <td className="px-4 py-1 text-xs text-gray-700">
+                                    {row.isDealDone ? 'Yes':'No'}
                                 </td>
                                 <td className="px-4 py-1 text-xs text-gray-700">
                                     <select
@@ -284,20 +256,6 @@ const TeacherRequest = () => {
                                 </td>
                                 <td className="px-2">
                                     <button
-
-                                        className="whitespace-nowrap w-full gap-1 mt-2 text-sm flex items-center justify-center rounded border border-violet-400 bg-gradient-to-r from-violet-100 to-violet-200 px-4 py-1 font-semibold text-violet-600 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-violet-300 focus:ring-offset-2 active:opacity-100 transition duration-150"
-                                    >
-                                        {row.isDealDone ? (
-                                            <FaRegThumbsUp className="text-xl cursor-not-allowed" />
-                                        ) : (
-
-                                            <FaRegThumbsDown onClick={() => handleDealDone(row._id)} className="text-xl" />
-                                        )}
-
-                                    </button>
-                                </td>
-                                <td className="px-2">
-                                    <button
                                         onClick={() => handleOpen(row._id)}
                                         className="whitespace-nowrap w-full gap-1 mt-2 text-sm flex items-center justify-center rounded border border-green-400 bg-gradient-to-r from-green-100 to-green-200 px-4 py-1 font-semibold text-green-600 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-green-300 focus:ring-offset-2 active:opacity-100 transition duration-150"
                                     >
@@ -305,7 +263,6 @@ const TeacherRequest = () => {
                                     </button>
                                 </td>
                                 <td className="px-2">
-
                                     {row.commentByAdmin.length > 0 ? (
                                         <Link
                                             onClick={() => handleCommentOpen(row.commentByAdmin)}
@@ -331,7 +288,19 @@ const TeacherRequest = () => {
 
             {/* Pagination */}
             <div className="flex items-center justify-between mt-4">
-
+                <div>
+                    <select
+                        value={pageSize}
+                        onChange={(e) => setPageSize(Number(e.target.value))}
+                        className="border border-gray-300 rounded py-1 px-2"
+                    >
+                        {PAGE_SIZE_OPTIONS.map((size) => (
+                            <option key={size} value={size}>
+                                {size} per page
+                            </option>
+                        ))}
+                    </select>
+                </div>
                 <div>
                     <button
                         onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}
@@ -445,4 +414,4 @@ const TeacherRequest = () => {
 
 };
 
-export default TeacherRequest;
+export default SubjectTeacherTable;

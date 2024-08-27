@@ -16,6 +16,7 @@ import AllTestinomial from '../../pages/Testinomials/AllTestinomial'
 import CreateReview from '../../pages/Testinomials/CreateReview'
 import AllBanners from '../../pages/Banners/AllBanners'
 import TeacherRequest from '../../pages/TeacherRequest/TeacherRequest'
+import SubjectTeacher from '../../pages/SubjectTeacher/SubjectTeacher'
 const SideContent = () => {
   return (
     <Routes>
@@ -33,6 +34,8 @@ const SideContent = () => {
       <Route path='/Manage-Reviews' element={<AllTestinomial />} />
       <Route path='/create-Review' element={<CreateReview />} />
       <Route path='/Manage-Teacher-Requests' element={<TeacherRequest />} />
+      <Route path='/Subject-Teacher-Requests' element={<SubjectTeacher />} />
+
 
 
     

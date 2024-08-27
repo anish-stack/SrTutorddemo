@@ -112,6 +112,55 @@
 .step-label {
   margin-top: 10px;
 }
+.glass-card {
+  background: rgba(255, 255, 255, 0.1); /* Glass effect with transparency */
+  border-radius: 15px;
+  backdrop-filter: blur(10px); /* Blur effect */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-card:hover {
+  transform: scale(1.05); /* Slightly enlarge the card on hover */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.teacher-details {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.detail-item {
+  display: flex;
+  margin-right: 2px;
+  justify-content: space-between;
+  font-size: 0.875rem;
+}
+.tags{
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: #ff3e3e;
+}
+.alert {
+  margin-top: 20px;
+}
+
+.alert-heading {
+  font-size: 1.5rem;
+}
 
 .step.active .step-number {
   background-color: #6aff00;
@@ -223,7 +272,15 @@
   justify-content: center;
   align-items: center;
 }
-
+.glass {
+  /* From https://css.glass */
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
 
 .city-image {
   width: 200px;
@@ -283,7 +340,7 @@
   }
 }
 
-.loader-screen{
+.loader-screen {
   display: flex;
   align-items: center;
   justify-content: center;

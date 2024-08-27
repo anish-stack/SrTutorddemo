@@ -4,15 +4,19 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import Loader from "./Loader";
 import toast from "react-hot-toast";
+import SubjectModel from "./SubjectModel";
 
 const LoginModal = ({ isOpen, modalType, onClose }) => {
+  
   const [formData, setFormData] = useState({
     Email: "",
     Password: "",
   });
 
   const [loading, setLoading] = useState(false);
-
+  const close = ()=>{
+    onClose()
+  }
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -34,6 +38,7 @@ const LoginModal = ({ isOpen, modalType, onClose }) => {
           "https://www.sr.apnipaathshaala.in/api/v1/student/login",
           formData
         );
+        
         userPrefix = "student";
       } else if (modalType === "teacher") {
         setLoading(true);
@@ -54,7 +59,7 @@ const LoginModal = ({ isOpen, modalType, onClose }) => {
         console.log("Login successful:", response.data);
         setTimeout(() => {
           window.location.reload();
-          onClose();
+          close()
         }, 500);
         setFormData({
           Email: "",
@@ -90,9 +95,10 @@ const LoginModal = ({ isOpen, modalType, onClose }) => {
   };
 
   return (
+  <>
     <Modal
       isOpen={isOpen}
-      onRequestClose={onClose}
+      onRequestClose={close}
       contentLabel={modalContent[modalType]?.title}
       className="modal-content"
       overlayClassName="modal-overlay"
@@ -101,7 +107,7 @@ const LoginModal = ({ isOpen, modalType, onClose }) => {
         <button
           type="button"
           className="close"
-          onClick={onClose}
+          onClick={close}
           aria-label="Close"
         >
           <span aria-hidden="true">&times;</span>
@@ -169,6 +175,8 @@ const LoginModal = ({ isOpen, modalType, onClose }) => {
         </form>
       </div>
     </Modal>
+    {/* <SubjectModel open={true} /> */}
+  </>
   );
 };
 

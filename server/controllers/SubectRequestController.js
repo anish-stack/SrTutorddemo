@@ -1,35 +1,104 @@
 const SubjectTeacherRequest = require("../models/SubjectRequest");
 const CatchAsync = require("../utils/CatchAsync");
 const SendEmail = require("../utils/SendEmails");
+const Teacher = require("../models/Teacher.model");
+const ParticularTeacher = require("../models/Particular.model");
+const Student = require('../models/Student.model');
+const sendEmail = require("../utils/SendEmails");
 
 exports.CreateRequestOfSubject = CatchAsync(async (req, res) => {
   try {
+    const user = req.user.id
+    console.log(user)
     // Step 1: Extract data from the request body
     const {
-      subject,
-      class: className,
-      location,
-      interested,
-      howManyClassYouWant,
-      minimumBudget,
-      maximumBudget,
-      startDate,
-      teacherGender,
-      userContactInfo,
+      Subject,
+      Class: className,
+      Location,
+      Interested,
+      HowManyClassYouWant,
+      MinumBudegt,
+      Maxmimu,
+      specificrequirement,
+      StartDate,
+      TeaherGender,
+      userconetcIfo, // corrected variable name
     } = req.body;
-
+    console.log(req.body);
+    // Validate the required fields
+    // Step 2: Validate fields and provide specific error messages
+    if (!Subject) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Subject is required.",
+      });
+    }
+    if (!Location) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Location is required.",
+      });
+    }
+    if (!Interested) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Interested field is required.",
+      });
+    }
+    if (!HowManyClassYouWant) {
+      return res.status(400).json({
+        status: "fail",
+        message: "How many classes you want is required.",
+      });
+    }
+    if (Number(MinumBudegt) < 500) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Minimum budget must be at least 500.",
+      });
+    }
+    if (Number(Maxmimu) <= Number(MinumBudegt)) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Maximum budget must be greater than minimum budget.",
+      });
+    }
+    if (!StartDate) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Start date is required.",
+      });
+    }
+    if (!TeaherGender) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Teacher gender preference is required.",
+      });
+    }
+    if (!userconetcIfo || !userconetcIfo.email) {
+      return res.status(400).json({
+        status: "fail",
+        message: "User contact information and email are required.",
+      });
+    }
     // Step 2: Create a new subject teacher request
     const newRequest = new SubjectTeacherRequest({
-      subject,
-      class: className,
-      location,
-      interested,
-      howManyClassYouWant,
-      minimumBudget,
-      maximumBudget,
-      startDate,
-      teacherGender,
-      userContactInfo,
+      subject: Subject,
+      class: className || "subject",
+      location: Location,
+      interested: Interested,
+      specificrequirement,
+      howManyClassYouWant: HowManyClassYouWant,
+      minimumBudget: MinumBudegt,
+      maximumBudget: Maxmimu,
+      startDate: StartDate,
+      teacherGender: TeaherGender,
+      studentId: user,
+      userContactInfo: {
+        name: userconetcIfo.Name,
+        email: userconetcIfo.email,
+        contactNumber: userconetcIfo.contactnumver,
+      }, // corrected variable name
     });
 
     // Step 3: Save the request to the database
@@ -161,13 +230,13 @@ exports.CreateRequestOfSubject = CatchAsync(async (req, res) => {
                 <h1>Thanks For Raising Request</h1>
             </div>
             <div class="content">
-                <h1>${subject} Request Received!</h1>
+                <h1>${Subject} Request Received!</h1>
                 <img src="https://i.ibb.co/XjMTHP8/pngwing-com-9.png" alt="Main Image">
                 <p class="content-text-bold">We Are Working On Your Request!</p>
-                <p class="content-text">Hello, <strong>${userContactInfo.name}</strong>! We have received your request for a subject teacher. Our team is working on it, and we will get back to you shortly with the best matches.</p>
+                <p class="content-text">Hello, <strong>${userconetcIfo.Name}</strong>! We have received your request for a subject teacher. Our team is working on it, and we will get back to you shortly with the best matches.</p>
                 <p class="content-text"><strong>Date:</strong> ${createdTime}</p>
                 <p class="content-text"><strong>Class:</strong> ${className}</p>
-                <p class="content-text"><strong>Location:</strong> ${location}</p>
+                <p class="content-text"><strong>Location:</strong> ${Location}</p>
             </div>
             <div class="cta">
                 <a href="http://localhost:3000/" target="_blank">Check Website</a>
@@ -178,7 +247,7 @@ exports.CreateRequestOfSubject = CatchAsync(async (req, res) => {
     `;
 
     await SendEmail({
-      email: userContactInfo.email,
+      email: userconetcIfo.email,
       subject: "Subject Teacher Request Confirmation",
       message: message,
     });
@@ -192,6 +261,7 @@ exports.CreateRequestOfSubject = CatchAsync(async (req, res) => {
     });
   } catch (error) {
     // Handle any errors
+    console.error(error); // Log the error for debugging
     res.status(500).json({
       status: "error",
       message: error.message,
@@ -226,8 +296,6 @@ exports.addAdminComment = CatchAsync(async (req, res) => {
   }
 });
 
-
-
 exports.getAllRequestOfSubject = CatchAsync(async (req, res) => {
   try {
     //Show Request By Created time stamp  latest
@@ -246,16 +314,70 @@ exports.getAllRequestOfSubject = CatchAsync(async (req, res) => {
       message: "Data found",
       data: AllRequest,
     });
-  } catch (error) {}
+  } catch (error) { }
 });
 
 exports.toggleStatusOfRequest = CatchAsync(async (req, res) => {
   try {
-    const { requestId } = req.params; // Extract request ID from params
+    const { requestId, action } = req.params;
 
-    // Find the request by ID and toggle its status
-    const request = await SubjectTeacherRequest.findById(requestId);
+    // Attempt to find the request in SubjectTeacherRequest collection
+    let request = await SubjectTeacherRequest.findById(requestId);
 
+    if (!request) {
+      // If not found, attempt to find the request in ParticularTeacher collection
+      request = await ParticularTeacher.findById(requestId);
+
+      if (!request) {
+        // If still not found, return a 404 error response
+        return res.status(404).json({
+          success: false,
+          message: "Request not found",
+        });
+      }
+    }
+
+    // Update the status of the found request
+    request.statusOfRequest = action;
+    await request.save();
+    const redisClient = req.app.locals.redis;
+
+    if (!redisClient) {
+      throw new Error('Redis client is not available.');
+    }
+
+    await redisClient.del('particularTeacherData');
+    // Return a success response
+    res.status(200).json({
+      success: true,
+      message: "Request status updated successfully",
+      data: request,
+    });
+
+  } catch (error) {
+    console.error("Error updating request status:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+
+exports.ToggleDealDone = CatchAsync(async (req, res) => {
+  try {
+    const { requestId } = req.params;
+
+    // Validate requestId
+    if (!requestId) {
+      return res.status(400).json({
+        success: false,
+        message: "Request ID is required",
+      });
+    }
+
+    // Fetch the request
+    const request = await ParticularTeacher.findById(requestId);
     if (!request) {
       return res.status(404).json({
         success: false,
@@ -263,8 +385,217 @@ exports.toggleStatusOfRequest = CatchAsync(async (req, res) => {
       });
     }
 
-    request.statusOfRequest = !request.statusOfRequest; // Toggle the status
-    await request.save(); // Save the updated request
+    // Check if the request status is 'Accept'
+    if (request.statusOfRequest !== 'Accept') {
+      return res.status(400).json({
+        success: false,
+        message: "The request is not yet accepted. Please ensure the request is marked as 'Accepted' before finalizing the deal.",
+      });
+    }
+    
+
+    // Fetch student and teacher info
+    let StudentFind, getTeacherInfo;
+    try {
+      StudentFind = await Student.findById(request.studentId);
+      getTeacherInfo = await Teacher.findById(request.teacherId);
+    } catch (dbError) {
+      return res.status(500).json({
+        success: false,
+        message: "Error fetching student or teacher data",
+      });
+    }
+
+    if (!StudentFind) {
+      return res.status(404).json({
+        success: false,
+        message: "Student not found",
+      });
+    }
+
+    if (!getTeacherInfo) {
+      return res.status(404).json({
+        success: false,
+        message: "Teacher not found",
+      });
+    }
+
+    // Check if the deal is already done
+    if (request.isDealDone) {
+      return res.status(400).json({
+        success: false,
+        message: "Deal is already done. Student subscribed successfully.",
+      });
+    }
+
+    // Toggle the deal status
+    request.isDealDone = !request.isDealDone;
+    await request.save();
+
+    // Prepare email content
+    const createdTime = new Date().toLocaleString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
+    });
+
+    const message = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Congratulations</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background-color: #003873;
+            padding: 20px;
+            text-align: center;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            color: #ffffff;
+        }
+        .header img {
+            max-width: 80px;
+            height: auto;
+            margin-bottom: 10px;
+        }
+        .header h1 {
+            font-size: 26px;
+            margin: 0;
+            font-weight: 700;
+        }
+        .content {
+            padding: 20px;
+            text-align: left;
+            color: #333333;
+        }
+        .content h2 {
+            font-size: 22px;
+            color: #003873;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #003873;
+            padding-bottom: 5px;
+        }
+        .content p {
+            font-size: 16px;
+            line-height: 1.5;
+            margin: 10px 0;
+        }
+        .teacher-profile {
+            background-color: #f0f8ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .teacher-profile h3 {
+            font-size: 20px;
+            color: #003873;
+            margin: 0 0 10px;
+        }
+        .teacher-profile p {
+            font-size: 16px;
+            margin: 5px 0;
+        }
+        .cta {
+            text-align: center;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .cta a {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #e21c1c;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 18px;
+            border-radius: 5px;
+            font-weight: 600;
+        }
+        @media only screen and (max-width: 600px) {
+            .email-container {
+                padding: 15px;
+            }
+            .content h2 {
+                font-size: 20px;
+            }
+            .cta a {
+                font-size: 16px;
+                padding: 10px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <img src="https://i.ibb.co/zS0B0TQ/srtutor-removebg-preview.png" alt="Logo">
+            <h1>Congratulations!</h1>
+        </div>
+        <div class="content">
+            <h2>You've Successfully Subscribed!</h2>
+            <p>Dear <strong>${StudentFind.StudentName}</strong>,</p>
+            <p>Congratulations! You have successfully subscribed to one of our renowned teachers. We are thrilled to have you on board and excited for the learning journey ahead.</p>
+            <p><strong>Subscription Details:</strong></p>
+            <ul style="list-style-type: none; padding: 0;">
+                <li><strong>Date:</strong> ${createdTime}</li>
+                <li><strong>Class:</strong> ${request.className}</li>
+                <li><strong>Location:</strong> ${request.Location}</li>
+            </ul>
+            
+            <div class="teacher-profile">
+                <h3>Teacher Profile</h3>
+                <p><strong>Name:</strong> ${getTeacherInfo.TeacherName}</p>
+                <p><strong>Gender:</strong> ${getTeacherInfo.gender}</p>
+                <p>Our esteemed teacher, <strong>${getTeacherInfo.TeacherName}</strong>, is looking forward to assisting you. With their extensive experience, you are set for an exceptional educational experience.</p>
+            </div>
+
+            <div class="cta">
+                <a href="${process.env.FRONTEND_URL}" target="_blank">Explore More</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+`;
+
+    // Send email
+    try {
+      await sendEmail({
+        email: StudentFind.Email,
+        subject: `${request.Subject} Request Received`,
+        message
+      });
+    } catch (emailError) {
+      return res.status(500).json({
+        success: false,
+        message: "Error sending email",
+      });
+    }
+
+    const redisClient = req.app.locals.redis;
+
+    if (!redisClient) {
+      throw new Error('Redis client is not available.');
+    }
+
+    await redisClient.del('particularTeacherData');
 
     res.status(200).json({
       success: true,
@@ -272,9 +603,10 @@ exports.toggleStatusOfRequest = CatchAsync(async (req, res) => {
       data: request,
     });
   } catch (error) {
+    console.error('Error in ToggleDealDone:', error);
     res.status(500).json({
       success: false,
-      message: error.message,
+      message: "An unexpected error occurred",
     });
   }
 });

@@ -17,6 +17,10 @@ const {
   VerifyPost,
   ShowAllPost,
   AddCommentOnPostByAdmin,
+  ParticularRequestForTeacher,
+  getSubscribed,
+  getParticularTeacherRequest,
+  addAdminCommentOnParticular,
 } = require("../controllers/Teacher.Request");
 const Protect = require("../middlewares/Auth");
 const {
@@ -25,6 +29,7 @@ const {
   getAllRequestOfSubject,
   toggleStatusOfRequest,
   UpdateComment,
+  ToggleDealDone,
 } = require("../controllers/SubectRequestController");
 
 //User Actions With
@@ -44,17 +49,21 @@ StudentRouter.get("/get-all-students", isAdmin, getAllStudents);
 
 StudentRouter.post("/Make-A-Teacher-Request", Protect, MakeARequestForTeacher);
 StudentRouter.post("/Verify-Teacher-Request", Protect, VerifyPost);
-
 StudentRouter.get("/Get-My-Post", Protect, GetPostByStudentId);
-StudentRouter.get("/Get-All-Post", ShowAllPost);
+StudentRouter.get("/Get-My-Subscribed-Teacher", Protect, getSubscribed);
 
+StudentRouter.get("/Get-All-Post", ShowAllPost);
 StudentRouter.post("/Add-Comment", AddCommentOnPostByAdmin);
+StudentRouter.post('/Make-Particular-request', Protect, ParticularRequestForTeacher)
 
 //Subject Teacher Request
 
-StudentRouter.post("/Subject-teacher-Request", CreateRequestOfSubject);
+StudentRouter.post("/Subject-teacher-Request", Protect, CreateRequestOfSubject);
 StudentRouter.post("/admin-make-comment", addAdminComment);
-StudentRouter.get("/admin-teacher-Request", getAllRequestOfSubject);
-StudentRouter.put("/admin-toggle-Request/:requestId", toggleStatusOfRequest);
+StudentRouter.get("/admin-teacher-Request", isAdmin, getAllRequestOfSubject);
+StudentRouter.put("/admin-toggle-Request/:requestId/:action", isAdmin, toggleStatusOfRequest);
+StudentRouter.get("/admin-particular-Request", getParticularTeacherRequest);
+StudentRouter.post('/ToggleDealDone/:requestId',ToggleDealDone)
+StudentRouter.post("/admin-do-comment", addAdminCommentOnParticular);
 
 module.exports = StudentRouter;

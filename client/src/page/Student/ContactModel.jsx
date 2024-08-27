@@ -7,7 +7,9 @@ import { ClassSearch } from "../../Slices/Class.slice";
 import PropTypes from "prop-types";
 import toast from "react-hot-toast";
 import { useGeolocated } from "react-geolocated";
+import { Col, Form } from "react-bootstrap";
 const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
+
   const [teacherData, setTeacherData] = useState([]);
   const [studentToken, setStudentToken] = useState(null);
   const [locationSuggestions, setLocationSuggestions] = useState([]);
@@ -23,6 +25,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
     StartDate: "",
     MaxRange: 0,
     SpecificRequirement: "",
+    HowManyClassYouWant: "",
     ClassId: '',
     className: '',
     teacherId: '',
@@ -44,6 +47,15 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
     userDecisionTimeout: 5000,
   });
 
+  function CALLACTION() {
+    const { coords, isGeolocationAvailable, isGeolocationEnabled } = useGeolocated({
+      positionOptions: {
+        enableHighAccuracy: true,
+      },
+      userDecisionTimeout: 5000,
+    });
+  }
+
   useEffect(() => {
     if (coords) {
       setFormData(prevState => ({
@@ -59,16 +71,16 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
       setTeacherData(teachersData);
       setFormData((prevFormData) => ({
         ...prevFormData,
-        Gender: teacherData.gender || prevFormData.Gender,
-        TeachingExperience: teacherData.experience || prevFormData.TeachingExperience,
-        TeachingMode: teacherData.teachingMode || prevFormData.TeachingMode,
-        Location: teacherData.location || prevFormData.Location,
-        Subject: teacherData.UserSubject || prevFormData.Subject,
-        teacherId: teacherData.TeacherId,
-        ClassId: teacherData.UserclassId,
+        Gender: teachersData.gender || prevFormData.Gender,
+        TeachingExperience: teachersData.experience || prevFormData.TeachingExperience,
+        TeachingMode: teachersData.teachingMode || prevFormData.TeachingMode,
+        Location: teachersData.location || prevFormData.Location,
+        Subject: teachersData.UserSubject || prevFormData.Subject,
+        teacherId: teachersData.TeacherId,
+        ClassId: teachersData.UserclassId,
       }));
     }
-  }, [teacherData]);
+  }, [teachersData]);
 
   useEffect(() => {
     const student = Cookies.get("studentToken");
@@ -76,7 +88,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
   }, []);
 
   useEffect(() => {
-    dispatch(ClassSearch()); // Fetch classes on component mount
+    dispatch(ClassSearch());
   }, [dispatch]);
 
   useEffect(() => {
@@ -140,6 +152,19 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
       console.error("Error fetching subjects:", error);
     }
   };
+  const handleSelectChange = (name) => (selectedOption) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: selectedOption ? selectedOption.value : "",
+    }));
+  }
+  const ClasessOptions = [
+    { value: 'Two Classes a Week', label: 'Two Classes a Week' },
+    { value: 'Three Classes a Week', label: 'Three Classes a Week' },
+    { value: 'Four Classes a Week', label: 'Four Classes a Week' },
+    { value: 'Five Classes a Week', label: 'Five Classes a Week' },
+    { value: 'Six Classes a Week', label: 'Six Classes a Week' },
+  ];
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -151,6 +176,10 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
     if (name === "Location") {
       handleLocationFetch(value);
     }
+
+
+
+
   };
 
   const handleLocationFetch = async (input) => {
@@ -281,32 +310,28 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
   const handleSubmit = async () => {
     if (!formData.latitude || !formData.longitude) {
       if (isGeolocationAvailable && isGeolocationEnabled) {
+
         // Trigger location update if not already available
         setFormData(prevState => ({
           ...prevState,
           latitude: coords.latitude,
           longitude: coords.longitude,
         }));
+
       }
     }
-
-    console.log("submit", formData)
-
     try {
-      await axios.post(
-        "https://www.sr.apnipaathshaala.in/api/v1/contact-teacher",
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${studentToken}`,
-          },
+      const response = await axios.post('http://localhost:7000/api/v1/student/Make-Particular-request', formData, {
+        headers: {
+          Authorization: `Bearer ${studentToken}`
         }
-      );
-      toast.success("Your request has been submitted successfully!");
-      isClose(); // Close modal on successful submission
+      })
+      console.log(response.data)
     } catch (error) {
-      console.error("Error submitting form:", error);
+      console.log(error)
     }
+
+
   };
 
 
@@ -453,6 +478,19 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
                     classNamePrefix="select"
                   />
                 </div>
+                <Col md={6}>
+                  <Form.Group className="mb-3"
+                    required>
+                    <Form.Label>How Many Classes You Want  <b className="text-danger fs-5">*</b></Form.Label>
+                    <Select
+                      name="HowManyClassYouWant"
+                      options={ClasessOptions}
+                      onChange={handleSelectChange('HowManyClassYouWant')}
+                      value={ClasessOptions.find(option => option.value === formData.HowManyClassYouWant) || null}
+                    />
+
+                  </Form.Group>
+                </Col>
                 <button
                   type="button"
                   className="btn btn-secondary me-2"
@@ -515,6 +553,20 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
                       ))}
                     </ul>
                   )}
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="SpecificRequirement" className="form-label">
+                    Specific Requirement <span className="text-danger">(Optional)</span>
+                  </label>
+                  <textarea
+                
+                    id="SpecificRequirement"
+                    
+                    name="SpecificRequirement"
+                    value={formData.SpecificRequirement}
+                    onChange={handleInputChange}
+                    className="form-control"
+                  />
                 </div>
                 <button
                   type="button"
@@ -664,10 +716,16 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
                     <strong>Preferred Start Date:</strong> {formData.StartDate}
                   </li>
                   <li className="list-group-item">
+                    <strong>Classes You Want:</strong> {formData.HowManyClassYouWant}
+                  </li>
+                  <li className="list-group-item">
                     <strong>Location:</strong> {formData.Location}
                   </li>
                   <li className="list-group-item">
                     <strong>Teaching Mode:</strong> {formData.TeachingMode}
+                  </li>
+                  <li className="list-group-item">
+                    <strong>Specific Requirement :</strong> {formData.SpecificRequirement || "No Specific Requirement"}
                   </li>
                   <li className="list-group-item">
                     <strong>Teaching Experience:</strong>{" "}

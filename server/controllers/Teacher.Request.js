@@ -1,7 +1,8 @@
-const Subject = require('../models/TeacherRequest.model')
-const Class = require('../models/ClassModel')
-const TeacherRequest = require('../models/TeacherRequest.model')
 
+const teacherPro = require('../models/Teacher.model')
+const TeacherRequest = require('../models/TeacherRequest.model')
+const ParticularTeacher = require('../models/Particular.model')
+const SubjectTeacherModel = require('../models/SubjectRequest')
 const Student = require('../models/Student.model')
 const CatchAsync = require('../utils/CatchAsync')
 const crypto = require('crypto')
@@ -12,7 +13,7 @@ const { check } = require('express-validator')
 exports.MakeARequestForTeacher = CatchAsync(async (req, res) => {
     try {
         const {
-            ClassName,  //done
+            ClassName,
             Subjects,  //done
             teacherId,  //done
             InterestedInTypeOfClass,  //done
@@ -318,7 +319,7 @@ exports.VerifyPost = CatchAsync(async (req, res) => {
 
 exports.GetPostByStudentId = CatchAsync(async (req, res) => {
     try {
-        const studentId = req.user.id; // Assuming student ID is passed as a URL parameter
+        const studentId = req.user.id;
 
         if (!studentId) {
             return res.status(400).json({
@@ -327,24 +328,88 @@ exports.GetPostByStudentId = CatchAsync(async (req, res) => {
             });
         }
 
-        const posts = await TeacherRequest.find({ 'StudentId': studentId });
+        // Fetch posts from SubjectTeacherModel where studentId matches and subjectRequest is true
+        const subjectTeacherPosts = await SubjectTeacherModel.find({
+            studentId: studentId
+        });
 
-        if (!posts || posts.length === 0) {
-            return res.status(404).json({
-                success: false,
-                message: "No posts found for this student."
-            });
-        }
+        // Fetch posts from ParticularTeacher where studentId matches and particularTeacher is true
+        const particularTeacherPosts = await ParticularTeacher.find({
+            studentId: studentId
+        });
+
+        // Combine both results
+        const combinedPosts = [...subjectTeacherPosts, ...particularTeacherPosts];
 
         res.status(200).json({
             success: true,
-            data: posts
+            data: combinedPosts
         });
     } catch (error) {
         console.error("Error:", error);
         res.status(500).json({
             success: false,
             message: "Internal Server Error"
+        });
+    }
+});
+
+exports.getSubscribed = CatchAsync(async (req, res) => {
+    try {
+        const studentId = req.user.id;
+
+        if (!studentId) {
+            return res.status(400).json({
+                success: false,
+                message: "Student ID is required."
+            });
+        }
+
+        // Fetch posts from SubjectTeacherModel where studentId matches and isDealDone is true
+        const subjectTeacherPosts = await SubjectTeacherModel.find({
+            studentId: studentId,
+            isDealDone: true
+        });
+
+        // Fetch posts from ParticularTeacher where studentId matches and isDealDone is true
+        const particularTeacherPosts = await ParticularTeacher.find({
+            studentId: studentId,
+            isDealDone: true
+        });
+
+        // Combine posts from both models
+        const combinedPostsWithTeacher = [...subjectTeacherPosts, ...particularTeacherPosts];
+
+        // Extract teacher IDs from the combined posts
+        const teacherIds = combinedPostsWithTeacher.map(post => post.teacherId).filter(id => id);
+
+        // Fetch teacher details based on the teacher IDs
+        const teacherDetails = await teacherPro.find({
+            _id: { $in: teacherIds }
+        }).select('-Password -TeacherProfile');
+
+
+        // Map teacher details to the posts
+        const postsWithTeacherInfo = combinedPostsWithTeacher.map(post => {
+            const teacherInfo = teacherDetails.find(teacher => teacher._id.toString() === post.teacherId.toString());
+            return {
+                ...post.toObject(), // Convert Mongoose document to plain object
+                teacherInfo: teacherInfo || null
+            };
+        });
+
+        // Send response with posts including teacher information
+        res.status(200).json({
+            success: true,
+            data: postsWithTeacherInfo
+        });
+
+    } catch (error) {
+        // Handle errors and send response
+        res.status(500).json({
+            success: false,
+            message: "An error occurred while fetching subscribed posts.",
+            error: error.message
         });
     }
 });
@@ -374,8 +439,6 @@ exports.ShowAllPost = CatchAsync(async (req, res) => {
         });
     }
 });
-
-
 
 exports.AddCommentOnPostByAdmin = CatchAsync(async (req, res) => {
     try {
@@ -415,6 +478,348 @@ exports.AddCommentOnPostByAdmin = CatchAsync(async (req, res) => {
         res.status(500).json({
             success: false,
             message: "Internal Server Error"
+        });
+    }
+});
+
+// Make a request for particular Teacher Request request
+
+exports.ParticularRequestForTeacher = CatchAsync(async (req, res) => {
+    try {
+        const {
+            ClassId,
+            className,
+            Subject,
+            teacherId,
+            TeachingMode,
+            Gender,
+            TeachingExperience,
+            HowManyClassYouWant,
+            MinRange,
+            MaxRange,
+            Location,
+            StartDate,
+            SpecificRequirement,
+            longitude,
+            latitude,
+            isBestFaculty
+        } = req.body;
+        console.log(req.body)
+        // Validate required fields
+        const missingFields = [];
+
+        // Check each required field
+        if (!ClassId) missingFields.push('ClassId');
+        if (!className) missingFields.push('className');
+        if (!Subject) missingFields.push('Subject');
+        if (!teacherId) missingFields.push('teacherId');
+        if (!TeachingMode) missingFields.push('TeachingMode');
+        if (!Gender) missingFields.push('Gender');
+        if (!HowManyClassYouWant) missingFields.push('HowManyClassYouWant');
+        if (!MinRange) missingFields.push('MinRange');
+        if (!MaxRange) missingFields.push('MaxRange');
+        if (!Location) missingFields.push('Location');
+        if (!StartDate) missingFields.push('StartDate');
+
+        if (!longitude) missingFields.push('longitude');
+        if (!latitude) missingFields.push('latitude');
+
+        // If there are missing fields, return an error response
+        if (missingFields.length > 0) {
+            return res.status(400).json({
+                success: false,
+                errors: missingFields
+            });
+        }
+
+        // Check if student is present
+        const studentId = req.user.id;
+        const student = await Student.findById(studentId);
+        if (!student) {
+            return res.status(401).json({
+                success: false,
+                message: "Please Login To make A Request For Teacher"
+            });
+        }
+
+        const getTeacherInfo = await teacherPro.findById(teacherId)
+
+        // Create a new ParticularTeacher request
+        const newRequest = new ParticularTeacher({
+            ClassId,
+            Subject,
+            TeachingMode,
+            Gender,
+            HowManyClassYouWant,
+            className,
+            TeachingExperience,
+            MinRange,
+            MaxRange,
+            Location,
+            StartDate,
+            teacherId,
+            SpecificRequirement,
+            longitude,
+            latitude,
+            studentId,
+            isBestFaculty,
+            StudentInfo: {
+                StudentName: student.StudentName,
+                ContactNumber: student.PhoneNumber,
+                EmailAddress: student.Email
+            }
+        });
+        const createdTime = new Date().toLocaleString("en-US", {
+            month: "long",
+            day: "numeric",
+            year: "numeric",
+            hour: "numeric",
+            minute: "numeric",
+            hour12: true,
+        });
+
+        // Save the request to the database
+        await newRequest.save();
+
+        // Send confirmation email
+        const message = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Email Template</title>
+            <style>
+                body {
+                    margin: 0;
+                    padding: 0;
+                    font-family: Arial, sans-serif;
+                    background-color: #f4f4f4;
+                }
+                .email-container {
+                    max-width: 600px;
+                    margin: 0 auto;
+                    padding: 20px;
+                    background-color: #ffffff;
+                    border-radius: 10px;
+                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                }
+                .header {
+                    background-color: #003873;
+                    padding: 20px;
+                    text-align: center;
+                    border-top-left-radius: 10px;
+                    border-top-right-radius: 10px;
+                    color: #ffffff;
+                }
+                .header img {
+                    max-width: 80px;
+                    height: auto;
+                    margin-bottom: 10px;
+                }
+                .header h1 {
+                    font-size: 26px;
+                    margin: 0;
+                    font-weight: 700;
+                }
+                .content {
+                    padding: 20px;
+                    text-align: left;
+                    color: #333333;
+                }
+                .content h2 {
+                    font-size: 22px;
+                    color: #003873;
+                    margin-bottom: 10px;
+                    border-bottom: 2px solid #003873;
+                    padding-bottom: 5px;
+                }
+                .content p {
+                    font-size: 16px;
+                    line-height: 1.5;
+                    margin: 10px 0;
+                }
+                .teacher-profile {
+                    background-color: #f0f8ff;
+                    padding: 20px;
+                    border-radius: 8px;
+                    margin-top: 20px;
+                }
+                .teacher-profile h3 {
+                    font-size: 20px;
+                    color: #003873;
+                    margin: 0 0 10px;
+                }
+                .teacher-profile p {
+                    font-size: 16px;
+                    margin: 5px 0;
+                }
+                .cta {
+                    text-align: center;
+                    padding: 20px;
+                    margin-top: 20px;
+                }
+                .cta a {
+                    display: inline-block;
+                    padding: 12px 25px;
+                    background-color: #e21c1c;
+                    color: #ffffff;
+                    text-decoration: none;
+                    font-size: 18px;
+                    border-radius: 5px;
+                    font-weight: 600;
+                }
+                @media only screen and (max-width: 600px) {
+                    .email-container {
+                        padding: 15px;
+                    }
+                    .content h2 {
+                        font-size: 20px;
+                    }
+                    .cta a {
+                        font-size: 16px;
+                        padding: 10px 20px;
+                    }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="email-container">
+                <div class="header">
+                    <img src="https://i.ibb.co/zS0B0TQ/srtutor-removebg-preview.png" alt="Logo">
+                    <h1>Thank You for Your Request</h1>
+                </div>
+                <div class="content">
+                    <h2>${Subject} Request Received!</h2>
+                    <p>Dear <strong>${student.StudentName}</strong>,</p>
+                    <p>We have successfully received your request for a subject teacher. Our team is actively working to find the best match for you. We will provide you with the details shortly.</p>
+                    <p><strong>Request Details:</strong></p>
+                    <ul style="list-style-type: none; padding: 0;">
+                        <li><strong>Date:</strong> ${createdTime}</li>
+                        <li><strong>Class:</strong> ${className}</li>
+                        <li><strong>Location:</strong> ${Location}</li>
+                    </ul>
+                    
+                    <div class="teacher-profile">
+                        <h3>Teacher Profile</h3>
+                        <p><strong>Name:</strong> ${getTeacherInfo.TeacherName}</p>
+                        <p><strong>Gender:</strong> ${getTeacherInfo.gender}</p>
+                        <p>Our dedicated teacher, <strong>${getTeacherInfo.TeacherName}</strong>, is ready to assist you. With extensive experience and a commitment to excellence, you can expect outstanding guidance in your learning journey.</p>
+                    </div>
+    
+                    <div class="cta">
+                        <a href="${process.env.FRONTEND_URL}" target="_blank">Go To Website</a>
+                    </div>
+                </div>
+            </div>
+        </body>
+        </html>`;
+
+        const redisClient = req.app.locals.redis;
+
+        if (!redisClient) {
+            throw new Error('Redis client is not available.');
+        }
+
+        await redisClient.del('particularTeacherData');
+        await sendEmail({
+            email: student.Email,
+            subject: `${Subject} Request Received`,
+            message
+        });
+
+        // Respond with success message
+        res.status(201).json({
+            success: true,
+            message: "Request Created Successfully and email sent"
+        });
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
+exports.getParticularTeacherRequest = CatchAsync(async (req, res) => {
+    try {
+        const redisClient = req.app.locals.redis;
+
+        if (!redisClient) {
+            throw new Error('Redis client is not available.');
+        }
+
+        // Cache key for particular teacher data
+        const cacheKey = 'particularTeacherData';
+
+        // Check if data exists in the cache
+        const cachedData = await redisClient.get(cacheKey);
+
+        if (cachedData) {
+            // Parse and send the cached data if available
+            const teachers = JSON.parse(cachedData);
+            return res.status(200).json({
+                status: 'success',
+                data: teachers,
+                source: 'cache', // Optional: to indicate data came from cache
+            });
+        }
+
+        // If data is not in the cache, fetch from the database
+        const teachers = await ParticularTeacher.find().sort({ createdAt: -1 });
+
+        // Set the data to cache with an expiry time (e.g., 60 seconds)
+        await redisClient.set(cacheKey, JSON.stringify(teachers), 'EX', 60);
+
+        // Send the fetched data
+        res.status(200).json({
+            status: 'success',
+            data: teachers,
+            source: 'database', // Optional: to indicate data came from database
+        });
+    } catch (error) {
+        // Handle errors properly
+        res.status(500).json({
+            status: 'error',
+            message: error.message,
+        });
+    }
+});
+
+exports.addAdminCommentOnParticular = CatchAsync(async (req, res) => {
+    try {
+        const { requestId, comment } = req.body;
+        // console.log(req.body)
+        const request = await ParticularTeacher.findById(requestId);
+        if (!request) {
+            return res.status(404).json({
+                status: "error",
+                message: "Request not found",
+            });
+        }
+        request.commentByAdmin.push({
+            comment
+        })
+
+        const redisClient = req.app.locals.redis;
+
+        if (!redisClient) {
+            throw new Error('Redis client is not available.');
+        }
+
+        await redisClient.del('particularTeacherData');
+        await request.save()
+        res.status(200).json({
+            status: "success",
+            data: request,
+            message: "Comment added and email sent to the student.",
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(200).json({
+            status: "failed",
+            message: "Comment not added and email not be  sent to the student.",
         });
     }
 });

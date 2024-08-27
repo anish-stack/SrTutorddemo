@@ -3,13 +3,16 @@ import { useDispatch, useSelector } from "react-redux";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import axios from "axios";
+import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import { ClassSearch } from "../Slices/Class.slice";
 import { setSelectedClass } from "../Slices/SelectedClass.slice";
 import { checkLogin } from "../Slices/LoginSlice";
 import SubjectRequestModel from "./SubjectRequestModel";
+import LoginModal from "./LoginModel";
 function Course() {
   const { isLogin } = useSelector((state) => state.login || {});
+  const token = Cookies.get('studentToken') || Cookies.get('teacherToken');
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -26,8 +29,16 @@ function Course() {
   const [currentClassPage, setCurrentClassPage] = useState(1);
   const [currentSubjectPage, setCurrentSubjectPage] = useState(1);
   const [showModal, setShowModal] = useState(false);
+  const [LshowModal, setLShowModal] = useState(false);
+
 
   const handleShow = () => setShowModal(true);
+  const LhandleShow = () => setLShowModal(true);
+  const LhandleClose = () => {
+    setLShowModal(false)
+
+  };
+
   const handleClose = () => setShowModal(false);
   useEffect(() => {
     dispatch(ClassSearch());
@@ -111,13 +122,17 @@ function Course() {
 
       setTimeout(() => {
         navigate(
-          `/Make-A-Request-For-Course?SourceType=Class&ClassName=${
-            item.Class
+          `/Make-A-Request-For-Course?SourceType=Class&ClassName=${item.Class
           }&isLogin=${isLogin ? true : false}`
         );
       }, 400);
     } else {
-      handleShow();
+      if (token) {
+        handleShow();
+        console.log("not open")
+      } else {
+        LhandleShow()
+      }
     }
   };
 
@@ -128,7 +143,11 @@ function Course() {
       Subjects: item,
     });
 
-    handleShow();
+    if (token) {
+      handleShow();
+    } else {
+      LhandleShow()
+    }
   };
 
   if (loading) {
@@ -167,17 +186,15 @@ function Course() {
               <div className="col-lg-6">
                 <div className="courses__nav-active">
                   <button
-                    className={`clasubject-btn ${
-                      tab === "Class" ? "active" : ""
-                    }`}
+                    className={`clasubject-btn ${tab === "Class" ? "active" : ""
+                      }`}
                     onClick={() => setTab("Class")}
                   >
                     Classes
                   </button>
                   <button
-                    className={`clasubject-btn ${
-                      tab === "Subjects" ? "active" : ""
-                    }`}
+                    className={`clasubject-btn ${tab === "Subjects" ? "active" : ""
+                      }`}
                     onClick={() => setTab("Subjects")}
                   >
                     Subjects
@@ -221,7 +238,7 @@ function Course() {
                   className="col-lg-4 col-sm-6 grid-item cat-two"
                   key={index}
                 >
-                  <div onClick={()=>handleSubjectSelect(subject.SubjectName)} className="categories__item-two tg-svg">
+                  <div onClick={() => handleSubjectSelect(subject.SubjectName)} className="categories__item-two tg-svg">
                     <a >
                       <div className="info">
                         <span className="name">{subject.SubjectName}</span>
@@ -283,6 +300,7 @@ function Course() {
           subject={selectedSubject}
           handleClose={handleClose}
         />
+        <LoginModal isOpen={LshowModal} onClose={LhandleClose} modalType={"student"} />
       </section>
     </>
   );
