@@ -22,15 +22,30 @@ const redisClient = redis.createClient(process.env.REDIS_PORT || 6379);
   app.locals.redis = redis;
   await redisClient.ping();
 })();
+
+// CORS Configuration
+const allowedOrigins = ["https://www.srtutors.hoverbusinessservices.com"]; // Update with your allowed origin(s)
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true
+}));
+
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-app.use(cors());
 app.use(cookieParser());
 
 // Connect to database
 connectDb();
+
 // Routes
 app.get("/", (req, res) => {
   res.send("Hello World I am From Sr Tutors 📖📖!");
