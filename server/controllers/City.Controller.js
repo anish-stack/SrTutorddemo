@@ -2,6 +2,7 @@ const cityModel = require("../models/City.model"); // Assuming the model is name
 const streamifier = require("streamifier");
 const Cloudinary = require("cloudinary").v2;
 require("dotenv").config();
+const { ServerError, warn } = require('../utils/Logger');
 
 // Configure Cloudinary
 Cloudinary.config({
@@ -31,6 +32,7 @@ exports.createCity = async (req, res) => {
     const file = req.file;
 
     if (!file) {
+      warn("No file uploaded for city creation", "City Controller", "createCity");
       return res.status(400).json({
         success: false,
         message: "No file uploaded",
@@ -57,7 +59,7 @@ exports.createCity = async (req, res) => {
       message: "City created successfully",
     });
   } catch (error) {
-    console.error("Error creating city:", error);
+    ServerError(`Error creating city: ${error.message}`, "City Controller", "createCity");
     res.status(500).json({
       success: false,
       message: "Internal Server Error",
@@ -74,6 +76,7 @@ exports.updateCity = async (req, res) => {
 
     const city = await cityModel.findById(id);
     if (!city) {
+      warn(`City with ID ${id} not found for update`, "City Controller", "updateCity");
       return res.status(404).json({
         success: false,
         message: "City not found",
@@ -81,8 +84,12 @@ exports.updateCity = async (req, res) => {
     }
 
     if (file) {
-      // Delete the old image from Cloudinary
-      await Cloudinary.uploader.destroy(city.CityImage.public_id);
+      try {
+        // Delete the old image from Cloudinary
+        await Cloudinary.uploader.destroy(city.CityImage.public_id);
+      } catch (error) {
+        ServerError(`Error deleting old image from Cloudinary: ${error.message}`, "City Controller", "updateCity");
+      }
 
       // Upload the new image
       const uploadResult = await uploadFromBuffer(file.buffer);
@@ -100,7 +107,7 @@ exports.updateCity = async (req, res) => {
       message: "City updated successfully",
     });
   } catch (error) {
-    console.error("Error updating city:", error);
+    ServerError(`Error updating city: ${error.message}`, "City Controller", "updateCity");
     res.status(500).json({
       success: false,
       message: "Internal Server Error",
@@ -115,6 +122,7 @@ exports.deleteCity = async (req, res) => {
 
     const city = await cityModel.findById(id);
     if (!city) {
+      warn(`City with ID ${id} not found for deletion`, "City Controller", "deleteCity");
       return res.status(404).json({
         success: false,
         message: "City not found",
@@ -122,7 +130,11 @@ exports.deleteCity = async (req, res) => {
     }
 
     // Delete the image from Cloudinary
-    await Cloudinary.uploader.destroy(city.CityImage.public_id);
+    try {
+      await Cloudinary.uploader.destroy(city.CityImage.public_id);
+    } catch (error) {
+      ServerError(`Error deleting image from Cloudinary: ${error.message}`, "City Controller", "deleteCity");
+    }
 
     // Delete the city from the database
     await city.remove();
@@ -132,7 +144,7 @@ exports.deleteCity = async (req, res) => {
       message: "City deleted successfully",
     });
   } catch (error) {
-    console.error("Error deleting city:", error);
+    ServerError(`Error deleting city: ${error.message}`, "City Controller", "deleteCity");
     res.status(500).json({
       success: false,
       message: "Internal Server Error",
@@ -140,17 +152,17 @@ exports.deleteCity = async (req, res) => {
   }
 };
 
-// Get all Citys (cities)
+// Get all Cities
 exports.getAllCities = async (req, res) => {
   try {
     const cities = await cityModel.find();
-    
+
     res.status(200).json({
       success: true,
       data: cities,
     });
   } catch (error) {
-    console.error("Error fetching cities:", error);
+    ServerError(`Error fetching cities: ${error.message}`, "City Controller", "getAllCities");
     res.status(500).json({
       success: false,
       message: "Internal Server Error",

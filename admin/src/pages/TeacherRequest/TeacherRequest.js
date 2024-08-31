@@ -27,7 +27,7 @@ const TeacherRequest = () => {
 
     const fetchData = async () => {
         try {
-            const response = await axios.get('https://www.sr.apnipaathshaala.in/api/v1/student/admin-particular-Request', {
+            const response = await axios.get('http://localhost:7000/api/v1/student/admin-particular-Request', {
                 headers: { Authorization: `Bearer ${token}` },
             });
             console.log(response.data.data)
@@ -71,7 +71,7 @@ const TeacherRequest = () => {
 
     const handleUpdateStatus = async (id, action) => {
         try {
-            await axios.put(`https://www.sr.apnipaathshaala.in/api/v1/student/admin-toggle-Request/${id}/${action}`, null, {
+            await axios.put(`http://localhost:7000/api/v1/student/admin-toggle-Request/${id}/${action}`, null, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setFilteredData(prevData =>
@@ -96,7 +96,7 @@ const TeacherRequest = () => {
     const handleAddComment = async () => {
         setLoading(true)
         try {
-            const response = await axios.post('https://www.sr.apnipaathshaala.in/api/v1/student/admin-do-comment', {
+            const response = await axios.post('http://localhost:7000/api/v1/student/admin-do-comment', {
                 requestId: selectedId, comment
             });
             console.log(response.data);
@@ -122,7 +122,7 @@ const TeacherRequest = () => {
     const paginatedData = sortedData.slice(currentPage * pageSize, (currentPage + 1) * pageSize);
     const handleDealDone = async (id) => {
         try {
-            const response = await axios.post(`https://www.sr.apnipaathshaala.in/api/v1/student/ToggleDealDone/${id}`)
+            const response = await axios.post(`http://localhost:7000/api/v1/student/ToggleDealDone/${id}`)
             fetchData()
             toast.success("Congratulations Deal is Done 🎉🎉")
 

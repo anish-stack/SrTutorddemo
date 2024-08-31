@@ -17,6 +17,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cookie-parser": "^1.4.6",
+    "dompurify": "^3.1.6",
     "jodit-react": "^4.1.2",
     "lucide-react": "^0.407.0",
     "react": "^18.3.1",
@@ -33,6 +34,7 @@
     "react-table": "^7.8.0",
     "redux-persist": "^6.0.0",
     "redux-thunk": "^3.1.0",
+    "sweetalert2": "^11.12.4",
     "tailwind-merge": "^2.4.0",
     "tailwindcss-animate": "^1.0.7",
     "web-vitals": "^2.1.4"

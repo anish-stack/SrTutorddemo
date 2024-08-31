@@ -10,7 +10,7 @@ const SideHeader = () => {
     const navigate = useNavigate();
     // const { isLogin } = useSelector((state) => state.login);
 
-   
+
     const [data, setData] = useState([]);
     const [pdata, setPData] = useState([]);
 
@@ -19,7 +19,7 @@ const SideHeader = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get('https://www.sr.apnipaathshaala.in/api/v1/student/admin-teacher-Request', {
+                const response = await axios.get('http://localhost:7000/api/v1/student/admin-teacher-Request', {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -35,7 +35,7 @@ const SideHeader = () => {
 
         const fetchDataParticular = async () => {
             try {
-                const response = await axios.get('https://www.sr.apnipaathshaala.in/api/v1/student/admin-particular-Request', {
+                const response = await axios.get('http://localhost:7000/api/v1/student/admin-particular-Request', {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 console.log(response.data.data)
@@ -115,11 +115,36 @@ const SideHeader = () => {
                                 <i className="fa-solid fa-city mr-3"></i>
                                 <Link to={'/Manage-City'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Manage City</Link>
                             </li>
+                            <li className="relative flex items-center group">
+                                <i className="fa-solid fa-envelope mr-3"></i>
+                                <Link className="text-lg lg:text-base hover:text-red-600 transition-colors">Manage Newsletter <i class="fa-solid fa-arrow-right"></i></Link>
+
+
+                                <ul className="absolute right-[-192px] mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out z-10">
+                                    <li className="hover:bg-gray-100">
+                                        <Link to="/all-subscribers" className="flex items-center px-4 py-2 text-gray-700 hover:text-red-600 transition-colors">
+                                            <i className="fa-solid fa-users mr-2"></i> All Subscribers
+                                        </Link>
+                                    </li>
+                                    <li className="hover:bg-gray-100">
+                                        <Link to="/all-template" className="flex items-center px-4 py-2 text-gray-700 hover:text-red-600 transition-colors">
+                                            <i className="fa-solid fa-envelope-open-text mr-2"></i> All Email Template
+                                        </Link>
+                                    </li>
+                                    {/* <li className="hover:bg-gray-100">
+                                        <Link to="/send-offers" className="flex items-center px-4 py-2 text-gray-700 hover:text-red-600 transition-colors">
+                                            <i className="fa-solid fa-paper-plane mr-2"></i> Send Offer Mails
+                                        </Link>
+                                    </li> */}
+                                </ul>
+                            </li>
+
+
                             <li className="flex items-center">
                                 <i className="fa-solid fa-user-cog mr-3"></i>
                                 <Link to={'/Manage-Profile'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Manage Profile</Link>
                             </li>
-                           
+
                         </ul>
                     </nav>
                 </div>

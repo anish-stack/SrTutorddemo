@@ -1,5 +1,5 @@
 const express = require('express')
-const { TeacherRegister, TeacherVerifyOtp, TeacherResendOtp, TeacherPasswordChangeRequest, TeacherPasswordOtpResent, TeacherVerifyPasswordOtp, TeacherLogin, AddProfileDetailsOfVerifiedTeacher, TeacherProfileResendOtp, TeacherVerifyProfileOtp, updateTeacherProfile, GetTeacherProfileId, GetAllTeacherProfile, GetAllTeacher, AdvancedQueryForFindingTeacher, SearchByMinimumCondition } = require('../controllers/Teacher.registration')
+const { TeacherRegister, TeacherVerifyOtp, TeacherResendOtp, TeacherPasswordChangeRequest, TeacherPasswordOtpResent, TeacherVerifyPasswordOtp, TeacherLogin, AddProfileDetailsOfVerifiedTeacher, TeacherProfileResendOtp, TeacherVerifyProfileOtp, updateTeacherProfile, GetTeacherProfileId, GetAllTeacherProfile, GetAllTeacher, AdvancedQueryForFindingTeacher, SearchByMinimumCondition, SingleTeacher, getMyClass, deleteClassOfTeacher, addMyClassMore, SubjectDelete, deleteSubjectOfTeacher } = require('../controllers/Teacher.registration')
 const Protect = require('../middlewares/Auth')
 const TeacherRouter = express.Router()
 const multer = require('multer');
@@ -10,6 +10,8 @@ TeacherRouter.post('/Create-teacher', TeacherRegister)
 TeacherRouter.post('/Verify-teacher', TeacherVerifyOtp)
 TeacherRouter.post('/resent-otp', TeacherResendOtp)
 TeacherRouter.post('/Teacher-Login', TeacherLogin)
+TeacherRouter.get('/Teacher-details/:id', SingleTeacher)
+
 TeacherRouter.post('/teacher-Password-Change-Request', TeacherPasswordChangeRequest)
 TeacherRouter.post('/teacher-Password-resend-otp', TeacherPasswordOtpResent)
 TeacherRouter.post('/teacher-Password-Verify-Otp', TeacherVerifyPasswordOtp)
@@ -18,10 +20,20 @@ TeacherRouter.post('/profile-otp', Protect, TeacherProfileResendOtp)
 TeacherRouter.post('/Verify-profile-otp', Protect, TeacherVerifyProfileOtp)
 TeacherRouter.put('/update-profile-details', Protect, updateTeacherProfile)
 TeacherRouter.get('/Get-Teacher/:id', Protect, GetTeacherProfileId)
+TeacherRouter.get('/Get-My-Classes', Protect, getMyClass)
+
 TeacherRouter.get('/Get-Teacher-Profile', Protect, GetAllTeacherProfile)
 TeacherRouter.get('/Get-Teacher', Protect, GetAllTeacher)
+TeacherRouter.post('/Add-Class-Subject', Protect, addMyClassMore)
+TeacherRouter.delete('/delete-Subject', Protect, deleteSubjectOfTeacher)
+
+
 TeacherRouter.post('/Get-Advanced-search', AdvancedQueryForFindingTeacher)
 TeacherRouter.get('/Get-Min-search/:Location/:ClassId/:Subject', SearchByMinimumCondition)
+
+TeacherRouter.delete('/deleteClassOfTeacher', Protect,deleteClassOfTeacher)
+
+
 TeacherRouter.post('/upload-xlsx', upload.single('file'), UploadXlsxFileAndExtractData)
 
 TeacherRouter.post('/upload-xlsxs', upload.single('file'), UploadXlsxFileAndExtractDataStudent)

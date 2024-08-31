@@ -49,7 +49,7 @@ const AddNewsClass = () => {
         setIsLoading(true)
         try {
             const response = await axios.post(
-                'https://www.sr.apnipaathshaala.in/api/v1/admin/Create-Class',
+                'http://localhost:7000/api/v1/admin/Create-Class',
                 formData,
                 {
                     headers: { Authorization: `Bearer ${Token}` }

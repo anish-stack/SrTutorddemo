@@ -1,23 +1,24 @@
 const UploadImages = require('../middlewares/Cloudinary');
 const Classes = require('../models/ClassModel');
 const CatchAsync = require('../utils/CatchAsync');
+const { ServerError, warn } = require('../utils/Logger');
 
 exports.CreateClass = CatchAsync(async (req, res) => {
     try {
-        const { Class, Subjects,InnerClasses } = req.body;
+        const { Class, Subjects, InnerClasses } = req.body;
         const iconsFile = req.file;
 
         // Check if a class with the same name already exists
         const existingClass = await Classes.findOne({ Class });
 
         if (existingClass) {
+            warn(`Attempt to create a class that already exists: ${Class}`);
             return res.status(400).json({
                 success: false,
                 status: 'fail',
                 message: 'Class with this name already exists.',
             });
         }
-
 
         // Initialize variables for the icon URL and public ID
         let iconUrl = '';
@@ -29,9 +30,6 @@ exports.CreateClass = CatchAsync(async (req, res) => {
             iconUrl = uploadResult.url;
             publicId = uploadResult.public_id;
         }
-
-        // Prepare subjects array
-        // const subjectsArray = Subjects.map(subject => subject.SubjectName);
 
         // Create a new class object
         const newClass = new Classes({
@@ -62,7 +60,7 @@ exports.CreateClass = CatchAsync(async (req, res) => {
             },
         });
     } catch (error) {
-        // Handle any errors
+        ServerError('Failed to create class', error.message);
         res.status(500).json({
             status: 'fail',
             message: 'Failed to create class',
@@ -71,7 +69,6 @@ exports.CreateClass = CatchAsync(async (req, res) => {
     }
 });
 
-
 exports.EditClassName = CatchAsync(async (req, res) => {
     try {
         const ClassId = req.params.ClassId;
@@ -79,6 +76,7 @@ exports.EditClassName = CatchAsync(async (req, res) => {
         // Find Class by ID
         const ExistClass = await Classes.findById(ClassId);
         if (!ExistClass) {
+            warn(`Attempt to edit non-existent class ID: ${ClassId}`);
             return res.status(400).json({
                 success: false,
                 status: 'fail',
@@ -90,6 +88,7 @@ exports.EditClassName = CatchAsync(async (req, res) => {
 
         // Check if the updated class name is provided
         if (!UpdatedClassName) {
+            warn('No class name provided for updating.');
             return res.status(400).json({
                 success: false,
                 status: 'fail',
@@ -118,7 +117,7 @@ exports.EditClassName = CatchAsync(async (req, res) => {
             },
         });
     } catch (error) {
-        // Handle any errors
+        ServerError('Error updating class name', error.message);
         return res.status(500).json({
             success: false,
             status: 'error',
@@ -128,7 +127,6 @@ exports.EditClassName = CatchAsync(async (req, res) => {
     }
 });
 
-
 exports.EditSubjectName = CatchAsync(async (req, res) => {
     try {
         const ClassId = req.params.ClassId;
@@ -137,6 +135,7 @@ exports.EditSubjectName = CatchAsync(async (req, res) => {
         // Find the class by ID
         const ExistClass = await Classes.findById(ClassId);
         if (!ExistClass) {
+            warn(`Attempt to edit a subject in a non-existent class ID: ${ClassId}`);
             return res.status(400).json({
                 success: false,
                 status: 'fail',
@@ -147,6 +146,7 @@ exports.EditSubjectName = CatchAsync(async (req, res) => {
         // Find the subject in the Subjects array
         const subject = ExistClass.Subjects.id(SubjectId);
         if (!subject) {
+            warn(`Subject with ID ${SubjectId} does not exist in class ID: ${ClassId}`);
             return res.status(400).json({
                 success: false,
                 status: 'fail',
@@ -163,7 +163,6 @@ exports.EditSubjectName = CatchAsync(async (req, res) => {
         }
         await redisClient.del('class');
         await redisClient.del('unique-subjects');
-        // Save the class with the updated subject
         await ExistClass.save();
 
         // Respond with success message
@@ -176,7 +175,7 @@ exports.EditSubjectName = CatchAsync(async (req, res) => {
             },
         });
     } catch (error) {
-        // Handle any errors
+        ServerError('Error updating subject name', error.message);
         return res.status(500).json({
             success: false,
             status: 'error',
@@ -186,7 +185,6 @@ exports.EditSubjectName = CatchAsync(async (req, res) => {
     }
 });
 
-
 exports.deleteAnySubject = CatchAsync(async (req, res) => {
     try {
         const { ClassId, SubjectId } = req.params;
@@ -194,6 +192,7 @@ exports.deleteAnySubject = CatchAsync(async (req, res) => {
         // Find the class by ID
         const ExistClass = await Classes.findById(ClassId);
         if (!ExistClass) {
+            warn(`Attempt to delete a subject from a non-existent class ID: ${ClassId}`);
             return res.status(400).json({
                 success: false,
                 status: 'fail',
@@ -204,6 +203,7 @@ exports.deleteAnySubject = CatchAsync(async (req, res) => {
         // Remove the subject from the class's subjects
         const subject = ExistClass.Subjects.id(SubjectId);
         if (!subject) {
+            warn(`Subject with ID ${SubjectId} does not exist in class ID: ${ClassId}`);
             return res.status(400).json({
                 success: false,
                 status: 'fail',
@@ -228,6 +228,7 @@ exports.deleteAnySubject = CatchAsync(async (req, res) => {
             message: 'Subject deleted successfully.',
         });
     } catch (error) {
+        ServerError('Error deleting subject', error.message);
         return res.status(500).json({
             success: false,
             status: 'error',
@@ -237,7 +238,6 @@ exports.deleteAnySubject = CatchAsync(async (req, res) => {
     }
 });
 
-
 exports.deleteClass = CatchAsync(async (req, res) => {
     try {
         const { ClassId } = req.params;
@@ -245,6 +245,7 @@ exports.deleteClass = CatchAsync(async (req, res) => {
         // Find and delete the class
         const deletedClass = await Classes.findByIdAndDelete(ClassId);
         if (!deletedClass) {
+            warn(`Attempt to delete a non-existent class ID: ${ClassId}`);
             return res.status(400).json({
                 success: false,
                 status: 'fail',
@@ -267,6 +268,7 @@ exports.deleteClass = CatchAsync(async (req, res) => {
             message: 'Class deleted successfully.',
         });
     } catch (error) {
+        ServerError('Error deleting class', error.message);
         return res.status(500).json({
             success: false,
             status: 'error',
@@ -276,53 +278,48 @@ exports.deleteClass = CatchAsync(async (req, res) => {
     }
 });
 
-
 exports.GetAllClass = CatchAsync(async (req, res) => {
     try {
-        // Retrieve all classes
-
         const redisClient = req.app.locals.redis;
 
         if (!redisClient) {
             throw new Error('Redis client is not available.');
         }
-        const cachedClass = await redisClient.get('class');
-        if (cachedClass) {
-            const activeClass = JSON.parse(cachedClass);
 
+        const cachedClasses = await redisClient.get('class');
+        if (cachedClasses) {
+            const activeClasses = JSON.parse(cachedClasses);
             return res.status(200).json({
                 success: true,
-                message: "data from cached",
-                data: activeClass
+                message: "Data fetched from cache",
+                data: activeClasses
             });
-        }
-        else {
+        } else {
             const classes = await Classes.find();
             if (!classes.length) {
+                warn('No classes found in the database.');
                 return res.status(404).json({
                     success: false,
                     status: 'fail',
                     message: 'No classes found.',
                 });
             }
+
+            // Cache the fetched classes
             await redisClient.set('class', JSON.stringify(classes));
 
             return res.status(200).json({
                 success: true,
-                status: 'success',
-                message: "data from db",
-                data:
-                    classes
-                ,
+                message: "Data fetched from database",
+                data: classes
             });
         }
-        // Respond with the list of classes
-
     } catch (error) {
+        ServerError('Error fetching classes', error.message);
         return res.status(500).json({
             success: false,
             status: 'error',
-            message: 'An error occurred while retrieving classes.',
+            message: 'An error occurred while fetching the classes.',
             error: error.message,
         });
     }
@@ -342,7 +339,7 @@ exports.GetSubjectsWithClassIds = CatchAsync(async (req, res) => {
             });
         }
 
-        // Validate ClassId if needed
+        // Validate ClassId
         if (!ClassId) {
             return res.status(400).json({
                 success: false,
@@ -368,15 +365,15 @@ exports.GetSubjectsWithClassIds = CatchAsync(async (req, res) => {
 
             // If not found, search all classes for a matching InnerClass
             if (!classes) {
-                classes = await Classes.findOne({ 
-                    'InnerClasses._id': ClassId 
+                classes = await Classes.findOne({
+                    'InnerClasses._id': ClassId
                 });
 
                 if (classes) {
-                    // Find the specific InnerClass with the matching ID
                     const innerClass = classes.InnerClasses.find(inner => inner._id.toString() === ClassId);
 
                     if (!innerClass) {
+                        warn('No InnerClass found with the provided ID.');
                         return res.status(404).json({
                             success: false,
                             status: 'fail',
@@ -384,16 +381,14 @@ exports.GetSubjectsWithClassIds = CatchAsync(async (req, res) => {
                         });
                     }
 
-                    // Return data for the found InnerClass
                     const Subjects = {
                         Class: classes.Class,
                         Subjects: classes.Subjects,
                     };
 
-                    // Cache the result for future requests
+                    // Cache the result
                     await redisClient.setEx(cacheKey, 3600, JSON.stringify(Subjects));
 
-                    // Respond with the list of subjects
                     return res.status(200).json({
                         success: true,
                         message: "Data retrieved from database",
@@ -402,6 +397,7 @@ exports.GetSubjectsWithClassIds = CatchAsync(async (req, res) => {
                     });
                 }
 
+                warn('No classes or InnerClasses found with the provided ID.');
                 return res.status(404).json({
                     success: false,
                     status: 'fail',
@@ -410,6 +406,7 @@ exports.GetSubjectsWithClassIds = CatchAsync(async (req, res) => {
             }
 
             if (classes.Subjects.length === 0) {
+                warn('No subjects found for this class.');
                 return res.status(404).json({
                     success: false,
                     status: 'fail',
@@ -422,10 +419,9 @@ exports.GetSubjectsWithClassIds = CatchAsync(async (req, res) => {
                 Subjects: classes.Subjects,
             };
 
-            // Cache the result for future requests
+            // Cache the result
             await redisClient.setEx(cacheKey, 3600, JSON.stringify(Subjects));
 
-            // Respond with the list of subjects
             return res.status(200).json({
                 success: true,
                 message: "Data retrieved from database",
@@ -434,7 +430,7 @@ exports.GetSubjectsWithClassIds = CatchAsync(async (req, res) => {
             });
         }
     } catch (error) {
-        console.error('Error fetching subjects:', error.message);
+        ServerError('Error fetching subjects', error.message);
         return res.status(500).json({
             success: false,
             status: 'error',
@@ -450,9 +446,9 @@ exports.AddSubjectInClass = CatchAsync(async (req, res) => {
         const { ClassId } = req.params;
         const { Subjects } = req.body;
 
-        // Find the class by ID
         const checkClass = await Classes.findById(ClassId);
         if (!checkClass) {
+            warn('No class found with the provided ID.');
             return res.status(404).json({
                 success: false,
                 status: 'fail',
@@ -460,7 +456,6 @@ exports.AddSubjectInClass = CatchAsync(async (req, res) => {
             });
         }
 
-        // Validate Subjects
         if (!Subjects || !Array.isArray(Subjects) || Subjects.length === 0) {
             return res.status(400).json({
                 success: false,
@@ -469,20 +464,19 @@ exports.AddSubjectInClass = CatchAsync(async (req, res) => {
             });
         }
 
-        // Add subjects to the class
         checkClass.Subjects.push(...Subjects);
+
         const redisClient = req.app.locals.redis;
 
         if (!redisClient) {
             throw new Error('Redis client is not available.');
         }
+
         await redisClient.del('class');
         await redisClient.del('unique-subjects');
 
-        // Save the updated class document
         await checkClass.save();
 
-        // Respond with success message
         res.status(200).json({
             success: true,
             status: 'success',
@@ -492,8 +486,8 @@ exports.AddSubjectInClass = CatchAsync(async (req, res) => {
             },
         });
     } catch (error) {
-        // Handle any errors
-        res.status(500).json({
+        ServerError('Error adding subjects', error.message);
+        return res.status(500).json({
             success: false,
             status: 'error',
             message: 'An error occurred while adding subjects.',
@@ -513,22 +507,20 @@ exports.GetUniqueAllSubjects = CatchAsync(async (req, res) => {
 
         const cacheKey = 'unique-subjects';
 
-        // Try fetching the data from Redis cache
         const cachedData = await redisClient.get(cacheKey);
 
         if (cachedData) {
-            // If cached data exists, return it
             return res.status(200).json({
                 success: true,
-                message: 'data from cached',
+                message: 'Data retrieved from cache',
                 status: 'success',
                 data: JSON.parse(cachedData)
             });
         }
 
-        // Fetch all classes from the database
         const classes = await Classes.find();
         if (!classes || classes.length === 0) {
+            warn('No classes found.');
             return res.status(404).json({
                 success: false,
                 status: 'fail',
@@ -536,34 +528,30 @@ exports.GetUniqueAllSubjects = CatchAsync(async (req, res) => {
             });
         }
 
-        // Initialize a set to store unique subjects
         const subjectsSet = new Set();
 
-        // Iterate over all classes and collect subjects
         classes.forEach(classDoc => {
             classDoc.Subjects.forEach(subject => {
                 subjectsSet.add(subject.SubjectName);
             });
         });
 
-        // Convert the set to an array
         const uniqueSubjects = Array.from(subjectsSet).map(subjectName => ({ SubjectName: subjectName }));
 
-        // Store the unique subjects in Redis cache with a 2-hour expiration
         await redisClient.setEx(cacheKey, 2 * 60 * 60, JSON.stringify(uniqueSubjects));
 
-        // Respond with the list of unique subjects
         return res.status(200).json({
             success: true,
-            message: 'data from db',
+            message: 'Data retrieved from database',
             status: 'success',
             data: uniqueSubjects
         });
     } catch (error) {
+        ServerError('Error retrieving unique subjects', error.message);
         return res.status(500).json({
             success: false,
             status: 'error',
-            message: 'An error occurred while retrieving subjects.',
+            message: 'An error occurred while retrieving unique subjects.',
             error: error.message,
         });
     }

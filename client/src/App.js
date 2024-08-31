@@ -13,6 +13,8 @@ import PostRequirement from "./page/Student/PostRequirement";
 import TeacherRegsitration from "./page/Teacher/TeacherRegsitration";
 import TeacherDashboard from "./page/Teacher/TeacherDashboard";
 import ThankYouPage from "./page/Thankyou";
+import ProfilePage from "./page/Teacher/ProfilePage";
+import TeacherProfileOtp from "./page/Teacher/TeacherProfileOtp";
 
 function App() {
   return (
@@ -30,6 +32,9 @@ function App() {
         <Route path="/teacher-register" element={<TeacherRegsitration />} />
         <Route path="/Teacher-dashboard" element={<TeacherDashboard />} />
         <Route path="/thankYou" element={<ThankYouPage />} />
+        <Route path="/Teacher-Profile-Verify" element={<TeacherProfileOtp />} />
+
+        <Route path="/Complete-profile" element={<ProfilePage />} />
 
 
         

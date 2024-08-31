@@ -49,7 +49,7 @@ const Slider = () => {
   const fetchSubjects = async (classId) => {
     try {
       const response = await axios.get(
-        `https://www.sr.apnipaathshaala.in/api/v1/admin/Get-Class-Subject/${classId}`
+        `http://localhost:7000/api/v1/admin/Get-Class-Subject/${classId}`
       );
       setSubjects(response.data.data.Subjects || []);
     } catch (error) {

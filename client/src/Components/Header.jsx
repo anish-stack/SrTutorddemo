@@ -64,14 +64,14 @@ function Header() {
       if (modalType === "student") {
         setLoading(true);
         response = await axios.post(
-          "https://www.sr.apnipaathshaala.in/api/v1/student/login",
+          "http://localhost:7000/api/v1/student/login",
           formData
         );
         userPrefix = "student";
       } else if (modalType === "teacher") {
         setLoading(true);
         response = await axios.post(
-          "https://www.sr.apnipaathshaala.in/api/v1/teacher/Teacher-Login",
+          "http://localhost:7000/api/v1/teacher/Teacher-Login",
           formData
         );
         userPrefix = "teacher";
@@ -82,6 +82,16 @@ function Header() {
 
         Cookies.set(`${userPrefix}Token`, token, { expires: 1 });
         Cookies.set(`${userPrefix}User`, JSON.stringify(user), { expires: 1 });
+
+        // Check if the teacher needs to complete their profile
+        if (userPrefix === 'teacher') {
+          const checkProfileId = user.TeacherProfile;
+          console.log(checkProfileId)
+          if (!checkProfileId) {
+            window.location.href = `/Complete-profile?token=${token}&encoded=${user._id}`;
+            return; // Exit early if redirecting
+          }
+        }
         setLoading(false);
         toast.success("Login successful");
         console.log("Login successful:", response.data);
@@ -397,7 +407,7 @@ function Header() {
             onClick={handleModalClose}
             aria-label="Close"
           >
-            <span aria-hidden="true">&times;</span>
+            <span aria-hidden="true"><i className="fa-solid fa-xmark"></i></span>
           </button>
         </div>
         <div className="text-center mb-3">

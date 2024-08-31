@@ -7,7 +7,7 @@ const cityModel = require("../models/City.model"); // Assuming the model is name
 const Classes = require('../models/ClassModel');
 const SubjectTeacherRequest = require("../models/SubjectRequest");
 const Testimonial = require('../models/Testinomial.mode')
-
+const Newsletter = require('../models/NewsLetterModal');
 const streamifier = require('streamifier');
 const CatchAsync = require('../utils/CatchAsync');
 const Cloudinary = require('cloudinary').v2;
@@ -23,7 +23,7 @@ Cloudinary.config({
 
 exports.createBanner = async (req, res) => {
     try {
-        const { ButtonText, active, RedirectPageUrl, Para,Position } = req.body;
+        const { ButtonText, active, RedirectPageUrl, Para, Position } = req.body;
         const file = req.file;
 
         if (!file) {
@@ -281,19 +281,83 @@ exports.updateBanner = async (req, res) => {
 
 
 exports.AnalyticalData = CatchAsync(async (req, res) => {
+    const redisClient = req.app.locals.redis;
+    const now = new Date();
+    const todayStart = new Date(now.setHours(0, 0, 0, 0));
+    const weekStart = new Date(todayStart);
+    weekStart.setDate(todayStart.getDate() - 7);
+
     try {
-        // Fetching counts from various models
-        const bannerCount = await bannerModel.countDocuments();
-        const heroBannerCount = await HeroBanner.countDocuments();
-        const blogCount = await Blogs.countDocuments();
-        const ParticularTeacherRequest = await ParticularTeacher.countDocuments();
-        const studentCount = await Student.countDocuments();
-        const cityCount = await cityModel.countDocuments();
-        const classCount = await Classes.countDocuments();
-        const subjectTeacherRequestCount = await SubjectTeacherRequest.countDocuments();
-        const Testimonials = await Testimonial.countDocuments();
+        // Helper function to get data from Redis or fetch from database
+        const getDataFromCacheOrDb = async (key, dbQuery) => {
+            const cachedData = await redisClient.get(key);
+            if (cachedData) {
+                return JSON.parse(cachedData);
+            } else {
+                const data = await dbQuery();
+                await redisClient.set(key, JSON.stringify(data), 'EX', 3600); // Cache for 1 hour
+                return data;
+            }
+        };
 
+        // Fetch counts from Redis or database
+        const [bannerCount, heroBannerCount, blogCount, cityCount, classCount] = await Promise.all([
+            getDataFromCacheOrDb('bannerCount', () => bannerModel.countDocuments()),
+            getDataFromCacheOrDb('heroBannerCount', () => HeroBanner.countDocuments()),
+            getDataFromCacheOrDb('blogCount', () => Blogs.countDocuments({ createdAt: { $gte: now.setDate(1) } })),
+            getDataFromCacheOrDb('cityCount', () => cityModel.countDocuments()),
+            getDataFromCacheOrDb('classCount', () => Classes.countDocuments())
+        ]);
 
+        // Calculate counts for particularTeacher, student, subjectTeacherRequest, and testimonial
+        const [particularTeacherCountToday, totalCountParticularTeacher, particularTeacherCountWeekAgo] = await Promise.all([
+            ParticularTeacher.countDocuments({ createdAt: { $gte: todayStart } }),
+            getDataFromCacheOrDb('totalCountParticularTeacher', () => ParticularTeacher.countDocuments()),
+            ParticularTeacher.countDocuments({ createdAt: { $gte: weekStart, $lt: todayStart } })
+        ]);
+
+        const [studentCountToday, totalCountStudent, studentCountWeekAgo] = await Promise.all([
+            Student.countDocuments({ createdAt: { $gte: todayStart } }),
+            getDataFromCacheOrDb('totalCountStudent', () => Student.countDocuments()),
+            Student.countDocuments({ createdAt: { $gte: weekStart, $lt: todayStart } })
+        ]);
+
+        const [subjectTeacherRequestCountToday, totalCountSubjectTeacherRequest, subjectTeacherRequestCountWeekAgo] = await Promise.all([
+            SubjectTeacherRequest.countDocuments({ createdAt: { $gte: todayStart } }),
+            getDataFromCacheOrDb('totalCountSubjectTeacherRequest', () => SubjectTeacherRequest.countDocuments()),
+            SubjectTeacherRequest.countDocuments({ createdAt: { $gte: weekStart, $lt: todayStart } })
+        ]);
+
+        const [testimonialCountToday, totalCountTestimonial, testimonialCountWeekAgo] = await Promise.all([
+            Testimonial.countDocuments({ createdAt: { $gte: todayStart } }),
+            getDataFromCacheOrDb('totalCountTestimonial', () => Testimonial.countDocuments()),
+            Testimonial.countDocuments({ createdAt: { $gte: weekStart, $lt: todayStart } })
+        ]);
+
+        // Calculate subscriber counts
+        const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+        const previousMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        const previousMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0); // Last day of previous month
+
+        const previousMonthCount = await Newsletter.countDocuments({
+            subscribedAt: {
+                $gte: previousMonthStart,
+                $lte: previousMonthEnd
+            }
+        });
+
+        const currentMonthCount = await Newsletter.countDocuments({
+            subscribedAt: {
+                $gte: currentMonthStart
+            }
+        });
+
+        const monthDifference = currentMonthCount - previousMonthCount;
+        const percentageDifference = previousMonthCount
+            ? ((monthDifference / previousMonthCount) * 100).toFixed(2)
+            : '0';
+
+        // Fetch unique subjects
         const classes = await Classes.find();
         if (!classes || classes.length === 0) {
             return res.status(404).json({
@@ -303,32 +367,53 @@ exports.AnalyticalData = CatchAsync(async (req, res) => {
             });
         }
 
-        // Initialize a set to store unique subjects
         const subjectsSet = new Set();
-
-        // Iterate over all classes and collect subjects
         classes.forEach(classDoc => {
             classDoc.Subjects.forEach(subject => {
                 subjectsSet.add(subject.SubjectName);
             });
         });
 
-        // Convert the set to an array
         const uniqueSubjects = Array.from(subjectsSet).map(subjectName => ({ SubjectName: subjectName }));
-
 
         // Collecting data
         const data = {
             bannerCount,
             heroBannerCount,
-            blogCount,
-            ParticularTeacherRequest,
-            studentCount,
+            blogCount: {
+                currentMonthCount: await Blogs.countDocuments({ createdAt: { $gte: currentMonthStart } }),
+                previousMonthCount: await Blogs.countDocuments({ createdAt: { $gte: previousMonthStart, $lte: previousMonthEnd } })
+            },
+            particularTeacherRequest: {
+                today: particularTeacherCountToday,
+                weekAgo: particularTeacherCountWeekAgo,
+                total: totalCountParticularTeacher
+            },
+            student: {
+                today: studentCountToday,
+                total: totalCountStudent,
+                weekAgo: studentCountWeekAgo
+            },
+            subjectTeacherRequest: {
+                today: subjectTeacherRequestCountToday,
+                weekAgo: subjectTeacherRequestCountWeekAgo,
+                total: totalCountSubjectTeacherRequest
+            },
+            testimonial: {
+                today: testimonialCountToday,
+                weekAgo: testimonialCountWeekAgo,
+                total: totalCountTestimonial
+            },
             cityCount,
             classCount,
-            Testimonials,
-            Subjects:uniqueSubjects.length,
-            subjectTeacherRequestCount,
+            Subjects: uniqueSubjects.length,
+            subscribers: {
+                subscriberCount: await Newsletter.countDocuments(),
+                currentMonthCount,
+                previousMonthCount,
+                monthDifference,
+                percentageDifference
+            }
         };
 
         // Sending response

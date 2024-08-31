@@ -7,10 +7,11 @@ const { createBlog, DeleteBlog, UpdateBlog, getAllBlog, getSingleBlog } = requir
 const { createBanner, getAllBanner, deleteBanner, ChangePosition, updateBanner, AnalyticalData } = require('../controllers/WebPage.controller')
 const { createCity, getAllCities, deleteCity, updateCity } = require('../controllers/City.Controller')
 const { GetTopTeacher } = require('../controllers/Teacher.registration')
+const { JoinNewsLetter, getAllSubscriptions, updateSubscription, deleteSubscription, sendEmailsInBatches, getAllTemplates, editTemplate, deleteTemplate, CreateTemplate } = require('../controllers/Newsletter.controller')
 const AdminRouter = express.Router()
 
 
-AdminRouter.post('/Admin-login',AdminLogin)
+AdminRouter.post('/Admin-login', AdminLogin)
 
 
 
@@ -37,7 +38,7 @@ AdminRouter.put('/update-Blog/:id', isAdmin, singleUploadImage, UpdateBlog)
 AdminRouter.post('/Create-Banner', isAdmin, singleUploadImage, createBanner)
 AdminRouter.get('/get-Banner', getAllBanner)
 AdminRouter.delete('/delete-Banner/:id', deleteBanner)
-AdminRouter.post('/Change-Position/:id',isAdmin, ChangePosition)
+AdminRouter.post('/Change-Position/:id', isAdmin, ChangePosition)
 AdminRouter.put('/update-Banner/:id', isAdmin, singleUploadImage, updateBanner)
 
 //For City Banners
@@ -69,7 +70,15 @@ AdminRouter.get('/Get-Dashboard', AnalyticalData)
 
 
 
-
+AdminRouter.post('/join-newsletter', JoinNewsLetter);
+AdminRouter.get('/get-all-subscribe-newsletter-email', getAllSubscriptions);
+AdminRouter.put('/update-newsletter-email/:id', updateSubscription);
+AdminRouter.delete('/delete-newsletter-email/:id', deleteSubscription);
+AdminRouter.post('/send-emails-in-batches', sendEmailsInBatches);
+AdminRouter.post('/add-template', CreateTemplate);
+AdminRouter.get('/get-all-templates', getAllTemplates);
+AdminRouter.put('/edit-template/:id', editTemplate);
+AdminRouter.delete('/delete-template/:id', deleteTemplate);
 
 
 

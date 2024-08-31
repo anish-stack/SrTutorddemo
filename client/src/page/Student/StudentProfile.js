@@ -31,7 +31,7 @@ const StudentProfile = () => {
 
   const MyPost = async () => {
     try {
-      const { data } = await axios.get('https://www.sr.apnipaathshaala.in/api/v1/student/Get-My-Post', {
+      const { data } = await axios.get('http://localhost:7000/api/v1/student/Get-My-Post', {
         headers: {
           Authorization: `Bearer ${studentToken}`
         },
@@ -50,7 +50,7 @@ const StudentProfile = () => {
 
   const MySubscribed = async () => {
     try {
-      const { data } = await axios.get('https://www.sr.apnipaathshaala.in/api/v1/student/Get-My-Subscribed-Teacher', {
+      const { data } = await axios.get('http://localhost:7000/api/v1/student/Get-My-Subscribed-Teacher', {
         headers: {
           Authorization: `Bearer ${studentToken}`
         }

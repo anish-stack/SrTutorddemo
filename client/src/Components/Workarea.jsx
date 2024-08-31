@@ -34,7 +34,7 @@ function Workarea() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get('https://www.sr.apnipaathshaala.in/api/v1/admin/get-City');
+                const response = await axios.get('http://localhost:7000/api/v1/admin/get-City');
                 if (response.data.success) {
                     const locations = response.data.data.map(city => ({
                         location_img: city.CityImage.url,
@@ -59,7 +59,7 @@ function Workarea() {
                             <div className="section__title text-center mb-50">
                                 <span className="sub-title">Our Network</span>
                                 <h2 className="title">
-                                    Home <span className="position-relative">Tutoring </span>In Your
+                                    Home <span className="position-relative"> Tutoring </span> In Your
                                     City
                                 </h2>
                             </div>

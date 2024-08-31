@@ -12,3 +12,14 @@ html,
 body {
     width: 100%;
 }
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .spinner {
+    display: inline-block;
+    margin-left: 0.5rem;
+    animation: spin 1s linear infinite;
+  }
+  

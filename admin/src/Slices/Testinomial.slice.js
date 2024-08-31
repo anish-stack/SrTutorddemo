@@ -14,7 +14,7 @@ export const GetTestimonials = createAsyncThunk(
 
         try {
             // Make the request with the token in the headers
-            const response = await axios.get('https://www.sr.apnipaathshaala.in/api/v1/admin/Get-All-Active-Testimonials',
+            const response = await axios.get('http://localhost:7000/api/v1/admin/Get-All-Active-Testimonials',
 
                 {
                     headers: {

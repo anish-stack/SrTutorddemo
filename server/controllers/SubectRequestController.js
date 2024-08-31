@@ -5,11 +5,11 @@ const Teacher = require("../models/Teacher.model");
 const ParticularTeacher = require("../models/Particular.model");
 const Student = require('../models/Student.model');
 const sendEmail = require("../utils/SendEmails");
-
+const { info, ServerError, warn } = require('../utils/Logger');
 exports.CreateRequestOfSubject = CatchAsync(async (req, res) => {
   try {
     const user = req.user.id
-    console.log(user)
+
     // Step 1: Extract data from the request body
     const {
       Subject,
@@ -24,7 +24,7 @@ exports.CreateRequestOfSubject = CatchAsync(async (req, res) => {
       TeaherGender,
       userconetcIfo, // corrected variable name
     } = req.body;
-    console.log(req.body);
+
     // Validate the required fields
     // Step 2: Validate fields and provide specific error messages
     if (!Subject) {
@@ -261,6 +261,7 @@ exports.CreateRequestOfSubject = CatchAsync(async (req, res) => {
     });
   } catch (error) {
     // Handle any errors
+    ServerError(`Error in CreateRequestOfSubject: ${error.message}`, 'Subject Controller', 'CreateRequestOfSubject');
     console.error(error); // Log the error for debugging
     res.status(500).json({
       status: "error",
@@ -289,6 +290,7 @@ exports.addAdminComment = CatchAsync(async (req, res) => {
     });
   } catch (error) {
     console.log(error);
+    ServerError(`Error in addAdminComment: ${error.message}`, 'Subject Controller', 'addAdminComment')
     res.status(200).json({
       status: "failed",
       message: "Comment not added and email not be  sent to the student.",
@@ -314,7 +316,10 @@ exports.getAllRequestOfSubject = CatchAsync(async (req, res) => {
       message: "Data found",
       data: AllRequest,
     });
-  } catch (error) { }
+  } catch (error) {
+    ServerError(`Error in getAllRequestOfSubject: ${error.message}`, 'Subject Controller', 'getAllRequestOfSubject')
+
+  }
 });
 
 exports.toggleStatusOfRequest = CatchAsync(async (req, res) => {
@@ -355,6 +360,8 @@ exports.toggleStatusOfRequest = CatchAsync(async (req, res) => {
     });
 
   } catch (error) {
+    ServerError(`Error in toggleStatusOfRequest: ${error.message}`, 'Subject Controller', 'toggleStatusOfRequest')
+
     console.error("Error updating request status:", error);
     res.status(500).json({
       success: false,
@@ -392,7 +399,7 @@ exports.ToggleDealDone = CatchAsync(async (req, res) => {
         message: "The request is not yet accepted. Please ensure the request is marked as 'Accepted' before finalizing the deal.",
       });
     }
-    
+
 
     // Fetch student and teacher info
     let StudentFind, getTeacherInfo;
@@ -583,6 +590,8 @@ exports.ToggleDealDone = CatchAsync(async (req, res) => {
         message
       });
     } catch (emailError) {
+      ServerError(`Error in toggleStatusOfRequest: ${error.message}`, 'Subject Controller', 'toggleStatusOfRequest')
+
       return res.status(500).json({
         success: false,
         message: "Error sending email",

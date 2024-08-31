@@ -6,6 +6,7 @@ const sendEmail = require('../utils/SendEmails')
 const streamifier = require('streamifier');
 const Cloudinary = require('cloudinary').v2;
 require('dotenv').config();
+const { ServerError, warn } = require('../utils/Logger');
 
 // Configure Cloudinary
 Cloudinary.config({
@@ -238,6 +239,7 @@ exports.StudentLogin = CatchAsync(async (req, res) => {
         });
     }
 });
+
 exports.AdminLogin = CatchAsync(async (req, res) => {
     try {
         // console.log("i am hit")
@@ -251,7 +253,7 @@ exports.AdminLogin = CatchAsync(async (req, res) => {
         }
 
         // Check if user exists (either Student or Teacher)
-        const CheckUser = await Student.findOne({ Email }) 
+        const CheckUser = await Student.findOne({ Email })
         if (!CheckUser) {
             return res.status(403).json({
                 Success: false,
@@ -287,6 +289,7 @@ exports.AdminLogin = CatchAsync(async (req, res) => {
         });
     }
 });
+
 //Student Password Change Request
 exports.StudentPasswordChangeRequest = CatchAsync(async (req, res) => {
     const { Email } = req.body;
@@ -346,7 +349,6 @@ exports.StudentVerifyPasswordOtp = CatchAsync(async (req, res) => {
 
     res.status(200).json({ message: 'Password changed successfully' });
 });
-
 
 //Student Resent Password Otp
 exports.StudentPasswordOtpResent = CatchAsync(async (req, res) => {
@@ -408,7 +410,6 @@ exports.getAllStudents = CatchAsync(async (req, res) => {
     }
 })
 
-
 //Add Testimonial Review 
 
 exports.AddTestimonial = CatchAsync(async (req, res) => {
@@ -450,7 +451,7 @@ exports.AddTestimonial = CatchAsync(async (req, res) => {
     const newTestimonial = await Testimonial.create({
         Rating,
         Text,
-        userImage:UserthumbnailUrl,
+        userImage: UserthumbnailUrl,
         Name,
         isActive: isActive || false // default to false if not provided
     });

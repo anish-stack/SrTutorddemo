@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
 // Define the Teacher Profile schema
+const rangeSchema = new mongoose.Schema({
+    lat: { type: Number, required: true },
+    lng: { type: Number, required: true }
+  });
 const TeacherProfileSchema = new mongoose.Schema({
     FullName: {
         type: String,
@@ -8,13 +12,16 @@ const TeacherProfileSchema = new mongoose.Schema({
         trim: true
     },
     DOB: {
-        type: Date,
-        required: true
+        type: String
     },
     Gender: {
         type: String,
         enum: ['Male', 'Female', 'Other'],
         required: true
+    },
+    ContactNumber: {
+        type: String,
+        unique: true
     },
     AlternateContact: {
         type: String,
@@ -76,13 +83,14 @@ const TeacherProfileSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    
+
     TeachingMode: {
         type: String,
         enum: [
             'Home Tuition at Student\'s Home',
             'Home Tuition at Your Home',
-            'Institute or Group Tuition'
+            'Institute or Group Tuition',
+            'Online Class'
         ],
         required: true
     },
@@ -95,18 +103,16 @@ const TeacherProfileSchema = new mongoose.Schema({
     }],
     latitude: {
         type: Number,
-        required: true
+
     },
     longitude: {
         type: Number,
-        required: true,
+
 
     },
-    RangeWhichWantToDoClasses: {
-        type: Number,
-        required: true,
-        default: 5  //in km 
-    },
+    RangeWhichWantToDoClasses: [
+        rangeSchema
+    ],
 
     TeacherUserId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -122,7 +128,8 @@ const TeacherProfileSchema = new mongoose.Schema({
     isAllDetailVerified: {
         type: Boolean,
         default: false
-    }
+    },
+
 }, { timestamps: true });
 
 // Create the Teacher Profile model

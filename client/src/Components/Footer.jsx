@@ -1,7 +1,43 @@
-import React, { Component } from "react";
+import React, { Component, useState } from "react";
 import { Link } from "react-router-dom";
-
+import axios from 'axios'
+import toast from 'react-hot-toast'
 function Footer() {
+    const [email, setEmail] = useState('');
+
+    const handleChange = (e) => {
+        setEmail(e.target.value);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!email) {
+            toast.warn("⚠️ Please enter a valid email address.");
+            return;
+        }
+
+        // Using toast.promise to handle the promise
+        toast.promise(
+            axios.post('http://localhost:7000/api/v1/admin/join-newsletter', { email }),
+            {
+                pending: "📧 Subscribing, please wait...",
+                success: "🎉 Success! You've been subscribed to our newsletter.",
+                 error: "❌ An error occurred. Please try again later."
+            }
+        )
+            .then(response => {
+                if (response.status === 201) {
+                    setEmail('');  // Clear input after successful subscription
+                } else {
+                    toast.error("⚠️ Something went wrong. Please try again.");
+                }
+            })
+            .catch(error => {
+                toast.error(error.response?.data?.message || "❌ An unexpected error occurred.");
+            });
+    };
+
+
     return (
         <>
             <button className="scroll__top scroll-to-target" data-target="html">
@@ -109,8 +145,13 @@ function Footer() {
                                         <p className="desc">
                                             Known printer took galley type and scrambled it to make.
                                         </p>
-                                        <form action="#">
-                                            <input type="email" placeholder="Enter your email" />
+                                        <form onSubmit={handleSubmit}>
+                                            <input
+                                                type="email"
+                                                placeholder="Enter your email"
+                                                value={email}
+                                                onChange={handleChange}
+                                            />
                                             <button type="submit">
                                                 <i className="fas fa-arrow-right" />
                                             </button>

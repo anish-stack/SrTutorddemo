@@ -388,7 +388,7 @@ exports.TeacherPasswordOtpResent = CatchAsync(async (req, res) => {
 exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
   try {
     const userId = req.user.id;
-    //check with this id teacher exist or not
+
     const CheckTeacher = await Teacher.findById(userId);
     if (!CheckTeacher) {
       return res.status(403).json({
@@ -400,17 +400,19 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
     const FetchProfileExist = await TeacherProfile.findOne({
       TeacherUserId: userId,
     });
-    // // console.log(FetchProfileExist)
-    // if (FetchProfileExist) {
-    //   return res.status(403).json({
-    //     success: false,
-    //     message: "Profile Already Updated",
-    //   });
-    // }
+    // console.log(FetchProfileExist)
+    if (FetchProfileExist) {
+      return res.status(403).json({
+        success: false,
+        message: "Profile Already Updated",
+      });
+    }
+
     const {
       FullName,
       DOB,
       Gender,
+      ContactNumber,
       AlternateContact,
       PermanentAddress,
       CurrentAddress,
@@ -424,13 +426,17 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
       latitude,
       longitude,
       RangeWhichWantToDoClasses,
+
     } = req.body;
+    console.log(req.body)
+    const ranges = RangeWhichWantToDoClasses.flatMap((range) => range)
 
     // Validate that all required fields are present and not empty
     if (
       !FullName ||
       !DOB ||
       !Gender ||
+      !ContactNumber ||
       !AlternateContact ||
       !PermanentAddress ||
       !CurrentAddress ||
@@ -439,8 +445,7 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
       !ExpectedFees ||
       !TeachingMode ||
       !AcademicInformation ||
-      !latitude ||
-      !longitude ||
+
       !RangeWhichWantToDoClasses
     ) {
       return res
@@ -463,25 +468,9 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
       }
     }
 
-    // Additional validation for ExpectedFees and RangeWhichWantToDoClasses
-    if (typeof ExpectedFees !== "number" || ExpectedFees <= 0) {
-      return res
-        .status(400)
-        .json({ message: "Expected Fees must be a positive number" });
-    }
 
-    if (
-      typeof RangeWhichWantToDoClasses !== "number" ||
-      RangeWhichWantToDoClasses <= 0
-    ) {
-      return res.status(400).json({
-        message: "Range Which Want To Do Classes must be a positive number",
-      });
-    }
 
-    // Validate AcademicInformation
-    // Validate AcademicInformation
-    // Validate AcademicInformation
+
     for (const element of AcademicInformation) {
       let classExists = await Class.findById(element.ClassId);
       if (!classExists) {
@@ -526,6 +515,7 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
       FullName,
       DOB,
       Gender,
+      ContactNumber,
       AlternateContact,
       PermanentAddress,
       CurrentAddress,
@@ -538,7 +528,7 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
       AcademicInformation,
       latitude,
       longitude,
-      RangeWhichWantToDoClasses,
+      RangeWhichWantToDoClasses: ranges,
       SubmitOtp,
       OtpExpired: OtpExpiresTime,
       isAllDetailVerified: false, // Assuming profile is not verified yet
@@ -597,9 +587,21 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
 `,
     };
 
-    // await sendEmail(emailOptions);
+    if (!CheckTeacher.DOB) {
+      CheckTeacher.DOB = teacherProfile.DOB
+    }
     await teacherProfile.save();
-    await CheckTeacher.save();
+    const save = await CheckTeacher.save();
+
+    const redisClient = req.app.locals.redis;
+    if (!redisClient) {
+      return res.status(402).json({
+        success: false,
+        message: "Redis No Found"
+      })
+    }
+    await redisClient.del('Teacher')
+    await sendEmail(emailOptions);
 
     // Respond with success message
     res.status(200).json({
@@ -609,6 +611,7 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
         "Profile details Saved successfully. OTP has been sent to your email.",
     });
   } catch (error) {
+    console.log(error)
     if (error.code === 11000) {
       // MongoDB duplicate key error code
       return res.status(400).json({
@@ -673,25 +676,20 @@ exports.TeacherVerifyProfileOtp = CatchAsync(async (req, res) => {
             Congratulations on successfully completing your onboarding process at SR Tutors! We are excited to have you join our team. Here is a summary of the details we have recorded for you:
         </p>
         <p style="font-size: 16px; line-height: 1.5; color: #333;">
-            You are a highly qualified teacher with a <strong>${
-              Teachers.TeachingExperience
-            }</strong> teaching experience and an expected fee of ₹${
-        Teachers.ExpectedFees
-      }. You will be providing <strong>${
-        Teachers.TeachingMode
-      }</strong> and are available for classes within a <strong>${
-        Teachers.RangeWhichWantToDoClasses
-      } km</strong> radius. 
+            You are a highly qualified teacher with a <strong>${Teachers.TeachingExperience
+        }</strong> teaching experience and an expected fee of ₹${Teachers.ExpectedFees
+        }. You will be providing <strong>${Teachers.TeachingMode
+        }</strong> and are available for classes within a <strong>${Teachers.RangeWhichWantToDoClasses
+        } km</strong> radius. 
         </p>
         <p style="font-size: 16px; line-height: 1.5; color: #333;">
             Your academic qualifications include:
             <ul>
                 ${Teachers.AcademicInformation.map(
-                  (info, index) =>
-                    `<li><strong>${
-                      classNames[index]
-                    }</strong>: ${info.SubjectNames.join(", ")}</li>`
-                ).join("")}
+          (info, index) =>
+            `<li><strong>${classNames[index]
+            }</strong>: ${info.SubjectNames.join(", ")}</li>`
+        ).join("")}
             </ul>
         </p>
         <p style="font-size: 16px; line-height: 1.5; color: #333;">
@@ -741,7 +739,7 @@ exports.TeacherVerifyProfileOtp = CatchAsync(async (req, res) => {
 //Resend Verify Otp Given By Teacher
 exports.TeacherProfileResendOtp = CatchAsync(async (req, res) => {
   const userEmail = req.user.id.Email;
-  console.log(userEmail);
+
   const Teachers = await TeacherProfile.findOne({ TeacherUserId: req.user.id });
   if (!Teachers) {
     return res.status(404).json({ message: "Teacher not found" });
@@ -778,14 +776,16 @@ exports.TeacherProfileResendOtp = CatchAsync(async (req, res) => {
   res.status(200).json({ message: "OTP resent Successful" });
 });
 
-//Update Teacher Profile Details
 exports.updateTeacherProfile = CatchAsync(async (req, res) => {
   try {
     const userId = req.user.id;
     const updates = req.body;
 
+    // console.log("Incoming data:", updates);
+
     // Fetch the current profile details
     const teacher = await TeacherProfile.findOne({ TeacherUserId: userId });
+    // console.log("Match:", teacher);
 
     if (!teacher) {
       return res.status(404).json({ message: "Teacher not found" });
@@ -793,17 +793,44 @@ exports.updateTeacherProfile = CatchAsync(async (req, res) => {
 
     // Update only the fields that are present in the request body
     Object.keys(updates).forEach((key) => {
-      if (updates[key] !== undefined && teacher[key] !== undefined) {
-        teacher[key] = updates[key];
+      if (updates[key] !== undefined) {
+        if (typeof updates[key] === 'object' && !Array.isArray(updates[key])) {
+          // Handle nested objects
+          if (teacher[key] && typeof teacher[key] === 'object') {
+            // Merge nested objects
+            teacher[key] = { ...teacher[key], ...updates[key] };
+          } else {
+            teacher[key] = updates[key];
+          }
+        } else if (Array.isArray(updates[key])) {
+          // Handle arrays
+          teacher[key] = updates[key];
+        } else {
+          // Handle primitive fields
+          teacher[key] = updates[key];
+        }
       }
     });
+
+    // Check and update additional fields in TeachersMain
+    const { FullName, Gender, ContactNumber, AlternateContact } = updates;
+    if (FullName || Gender || ContactNumber || AlternateContact) {
+      const TeachersMain = await Teacher.findById(userId);
+
+      if (TeachersMain) {
+        if (FullName !== undefined) TeachersMain.TeacherName = FullName;
+        if (Gender !== undefined) TeachersMain.gender = Gender;
+        if (ContactNumber !== undefined) TeachersMain.PhoneNumber = ContactNumber;
+        if (AlternateContact !== undefined) TeachersMain.AltNumber = AlternateContact;
+        console.log(TeachersMain)
+        await TeachersMain.save();
+      }
+    }
 
     // Save the updated profile
     await teacher.save();
 
-    res
-      .status(200)
-      .json({ message: "Profile updated successfully", data: teacher });
+    res.status(200).json({ message: "Profile updated successfully", data: teacher });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
@@ -821,24 +848,10 @@ exports.GetTeacherProfileId = CatchAsync(async (req, res) => {
       });
     }
 
-    const redisClient = req.app.locals.redis;
 
-    if (!redisClient) {
-      return res.status(500).json({
-        success: false,
-        message: "Redis client is not available.",
-      });
-    }
 
-    // Check if profile is cached
-    const cachedProfile = await redisClient.get(`TeacherProfile:${TeacherId}`);
-    if (cachedProfile) {
-      return res.status(200).json({
-        success: true,
-        message: "Profile fetched from cache",
-        data: JSON.parse(cachedProfile),
-      });
-    }
+
+
 
     // Fetch profile from database
     const teacherProfile = await TeacherProfile.findOne({
@@ -868,12 +881,7 @@ exports.GetTeacherProfileId = CatchAsync(async (req, res) => {
     );
 
     // Cache the profile data
-    await redisClient.set(
-      `TeacherProfile:${TeacherId}`,
-      JSON.stringify(teacherProfile),
-      "EX",
-      3600
-    ); // Cache for 1 hour
+
 
     res.status(200).json({
       success: true,
@@ -1157,6 +1165,8 @@ exports.AdvancedQueryForFindingTeacher = CatchAsync(async (req, res) => {
   }
 });
 
+
+
 exports.SearchByMinimumCondition = CatchAsync(async (req, res) => {
   try {
     const { Location, ClassId, Subject } = req.params;
@@ -1216,6 +1226,272 @@ exports.SearchByMinimumCondition = CatchAsync(async (req, res) => {
     res.status(500).json({
       success: false,
       message: "An error occurred while processing the request.",
+    });
+  }
+});
+
+
+exports.SingleTeacher = CatchAsync(async (req, res) => {
+  try {
+    const { id } = req.params;
+
+
+
+    // Fetch Teacher from database
+    const teacher = await Teacher.findById(id).select('-Password');
+
+    if (!teacher) {
+      return res.status(404).json({
+        success: false,
+        message: "Teacher not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Teacher fetched successfully",
+      data: teacher,
+    });
+  } catch (error) {
+    console.error("Error fetching teacher:", error); // Log the error for debugging
+    res.status(500).json({
+      success: false,
+      message: "Error fetching teacher",
+      error: error.message,
+    });
+  }
+});
+
+
+
+exports.getMyClass = CatchAsync(async (req, res) => {
+  try {
+    const id = req.user.id;
+    // Fetch AcademicInformation from the teacher's profile
+    const teacherProfile = await TeacherProfile.findOne({ TeacherUserId: id }).select('AcademicInformation');
+
+    if (!teacherProfile) {
+      return res.status(404).json({ message: "Teacher not found" });
+    }
+
+    const academicInfo = teacherProfile.AcademicInformation;
+    console.log(academicInfo)
+    // Process each academic info entry
+    const allClasses = await Promise.all(
+      academicInfo.map(async (info) => {
+        try {
+
+          let classInfo = await Class.findOne({ _id: info.ClassId }).lean();
+          console.log(classInfo)
+          if (classInfo) {
+            // If class is found, filter subjects based on AcademicInformation
+            return {
+              classid: classInfo._id,
+              className: classInfo.Class,
+              subjects: info.SubjectNames // Use info.SubjectNames directly
+            };
+          } else {
+            // If class is not found, check in InnerClasses array
+            classInfo = await Class.findOne({ "InnerClasses._id": info.ClassId }).lean();
+
+            if (classInfo) {
+              // Find the specific inner class
+              const innerClass = classInfo.InnerClasses.find(inner => inner._id.toString() === info.ClassId.toString());
+
+              if (innerClass) {
+                const filteredSubjects = classInfo.Subjects
+                  .filter(sub => info.SubjectNames.includes(sub.SubjectName))
+                  .map(sub => sub.SubjectName);
+
+                return {
+                  classid: innerClass._id,
+                  className: innerClass.InnerClass,  // Only return the inner class name
+                  subjects: filteredSubjects  // Only subjects present in AcademicInformation
+                };
+              }
+            }
+          }
+
+          // If no matches are found, return null
+          return null;
+        } catch (err) {
+          console.error('Error processing class info:', err);
+          return null;
+        }
+      })
+    );
+    console.log(allClasses)
+    // Filter out null or empty results
+    const validClasses = allClasses.filter(cls => cls !== null && cls.classid && cls.className);
+
+    // Send a response with the class information
+    res.status(200).json({
+      status: 'success',
+      data: {
+        classes: validClasses
+      }
+    });
+
+  } catch (error) {
+    console.error('Error fetching teacher classes:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Internal server error',
+      error: error.message
+    });
+  }
+});
+
+
+
+exports.addMyClassMore = CatchAsync(async (req, res) => {
+  try {
+    const teacherId = req.user.id;
+    const { classId, Subjects } = req.body;
+
+    // Fetch teacher profile
+    const teacherProfile = await TeacherProfile.findOne({ TeacherUserId: teacherId }).select('AcademicInformation');
+
+    if (!teacherProfile) {
+      return res.status(404).json({ message: "Teacher not found" });
+    }
+
+    const academicInfo = teacherProfile.AcademicInformation;
+
+    // Find the index of the classId in the academic information
+    const classIndex = academicInfo.findIndex(item => item.ClassId.toString() === classId.toString());
+
+    if (classIndex > -1) {
+      // ClassId exists in the academic information
+      const existingClass = academicInfo[classIndex];
+      const existingSubjects = new Set(existingClass.SubjectNames);
+
+      // Find new subjects to add
+      const newSubjects = Subjects.filter(subject => !existingSubjects.has(subject));
+
+      if (newSubjects.length > 0) {
+        // Update the existing class with new subjects
+        existingClass.SubjectNames = [...existingClass.SubjectNames, ...newSubjects];
+        await TeacherProfile.updateOne(
+          { TeacherUserId: teacherId, 'AcademicInformation.ClassId': classId },
+          { $set: { 'AcademicInformation.$.SubjectNames': existingClass.SubjectNames } }
+        );
+      }
+
+      return res.status(200).json({
+        status: 'success',
+        message: 'Subjects updated successfully'
+      });
+    } else {
+      // ClassId does not exist in the academic information
+      const newEntry = {
+        ClassId: classId,
+        SubjectNames: Subjects
+      };
+
+      await TeacherProfile.updateOne(
+        { TeacherUserId: teacherId },
+        { $push: { AcademicInformation: newEntry } }
+      );
+
+      return res.status(200).json({
+        status: 'success',
+        message: 'Class and subjects added successfully'
+      });
+    }
+
+  } catch (error) {
+    console.error('Error adding class and subjects:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Internal server error',
+      error: error.message
+    });
+  }
+});
+
+
+
+exports.deleteSubjectOfTeacher = CatchAsync(async (req, res) => {
+  try {
+    const { ClassID, subjectName } = req.body;
+    const TeacherId = req.user.id;
+
+    const teacherProfile = await TeacherProfile.findOne({ TeacherUserId: TeacherId }).select('AcademicInformation');
+
+    if (!teacherProfile) {
+      return res.status(404).json({ message: 'Teacher profile not found' });
+    }
+
+    const academicInfo = teacherProfile.AcademicInformation;
+
+    const filterClass = academicInfo.find((item) => item.ClassId.toString() === ClassID.toString() && item.SubjectNames.includes(subjectName));
+
+    if (!filterClass) {
+      return res.status(404).json({ message: 'Class or Subject not found' });
+    }
+
+    filterClass.SubjectNames = filterClass.SubjectNames.filter(subject => subject !== subjectName);
+
+    await teacherProfile.save();
+
+    res.status(200).json({ message: 'Subject deleted successfully' });
+  } catch (error) {
+    res.status(501).json({
+      success: false,
+      message: 'Subject deleted Error'
+    });
+
+  }
+});
+
+
+exports.deleteClassOfTeacher = CatchAsync(async (req, res) => {
+  try {
+    console.log("I am Hit");
+    const { ClassId } = req.body;
+    const TeacherId = req.user.id; // Assuming TeacherId is provided in params
+
+    if (!ClassId) {
+      return res.status(403).json({
+        success: false,
+        message: 'Please provide Class Id'
+      });
+    }
+
+    const teacherProfile = await TeacherProfile.findOne({ TeacherUserId: TeacherId }).select('AcademicInformation');
+    if (!teacherProfile) {
+      return res.status(404).json({ message: 'Teacher profile not found' });
+    }
+
+    const academicInfo = teacherProfile.AcademicInformation;
+
+    // Find the index of the class that needs to be deleted
+    const classIndex = academicInfo.findIndex(info => info.ClassId.toString() === ClassId);
+
+    if (classIndex === -1) {
+      return res.status(404).json({
+        success: false,
+        message: 'Class not found in teacher profile'
+      });
+    }
+
+    // Remove the class entry
+    academicInfo.splice(classIndex, 1);
+
+    // Save the updated teacher profile
+    await teacherProfile.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Class and associated subjects deleted successfully"
+    });
+  } catch (error) {
+    console.error("Error in deleting class of teacher:", error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal Server Error',
+      error: error.message
     });
   }
 });

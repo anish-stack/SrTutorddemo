@@ -148,16 +148,42 @@
   justify-content: space-between;
   font-size: 0.875rem;
 }
+
 .tags{
   position: absolute;
   top: 0;
   right: 0;
   background: #ff3e3e;
 }
+.drag {
+  display: inline-block;
+  background: linear-gradient(135deg, #ff1a05, #75f735); /* Gradient background */
+  color: white; /* Text color */
+  padding: 10px 20px; /* Padding around text */
+  border-radius: 5px; /* Rounded corners */
+  font-size: 16px; /* Font size */
+  font-weight: bold; /* Bold text */
+  text-align: center; /* Center text */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Shadow for depth */
+  transition: transform 0.2s ease, background 0.3s ease; /* Smooth transitions */
+  cursor: pointer; /* Pointer cursor on hover */
+}
+
+.drag:hover {
+  background: linear-gradient(135deg, #ff7f7f, #ff5722); /* Lighter gradient on hover */
+  transform: scale(1.05); /* Slightly enlarge on hover */
+}
+
+.drag:active {
+  transform: scale(0.95); /* Slightly shrink on click */
+}
+
 .alert {
   margin-top: 20px;
 }
-
+.p-half{
+  padding: 0.9rem;
+}
 .alert-heading {
   font-size: 1.5rem;
 }

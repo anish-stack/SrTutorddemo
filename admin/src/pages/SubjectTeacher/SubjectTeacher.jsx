@@ -27,7 +27,7 @@ const SubjectTeacherTable = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get('https://www.sr.apnipaathshaala.in/api/v1/student/admin-teacher-Request', {
+                const response = await axios.get('http://localhost:7000/api/v1/student/admin-teacher-Request', {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 console.log(response.data.data)
@@ -69,7 +69,7 @@ const SubjectTeacherTable = () => {
 
     const handleUpdateStatus = async (id, action) => {
         try {
-            await axios.put(`https://www.sr.apnipaathshaala.in/api/v1/student/admin-toggle-Request/${id}/${action}`, null, {
+            await axios.put(`http://localhost:7000/api/v1/student/admin-toggle-Request/${id}/${action}`, null, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setFilteredData(prevData =>
@@ -95,7 +95,7 @@ const SubjectTeacherTable = () => {
     const handleAddComment = async () => {
         setLoading(true)
         try {
-            const response = await axios.post('https://www.sr.apnipaathshaala.in/api/v1/student/admin-make-comment', {
+            const response = await axios.post('http://localhost:7000/api/v1/student/admin-make-comment', {
                 requestId: selectedId, comment
             });
             console.log(response.data);

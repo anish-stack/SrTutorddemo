@@ -18,9 +18,16 @@ import AllBanners from '../../pages/Banners/AllBanners'
 import TeacherRequest from '../../pages/TeacherRequest/TeacherRequest'
 import SubjectTeacher from '../../pages/SubjectTeacher/SubjectTeacher'
 import Dashboard from '../../Home/Dashboard'
+import AllCitys from '../../pages/City/AllCitys'
+import AllSubcription from '../../pages/Newsletters/AllSubcription'
+import CreateTemplete from '../../pages/Newsletters/CreateTemplete'
+import SendOfferMails from '../../pages/Newsletters/SendOfferMails'
+import MessageTemplate from '../../pages/Newsletters/MessageTemplate'
+import EditTemplate from '../../pages/Newsletters/EditTemplete'
 const SideContent = () => {
   return (
     <Routes>
+      <Route path='/' element={<Dashboard />} />
       <Route path='/Manage-Teacher' element={<Teacher />} />
       <Route path='/Manage-Teacher/:id' element={<ProfileOfTeacher />} />
       <Route path='/Search-result' element={<SearchResult />} />
@@ -36,23 +43,16 @@ const SideContent = () => {
       <Route path='/create-Review' element={<CreateReview />} />
       <Route path='/Manage-Teacher-Requests' element={<TeacherRequest />} />
       <Route path='/Subject-Teacher-Requests' element={<SubjectTeacher />} />
-      <Route path='/' element={<Dashboard />} />
-
-
-
-    
-
       <Route path='/Login-By-redirect' element={<Login />} />
+      <Route path='/Manage-City' element={<AllCitys />} />
+      <Route path='/all-subscribers' element={<AllSubcription />} />
+      <Route path='/create-template' element={<CreateTemplete />} />
+      <Route path='/all-template' element={<MessageTemplate />} />
+      <Route path='/edit-template/:id' element={<EditTemplate />} />
+
+      <Route path='/send-offers' element={<SendOfferMails />} />
+
       <Route path='/forbidden' element={<Forbidden />} />
-
-
-
-
-
-
-
-
-
     </Routes>
   )
 }

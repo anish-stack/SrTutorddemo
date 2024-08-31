@@ -27,8 +27,7 @@ const TeacherSchema = new mongoose.Schema({
         type: String
     },
     DOB: {
-        type: String,
-        required: true
+        type: String
     },
     Password: {
         type: String,
