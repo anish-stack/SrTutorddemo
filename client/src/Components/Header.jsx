@@ -6,12 +6,31 @@ import Loader from "./Loader";
 import Modal from "react-modal";
 import toast from "react-hot-toast";
 import { Dropdown, DropdownButton, Button } from "react-bootstrap";
-// Modal configuration
+import { useGeolocated } from "react-geolocated";
 Modal.setAppElement("#root");
 
 function Header() {
   const [teacherToken, setTeacherToken] = useState(null);
   const [studentToken, setStudentToken] = useState(null);
+  const { coords, isGeolocationAvailable, isGeolocationEnabled } = useGeolocated({
+    positionOptions: {
+      enableHighAccuracy: true,
+    },
+    userDecisionTimeout: 5000,
+  });
+  const [locationData, setLocationData] = useState({
+    lng: '',
+    lat: '',
+  })
+  useEffect(() => {
+    // Check if coords is defined
+    if (coords) {
+      setLocationData({
+        lng: coords.longitude,
+        lat: coords.latitude
+      });
+    }
+  }, [coords]);
   useEffect(() => {
     const token = Cookies.get("teacherToken");
     setTeacherToken(token || null);
@@ -148,6 +167,7 @@ function Header() {
                       <Link to="/">
                         <img src="assets/img/logo/srtutor.webp" alt="Logo" />
                       </Link>
+
                     </div>
                     <div className="tgmenu__navbar-wrap tgmenu__main-menu d-none d-xl-flex">
                       <ul className="navigation">
@@ -190,13 +210,10 @@ function Header() {
                     </div>
                     <div className="tgmenu__categories d-none d-md-block">
                       <div className="dropdown">
-                        <button
+                        <Link
                           style={{ border: "1px solid gray" }}
                           className="dropdown-toggle category-btn"
-                          type="button"
-                          id="dropdownMenuButton1"
-                          data-bs-toggle="dropdown"
-                          aria-expanded="false"
+                          to={`/Browse-Tutors?lat=${locationData.lat}&lng=${locationData.lng}`}
                         >
                           <svg
                             width={8}
@@ -211,22 +228,8 @@ function Header() {
                             />
                           </svg>
                           Browse Tutors
-                        </button>
-                        <ul
-                          className="dropdown-menu"
-                          aria-labelledby="dropdownMenuButton1"
-                        >
-                          <li>
-                            <a className="dropdown-item" to="#">
-                              Subjects
-                            </a>
-                          </li>
-                          <li>
-                            <a className="dropdown-item" to="#">
-                              Classes
-                            </a>
-                          </li>
-                        </ul>
+                        </Link>
+
                       </div>
                     </div>
                     <div className="tgmenu__action">
@@ -246,7 +249,7 @@ function Header() {
                       <Link
                         to={`${modalContent.teacher.DashboardUrl}`}
                         style={{ fontSize: "12px" }}
-                        className="btn  btn-primary"
+                        className="btn responive btn-primary"
                       >
                         Teacher Dashboard
                       </Link>
@@ -314,7 +317,11 @@ function Header() {
                       <Link to="/">
                         <img src="assets/img/logo/srtutor.webp" alt="Logo" />
                       </Link>
+                      <div onClick={handleToggle} className="mobile-nav-toggler">
+                        <i className="fa fa-close" />
+                      </div>
                     </div>
+
                     <div className="tgmobile__search">
                       <form action="#">
                         <input type="text" placeholder="Search..." />

@@ -20,8 +20,7 @@ function Joinus() {
                                 </div>
                                 <div className="cta__desc">
                                     <p>
-                                        Borem ipsum dolor sit amet, consectetur adipiscing eliawe awUt
-                                        elit ellus, luctus nec ullamcorper mattisBorem
+                                    We’re excited to share updates, exclusive offers, and resources. As a senior tutor, your expertise guides students to success. Check out new tools designed to enhance your teaching!
                                     </p>
                                 </div>
                                 <div className="tg-button-wrap justify-content-center justify-content-md-end">

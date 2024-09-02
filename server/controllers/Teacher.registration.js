@@ -428,8 +428,8 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
       RangeWhichWantToDoClasses,
 
     } = req.body;
-    console.log(req.body)
     const ranges = RangeWhichWantToDoClasses.flatMap((range) => range)
+    console.log(ranges)
 
     // Validate that all required fields are present and not empty
     if (
@@ -508,7 +508,12 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
     // Generate OTP and its expiration time
     const SubmitOtp = crypto.randomInt(100000, 999999); // Generate a 6-digit OTP
     const OtpExpiresTime = Date.now() + 10 * 60 * 1000; // OTP valid for 10 minutes
-
+    const formattedRanges = ranges.map(range => ({
+      location: {
+        type: 'Point',
+        coordinates: [range.lng, range.lat] // GeoJSON format requires [longitude, latitude]
+      }
+    }));
     // Save or update teacher profile details
     const teacherProfile = new TeacherProfile({
       TeacherUserId: userId,
@@ -528,7 +533,7 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
       AcademicInformation,
       latitude,
       longitude,
-      RangeWhichWantToDoClasses: ranges,
+      RangeWhichWantToDoClasses: formattedRanges,
       SubmitOtp,
       OtpExpired: OtpExpiresTime,
       isAllDetailVerified: false, // Assuming profile is not verified yet
@@ -600,6 +605,7 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
         message: "Redis No Found"
       })
     }
+    console.log(teacherProfile)
     await redisClient.del('Teacher')
     await sendEmail(emailOptions);
 
@@ -1167,55 +1173,62 @@ exports.AdvancedQueryForFindingTeacher = CatchAsync(async (req, res) => {
 
 
 
+
 exports.SearchByMinimumCondition = CatchAsync(async (req, res) => {
   try {
+    const { lat, lng } = req.query
+    if (!lat || !lng) {
+      return res.status(400).json({ message: 'Latitude and longitude are required.' });
+    }
     const { Location, ClassId, Subject } = req.params;
-    // console.log(req.params)
-    // Fetch all teachers
+
     const AllTeacher = await TeacherProfile.find();
 
-    // Split location and create a regex pattern for matching
-    const locationParts = Location.split("-").map((part) => part.trim());
-    const locationRegex = new RegExp(locationParts.join("|"), "gi");
+    let locationResults;
 
-    // console.log("Location Query:", Location);
-    // console.log("Location Regex:", locationRegex);
+    const userLocation = {
+      type: 'Point',
+      coordinates: [parseFloat(lng), parseFloat(lat)]
+    };
 
-    // Filter teachers by location
-    let locationResults = AllTeacher.filter((teacher) => {
-      return (
-        locationRegex.test(teacher.PermanentAddress.LandMark) ||
-        locationRegex.test(teacher.CurrentAddress.LandMark) ||
-        locationRegex.test(teacher.PermanentAddress.Pincode) ||
-        locationRegex.test(teacher.CurrentAddress.Pincode)
-      );
-    });
-
-    // console.log("Location Results:", locationResults);
-
-    let finalResults = locationResults.filter((teacher) => {
-      // Check if teacher has AcademicInformation
-      const academicInfo = teacher.AcademicInformation;
-      console.log("academicInfo", academicInfo);
-      // Check if ClassId matches
-      const classMatches = academicInfo.some(
-        (info) => info.ClassId.toString() === ClassId
-      );
-
-      // If ClassId matches, then check if Subject is in SubjectNames
-      if (classMatches) {
-        return academicInfo.some((info) => info.SubjectNames.includes(Subject));
+    locationResults = await TeacherProfile.find({
+      'RangeWhichWantToDoClasses.location': {
+        $near: {
+          $geometry: userLocation,
+          $maxDistance: 5000
+        }
       }
-
-      return false;
     });
+    console.log(locationResults)
+    if (ClassId && Subject) {
 
-    console.log("Final Results:", finalResults);
+      let finalResults = locationResults.filter((teacher) => {
+        // Check if teacher has AcademicInformation
+        const academicInfo = teacher.AcademicInformation;
+        console.log("academicInfo", academicInfo);
+        // Check if ClassId matches
+        const classMatches = academicInfo.some(
+          (info) => info.ClassId.toString() === ClassId
+        );
 
-    // Calculate the count of the filtered results
-    const count = finalResults.length;
+        // If ClassId matches, then check if Subject is in SubjectNames
+        if (classMatches) {
+          return academicInfo.some((info) => info.SubjectNames.includes(Subject));
+        }
 
-    // Respond with the filtered results and count
+        return false;
+      });
+
+      const count = finalResults.length;
+
+      // Respond with the filtered results and count
+      return res.status(200).json({
+        success: true,
+        count: count,
+        results: locationResults,
+      });
+    }
+
     res.status(200).json({
       success: true,
       count: count,
@@ -1229,6 +1242,102 @@ exports.SearchByMinimumCondition = CatchAsync(async (req, res) => {
     });
   }
 });
+
+
+exports.BrowseTutorsNearMe = CatchAsync(async (req, res) => {
+  try {
+    const {
+      lat, lng, ResultLimit = 10, Page = 1, verified, maxRange, minRange,
+      Subject, Experience, ModeOfTuition, Gender
+    } = req.query;
+    // console.log(req.query)
+    if (!lat || !lng) {
+      return res.status(400).json({ message: 'Latitude and longitude are required.' });
+    }
+
+    // Parse and validate ResultLimit and Page
+    const limit = parseInt(ResultLimit, 10);
+    const page = parseInt(Page, 10);
+
+    if (isNaN(limit) || limit <= 0) {
+      return res.status(400).json({ message: 'Invalid ResultLimit value.' });
+    }
+
+    if (isNaN(page) || page <= 0) {
+      return res.status(400).json({ message: 'Invalid Page value.' });
+    }
+
+    // Create a point object from latitude and longitude
+    const userLocation = {
+      type: 'Point',
+      coordinates: [parseFloat(lng), parseFloat(lat)]
+    };
+
+    // Find teachers within the given radius
+    let locationResults = await TeacherProfile.find({
+      'RangeWhichWantToDoClasses.location': {
+        $near: {
+          $geometry: userLocation,
+          $maxDistance: 10000 // 5km radius in meters
+        }
+      }
+    })
+      .skip((page - 1) * limit)
+      .limit(limit);
+    // Apply additional filters
+    if (Gender) {
+      locationResults = locationResults.filter(teacher => teacher.Gender === Gender);
+    }
+
+
+
+    if (ModeOfTuition) {
+      locationResults = locationResults.filter(teacher => teacher.TeachingMode === ModeOfTuition);
+    }
+
+    if (verified) {
+      const isVerified = verified === 'true';
+      locationResults = locationResults.filter(teacher => teacher.isAllDetailVerified === isVerified);
+    }
+
+    if (Subject) {
+      const subjectFilter = locationResults.filter(teacher =>
+        teacher.AcademicInformation.some(item =>
+          item.SubjectNames.map(subjectName => subjectName.toLowerCase()).includes(Subject.toLowerCase())
+        )
+      );
+      locationResults = subjectFilter
+    }
+    
+    // if (maxRange && minRange) {
+    //   locationResults = locationResults.filter(teacher => {
+    //     const maxRangeValue = parseFloat(maxRange);
+    //     const minRangeValue = parseFloat(minRange);
+    //     // Implement the range logic according to your requirements
+    //     return teacher.ExpectedFees >= minRangeValue && teacher.ExpectedFees <= maxRangeValue;
+    //   });
+    // }
+
+    const count = locationResults.length;
+    // console.log(count)
+
+    // Respond with the filtered results and count
+    return res.status(200).json({
+      success: true,
+      count: count,
+      results: locationResults,
+    });
+
+  } catch (error) {
+    console.error("Error in BrowseTutorsNearMe:", error);
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while processing the request.",
+    });
+  }
+});
+
+
 
 
 exports.SingleTeacher = CatchAsync(async (req, res) => {

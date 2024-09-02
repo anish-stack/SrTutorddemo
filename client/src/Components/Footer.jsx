@@ -18,7 +18,7 @@ function Footer() {
 
         // Using toast.promise to handle the promise
         toast.promise(
-            axios.post('http://localhost:7000/api/v1/admin/join-newsletter', { email }),
+            axios.post('https://sr.apnipaathshaala.in/api/v1/admin/join-newsletter', { email }),
             {
                 pending: "📧 Subscribing, please wait...",
                 success: "🎉 Success! You've been subscribed to our newsletter.",
@@ -118,22 +118,22 @@ function Footer() {
                                     <h4 className="fw-title">Courses</h4>
                                     <ul className="list-wrap">
                                         <li>
-                                            <a href="#">Life Coach</a>
+                                            <a href="#">I-V</a>
                                         </li>
                                         <li>
-                                            <a href="#">Business Coach</a>
+                                            <a href="#">X-VIII</a>
                                         </li>
                                         <li>
-                                            <a href="#">Health Coach</a>
+                                            <a href="#">JEE</a>
                                         </li>
                                         <li>
-                                            <a href="#">Development</a>
+                                            <a href="#">NEET</a>
                                         </li>
                                         <li>
-                                            <a href="#">Web Design</a>
+                                            <a href="#">BA</a>
                                         </li>
                                         <li>
-                                            <a href="#">SEO Optimize</a>
+                                            <a href="#">BCA</a>
                                         </li>
                                     </ul>
                                 </div>

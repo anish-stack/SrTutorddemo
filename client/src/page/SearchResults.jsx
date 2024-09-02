@@ -25,7 +25,8 @@ const SearchResults = () => {
     const locationParam = params.get("Location");
     const classIdParam = params.get("ClassId");
     const subjectParam = params.get("Subject");
-
+    const latParam = params.get("lat");
+    const longParam = params.get("lng");
     if (locationParam && classIdParam && subjectParam) {
       setLocation(locationParam);
       setClassId(classIdParam);
@@ -34,7 +35,7 @@ const SearchResults = () => {
       const fetchResults = async () => {
         try {
           const response = await axios.get(
-            `http://localhost:7000/api/v1/teacher/Get-Min-search/${locationParam}/${classIdParam}/${subjectParam}`
+            `http://localhost:7000/api/v1/teacher/Get-Min-search/${locationParam}/${classIdParam}/${subjectParam}?lat=${latParam}&lng=${longParam}`
           );
           setResults(response.data.results);
           setCount(response.data.count);
@@ -84,18 +85,18 @@ const SearchResults = () => {
   useEffect(() => {
     if (error) {
       setLoading(true);
-      
+
       const timer = setTimeout(() => {
         setLoading(false);
-        setShowError(true); 
+        setShowError(true);
       }, 3000);
-      
+
       return () => clearTimeout(timer); // Clean up the timer on component unmount
     }
   }, [error]);
 
   if (loading) {
-    return <div style={{width:"100%",height:"100vh"}}><Loader/></div>;
+    return <div style={{ width: "100%", height: "100vh" }}><Loader /></div>;
   }
   if (showError) {
     return (

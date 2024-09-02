@@ -15,6 +15,7 @@ import TeacherDashboard from "./page/Teacher/TeacherDashboard";
 import ThankYouPage from "./page/Thankyou";
 import ProfilePage from "./page/Teacher/ProfilePage";
 import TeacherProfileOtp from "./page/Teacher/TeacherProfileOtp";
+import Browsetutors from "./page/Tutors/Browsetutors";
 
 function App() {
   return (
@@ -33,11 +34,12 @@ function App() {
         <Route path="/Teacher-dashboard" element={<TeacherDashboard />} />
         <Route path="/thankYou" element={<ThankYouPage />} />
         <Route path="/Teacher-Profile-Verify" element={<TeacherProfileOtp />} />
+        <Route path="/Browse-Tutors" element={<Browsetutors />} />
 
         <Route path="/Complete-profile" element={<ProfilePage />} />
 
 
-        
+
       </Routes>
       <Footer />
     </>

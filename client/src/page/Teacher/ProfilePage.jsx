@@ -21,7 +21,7 @@ const ProfilePage = () => {
             if (existingIndex > -1) {
                 return prevPoints.filter((_, index) => index !== existingIndex);
             } else {
-                return [...prevPoints, { lat, lng }];
+                return [...prevPoints, { lng, lat }];
             }
         });
     };
@@ -385,10 +385,10 @@ const ProfilePage = () => {
             console.log(response.data)
             toast.success("🎉 Profile submitted successfully! Please verify it with the OTP sent to your registered email. 📧");
             setLoading(false)
-            setTimeout(() => {
+            // setTimeout(() => {
 
-                window.location.href = `/Teacher-Profile-Verify?token=${tokenQuery}&id=${IdQuery}`
-            }, 500);
+            //     window.location.href = `/Teacher-Profile-Verify?token=${tokenQuery}&id=${IdQuery}`
+            // }, 500);
         } catch (error) {
             console.log(error)
             setLoading(false)
@@ -399,7 +399,7 @@ const ProfilePage = () => {
 
     const handleNext = (e) => {
         e.preventDefault();
-      
+
         if (validateForm()) {
             setStep(prevStep => prevStep + 1);
         }
@@ -429,7 +429,7 @@ const ProfilePage = () => {
                         </div>
                         <div className="col-md-4 mb-3">
                             <label className="form-label" htmlFor="DOB">DOB (Date-Of-Birth)</label>
-                            <input type="date"  className={`form-control `} id="DOB" name="DOB" placeholder="Enter Date Of Birth" value={formData.DOB} onChange={handleChange} />
+                            <input type="date" className={`form-control `} id="DOB" name="DOB" placeholder="Enter Date Of Birth" value={formData.DOB} onChange={handleChange} />
                         </div>
                         <div className="col-md-4 mb-3">
                             <label className="form-label" htmlFor="Gender">Gender</label>

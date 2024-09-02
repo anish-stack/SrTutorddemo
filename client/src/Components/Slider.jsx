@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ClassSearch } from "../Slices/Class.slice";
 import axios from "axios";
-import bannerShape03 from "./banner/banner_shape01.png";
+import bannerShape03 from "./banner/banner_shape03.png";
+
 import bannerImg01 from "./banner/banner_img01.png";
 import bannerImg02 from "./banner/banner_img02.png";
 import bannerImg03 from "./banner/banner_img03.png";
@@ -49,7 +50,7 @@ const Slider = () => {
   const fetchSubjects = async (classId) => {
     try {
       const response = await axios.get(
-        `http://localhost:7000/api/v1/admin/Get-Class-Subject/${classId}`
+        `https://sr.apnipaathshaala.in/api/v1/admin/Get-Class-Subject/${classId}`
       );
       setSubjects(response.data.data.Subjects || []);
     } catch (error) {
@@ -124,7 +125,7 @@ const Slider = () => {
       <div className="container-fluid">
         <div className="row px-4 align-items-center">
           <div className="col-lg-6">
-            <div className="banner__content-two">
+            <div className="banner__content-two hero-contact-left">
               <img
                 src={bannerShape03}
                 alt="shape"
@@ -225,36 +226,23 @@ const Slider = () => {
           </div>
           <div className="col-lg-6">
             <div className="banner__images-two">
-              <img
-                src={bannerShape03}
-                alt="shape"
-                className="shape"
-                data-aos="zoom-in-down"
-                data-aos-delay={800}
-              />
+           
+              <img src={bannerShape03} alt="shape" className="shape" data-aos="zoom-in-down" data-aos-delay={800} />
               <div className="banner__images-grid">
                 <div className="banner__images-col" data-aos="fade-up" data-aos-delay={200}>
                   <img src={bannerImg01} alt="img" />
                 </div>
                 <div className="banner__images-col">
-                  <img
-                    src={bannerImg02}
-                    alt="img"
-                    data-aos="fade-left"
-                    data-aos-delay={300}
-                  />
-                  <img
-                    src={bannerImg03}
-                    alt="img"
-                    data-aos="fade-left"
-                    data-aos-delay={400}
-                  />
+                  <img src={bannerImg02} alt="img" data-aos="fade-left" data-aos-delay={300}/>
+                  <img src={bannerImg03} alt="img" data-aos="fade-left" data-aos-delay={400} />
                 </div>
               </div>
+
             </div>
           </div>
         </div>
       </div>
+      <img src="assets/img/banner/banner_shape01.png" alt="shape" class="banner__two-shape alltuchtopdown" />
     </section>
   );
 };

@@ -101,7 +101,7 @@ const CompleteProfile = ({ profileInfo, readable, title }) => {
                 return;
             }
 
-            const response = await axios.put('http://localhost:7000/api/v1/teacher/update-profile-details', updatedFields, {
+            const response = await axios.put('https://sr.apnipaathshaala.in/api/v1/teacher/update-profile-details', updatedFields, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -118,7 +118,7 @@ const CompleteProfile = ({ profileInfo, readable, title }) => {
     }
 
     return (
-        <div className="container my-4">
+        <div className="container complet-profile-bg ">
             <h2>{title} Profile</h2>
             <form onSubmit={handleSubmit}>
                 <div className="row">

@@ -2,9 +2,18 @@ const mongoose = require('mongoose');
 
 // Define the Teacher Profile schema
 const rangeSchema = new mongoose.Schema({
-    lat: { type: Number, required: true },
-    lng: { type: Number, required: true }
-  });
+    location: {
+        type: {
+            type: String,
+            enum: ['Point'],
+            default: 'Point'  // Automatically sets to 'Point'
+        },
+        coordinates: {
+            type: [Number], // [longitude, latitude]
+            required: true
+        }
+    }
+})
 const TeacherProfileSchema = new mongoose.Schema({
     FullName: {
         type: String,
@@ -133,6 +142,7 @@ const TeacherProfileSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Create the Teacher Profile model
+TeacherProfileSchema.index({ 'RangeWhichWantToDoClasses.location': '2dsphere' })
 const TeacherProfile = mongoose.model('TeacherProfile', TeacherProfileSchema);
 
 module.exports = TeacherProfile;

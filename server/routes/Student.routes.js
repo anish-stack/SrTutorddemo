@@ -31,6 +31,7 @@ const {
   UpdateComment,
   ToggleDealDone,
 } = require("../controllers/SubectRequestController");
+const { BrowseTutorsNearMe } = require("../controllers/Teacher.registration");
 
 //User Actions With
 StudentRouter.post("/Create-Student", StudentRegister);
@@ -65,5 +66,9 @@ StudentRouter.put("/admin-toggle-Request/:requestId/:action", isAdmin, toggleSta
 StudentRouter.get("/admin-particular-Request", getParticularTeacherRequest);
 StudentRouter.post('/ToggleDealDone/:requestId',ToggleDealDone)
 StudentRouter.post("/admin-do-comment", addAdminCommentOnParticular);
+
+
+StudentRouter.get('/BrowseTutorsNearMe',BrowseTutorsNearMe)
+
 
 module.exports = StudentRouter;

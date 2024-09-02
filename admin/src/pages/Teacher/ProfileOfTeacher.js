@@ -38,9 +38,9 @@ const ProfileOfTeacher = () => {
     const handleUpdateClick = () => {
         setIsEditing(false);
         console.log(formData)
-        // dispatch(updateTeacher({ id, formData }));
-        // You may want to add a success message here
+
     };
+    console.log(teacherData)
 
     if (loading) {
         return <div>Loading...</div>;
@@ -251,15 +251,29 @@ const ProfileOfTeacher = () => {
                         <label className="block py- px-3 text-sm font-medium text-gray-700">Longitude</label>
                         <input type="text" readOnly value={teacherData.longitude} className="mt-1 py-1 px-3 block w-full bg-white border border-gray-300 rounded-md shadow-sm text-gray-900" />
                     </div>
-                    <div className="bg-gray-100 p-4 rounded-md md:col-span-2">
-                        <label className="block py- px-3 text-sm font-medium text-gray-700">Range for Classes In Km</label>
-                        <input type="text"
-                            name="RangeWhichWantToDoClasses"
-                            //   value={`${formData.PermanentAddress.HouseNo}, ${formData.PermanentAddress.LandMark}, ${formData.PermanentAddress.District}, ${formData.PermanentAddress.Pincode}`}
-                            onChange={handleInputChange}
-                            readOnly={!isEditing}
-                            value={`${formData.RangeWhichWantToDoClasses}`} className="mt-1 py-1 px-3 block w-full bg-white border border-gray-300 rounded-md shadow-sm text-gray-900" />
-                    </div>
+                    <label className="block py- px-3 text-sm font-medium text-gray-700">Range for Classes In Km</label>
+                    {teacherData.RangeWhichWantToDoClasses.map((item, index) => (
+
+                        <div key={index} className="bg-gray-100 gap-2 p-4 grid grid-cols-2 rounded-md md:col-span-2">
+                            <div>
+                                <label>Lat</label>
+                                <input type="text"
+                                    name="RangeWhichWantToDoClasses"
+                                    readOnly={!isEditing}
+                                    value={`${item.lat}`} className="mt-1 py-1 px-3 block w-full bg-white border border-gray-300 rounded-md shadow-sm text-gray-900"
+                                />
+                            </div>
+                            <div>
+                                <label>lang</label>
+                                <input type="text"
+                                    name="RangeWhichWantToDoClasses"
+                                    onChange={handleInputChange}
+                                    readOnly={!isEditing}
+                                    value={`${item.lat}`} className="mt-1 py-1 px-3 block w-full bg-white border border-gray-300 rounded-md shadow-sm text-gray-900"
+                                />
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </div>
 

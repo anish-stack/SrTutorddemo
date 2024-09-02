@@ -39,14 +39,14 @@ const TeacherPost = () => {
         { value: '5000 - 7000', label: 'Five Classes a Week Rs.5000 - 7000' },
     ];
 
-    function romanToInt(roman) {
-        const romanMap = {
-            'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5,
-            'VI': 6, 'VII': 7, 'VIII': 8, 'IX': 9, 'X': 10,
-            'XI': 11, 'XII': 12
-        };
-        return romanMap[roman] || 0;
-    }
+    // function romanToInt(roman) {
+    //     const romanMap = {
+    //         'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5,
+    //         'VI': 6, 'VII': 7, 'VIII': 8, 'IX': 9, 'X': 10,
+    //         'XI': 11, 'XII': 12
+    //     };
+    //     return romanMap[roman] || 0;
+    // }
 
     function generateClassNamesFromRange(className) {
         const romanNumerals = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
@@ -177,6 +177,9 @@ const TeacherPost = () => {
         }
     };
 
+    const getData = JSON.parse(sessionStorage.getItem('formData'))
+    console.log(getData)
+   
     // Show a confirmation dialog when the user tries to refresh or leave the page
     window.addEventListener('beforeunload', (event) => {
         const formData = JSON.parse(sessionStorage.getItem('formData'));
@@ -225,33 +228,38 @@ const TeacherPost = () => {
                         </div>
                     </div>
                 </div>
-
-                <div className="steps">
+                 
+                <div className="container-fluid steps-bg">
+                    {/* <div className='row'>
+                        <div className='col-md-12 mb-5'>
+                        <div className="courses__nav-active">
+                                <div className="stepper">
+                                    <ul className="stepper-list">
+                                        {[1, 2, 3, 4].map(step => (
+                                            <li key={step} className={`step ${currentStep === step ? 'active' : ''}`}>
+                                                <div className="step-number">{step}</div>
+                                                <div className="step-label">Step {step}</div>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                    <div className="progress-bar">
+                                        <div className="progress-fill" style={{ width: `${(currentStep - 1) * 33.33}%` }}></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div> */}
                     {currentStep === 1 && (
-                        <div className="card col-md-12 p-4 mb-4">
+                        <div className="card card-radius col-md-12 p-4 mb-4">
 
                             <h4>Select Classes</h4>
-                            <div className="form-group d-flex justify-content-between align-items-center">
+                            <div className="form-group d-flex justify-content-between align-items-center mt-4 pb-3">
                                 {allClasses.map((classItem, index) => (
-                                    <label key={index} htmlFor={`class-${classItem}`} className="d-flex  gap-2 justify-content-center flex-column align-items-center">
-                                        <div className="card form-check d-flex  justify-content-center align-items-center p-2 mb-4 shadow-sm" style={{ minWidth: '120px' }}>
-                                            <img
-                                                src={virtualClass}
-                                                alt=""
-                                                className="img-fluid"
-                                                style={{ width: '40px', height: '40px', objectFit: 'cover', cursor: 'pointer' }}
-                                            />
-                                            <div className='d-flex  gap-2 justify-content-center align-items-center'>
-                                                <input
-                                                    className="form-check-input mt-2"
-                                                    type="checkbox"
-                                                    id={`class-${classItem}`}
-                                                    name="selectedClasses"
-                                                    value={classItem}
-                                                    checked={Array.isArray(JSON.parse(sessionStorage.getItem('formData'))?.selectedClasses) && JSON.parse(sessionStorage.getItem('formData'))?.selectedClasses.includes(classItem)}
-                                                    onChange={handleChange}
-                                                    style={{ cursor: 'pointer' }}
-                                                />
+                                    <label key={index} htmlFor={`class-${classItem}`} className="d-flex  gap-2 justify-content-center flex-column align-items-center select-class">
+                                        <div className="card select-class-design form-check d-flex  justify-content-center align-items-center p-2 mb-4 shadow-sm" style={{ minWidth: '120px' }}>
+                                            <img src={virtualClass} alt="" className="img-fluid" style={{ width: '40px', height: '40px', objectFit: 'cover', cursor: 'pointer' }} />
+                                            <div className='d-flex  gap-2 justify-content-center align-items-center select-class-content'>
+                                                <input className="form-check-input mt-2" type="checkbox"  id={`class-${classItem}`} name="selectedClasses" value={classItem} checked={Array.isArray(JSON.parse(sessionStorage.getItem('formData'))?.selectedClasses) && JSON.parse(sessionStorage.getItem('formData'))?.selectedClasses.includes(classItem)} onChange={handleChange}  style={{ cursor: 'pointer' }} />
                                                 <span className="form-check-label mt-2" style={{ fontWeight: '800', fontSize: '0.9rem' }}>
                                                     {classItem}
                                                 </span>
@@ -262,15 +270,9 @@ const TeacherPost = () => {
                                 ))}
                             </div>
 
-                            <div className="form-group">
-                                <label>Subjects</label>
-                                <Select
-                                    isMulti
-                                    name="subjects"
-                                    styles={{
-                                        control: (baseStyles, state) => ({
-                                            ...baseStyles,
-                                            borderColor: state.isFocused ? 'red' : 'gray',
+                            <div className="form-group select-sbuject-bg">
+                                <label  className='text-whit'><strong>Subjects</strong></label>
+                                <Select className='mt-2' isMulti name="subjects" styles={{ control: (baseStyles, state) => ({ ...baseStyles, borderColor: state.isFocused ? 'red' : 'gray',
                                         }),
                                     }}
                                     options={Subjects}
@@ -278,27 +280,27 @@ const TeacherPost = () => {
                                     value={Subjects.filter(subject => JSON.parse(sessionStorage.getItem('formData'))?.subjects?.includes(subject.value))}
                                 />
                             </div>
-                            <div className="form-group mb-4">
+
+                            <div className="form-group mb-4 mt-4">
                                 <label className='fs-4 fw-bold'>Interested in</label>
-                                <div className="d-flex flex-wrap gap-4">
+                                <div className="row mt-4">
+
                                     {options.map((option) => (
-                                        <div
+                                        <div className='col-md-4'>
+                                              <div
                                             key={option.value}
-                                            className={`card form-check d-flex flex-column align-items-center p-2 mb-4 shadow-sm ${selectedsOption === option.value ? 'border border-danger scale-105' : ''
+                                            className={`card card-interest form-check d-flex flex-column align-items-center p-2 mb-4 shadow-sm ${selectedsOption === option.value ? 'border border-danger scale-105' : ''
                                                 }`}
                                             style={{ minWidth: '120px', cursor: 'pointer', transition: 'transform 0.3s, border-color 0.3s' }}
                                             onClick={() => handleImageClick(option.value)}
                                         >
-                                            <img
-                                                src={option.imgSrc}
-                                                alt={option.label}
-                                                className={`img-fluid ${selectedsOption === option.value ? 'scale-110' : ''}`}
-                                                style={{ width: '40px', height: '40px', objectFit: 'cover', transition: 'transform 0.3s' }}
-                                            />
+                                            <img src={option.imgSrc} alt={option.label} className={`img-fluid ${selectedsOption === option.value ? 'scale-110' : ''}`} style={{ width: '40px', height: '40px', objectFit: 'cover', transition: 'transform 0.3s' }} />
                                             <span className="form-check-label mt-2" style={{ fontWeight: '800', fontSize: '0.9rem' }}>
                                                 {option.label}
                                             </span>
                                         </div>
+                                        </div>
+                                      
                                     ))}
                                 </div>
                             </div>
@@ -309,7 +311,7 @@ const TeacherPost = () => {
                         </div>
                     )}
                     {currentStep === 2 && (
-                        <div className="card p-4 mb-4">
+                        <div className="card card-radius p-4 mb-4">
                             <h4>Preferences</h4>
                             <div className="form-group mb-4">
                                 <label>Class Frequency</label>
@@ -382,16 +384,12 @@ const TeacherPost = () => {
                         </div>
                     )}
                     {currentStep === 3 && (
-                        <div className="card p-4 mb-4">
+                        <div className="card card-radius p-4 mb-4">
 
                             <div className="form-group">
                                 <h4>Review and Submit</h4>
-                                <textarea
-                                    className="form-control"
-
-                                    readOnly
-                                    value={JSON.stringify(JSON.parse(sessionStorage.getItem('formData')), null, 2)}
-                                />
+                              
+                                <input type="text" value={''} />
                             </div>
 
                             <div className='d-flex gap-2 mt-2  justify-content-center items-center'>

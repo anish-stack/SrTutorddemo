@@ -47,7 +47,7 @@ const MyClasses = ({ Class }) => {
     const handleDelete = async (id) => {
         try {
             setLoadingId(id); // Set the loading ID
-            const response = await axios.delete('http://localhost:7000/api/v1/teacher/deleteClassOfTeacher', {
+            const response = await axios.delete('https://sr.apnipaathshaala.in/api/v1/teacher/deleteClassOfTeacher', {
                 data: { ClassId: id },
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -66,7 +66,7 @@ const MyClasses = ({ Class }) => {
 
     const handleDeleteSubject = async (id, Subject) => {
         try {
-            const response = await axios.delete('http://localhost:7000/api/v1/teacher/delete-Subject', {
+            const response = await axios.delete('https://sr.apnipaathshaala.in/api/v1/teacher/delete-Subject', {
                 data: { ClassID: id, subjectName: Subject },
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -97,16 +97,11 @@ const MyClasses = ({ Class }) => {
     };
 
     return (
-        <div className="container mt-4">
+        <div className="container myclass-bg px-5 py-2">
             {error && <Alert variant="danger">{error}</Alert>}
-            <div className="mb-3 text-end">
-                <Button
-                    variant="primary"
-                    onClick={handleOpens}
-                    className="btn btn-primary btn-sm"
-                    style={{ padding: '8px 16px', borderRadius: '5px' }}
-                >
-                    Add Class
+            <div className="mb-3 text-end addclass-btn-row">
+                <Button variant="primary" onClick={handleOpens} className="btn btn-primary btn-sm myclass-adbtn" style={{ padding: '8px 16px', borderRadius: '5px' }} >
+                    + Add Class
                 </Button>
             </div>
 
@@ -116,7 +111,7 @@ const MyClasses = ({ Class }) => {
                 ) : currentClasses.length > 0 ? (
                     currentClasses.map((item, index) => (
                         <div key={index} className="col-md-4 mb-4">
-                            <Card className="glass border-0 h-100">
+                            <Card className="glass border-0 h-100 ">
                                 <Card.Body className="d-flex flex-column justify-content-between">
                                     <div>
                                         <Card.Title className="h6 mb-2">{item.className}</Card.Title>

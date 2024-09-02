@@ -1,47 +1,64 @@
-{
-  "_id": "66d05094d495c8adb93d4987",
-  "FullName": "Test Teacher",
-  "DOB": "1987-06-23T00:00:00.000Z",
-  "Gender": "Male",
-  "ContactNumber": "8525639857",
-  "AlternateContact": "2277556699",
-  "PermanentAddress": {},
-  "CurrentAddress": {},
-  "isAddressSame": false,
-  "Qualification": "MCA",
-  "TeachingExperience": "5",
-  "ExpectedFees": 5000,
-  "VehicleOwned": false,
-  "TeachingMode": "Home Tuition at Your Home",
-  "AcademicInformation": [
-    {
-      "ClassId": "66c2cc78e14938da64e9b438",
-      "SubjectNames": [
-        "Mathematics",
-        "Physics",
-        "Hindi",
-        "Geography",
-        "Chemistry",
-        "ilove y"
-      ],
-      "_id": "66d05094d495c8adb93d4988"
-    }
-  ],
-  "RangeWhichWantToDoClasses": [
-    {
-      "lat": 28.72831761818101,
-      "lng": 77.1685523976339,
-      "_id": "66d05094d495c8adb93d498b"
-    },
-    {
-      "lat": 28.71552166979382,
-      "lng": 77.11636733904017,
-      "_id": "66d05094d495c8adb93d498c"
-    },
-    {}, {}, {}, {}, {}
-  ],
-  "TeacherUserId": "66cf11820d392bd441517fd6",
-  "isAllDetailVerified": true,
-  "createdAt": "2024-08-29T10:42:28.653Z",
-  "updatedAt": "2024-08-30T06:43:47.242Z"
-}
+ {
+           
+          
+            "Gender": "Female"
+            "TeachingExperience": "5",
+            "ExpectedFees": 2000,
+            "VehicleOwned": true,
+            "TeachingMode": "Home Tuition at Your Home",
+            "AcademicInformation": [
+                {
+                    "ClassId": "66c2cb9f6f6dc1eea6cd565f",
+                    "SubjectNames": [
+                        "Mathematics",
+                        "English",
+                        "Science King"
+                    ],
+                    "_id": "66d569d07995292a18b465f4"
+                },
+                {
+                    "ClassId": "66c2ccfee14938da64e9b7ff",
+                    "SubjectNames": [
+                        "Mathematics",
+                        "Physics",
+                        "Chemistry"
+                    ],
+                    "_id": "66d569d07995292a18b465f5"
+                },
+                {
+                    "ClassId": "66c2cd09e14938da64e9b805",
+                    "SubjectNames": [
+                        "Biology",
+                        "Chemistry",
+                        "Physics"
+                    ],
+                    "_id": "66d569d07995292a18b465f6"
+                },
+                {
+                    "ClassId": "66d1732924b572536959a1dc",
+                    "SubjectNames": [
+                        "Mathematics",
+                        "English",
+                        "Hindi",
+                        "Sanskrit",
+                        "Art Education",
+                        "Physical Education"
+                    ],
+                    "_id": "66d569d07995292a18b465f7"
+                },
+                {
+                    "ClassId": "66c2cd4de14938da64e9b81b",
+                    "SubjectNames": [
+                        "Mathematics",
+                        "Data Structures",
+                        "Software Engineering",
+                        "Operating Systems",
+                        "Object-Oriented Programming",
+                        "Web Technology"
+                    ],
+                    "_id": "66d569d07995292a18b465f8"
+                }
+            ],
+            "isAllDetailVerified": false,
+          
+        },
