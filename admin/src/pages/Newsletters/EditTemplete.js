@@ -18,7 +18,7 @@ const navigate = useNavigate()
 
   const handleFetchTemplate = async () => {
     try {
-      const res = await axios.get('http://localhost:7000/api/v1/admin/get-all-templates');
+      const res = await axios.get('https://www.sr.apnipaathshaala.in/api/v1/admin/get-all-templates');
       const template = res.data.data.find((item) => item._id === id);  // Adjust '_id' if your id field name is different
       if (template) {
         setSubject(template.subject || '');
@@ -35,7 +35,7 @@ const navigate = useNavigate()
   const handleEditTemplate = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`http://localhost:7000/api/v1/admin/edit-template/${id}`, {
+      await axios.put(`https://www.sr.apnipaathshaala.in/api/v1/admin/edit-template/${id}`, {
         subject,
         message: content,
       });

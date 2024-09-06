@@ -371,6 +371,55 @@ exports.toggleStatusOfRequest = CatchAsync(async (req, res) => {
 });
 
 
+exports.deleteRequest = CatchAsync(async (req, res) => {
+  try {
+    const { requestId } = req.params;
+
+    // Attempt to find the request in SubjectTeacherRequest collection
+    let request = await SubjectTeacherRequest.findByIdAndDelete(requestId);
+
+    if (!request) {
+      // If not found, attempt to find the request in ParticularTeacher collection
+      request = await ParticularTeacher.findById(requestId);
+
+      if (!request) {
+        // If still not found, return a 404 error response
+        return res.status(404).json({
+          success: false,
+          message: "Request not found",
+        });
+      }
+    }
+
+    // Update the status of the found request
+   
+    await request.save();
+    const redisClient = req.app.locals.redis;
+
+    if (!redisClient) {
+      throw new Error('Redis client is not available.');
+    }
+
+    await redisClient.del('particularTeacherData');
+    // Return a success response
+    res.status(200).json({
+      success: true,
+      message: "Request Delete  successfully",
+      data: request,
+    });
+
+  } catch (error) {
+    ServerError(`Error in Delete: ${error.message}`, 'Subject Controller', 'delete request')
+
+    console.error("Error updating request status:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+
 exports.ToggleDealDone = CatchAsync(async (req, res) => {
   try {
     const { requestId } = req.params;

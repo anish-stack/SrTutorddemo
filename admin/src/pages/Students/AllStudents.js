@@ -12,7 +12,7 @@ const AllStudents = () => {
     useEffect(() => {
         const fetchStudents = async () => {
             try {
-                const response = await axios.get('http://localhost:7000/api/v1/student/get-all-students', {
+                const response = await axios.get('https://www.sr.apnipaathshaala.in/api/v1/student/get-all-students', {
                     headers: {
                         Authorization: `Bearer ${Token}` // Replace with your actual token or state variable
                     }
@@ -32,7 +32,7 @@ const AllStudents = () => {
     const handleDeleteStudent = async (studentId) => {
         try {
             await toast.promise(
-                axios.delete(`http://localhost:7000/api/v1/student/delete/${studentId}`, {
+                axios.delete(`https://www.sr.apnipaathshaala.in/api/v1/student/delete/${studentId}`, {
                     headers: {
                         Authorization: `Bearer ${Token}` // Replace with your actual token or state variable
                     }

@@ -38,7 +38,7 @@ const AllTestinomial = () => {
     const handleDeleteTest = async (id) => {
         try {
             await toast.promise(
-                axios.delete(`http://localhost:7000/api/v1/admin/Delete-Testimonial/${id}`, {
+                axios.delete(`https://www.sr.apnipaathshaala.in/api/v1/admin/Delete-Testimonial/${id}`, {
                     headers: {
                         Authorization: `Bearer ${Token}`
                     }
@@ -57,7 +57,7 @@ const AllTestinomial = () => {
 
     const toggleStatusOfReview = async (id) => {
         try {
-            await axios.post(`http://localhost:7000/api/v1/admin/Toggle-Testimonial-Status/${id}`, {}, {
+            await axios.post(`https://www.sr.apnipaathshaala.in/api/v1/admin/Toggle-Testimonial-Status/${id}`, {}, {
                 headers: {
                     Authorization: `Bearer ${Token}`
                 }
@@ -146,12 +146,12 @@ const AllTestinomial = () => {
                                     </button>
                                 </div>
 
-                                <Link
+                                {/* <Link
                                     to={`/Edit-review/${item._id}`}
                                     className="whitespace-nowrap gap-1 text-sm flex items-center justify-center rounded border border-green-400 bg-gradient-to-r from-green-100 to-green-200 px-4 py-1 font-semibold text-green-600 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-green-300 focus:ring-offset-2 active:opacity-100 transition duration-150"
                                 >
                                     <CiEdit />
-                                </Link>
+                                </Link> */}
                                 <button
                                     onClick={() => handleDeleteTest(item._id)}
                                     className="whitespace-nowrap gap-1 text-sm flex items-center justify-center rounded border border-red-400 bg-gradient-to-r from-red-100 to-red-200 px-4 py-1 font-semibold text-red-600 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-offset-2 active:opacity-100 transition duration-150"

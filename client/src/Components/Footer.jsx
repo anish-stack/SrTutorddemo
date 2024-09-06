@@ -18,11 +18,11 @@ function Footer() {
 
         // Using toast.promise to handle the promise
         toast.promise(
-            axios.post('https://sr.apnipaathshaala.in/api/v1/admin/join-newsletter', { email }),
+            axios.post('https://www.sr.apnipaathshaala.in/api/v1/admin/join-newsletter', { email }),
             {
                 pending: "📧 Subscribing, please wait...",
                 success: "🎉 Success! You've been subscribed to our newsletter.",
-                 error: "❌ An error occurred. Please try again later."
+
             }
         )
             .then(response => {
@@ -33,6 +33,7 @@ function Footer() {
                 }
             })
             .catch(error => {
+                console.log(error)
                 toast.error(error.response?.data?.message || "❌ An unexpected error occurred.");
             });
     };
@@ -93,22 +94,22 @@ function Footer() {
                                     <h4 className="fw-title">Resources</h4>
                                     <ul className="list-wrap">
                                         <li>
-                                            <a href="about-us.html">About</a>
+                                            <Link  to="/about-us">About</Link>
                                         </li>
                                         <li>
-                                            <a href="contact.html">Contact</a>
+                                            <Link  to="/contact-us">Contact</Link>
                                         </li>
                                         <li>
-                                            <a href="contact.html">Help Center</a>
+                                            <Link  to="/Help">Help Center</Link>
                                         </li>
                                         <li>
-                                            <a href="#">Refund</a>
+                                            <Link  to="/Refunds">Refund</Link>
                                         </li>
                                         <li>
-                                            <a href="#">Conditions</a>
+                                            <Link  to="/Conditions">Conditions</Link>
                                         </li>
                                         <li>
-                                            <a href="#">Privacy Policy</a>
+                                            <Link  to="/Privacy">Privacy Policy</Link>
                                         </li>
                                     </ul>
                                 </div>

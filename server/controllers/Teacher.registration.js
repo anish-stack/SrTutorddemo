@@ -98,7 +98,7 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
       SignInOtp: otp,
       OtpExpiresTime: otpExpiresTime,
     });
-    console.log(newTeacher);
+ 
     const Options = {
       email: Email,
       subject: "OTP Verification",
@@ -128,6 +128,7 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
     }
 
     // Clear cache
+    // await newTeacher.save()
     await redisClient.del("Teacher");
     await sendEmail(Options);
 
@@ -1177,8 +1178,15 @@ exports.AdvancedQueryForFindingTeacher = CatchAsync(async (req, res) => {
 exports.SearchByMinimumCondition = CatchAsync(async (req, res) => {
   try {
     const { lat, lng } = req.query
+    console.log(req.query)
     if (!lat || !lng) {
       return res.status(400).json({ message: 'Latitude and longitude are required.' });
+    }
+    const latitude = parseFloat(lat);
+    const longitude = parseFloat(lng);
+
+    if (isNaN(latitude) || isNaN(longitude)) {
+      return res.status(400).json({ message: 'Valid latitude and longitude are required.' });
     }
     const { Location, ClassId, Subject } = req.params;
 
@@ -1308,7 +1316,7 @@ exports.BrowseTutorsNearMe = CatchAsync(async (req, res) => {
       );
       locationResults = subjectFilter
     }
-    
+
     // if (maxRange && minRange) {
     //   locationResults = locationResults.filter(teacher => {
     //     const maxRangeValue = parseFloat(maxRange);

@@ -10,10 +10,11 @@ import toast from "react-hot-toast";
 
 
 const ClassModel = ({ showModal, handleClose, subject }) => {
-  const { Class, Subjects = [], isClass, id } = subject; // Default Subjects to an empty array if it's not an array
+  const { Class, Subjects = [], isClass, id } = subject;
   const [locationSuggestions, setLocationSuggestions] = useState([]);
   const token = Cookies.get('studentToken') || false
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [loading,setLoading] = useState(false)
   const [formData, setFormData] = useState({
     Subject: [],
     Class: "",
@@ -100,18 +101,21 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
       ...formData,
       Subject: isClass ? formData.Subject : Subjects, // Set to Subjects if not class-based
     };
-
+    setLoading(true)
     try {
-      const response = await axios.post('http://localhost:7000/api/v1/student/Subject-teacher-Request', submittedData, {
+      const response = await axios.post('https://www.sr.apnipaathshaala.in/api/v1/student/Subject-teacher-Request', submittedData, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       })
-      console.log(response)
+      setLoading(false)
+
 
       window.location.href = "/thankYou"
     } catch (error) {
       console.log(error)
+      setLoading(false)
+
       toast.error("Server Error Exist Please try After Sometimes")
 
 
@@ -422,8 +426,8 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
               <Button variant="secondary" onClick={() => handleStepChange(2)}>
                 Back
               </Button>
-              <Button variant="primary" onClick={handleSubmit}>
-                Submit
+              <Button variant="primary" disabled={loading} onClick={handleSubmit}>
+               {loading ? 'Please Wait...':'Submit'}
               </Button>
             </>
           )}

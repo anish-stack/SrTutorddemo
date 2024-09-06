@@ -24,6 +24,9 @@ import CreateTemplete from '../../pages/Newsletters/CreateTemplete'
 import SendOfferMails from '../../pages/Newsletters/SendOfferMails'
 import MessageTemplate from '../../pages/Newsletters/MessageTemplate'
 import EditTemplate from '../../pages/Newsletters/EditTemplete'
+import TeacherInfo from '../../pages/TeacherInfo/TeacherInfo'
+import StudentInfo from '../../pages/StudentInfo/StudentInfo'
+import ClassTeacherRequest from '../../pages/ClassTeacherRequest/ClassTeacherRequest'
 const SideContent = () => {
   return (
     <Routes>
@@ -49,6 +52,9 @@ const SideContent = () => {
       <Route path='/create-template' element={<CreateTemplete />} />
       <Route path='/all-template' element={<MessageTemplate />} />
       <Route path='/edit-template/:id' element={<EditTemplate />} />
+      <Route path='/teacher-info/:id' element={<TeacherInfo />} />
+      <Route path='/Student-info/:id' element={<StudentInfo />} />
+      <Route path='/Manage-Class-teacher-request' element={<ClassTeacherRequest />} />
 
       <Route path='/send-offers' element={<SendOfferMails />} />
 

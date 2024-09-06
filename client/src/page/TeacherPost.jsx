@@ -1,27 +1,113 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import Select, { StylesConfig } from 'react-select';
-import { updateFormData, setCurrentStep } from '../Slices/TeacherRequest.slice';
-import { useLocation } from 'react-router-dom';
-import virtualClass from './virtual-class.png'
-import tarvel from './earth.png'
-import online from './online-learning.png'
-import home from './home.png'
+import React, { useState } from 'react';
+import { Modal, Button, Form, Alert } from 'react-bootstrap';
+import Select from 'react-select';
+import LoginModal from '../Components/LoginModel';
+import Cookies from 'js-cookie'
+const TeacherPost = ({ item, isOpen, OnClose }) => {
+    const token = Cookies.get('studentToken') || false
+    const [formData, setFormData] = useState({
+        selectedClasses: [],
+        teacherGender: '',
+        numberOfSessions: [],
+        subjects: [],
+        minBudget: '',
+        maxBudget: '',
+        currentAddress: '',
+        state: '',
+        pincode: '',
+        studentName: '',
+        studentEmail: '',
+        contactNumber: '',
+        allDetailsCorrect: false,
+    });
+    const [step, setStep] = useState(1);
+    const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false);
+    const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
-const TeacherPost = () => {
-    const dispatch = useDispatch();
+    const classOptions = item?.InnerClasses?.map(cls => ({
+        value: cls.InnerClass,
+        label: cls.InnerClass,
+    }));
 
-    const { DataForm, currentStep } = useSelector((state) => state.teacherProfile);
-    const locations = new URLSearchParams(window.location.href);
-    const query = locations.get('ClassName');
-    const { ClassSelected } = useSelector((state) => state.ClassSelected);
-    const className = ClassSelected?.Class || query;
-    const Subjects = ClassSelected?.Subjects?.map((item) => ({
-        value: item.SubjectName,
-        label: item.SubjectName,
-    })) || [];
+    const subjectOptions = item?.Subjects?.map(subject => ({
+        value: subject.SubjectName,
+        label: subject.SubjectName,
+    }));
 
-    const allClasses = generateClassNamesFromRange(className);
+    const handleSelectChange = (selectedOption, { name }) => {
+        setFormData({
+            ...formData,
+            [name]: selectedOption,
+        });
+        setErrors({
+            ...errors,
+            [name]: '', // Clear error on change
+        });
+    };
+    const closeLoginModal = () => {
+        setIsLoginModalOpen(false);
+
+    };
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({
+            ...formData,
+            [name]: value,
+        });
+        setErrors({
+            ...errors,
+            [name]: '', // Clear error on change
+        });
+    };
+
+    const handleCheckboxChange = (e) => {
+        setFormData({
+            ...formData,
+            allDetailsCorrect: e.target.checked,
+        });
+        setErrors({
+            ...errors,
+            allDetailsCorrect: '', // Clear error on change
+        });
+    };
+
+    const validateForm = () => {
+        const newErrors = {};
+
+        if (step === 1) {
+            if (!formData.selectedClasses.length) newErrors.selectedClasses = 'Please select at least one class.';
+            if (!formData.teacherGender) newErrors.teacherGender = 'Please select a gender.';
+            if (!formData.numberOfSessions.length) newErrors.numberOfSessions = 'Please select the number of sessions.';
+            if (!formData.subjects.length) newErrors.subjects = 'Please select at least one subject.';
+        } else if (step === 2) {
+            if (!formData.minBudget) newErrors.minBudget = 'Minimum budget is required.';
+            if (!formData.maxBudget) newErrors.maxBudget = 'Maximum budget is required.';
+            if (!formData.currentAddress) newErrors.currentAddress = 'Current address is required.';
+            if (!formData.state) newErrors.state = 'State is required.';
+            if (!formData.pincode) newErrors.pincode = 'Pincode is required.';
+        } else if (step === 3) {
+            if (!formData.studentName) newErrors.studentName = 'Student name is required.';
+            if (!formData.studentEmail) newErrors.studentEmail = 'Student email is required.';
+            if (!formData.contactNumber) newErrors.contactNumber = 'Contact number is required.';
+            if (!formData.allDetailsCorrect) newErrors.allDetailsCorrect = 'You must confirm that all details are correct.';
+        }
+
+        // Set errors and return validation result
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+
+    const handleStepChange = (direction) => {
+        if (direction === 1 && step < 3) {
+            if (validateForm()) {
+                setStep(step + direction);
+            }
+        } else if (direction === -1 && step > 1) {
+            setStep(step + direction);
+        }
+    };
 
     const ClasessOptions = [
         { value: 'Two Classes a Week', label: 'Two Classes a Week' },
@@ -31,376 +117,259 @@ const TeacherPost = () => {
         { value: 'Six Classes a Week', label: 'Six Classes a Week' },
     ];
 
-    const BuddgetOptions = [
-        { value: '3600 - 4400', label: 'Basic Rs.3600 - 4400' },
-        { value: '2200 - 3500', label: 'Two Classes a Week Rs.2200 - 3500' },
-        { value: '3500 - 4200', label: 'Three Classes a Week Rs.3500 - 4200' },
-        { value: '4200 - 5000', label: 'Four Classes a Week Rs.4200 - 5000' },
-        { value: '5000 - 7000', label: 'Five Classes a Week Rs.5000 - 7000' },
-    ];
 
-    // function romanToInt(roman) {
-    //     const romanMap = {
-    //         'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5,
-    //         'VI': 6, 'VII': 7, 'VIII': 8, 'IX': 9, 'X': 10,
-    //         'XI': 11, 'XII': 12
-    //     };
-    //     return romanMap[roman] || 0;
-    // }
 
-    function generateClassNamesFromRange(className) {
-        const romanNumerals = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
-        const [startClass, endClass] = className.split('-').map(s => s.trim());
+    const handleSubmit = async () => {
+        if (!validateForm()) return;
 
-        if (!romanNumerals.includes(startClass) || !romanNumerals.includes(endClass)) {
-            throw new Error("Invalid class names.");
-        }
+        setLoading(true);
+        setErrors({});
+        if (token) {
+            try {
 
-        const startIndex = romanNumerals.indexOf(startClass);
-        const endIndex = romanNumerals.indexOf(endClass);
+                // Submit the form data to the backend API
+                const response = await fetch('https://www.sr.apnipaathshaala.in/api/v1/student/Class-Teacher-Request', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(formData)
+                });
 
-        if (startIndex > endIndex) {
-            throw new Error("Start class must be before or equal to end class.");
-        }
-
-        return romanNumerals.slice(startIndex, endIndex + 1);
-    }
-
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
-
-        let updatedData = JSON.parse(sessionStorage.getItem('formData')) || {};
-
-        if (name === 'selectedClasses') {
-            const newSelectedClasses = checked
-                ? [...(updatedData.selectedClasses || []), value]
-                : (updatedData.selectedClasses || []).filter(item => item !== value);
-
-            updatedData = { ...updatedData, selectedClasses: newSelectedClasses };
-        } else {
-            updatedData = { ...updatedData, [name]: type === 'checkbox' ? checked : value };
-        }
-
-        sessionStorage.setItem('formData', JSON.stringify(updatedData));
-        dispatch(updateFormData(updatedData));
-    };
-    useEffect(() => {
-        const clearFormData = () => {
-            sessionStorage.removeItem('formData');
-            dispatch(updateFormData({}));
-        };
-
-        window.addEventListener('pageshow', clearFormData);
-
-        return () => {
-            window.removeEventListener('pageshow', clearFormData);
-        };
-
-    }, [window.location.pathname]);
-    const handleSelectChange = (selectedOptions, { name }) => {
-        const values = Array.isArray(selectedOptions)
-            ? selectedOptions.map(option => option.value)
-            : selectedOptions ? [selectedOptions.value] : [];
-
-        const updatedData = { ...JSON.parse(sessionStorage.getItem('formData')), [name]: values };
-        sessionStorage.setItem('formData', JSON.stringify(updatedData));
-        dispatch(updateFormData(updatedData));
-    };
-    useEffect(() => {
-        const handleVisibilityChange = () => {
-            if (document.visibilityState === 'visible') {
-                sessionStorage.removeItem('formData')
-                dispatch(updateFormData({})); // Clear form data when tab becomes visible
+                if (response.ok) {
+                    alert('Form submitted successfully');
+                    console.log(response)
+                    window.location.href="/thankyou"
+                    OnClose(); // Close the modal on successful submission
+                } else {
+                    const errorData = await response.json();
+                    setErrors({ submit: errorData.message || 'Something went wrong. Please try again.' });
+                }
+            } catch (error) {
+                console.error('Error during form submission:', error);
+                setErrors({ submit: 'Failed to submit. Please try again later.' });
+            } finally {
+                setLoading(false);
             }
-        };
-
-        const handlePopState = () => {
-            sessionStorage.removeItem('formData')
-            dispatch(updateFormData({})); // Clear form data when navigating back
-        };
-
-        document.addEventListener('visibilitychange', handleVisibilityChange);
-        window.addEventListener('popstate', handlePopState);
-        window.scrollTo({
-            top: '0',
-            behavior: 'smooth'
-        }, [dispatch])
-        return () => {
-            document.removeEventListener('visibilitychange', handleVisibilityChange);
-            window.removeEventListener('popstate', handlePopState);
-        };
-
-    }, [dispatch]);
-
-    const options = [
-        { value: 'Home Tuition at My Home', label: 'Home Tuition at My Home', imgSrc: home },
-        { value: 'Willing to Travel to Teacher\'s Home', label: 'Willing to Travel to Teacher\'s Home', imgSrc: tarvel },
-        { value: 'Online Class', label: 'Online Class', imgSrc: online },
-    ];
-
-
-    const [selectedsOption, setSelectedsOption] = useState(JSON.parse(sessionStorage.getItem('formData'))?.interestType || '');
-
-    const handleImageClick = (value) => {
-        setSelectedsOption(value);
-        // Update sessionStorage
-        const formData = JSON.parse(sessionStorage.getItem('formData')) || {};
-        sessionStorage.setItem('formData', JSON.stringify({ ...formData, interestType: value }));
-    };
-
-
-
-
-    const handleBudgetChange = (selectedOption) => {
-        const budgetRange = selectedOption ? selectedOption.value.split(' - ') : [];
-        const updatedData = {
-            ...JSON.parse(sessionStorage.getItem('formData')),
-            minBudget: budgetRange[0] || '',
-            maxBudget: budgetRange[1] || ''
-        };
-        sessionStorage.setItem('formData', JSON.stringify(updatedData));
-        dispatch(updateFormData(updatedData));
-    };
-
-    const handleSubmit = (e) => {
-        // Prevent default form submission
-        e.preventDefault();
-
-        // Ask for confirmation before submission
-        const isConfirmed = window.confirm("Are you sure you want to submit the form?");
-        if (isConfirmed) {
-            console.log('Form Data:', JSON.parse(sessionStorage.getItem('formData')));
-            // Proceed with the form submission or further processing
-        } else {
-            console.log('Form submission was canceled.');
-            sessionStorage.removeItem('formData')
         }
+        else {
+            setIsLoginModalOpen(true)
+        }
+
     };
 
-    const getData = JSON.parse(sessionStorage.getItem('formData'))
-    console.log(getData)
-   
-    // Show a confirmation dialog when the user tries to refresh or leave the page
-    window.addEventListener('beforeunload', (event) => {
-        const formData = JSON.parse(sessionStorage.getItem('formData'));
-        if (formData) {
-            event.preventDefault();
-            event.returnValue = ''; // Chrome requires returnValue to be set
-            sessionStorage.removeItem('formData')
-        }
-    });
 
     return (
-        <div className="container-fluid mt-4 mx-4 py-4">
-            <div className="heading-teacherPost"></div>
-            <div className="container mx-auto me-auto">
-                <div className="section__title-wrap">
-                    <div className="row align-items-end">
-                        <div className="col-lg-6">
-                            <div className="section__title text-center text-lg-start">
-                                <span className="sub-title">100+ Unique Subjects Teachers With Us</span>
-                                <h2 className="title tg-svg">
-                                    Tutors{" "}
-                                    <span className="position-relative">
-                                        <span className="svg-icon" id="svg-4" data-svg-icon="assets/img/icons/title_shape.svg"></span>
-                                        According
-                                    </span>{" "}
-                                    To Needs
-                                </h2>
-                            </div>
-                        </div>
-                        <div className="col-lg-6">
-                            <div className="courses__nav-active">
-                                <div className="stepper">
-                                    <ul className="stepper-list">
-                                        {[1, 2, 3, 4].map(step => (
-                                            <li key={step} className={`step ${currentStep === step ? 'active' : ''}`}>
-                                                <div className="step-number">{step}</div>
-                                                <div className="step-label">Step {step}</div>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                    <div className="progress-bar">
-                                        <div className="progress-fill" style={{ width: `${(currentStep - 1) * 33.33}%` }}></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                 
-                <div className="container-fluid steps-bg">
-                    {/* <div className='row'>
-                        <div className='col-md-12 mb-5'>
-                        <div className="courses__nav-active">
-                                <div className="stepper">
-                                    <ul className="stepper-list">
-                                        {[1, 2, 3, 4].map(step => (
-                                            <li key={step} className={`step ${currentStep === step ? 'active' : ''}`}>
-                                                <div className="step-number">{step}</div>
-                                                <div className="step-label">Step {step}</div>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                    <div className="progress-bar">
-                                        <div className="progress-fill" style={{ width: `${(currentStep - 1) * 33.33}%` }}></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div> */}
-                    {currentStep === 1 && (
-                        <div className="card card-radius col-md-12 p-4 mb-4">
+        <Modal show={isOpen} onHide={OnClose} centered>
+            <Modal.Header closeButton>
+                <Modal.Title>Request For Tutor</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                {step === 1 && (
+                    <Form>
+                        <Form.Group>
+                            <Form.Label className="mb-0">Interested Classes:</Form.Label>
+                            <Select
+                                name="selectedClasses"
+                                options={classOptions}
+                                onChange={handleSelectChange}
+                                isMulti
+                                placeholder="Select Classes"
+                            />
+                            {errors.selectedClasses && <Alert variant="danger">{errors.selectedClasses}</Alert>}
+                        </Form.Group>
 
-                            <h4>Select Classes</h4>
-                            <div className="form-group d-flex justify-content-between align-items-center mt-4 pb-3">
-                                {allClasses.map((classItem, index) => (
-                                    <label key={index} htmlFor={`class-${classItem}`} className="d-flex  gap-2 justify-content-center flex-column align-items-center select-class">
-                                        <div className="card select-class-design form-check d-flex  justify-content-center align-items-center p-2 mb-4 shadow-sm" style={{ minWidth: '120px' }}>
-                                            <img src={virtualClass} alt="" className="img-fluid" style={{ width: '40px', height: '40px', objectFit: 'cover', cursor: 'pointer' }} />
-                                            <div className='d-flex  gap-2 justify-content-center align-items-center select-class-content'>
-                                                <input className="form-check-input mt-2" type="checkbox"  id={`class-${classItem}`} name="selectedClasses" value={classItem} checked={Array.isArray(JSON.parse(sessionStorage.getItem('formData'))?.selectedClasses) && JSON.parse(sessionStorage.getItem('formData'))?.selectedClasses.includes(classItem)} onChange={handleChange}  style={{ cursor: 'pointer' }} />
-                                                <span className="form-check-label mt-2" style={{ fontWeight: '800', fontSize: '0.9rem' }}>
-                                                    {classItem}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </label>
+                        <Form.Group className="mt-1">
+                            <Form.Label className="mb-0">Subjects:</Form.Label>
+                            <Select
+                                name="subjects"
+                                options={subjectOptions}
+                                onChange={handleSelectChange}
+                                isMulti
+                                placeholder="Select Subjects"
+                            />
+                            {errors.subjects && <Alert variant="danger">{errors.subjects}</Alert>}
+                        </Form.Group>
 
-                                ))}
-                            </div>
+                        <Form.Group className="mt-1">
+                            <Form.Label className="mb-0">Teacher's Gender:</Form.Label>
+                            <Form.Control
+                                as="select"
+                                name="teacherGender"
+                                onChange={handleInputChange}
+                                isInvalid={!!errors.teacherGender}
+                            >
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </Form.Control>
+                            {errors.teacherGender && <Form.Control.Feedback type="invalid">{errors.teacherGender}</Form.Control.Feedback>}
+                        </Form.Group>
 
-                            <div className="form-group select-sbuject-bg">
-                                <label  className='text-whit'><strong>Subjects</strong></label>
-                                <Select className='mt-2' isMulti name="subjects" styles={{ control: (baseStyles, state) => ({ ...baseStyles, borderColor: state.isFocused ? 'red' : 'gray',
-                                        }),
-                                    }}
-                                    options={Subjects}
-                                    onChange={handleSelectChange}
-                                    value={Subjects.filter(subject => JSON.parse(sessionStorage.getItem('formData'))?.subjects?.includes(subject.value))}
-                                />
-                            </div>
+                        <Form.Group className="mt-1">
+                            <Form.Label className="mb-0">Number of Sessions per Week:</Form.Label>
+                            <Select
+                                name="numberOfSessions"
+                                options={ClasessOptions}
+                                onChange={handleSelectChange}
+                                isMulti
+                                placeholder="Number Of Sessions"
+                            />
+                            {errors.numberOfSessions && <Alert variant="danger">{errors.numberOfSessions}</Alert>}
+                        </Form.Group>
+                    </Form>
+                )}
 
-                            <div className="form-group mb-4 mt-4">
-                                <label className='fs-4 fw-bold'>Interested in</label>
-                                <div className="row mt-4">
+                {step === 2 && (
+                    <Form>
+                        <Form.Group>
+                            <Form.Label className="mb-0">Minimum Budget:</Form.Label>
+                            <Form.Control
+                                type="number"
+                                name="minBudget"
+                                value={formData.minBudget}
+                                onChange={handleInputChange}
+                                isInvalid={!!errors.minBudget}
+                            />
+                            {errors.minBudget && <Form.Control.Feedback type="invalid">{errors.minBudget}</Form.Control.Feedback>}
+                        </Form.Group>
 
-                                    {options.map((option) => (
-                                        <div className='col-md-4'>
-                                              <div
-                                            key={option.value}
-                                            className={`card card-interest form-check d-flex flex-column align-items-center p-2 mb-4 shadow-sm ${selectedsOption === option.value ? 'border border-danger scale-105' : ''
-                                                }`}
-                                            style={{ minWidth: '120px', cursor: 'pointer', transition: 'transform 0.3s, border-color 0.3s' }}
-                                            onClick={() => handleImageClick(option.value)}
-                                        >
-                                            <img src={option.imgSrc} alt={option.label} className={`img-fluid ${selectedsOption === option.value ? 'scale-110' : ''}`} style={{ width: '40px', height: '40px', objectFit: 'cover', transition: 'transform 0.3s' }} />
-                                            <span className="form-check-label mt-2" style={{ fontWeight: '800', fontSize: '0.9rem' }}>
-                                                {option.label}
-                                            </span>
-                                        </div>
-                                        </div>
-                                      
-                                    ))}
-                                </div>
-                            </div>
-                            <div className='d-flex gap-2  justify-content-center items-center'>
-                                <button className="btn btn-secondary " onClick={() => dispatch(setCurrentStep(0))}>Back</button>
-                                <button className="btn btn-primary" onClick={() => dispatch(setCurrentStep(2))}>Next</button>
-                            </div>
-                        </div>
-                    )}
-                    {currentStep === 2 && (
-                        <div className="card card-radius p-4 mb-4">
-                            <h4>Preferences</h4>
-                            <div className="form-group mb-4">
-                                <label>Class Frequency</label>
-                                <Select
-                                    name="classFrequency"
-                                    options={ClasessOptions}
-                                    onChange={handleSelectChange}
-                                    value={{ value: JSON.parse(sessionStorage.getItem('formData'))?.classFrequency || '', label: JSON.parse(sessionStorage.getItem('formData'))?.classFrequency || 'Select Frequency' }}
-                                />
-                            </div>
-                            <div className="form-group mb-4">
-                                <label>Teacher Gender Preference</label>
-                                <Select
-                                    name="teacherGenderPreference"
-                                    options={[
-                                        { value: 'Male', label: 'Male' },
-                                        { value: 'Female', label: 'Female' },
-                                        { value: 'Any', label: 'Any' }
-                                    ]}
-                                    onChange={handleSelectChange}
-                                    value={{ value: JSON.parse(sessionStorage.getItem('formData'))?.teacherGenderPreference || '', label: JSON.parse(sessionStorage.getItem('formData'))?.teacherGenderPreference || 'Select Gender Preference' }}
-                                />
-                            </div>
-                            <div className="form-group mb-4">
-                                <label>Preferred Location</label>
-                                <Select
-                                    name="preferredLocation"
-                                    options={[
-                                        { value: 'Urban', label: 'Urban' },
-                                        { value: 'Suburban', label: 'Suburban' },
-                                        { value: 'Rural', label: 'Rural' }
-                                    ]}
-                                    onChange={handleSelectChange}
-                                    value={{ value: JSON.parse(sessionStorage.getItem('formData'))?.preferredLocation || '', label: JSON.parse(sessionStorage.getItem('formData'))?.preferredLocation || 'Select Location' }}
-                                />
-                            </div>
-                            <div className="form-group mb-4">
-                                <label>Budget Range</label>
-                                <Select
-                                    name="budgetRange"
-                                    options={BuddgetOptions}
-                                    onChange={handleBudgetChange}
-                                    value={{ value: `${JSON.parse(sessionStorage.getItem('formData'))?.minBudget} - ${JSON.parse(sessionStorage.getItem('formData'))?.maxBudget}`, label: `Rs.${JSON.parse(sessionStorage.getItem('formData'))?.minBudget || ''} - Rs.${JSON.parse(sessionStorage.getItem('formData'))?.maxBudget || ''}` }}
-                                />
-                                {JSON.parse(sessionStorage.getItem('formData'))?.budgetRange && (
-                                    <div>
-                                        <input
-                                            type="number"
-                                            name="minBudget"
-                                            placeholder="Minimum Budget"
-                                            value={JSON.parse(sessionStorage.getItem('formData'))?.minBudget || ''}
-                                            onChange={handleChange}
-                                        />
-                                        <input
-                                            type="number"
-                                            name="maxBudget"
-                                            placeholder="Maximum Budget"
-                                            value={JSON.parse(sessionStorage.getItem('formData'))?.maxBudget || ''}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                )}
-                            </div>
-                            <div className='d-flex gap-2  justify-content-center items-center'>
+                        <Form.Group className="mt-1">
+                            <Form.Label className="mb-0">Maximum Budget:</Form.Label>
+                            <Form.Control
+                                type="number"
+                                name="maxBudget"
+                                value={formData.maxBudget}
+                                onChange={handleInputChange}
+                                isInvalid={!!errors.maxBudget}
+                            />
+                            {errors.maxBudget && <Form.Control.Feedback type="invalid">{errors.maxBudget}</Form.Control.Feedback>}
+                        </Form.Group>
 
-                                <button className="btn btn-secondary " onClick={() => dispatch(setCurrentStep(1))}>Back</button>
+                        <Form.Group className="mt-1">
+                            <Form.Label className="mb-0">Current Address:</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="currentAddress"
+                                value={formData.currentAddress}
+                                onChange={handleInputChange}
+                                isInvalid={!!errors.currentAddress}
+                            />
+                            {errors.currentAddress && <Form.Control.Feedback type="invalid">{errors.currentAddress}</Form.Control.Feedback>}
+                        </Form.Group>
 
-                                <button className="btn btn-primary" onClick={() => dispatch(setCurrentStep(3))}>Next</button>
-                            </div>
-                        </div>
-                    )}
-                    {currentStep === 3 && (
-                        <div className="card card-radius p-4 mb-4">
+                        <Form.Group className="mt-1">
+                            <Form.Label className="mb-0">State:</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="state"
+                                value={formData.state}
+                                onChange={handleInputChange}
+                                isInvalid={!!errors.state}
+                            />
+                            {errors.state && <Form.Control.Feedback type="invalid">{errors.state}</Form.Control.Feedback>}
+                        </Form.Group>
 
-                            <div className="form-group">
-                                <h4>Review and Submit</h4>
-                              
-                                <input type="text" value={''} />
-                            </div>
+                        <Form.Group className="mt-1">
+                            <Form.Label className="mb-0">Pincode:</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="pincode"
+                                value={formData.pincode}
+                                onChange={handleInputChange}
+                                isInvalid={!!errors.pincode}
+                            />
+                            {errors.pincode && <Form.Control.Feedback type="invalid">{errors.pincode}</Form.Control.Feedback>}
+                        </Form.Group>
+                    </Form>
+                )}
 
-                            <div className='d-flex gap-2 mt-2  justify-content-center items-center'>
-                                <button className="btn btn-secondary " onClick={() => dispatch(setCurrentStep(2))}>Back</button>
-                                <button className="btn btn-primary" onClick={handleSubmit}>Submit</button>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </div>
-        </div>
+                {step === 3 && (
+                    <Form>
+                        <Form.Group>
+                            <Form.Label className="mb-0">Student Name:</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="studentName"
+                                value={formData.studentName}
+                                onChange={handleInputChange}
+                                isInvalid={!!errors.studentName}
+                            />
+                            {errors.studentName && <Form.Control.Feedback type="invalid">{errors.studentName}</Form.Control.Feedback>}
+                        </Form.Group>
+
+                        <Form.Group className="mt-1">
+                            <Form.Label className="mb-0">Student Email:</Form.Label>
+                            <Form.Control
+                                type="email"
+                                name="studentEmail"
+                                value={formData.studentEmail}
+                                onChange={handleInputChange}
+                                isInvalid={!!errors.studentEmail}
+                            />
+                            {errors.studentEmail && <Form.Control.Feedback type="invalid">{errors.studentEmail}</Form.Control.Feedback>}
+                        </Form.Group>
+
+                        <Form.Group className="mt-1">
+                            <Form.Label className="mb-0">Contact Number:</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="contactNumber"
+                                value={formData.contactNumber}
+                                onChange={handleInputChange}
+                                isInvalid={!!errors.contactNumber}
+                            />
+                            {errors.contactNumber && <Form.Control.Feedback type="invalid">{errors.contactNumber}</Form.Control.Feedback>}
+                        </Form.Group>
+
+                        <Form.Group className="mt-1">
+                            <Form.Check
+                                type="checkbox"
+                                label="I confirm that all details are correct"
+                                name="allDetailsCorrect"
+                                checked={formData.allDetailsCorrect}
+                                onChange={handleCheckboxChange}
+                                isInvalid={!!errors.allDetailsCorrect}
+                            />
+                            {errors.allDetailsCorrect && <Alert variant="danger">{errors.allDetailsCorrect}</Alert>}
+                        </Form.Group>
+                    </Form>
+                )}
+
+                {errors.submit && <Alert variant="danger">{errors.submit}</Alert>}
+            </Modal.Body>
+            <Modal.Footer>
+                {step > 1 && (
+                    <Button variant="secondary" onClick={() => handleStepChange(-1)}>
+                        Previous
+                    </Button>
+                )}
+                {step < 3 ? (
+                    <Button
+                        variant="primary"
+                        onClick={() => handleStepChange(1)}
+                    >
+                        Next
+                    </Button>
+                ) : (
+                    <Button
+                        variant="primary"
+                        onClick={handleSubmit}
+                        disabled={loading}
+                    >
+                        {loading ? 'Submitting...' : 'Submit'}
+                    </Button>
+                )}
+            </Modal.Footer>
+
+
+            <LoginModal
+                isOpen={isLoginModalOpen}
+                modalType="student"
+                onClose={closeLoginModal}
+            />
+        </Modal>
     );
 };
 

@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken')
 
 const sendToken = async (user, res, status) => {
     try {
+        console.log(user)
         //Generate JWT Token
         const token = jwt.sign({ id: user }, process.env.JWT_SECRET, {
             expiresIn: process.env.JWT_EXPIRES_TIME

@@ -76,7 +76,7 @@ const subjectTeacherRequestSchema = new mongoose.Schema(
         type: String,
         required: true,
         trim: true,
-        match: [/^\d{12}$/, "Please provide a valid 12-digit contact number."],
+ 
         set: (v) => sanitizeHtml(v),
       },
     },

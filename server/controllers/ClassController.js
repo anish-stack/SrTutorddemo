@@ -1,8 +1,8 @@
 const UploadImages = require('../middlewares/Cloudinary');
 const Classes = require('../models/ClassModel');
 const CatchAsync = require('../utils/CatchAsync');
-const { ServerError, warn } = require('../utils/Logger');
-
+const { ServerError, warn } = require('../utils/Logger');   
+const mongoose = require('mongoose')
 exports.CreateClass = CatchAsync(async (req, res) => {
     try {
         const { Class, Subjects, InnerClasses } = req.body;
@@ -84,7 +84,7 @@ exports.EditClassName = CatchAsync(async (req, res) => {
             });
         }
 
-        const { UpdatedClassName } = req.body;
+        const { UpdatedClassName, UpdatedInnerClasses } = req.body;
 
         // Check if the updated class name is provided
         if (!UpdatedClassName) {
@@ -98,6 +98,43 @@ exports.EditClassName = CatchAsync(async (req, res) => {
 
         // Update the class name
         ExistClass.Class = UpdatedClassName;
+
+        // Handle InnerClasses update and addition
+        const updatedInnerClassesMap = new Map();
+        UpdatedInnerClasses.forEach(innerClass => {
+            if (innerClass._id) {
+                // For existing inner classes, add them to the map with their ID
+                updatedInnerClassesMap.set(innerClass._id.toString(), innerClass);
+            } else {
+                // For new inner classes (without _id), add them as a new entry
+                updatedInnerClassesMap.set(new mongoose.Types.ObjectId().toString(), innerClass);
+            }
+        });
+
+        const existingInnerClassesMap = new Map();
+        ExistClass.InnerClasses.forEach(innerClass => {
+            if (innerClass._id) {
+                existingInnerClassesMap.set(innerClass._id.toString(), innerClass);
+            }
+        });
+
+        // Update existing inner classes and add new ones
+        const newInnerClasses = [];
+        updatedInnerClassesMap.forEach((innerClass, id) => {
+            if (existingInnerClassesMap.has(id)) {
+                // Update existing inner class
+                const existingInnerClass = existingInnerClassesMap.get(id);
+                existingInnerClass.InnerClass = innerClass.InnerClass; // Adjust this line based on your inner class structure
+                newInnerClasses.push(existingInnerClass);
+            } else {
+                // Add new inner class
+                newInnerClasses.push(innerClass);
+            }
+        });
+
+        // Set the updated inner classes
+        ExistClass.InnerClasses = newInnerClasses;
+
         const redisClient = req.app.locals.redis;
 
         if (!redisClient) {
@@ -111,7 +148,7 @@ exports.EditClassName = CatchAsync(async (req, res) => {
         return res.status(200).json({
             success: true,
             status: 'success',
-            message: 'Class name updated successfully.',
+            message: 'Class name and inner classes updated successfully.',
             data: {
                 class: ExistClass
             },
@@ -126,6 +163,9 @@ exports.EditClassName = CatchAsync(async (req, res) => {
         });
     }
 });
+
+
+
 
 exports.EditSubjectName = CatchAsync(async (req, res) => {
     try {

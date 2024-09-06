@@ -253,27 +253,31 @@ const ProfileOfTeacher = () => {
                     </div>
                     <label className="block py- px-3 text-sm font-medium text-gray-700">Range for Classes In Km</label>
                     {teacherData.RangeWhichWantToDoClasses.map((item, index) => (
-
                         <div key={index} className="bg-gray-100 gap-2 p-4 grid grid-cols-2 rounded-md md:col-span-2">
                             <div>
-                                <label>Lat</label>
-                                <input type="text"
-                                    name="RangeWhichWantToDoClasses"
+                                <label>Longitude</label>
+                                <input
+                                    type="text"
+                                    name="longitude"
                                     readOnly={!isEditing}
-                                    value={`${item.lat}`} className="mt-1 py-1 px-3 block w-full bg-white border border-gray-300 rounded-md shadow-sm text-gray-900"
+                                    value={item.location.coordinates[0]} // Longitude
+                                    className="mt-1 py-1 px-3 block w-full bg-white border border-gray-300 rounded-md shadow-sm text-gray-900"
                                 />
                             </div>
                             <div>
-                                <label>lang</label>
-                                <input type="text"
-                                    name="RangeWhichWantToDoClasses"
+                                <label>Latitude</label>
+                                <input
+                                    type="text"
+                                    name="latitude"
                                     onChange={handleInputChange}
                                     readOnly={!isEditing}
-                                    value={`${item.lat}`} className="mt-1 py-1 px-3 block w-full bg-white border border-gray-300 rounded-md shadow-sm text-gray-900"
+                                    value={item.location.coordinates[1]} // Latitude
+                                    className="mt-1 py-1 px-3 block w-full bg-white border border-gray-300 rounded-md shadow-sm text-gray-900"
                                 />
                             </div>
                         </div>
                     ))}
+
                 </div>
             </div>
 

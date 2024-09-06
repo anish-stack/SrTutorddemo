@@ -901,3 +901,6 @@ html {
   margin: 0 auto;
   padding: 20px !important;
 }
+.smallText{
+  font-size: 0.9rem;
+}

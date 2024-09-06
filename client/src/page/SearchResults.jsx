@@ -27,6 +27,7 @@ const SearchResults = () => {
     const subjectParam = params.get("Subject");
     const latParam = params.get("lat");
     const longParam = params.get("lng");
+    console.log(latParam,longParam)
     if (locationParam && classIdParam && subjectParam) {
       setLocation(locationParam);
       setClassId(classIdParam);
@@ -35,7 +36,7 @@ const SearchResults = () => {
       const fetchResults = async () => {
         try {
           const response = await axios.get(
-            `http://localhost:7000/api/v1/teacher/Get-Min-search/${locationParam}/${classIdParam}/${subjectParam}?lat=${latParam}&lng=${longParam}`
+            `https://www.sr.apnipaathshaala.in/api/v1/teacher/Get-Min-search/${locationParam}/${classIdParam}/${subjectParam}?lat=${latParam}&lng=${longParam}`
           );
           setResults(response.data.results);
           setCount(response.data.count);

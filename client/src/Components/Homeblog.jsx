@@ -8,7 +8,7 @@ function Homeblog() {
     const fetchBlog = async () => {
         try {
 
-            const response = await axios.get('http://localhost:7000/api/v1/admin/get-Blogs');
+            const response = await axios.get('https://www.sr.apnipaathshaala.in/api/v1/admin/get-Blogs');
             console.log(response.data.data)
             setBlog(response.data.data)
         } catch (error) {
@@ -50,14 +50,14 @@ function Homeblog() {
                             <div key={item.id || index} className="col-lg-6">
                                 <div className="blog__post-item-two shine__animate-item">
                                     <div className="blog__post-thumb-two">
-                                        <Link to={`/blog/${item._id}`} className="shine__animate-link">
+                                        <Link to={`/blogs/${item._id}`} className="shine__animate-link">
                                             <img src={item.ImageOfBlog} alt={item.Headline} />
                                         </Link>
                                     </div>
                                     <div className="blog__post-content-two">
                                         <Link  className="cat">{item.Tag}</Link>
                                         <h4 className="title">
-                                            <Link to={`/blog/${item._id}`}>{item.Headline}</Link>
+                                            <Link to={`/blogs/${item._id}`}>{item.Headline}</Link>
                                         </h4>
                                         <ul className="list-wrap blog__post-meta">
                                             <li>
@@ -76,7 +76,7 @@ function Homeblog() {
                             {blog && blog.reverse().slice(0,2).map((item, index) => (
                                 <div key={item.id || index} className="blog__post-item-three shine__animate-item">
                                     <div className="blog__post-thumb-three">
-                                        <Link to={`/blog/${item._id}`} className="shine__animate-link">
+                                        <Link to={`/blogs/${item._id}`} className="shine__animate-link">
                                             <img src={item.ImageOfBlog} alt={item.Headline} />
                                         </Link>
                                     </div>
@@ -85,7 +85,7 @@ function Homeblog() {
                                             {item.Tag}
                                         </a>
                                         <h4 className="title">
-                                            <Link to={`/blog/${item._id}`}>
+                                            <Link to={`/blogs/${item._id}`}>
                                                 {item.Headline}
                                             </Link>
                                         </h4>

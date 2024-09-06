@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 import { useGeolocated } from "react-geolocated";
 import { Col, Form } from "react-bootstrap";
 const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
-
+const [loading,setLoading] = useState(false)
   const [teacherData, setTeacherData] = useState([]);
   const [studentToken, setStudentToken] = useState(null);
   const [locationSuggestions, setLocationSuggestions] = useState([]);
@@ -130,7 +130,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
 
   const fetchSubjects = async (classId) => {
     try {
-      const response = await axios.get(`http://localhost:7000/api/v1/admin/Get-Class-Subject/${classId}`);
+      const response = await axios.get(`https://www.sr.apnipaathshaala.in/api/v1/admin/Get-Class-Subject/${classId}`);
       const fetchedSubjects = response.data.data.Subjects;
 
       if (fetchedSubjects) {
@@ -320,15 +320,20 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
 
       }
     }
+    setLoading(true)
     try {
-      const response = await axios.post('http://localhost:7000/api/v1/student/Make-Particular-request', formData, {
+      const response = await axios.post('https://www.sr.apnipaathshaala.in/api/v1/student/Make-Particular-request', formData, {
         headers: {
           Authorization: `Bearer ${studentToken}`
         }
       })
       window.location.href="/thankYou"
       console.log(response.data)
+      setLoading(false)
+
     } catch (error) {
+      setLoading(false)
+
       console.log(error)
     }
 
@@ -692,16 +697,16 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
               <>
                 <h4>Step 5: Review Your Information</h4>
                 <ul className="list-group mb-3">
-                  <li className="list-group-item">
+                  <li className="list-group-item smallText">
                     <strong>Gender:</strong> {formData.Gender}
                   </li>
-                  <li className="list-group-item">
+                  <li className="list-group-item smallText">
                     <strong>Vehicle Owned:</strong> {formData.VehicleOwned}
                   </li>
-                  <li className="list-group-item">
+                  <li className="list-group-item smallText">
                     <strong>Class:</strong> {formData.className}
                   </li>
-                  <li className="list-group-item">
+                  <li className="list-group-item smallText">
                     <strong>Subjects:</strong>{" "}
                     {Array.isArray(formData.Subject)
                       ? formData.Subject.length > 0
@@ -713,32 +718,32 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
                   </li>
 
 
-                  <li className="list-group-item">
+                  <li className="list-group-item smallText">
                     <strong>Preferred Start Date:</strong> {formData.StartDate}
                   </li>
-                  <li className="list-group-item">
+                  <li className="list-group-item smallText">
                     <strong>Classes You Want:</strong> {formData.HowManyClassYouWant}
                   </li>
-                  <li className="list-group-item">
+                  <li className="list-group-item smallText">
                     <strong>Location:</strong> {formData.Location}
                   </li>
-                  <li className="list-group-item">
+                  <li className="list-group-item smallText">
                     <strong>Teaching Mode:</strong> {formData.TeachingMode}
                   </li>
-                  <li className="list-group-item">
+                  <li className="list-group-item smallText">
                     <strong>Specific Requirement :</strong> {formData.SpecificRequirement || "No Specific Requirement"}
                   </li>
-                  <li className="list-group-item">
+                  <li className="list-group-item smallText">
                     <strong>Teaching Experience:</strong>{" "}
                     {formData.TeachingExperience} years
                   </li>
-                  <li className="list-group-item">
+                  <li className="list-group-item smallText">
                     <strong>Minimum Range:</strong> {formData.MinRange}
                   </li>
-                  <li className="list-group-item">
+                  <li className="list-group-item smallText">
                     <strong>Maximum Range:</strong> {formData.MaxRange}
                   </li>
-                  <li className="list-group-item">
+                  <li className="list-group-item smallText">
                     <strong>Is Best Faculty:</strong>{" "}
                     {formData.isBestFaculty ? "Yes" : "No"}
                   </li>
@@ -752,10 +757,11 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
                 </button>
                 <button
                   type="button"
+                  disabled={loading}
                   className="btn btn-primary"
                   onClick={handleSubmit}
                 >
-                  Submit
+                  {loading ? 'Please Wait...  ':'Submit'}
                 </button>
               </>
             )}

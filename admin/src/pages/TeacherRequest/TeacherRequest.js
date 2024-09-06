@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { CiEdit } from 'react-icons/ci';
+import { CiEdit, CiViewBoard } from 'react-icons/ci';
 import { ImBin } from 'react-icons/im';
-import { FaCalendarAlt, FaComments, FaEye, FaRegComments, FaRegThumbsDown, FaRegThumbsUp, FaThumbsUp, FaTimes } from 'react-icons/fa';
+import { FaCalendarAlt, FaCheckDouble, FaComments, FaEye, FaRegComments, FaRegThumbsDown, FaRegThumbsUp, FaThumbsUp, FaTimes } from 'react-icons/fa';
 import { PiEyeClosed } from 'react-icons/pi';
 import toast from 'react-hot-toast';
 
@@ -20,24 +20,34 @@ const TeacherRequest = () => {
     const [CommentModelOpen, setCommentModelOpen] = useState(false);
     const [adminComment, setAdminComment] = useState(false);
     const [loading, setLoading] = useState(false)
-
+    const [dealDoneData, setDealDoneData] = useState(false)
     const [selectedId, setSelectedId] = useState(null); // New state for the selected ID
     const token = localStorage.getItem('Sr-token');
     const [comment, setComment] = useState('');
 
+
     const fetchData = async () => {
         try {
-            const response = await axios.get('http://localhost:7000/api/v1/student/admin-particular-Request', {
+            const response = await axios.get('https://www.sr.apnipaathshaala.in/api/v1/student/admin-particular-Request', {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            console.log(response.data.data)
-            setData(response.data.data);
-            setFilteredData(response.data.data);
+
+            const data = response.data.data.filter((item) => item.isDealDone === dealDoneData);
+            setData(data);
+            setFilteredData(data);
         } catch (error) {
             console.error('Error fetching data:', error);
         }
     };
+    const handleShowDataOfdeal = () => {
+        setLoading(true)
+        fetchData()
+        setTimeout(() => {
+            setDealDoneData(!dealDoneData)
+            setLoading(false)
 
+        }, 2000)
+    }
 
     useEffect(() => {
         fetchData();
@@ -71,9 +81,10 @@ const TeacherRequest = () => {
 
     const handleUpdateStatus = async (id, action) => {
         try {
-            await axios.put(`http://localhost:7000/api/v1/student/admin-toggle-Request/${id}/${action}`, null, {
+            const res = await axios.put(`https://www.sr.apnipaathshaala.in/api/v1/student/admin-toggle-Request/${id}/${action}`, null, {
                 headers: { Authorization: `Bearer ${token}` },
             });
+            console.log(res.data)
             setFilteredData(prevData =>
                 prevData.map(item =>
                     item._id === id ? { ...item, statusOfRequest: action } : item
@@ -83,6 +94,22 @@ const TeacherRequest = () => {
             console.error('Error updating status:', error);
         }
     };
+
+    const handleDeleteStatus = async (id,) => {
+        try {
+            const res = await axios.delete(`https://www.sr.apnipaathshaala.in/api/v1/student/admin-delete-Request/${id}`, null, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            console.log(res.data)
+            toast.success("Request Deleted Successful")
+            fetchData()
+        } catch (error) {
+            console.error('Error updating status:', error);
+        }
+    };
+
+
+
     const handleOpen = (id) => {
         setSelectedId(id); // Capture the ID of the row
         setIsModelOpen(true);
@@ -96,7 +123,7 @@ const TeacherRequest = () => {
     const handleAddComment = async () => {
         setLoading(true)
         try {
-            const response = await axios.post('http://localhost:7000/api/v1/student/admin-do-comment', {
+            const response = await axios.post('https://www.sr.apnipaathshaala.in/api/v1/student/admin-do-comment', {
                 requestId: selectedId, comment
             });
             console.log(response.data);
@@ -122,19 +149,39 @@ const TeacherRequest = () => {
     const paginatedData = sortedData.slice(currentPage * pageSize, (currentPage + 1) * pageSize);
     const handleDealDone = async (id) => {
         try {
-            const response = await axios.post(`http://localhost:7000/api/v1/student/ToggleDealDone/${id}`)
+            setLoading(true)
+            const response = await axios.post(`https://www.sr.apnipaathshaala.in/api/v1/student/ToggleDealDone/${id}`)
             fetchData()
             toast.success("Congratulations Deal is Done 🎉🎉")
+            setLoading(false)
+
 
         } catch (error) {
+            setLoading(false)
 
             toast.error(error.response.data.message)
         }
     }
 
     return (
-        <div className="p-4">
-            <h1 className="text-xl font-bold mb-4">Particular Teacher Requests</h1>
+        <div className="py-4 px-0 ">
+            <div className='flex items-center justify-between h-12 ml-4 mr-4 mb-3'>
+                <div><h1 className="text-xl font-bold mb-4">Particular Teacher Requests</h1></div>
+                <div onClick={handleShowDataOfdeal}>
+                    <Link
+                        className="whitespace-nowrap w-full gap-1 mt-2 text-sm flex items-center justify-center rounded border border-sky-400 bg-gradient-to-r from-sky-100 to-sky-200 px-2 py-1 font-semibold text-sky-600 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-sky-300 focus:ring-offset-2 active:opacity-100 transition duration-150"
+                    >
+                        {loading ? (
+                            <span>Loading...</span> // Show loader text while loading
+                        ) : (
+                            <>
+                                {dealDoneData ? 'Show New Request' : 'Check Deal Done Request'}{' '}
+                                <FaCheckDouble className="text-gray-900" />
+                            </>
+                        )}
+                    </Link>
+                </div>
+            </div>
 
             {/* Search Input */}
             <div className="grid w-full grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -145,7 +192,7 @@ const TeacherRequest = () => {
                         onChange={(e) => setGlobalFilter(e.target.value)}
                         placeholder="Search by: studentId, className, Subject, location, interested, howManyClassYouWant, minimumBudget, maximumBudget, startDate, isDealDone, teacherGender"
 
-                        className="py-3 px-4 border border-gray-300 rounded-lg shadow-sm w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 ease-in-out"
+                        className="py-3 px-2 border border-gray-300 rounded-lg shadow-sm w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 ease-in-out"
                     />
                 </div>
 
@@ -154,7 +201,7 @@ const TeacherRequest = () => {
                     <select
                         value={pageSize}
                         onChange={(e) => setPageSize(Number(e.target.value))}
-                        className="py-3 px-4 border border-gray-300 rounded-lg shadow-sm w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 ease-in-out"
+                        className="py-3 px-2 border border-gray-300 rounded-lg shadow-sm w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 ease-in-out"
                     >
                         {PAGE_SIZE_OPTIONS.map((size) => (
                             <option key={size} value={size}>
@@ -166,30 +213,31 @@ const TeacherRequest = () => {
             </div>
 
             {/* Table */}
-            <div className="overflow-x-auto">
-                <table className="min-w-full bg-white border border-gray-200">
-                    <thead>
+            <div className=" relative overflow-x-auto">
+                <table className="w-full t text-left rtl:text-right text-gray-500 dark:text-gray-400 ">
+                    <thead className='t text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400'>
                         <tr className="bg-gray-100">
                             {[
                                 'Student Id',
+                                'Teacher Id',
                                 'Classes/Week',
                                 'Class',
                                 'Subject',
                                 'Location',
                                 'Interested',
-                                'Budget Range',
-                                'Start Date',
-                                'Teacher Gender',
+                                // 'Budget Range',
+                                // 'Start Date',
+                                // 'Teacher Gender',
                                 'isDealDone',
                                 'Action',
                                 'Deal Done',
-
+                                // 'Show Details',
                                 'Add Comment',
                                 'View Comment',
                             ].map((header, idx) => (
                                 <th
                                     key={header}
-                                    className="px-4 py-1 text-left text-sm font-medium text-gray-700"
+                                    className="px-2 whitespace-nowrap py-2 text-left text-xs font-medium text-gray-700"
                                     onClick={() =>
                                         idx < 11 &&
                                         handleSort(
@@ -200,9 +248,9 @@ const TeacherRequest = () => {
                                                 'location',
                                                 'interested',
                                                 'howManyClassYouWant',
-                                                'minimumBudget',
-                                                'maximumBudget',
-                                                'startDate',
+                                                // 'minimumBudget',
+                                                // 'maximumBudget',
+                                                // 'startDate',
                                                 'isDealDone',
                                                 'Gender',
                                             ][idx]
@@ -232,7 +280,7 @@ const TeacherRequest = () => {
                     <tbody>
                         {paginatedData.map((row) => (
                             <tr key={row._id} className="border-b">
-                                <td className="px-4 py-1 text-xs text-gray-700">
+                                <td className="px-2 text-xs text-gray-700">
                                     <a
                                         href={`/Student-info/${row.studentId}`}
                                         className="text-red-500 hover:underline"
@@ -240,36 +288,45 @@ const TeacherRequest = () => {
                                         {row.studentId.substring(0, 4) + '...'}
                                     </a>
                                 </td>
-                                <td className="px-4 py-1 text-xs text-gray-700">
+                                <td>
+                                    <a
+                                        href={`/Manage-Teacher/${row.teacherId}`}
+                                        className="text-red-500 hover:underline"
+                                    >
+                                        {row.teacherId.substring(0, 4) + '...'}
+                                    </a>
+
+                                </td>
+                                <td className="px-2 py-1 text-xs text-gray-700">
                                     {row.HowManyClassYouWant || "Not-Sure"}
                                 </td>
-                                <td className="px-4 py-1 text-xs text-gray-700">
+                                <td className="px-2 py-1 text-xs text-gray-700">
                                     {row.className}
                                 </td>
-                                <td className="px-4 py-1 text-xs text-gray-700">
+                                <td className="px-2 py-1 text-xs text-gray-700">
                                     {row.Subject.join(', ')}
                                 </td>
 
-                                <td className="px-4 py-1 text-xs text-gray-700">
+                                <td className="px-2 py-1 text-xs text-gray-700">
                                     {row.Location}
                                 </td>
-                                <td className="px-4 py-1 text-xs text-gray-700">
+                                <td className="px-2 py-1 text-xs text-gray-700">
                                     {row.TeachingMode}
                                 </td>
 
-                                <td className="px-4 py-1 text-xs text-gray-700">
+                                {/* <td className="px-2 py-1 text-xs text-gray-700">
                                     {row.MinRange} - {row.MaxRange}
-                                </td>
-                                <td className="px-4 py-1 text-xs text-gray-700">
+                                </td> */}
+                                {/* <td className="px-2 py-1 text-xs text-gray-700">
                                     {new Date(row.StartDate).toLocaleDateString('es-gd')}
-                                </td>
-                                <td className="px-4 py-1 text-xs text-gray-700">
+                                </td> */}
+                                {/* <td className="px-2 py-1 text-xs text-gray-700">
                                     {row.Gender}
-                                </td>
-                                <td className="px-4 py-1 text-xs text-gray-700">
+                                </td> */}
+                                <td className="px-2 py-1 text-xs text-gray-700">
                                     {row.isDealDone ? 'Yes' : 'No'}
                                 </td>
-                                <td className="px-4 py-1 text-xs text-gray-700">
+                                <td className="px-2 py-1 text-xs text-gray-700">
                                     <select
                                         onChange={(e) =>
                                             handleUpdateStatus(row._id, e.target.value)
@@ -284,22 +341,49 @@ const TeacherRequest = () => {
                                 </td>
                                 <td className="px-2">
                                     <button
-
-                                        className="whitespace-nowrap w-full gap-1 mt-2 text-sm flex items-center justify-center rounded border border-violet-400 bg-gradient-to-r from-violet-100 to-violet-200 px-4 py-1 font-semibold text-violet-600 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-violet-300 focus:ring-offset-2 active:opacity-100 transition duration-150"
+                                        className="whitespace-nowrap w-full gap-1 mt-2 text-sm flex items-center justify-center rounded border border-violet-400 bg-gradient-to-r from-violet-100 to-violet-200 px-2 py-1 font-semibold text-violet-600 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-violet-300 focus:ring-offset-2 active:opacity-100 transition duration-150"
                                     >
-                                        {row.isDealDone ? (
+                                        {loading ? (
+                                            <svg
+                                                className="animate-spin h-5 w-5 text-violet-600"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <circle
+                                                    className="opacity-25"
+                                                    cx="12"
+                                                    cy="12"
+                                                    r="10"
+                                                    stroke="currentColor"
+                                                    strokeWidth="4"
+                                                ></circle>
+                                                <path
+                                                    className="opacity-75"
+                                                    fill="currentColor"
+                                                    d="M4 12a8 8 0 018-8v8h8a8 8 0 11-16 0z"
+                                                ></path>
+                                            </svg>
+                                        ) : row.isDealDone ? (
                                             <FaRegThumbsUp className="text-xl cursor-not-allowed" />
                                         ) : (
-
                                             <FaRegThumbsDown onClick={() => handleDealDone(row._id)} className="text-xl" />
                                         )}
-
                                     </button>
                                 </td>
+
+                                {/* <td className="px-2">
+                                    <button
+                                        onClick={() => handleDeleteStatus(row._id)}
+                                        className="whitespace-nowrap w-full gap-1 mt-2 text-sm flex items-center justify-center rounded border border-red-400 bg-gradient-to-r from-red-100 to-red-200 px-2 py-1 font-semibold text-red-600 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-offset-2 active:opacity-100 transition duration-150"
+                                    >
+                                        <CiViewBoard className="text-xl" />
+                                    </button>
+                                </td> */}
                                 <td className="px-2">
                                     <button
                                         onClick={() => handleOpen(row._id)}
-                                        className="whitespace-nowrap w-full gap-1 mt-2 text-sm flex items-center justify-center rounded border border-green-400 bg-gradient-to-r from-green-100 to-green-200 px-4 py-1 font-semibold text-green-600 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-green-300 focus:ring-offset-2 active:opacity-100 transition duration-150"
+                                        className="whitespace-nowrap w-full gap-1 mt-2 text-sm flex items-center justify-center rounded border border-green-400 bg-gradient-to-r from-green-100 to-green-200 px-2 py-1 font-semibold text-green-600 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-green-300 focus:ring-offset-2 active:opacity-100 transition duration-150"
                                     >
                                         <CiEdit className="text-xl" />
                                     </button>
@@ -309,14 +393,14 @@ const TeacherRequest = () => {
                                     {row.commentByAdmin.length > 0 ? (
                                         <Link
                                             onClick={() => handleCommentOpen(row.commentByAdmin)}
-                                            className="whitespace-nowrap w-full gap-1 mt-2 text-sm flex items-center justify-center rounded border border-blue-400 bg-gradient-to-r from-blue-100 to-blue-200 px-4 py-1 font-semibold text-blue-600 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2 active:opacity-100 transition duration-150"
+                                            className="whitespace-nowrap w-full gap-1 mt-2 text-sm flex items-center justify-center rounded border border-blue-400 bg-gradient-to-r from-blue-100 to-blue-200 px-2 py-1 font-semibold text-blue-600 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2 active:opacity-100 transition duration-150"
                                         >
                                             <FaEye className="text-xl" />
                                         </Link>
                                     ) : (
                                         <button
                                             disabled={true}
-                                            className="whitespace-nowrap w-full gap-1 cursor-not-allowed mt-2 text-sm flex items-center justify-center rounded border border-blue-400 bg-gradient-to-r from-blue-100 to-blue-200 px-4 py-1 font-semibold text-blue-600 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2 active:opacity-100 transition duration-150"
+                                            className="whitespace-nowrap w-full gap-1 cursor-not-allowed mt-2 text-sm flex items-center justify-center rounded border border-blue-400 bg-gradient-to-r from-blue-100 to-blue-200 px-2 py-1 font-semibold text-blue-600 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2 active:opacity-100 transition duration-150"
                                         >
                                             <PiEyeClosed className="text-xl" />
                                         </button>
@@ -369,14 +453,14 @@ const TeacherRequest = () => {
                         <div className="flex justify-end">
                             <button
                                 onClick={onClose}
-                                className="px-4 py-2 bg-gray-200 text-gray-700 rounded mr-2"
+                                className="px-2 py-2 bg-gray-200 text-gray-700 rounded mr-2"
                             >
                                 Cancel
                             </button>
                             <button
                                 disabled={loading}
                                 onClick={handleAddComment}
-                                className={`px-4 py-2 bg-blue-500 text-white rounded ${loading ? 'cursor-not-allowed' : 'cursor-pointer'} `}
+                                className={`px-2 py-2 bg-blue-500 text-white rounded ${loading ? 'cursor-not-allowed' : 'cursor-pointer'} `}
                             >
                                 {loading ? "Please Wait ..." : "Submit"}
                             </button>

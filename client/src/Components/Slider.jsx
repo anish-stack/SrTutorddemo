@@ -7,6 +7,7 @@ import bannerShape03 from "./banner/banner_shape03.png";
 import bannerImg01 from "./banner/banner_img01.png";
 import bannerImg02 from "./banner/banner_img02.png";
 import bannerImg03 from "./banner/banner_img03.png";
+import { useGeolocated } from "react-geolocated";
 
 const Slider = () => {
   const { data, loading, error } = useSelector((state) => state.Class);
@@ -18,7 +19,10 @@ const Slider = () => {
   const [locationSuggestions, setLocationSuggestions] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState("");
   const [concatenatedData, setConcatenatedData] = useState([]);
-
+  const [locationData, setLocationData] = useState({
+    lng: '',
+    lat: '',
+  })
   useEffect(() => {
     dispatch(ClassSearch());
   }, [dispatch]);
@@ -104,7 +108,21 @@ const Slider = () => {
     setLocationInput(suggestion);
     setLocationSuggestions([]);
   };
-
+  const { coords, isGeolocationAvailable, isGeolocationEnabled } = useGeolocated({
+    positionOptions: {
+      enableHighAccuracy: true,
+    },
+    userDecisionTimeout: 5000,
+  });
+  useEffect(() => {
+    // Check if coords is defined
+    if (coords) {
+      setLocationData({
+        lng: coords.longitude,
+        lat: coords.latitude
+      });
+    }
+  }, [coords]);
   const handlePassQuery = () => {
     // Function to clean and encode the location input
     const cleanAndEncode = (str) => {
@@ -117,7 +135,7 @@ const Slider = () => {
     const classParam = encodeURIComponent(selectedClass);
     const subjectParam = encodeURIComponent(selectedSubject);
 
-    window.location.href = `/Search-result?via-home-page&Location=${locationParam}&ClassId=${classParam}&Subject=${subjectParam}`;
+    window.location.href = `/Search-result?via-home-page&Location=${locationParam}&ClassId=${classParam}&Subject=${subjectParam}&lat=${locationData.lat}&lng=${locationData.lng}`;
   };
 
   return (

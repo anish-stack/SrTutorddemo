@@ -84,7 +84,7 @@ function About() {
                   know the best ways to shape the future of children.
                 </p>
                 <div className="tg-button-wrap">
-                  <a href="#" className="btn tg-svg">
+                  <a href="/about-us" className="btn tg-svg">
                     <span className="text">Discover More</span>{" "}
                     <span
                       className="svg-icon"

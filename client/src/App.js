@@ -1,5 +1,5 @@
 import "./App.css";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import Header from "./Components/Header";
 import Footer from "./Components/Footer";
 import Home from "./page/Home";
@@ -16,14 +16,28 @@ import ThankYouPage from "./page/Thankyou";
 import ProfilePage from "./page/Teacher/ProfilePage";
 import TeacherProfileOtp from "./page/Teacher/TeacherProfileOtp";
 import Browsetutors from "./page/Tutors/Browsetutors";
+import SingleBlog from "./Components/SinglePageBlog";
+import StudentRegistration from "./page/Student/StudentRegister";
+import PageNotFound from "./page/Error/PageNotFound";
+import { useEffect } from "react";
 
 function App() {
+  const locations = useLocation()
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth' // 'smooth' for animated scroll, 'auto' for instant scroll
+    });
+  }, [locations.pathname]);
   return (
+
     <>
       <Header />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about-us" element={<Aboutus />} />
+        <Route path="/blogs/:id" element={<SingleBlog />} />
+        <Route path="/Student-register" element={<StudentRegistration />} />
         <Route path="/services" element={<Services />} />
         <Route path="/contact-us" element={<Contactus />} />
         <Route path="/Make-A-Request-For-Course" element={<TeacherPost />} />
@@ -35,6 +49,7 @@ function App() {
         <Route path="/thankYou" element={<ThankYouPage />} />
         <Route path="/Teacher-Profile-Verify" element={<TeacherProfileOtp />} />
         <Route path="/Browse-Tutors" element={<Browsetutors />} />
+        <Route path="/*" element={<PageNotFound />} />
 
         <Route path="/Complete-profile" element={<ProfilePage />} />
 

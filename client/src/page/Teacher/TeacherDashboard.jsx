@@ -60,7 +60,7 @@ const TeacherDashboard = () => {
         if (teacherToken && teacherUser) {
             const handleFetch = async () => {
                 try {
-                    const { data } = await axios.get(`http://localhost:7000/api/v1/teacher/Get-Teacher/${teacherUser._id}`, {
+                    const { data } = await axios.get(`https://www.sr.apnipaathshaala.in/api/v1/teacher/Get-Teacher/${teacherUser._id}`, {
                         headers: {
                             Authorization: `Bearer ${teacherToken}`,
                         },
@@ -81,7 +81,7 @@ const TeacherDashboard = () => {
         if (teacherToken && teacherUser) {
             const handleClassFetch = async () => {
                 try {
-                    const { data } = await axios.get(`http://localhost:7000/api/v1/teacher/Get-My-Classes`, {
+                    const { data } = await axios.get(`https://www.sr.apnipaathshaala.in/api/v1/teacher/Get-My-Classes`, {
                         headers: {
                             Authorization: `Bearer ${teacherToken}`,
                         },
@@ -253,7 +253,7 @@ const TeacherDashboard = () => {
                 </div>
             </div >
 
-        </div >
+        </div>
     );
 }
 

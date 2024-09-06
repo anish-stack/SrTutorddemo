@@ -19,7 +19,7 @@ const SideHeader = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get('http://localhost:7000/api/v1/student/admin-teacher-Request', {
+                const response = await axios.get('https://www.sr.apnipaathshaala.in/api/v1/student/admin-teacher-Request', {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -35,7 +35,7 @@ const SideHeader = () => {
 
         const fetchDataParticular = async () => {
             try {
-                const response = await axios.get('http://localhost:7000/api/v1/student/admin-particular-Request', {
+                const response = await axios.get('https://www.sr.apnipaathshaala.in/api/v1/student/admin-particular-Request', {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 console.log(response.data.data)
@@ -83,10 +83,7 @@ const SideHeader = () => {
                                 <i className="fa-solid fa-school mr-3"></i>
                                 <Link to={'/Manage-Class'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Manage Class</Link>
                             </li>
-                            {/* <li className="flex items-center">
-                                <i className="fa-solid fa-book-open mr-3"></i>
-                                <Link to={'/Manage-Subjects'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Manage Subjects</Link>
-                            </li> */}
+                          
                             <li className="flex items-center">
                                 <i className="fa-solid fa-blog mr-3"></i>
                                 <Link to={'/Manage-Blogs'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Manage Blogs</Link>
@@ -98,6 +95,10 @@ const SideHeader = () => {
                             <li className="flex items-center">
                                 <i className="fa-solid fa-image mr-3"></i>
                                 <Link to={'/Manage-Banners'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Manage Banners</Link>
+                            </li>
+                            <li className="flex items-center">
+                                <i className="fa-solid fa-book-open mr-3"></i>
+                                <Link to={'/Manage-Class-teacher-request'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Manage Class Teacher Request</Link>
                             </li>
                             <li className="flex items-center">
                                 <i className="fa-solid fa-user-edit mr-3"></i>

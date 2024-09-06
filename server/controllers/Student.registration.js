@@ -21,7 +21,7 @@ const crypto = require('crypto')
 //Student New Register
 exports.StudentRegister = CatchAsync(async (req, res) => {
     try {
-        const { StudentName, PhoneNumber, Email, Password, latitude, longitude } = req.body;
+        const { StudentName, AltPhoneNumber, PhoneNumber, Email, Password, latitude, longitude } = req.body;
 
         // Check for missing fields
         const missingFields = [];
@@ -87,6 +87,7 @@ exports.StudentRegister = CatchAsync(async (req, res) => {
             Email,
             Password,
             latitude,
+            AltPhoneNumber,
             longitude,
             isStudentVerified: false,
             SignInOtp: otp,
@@ -145,7 +146,7 @@ exports.StudentVerifyOtp = CatchAsync(async (req, res) => {
         student.OtpExpiresTime = undefined;
         await student.save();
 
-        await sendToken(Student, res, 201);
+        await sendToken(student, res, 201);
     } catch (error) {
         return res.status(500).json({ message: 'Internal server error', error: error.message });
     }
@@ -409,6 +410,31 @@ exports.getAllStudents = CatchAsync(async (req, res) => {
         })
     }
 })
+
+exports.getSingleStudent = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const singleStudent = await Student.findById(id)
+        if (!singleStudent) {
+            return res.status(404).json({
+                success: false,
+                message: 'no student found by this id'
+            })
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'student founded successfully',
+            data: singleStudent
+        })
+    } catch (error) {
+        console.log(error)
+        res.status({
+            success: false,
+            message: 'Internal server error'
+        })
+    }
+}
 
 //Add Testimonial Review 
 

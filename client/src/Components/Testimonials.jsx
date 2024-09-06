@@ -8,7 +8,7 @@ function Testimonials() {
 
     const fetchTestimonial = async () => {
         try {
-            const response = await axios.get('http://localhost:7000/api/v1/admin/Get-All-Active-Testimonials');
+            const response = await axios.get('https://www.sr.apnipaathshaala.in/api/v1/admin/Get-All-Active-Testimonials');
             setTestimonials(response.data.data);
         } catch (error) {
             console.error("Failed to fetch testimonials", error);

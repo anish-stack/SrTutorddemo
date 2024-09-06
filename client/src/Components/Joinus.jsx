@@ -24,7 +24,7 @@ function Joinus() {
                                     </p>
                                 </div>
                                 <div className="tg-button-wrap justify-content-center justify-content-md-end">
-                                    <a href="contact.html" className="btn white-btn tg-svg">
+                                    <a href="/teacher-register" className="btn white-btn tg-svg">
                                         <span className="text">Become an Instructor</span>{" "}
                                         <span className="svg-icon" id="cta-btn" data-svg-icon="assets/img/icons/btn-arrow.svg" />
                                     </a>

@@ -5,7 +5,7 @@ const { ServerError, warn } = require('../utils/Logger');
 
 exports.JoinNewsLetter = async (req, res) => {
     const { email } = req.body;
-
+    console.log(email)
     try {
         // Check if the email already exists
         let subscriber = await NewsLetter.findOne({ email });
@@ -77,8 +77,9 @@ exports.JoinNewsLetter = async (req, res) => {
         await redisClient.del('subscribers')
         res.status(201).json({ message: 'Subscription successful', subscriber });
     } catch (error) {
-        ServerError(`Error occurred while subscribing email: ${error.message}`, 'NewsLetter Controller', 'JoinNewsLetter');
-        res.status(500).json({ message: 'Server error', error: error.message });
+        console.log(error)
+        // ServerError(`Error occurred while subscribing email: ${error.message}`, 'NewsLetter Controller', 'JoinNewsLetter');
+        res.status(500).json({ message: 'Server error', error: error });
     }
 };
 

@@ -10,7 +10,7 @@ const AllSubscription = () => {
     // Fetch all subscribed emails
     const handleFetch = async () => {
         try {
-            const res = await axios.get('http://localhost:7000/api/v1/admin/get-all-subscribe-newsletter-email');
+            const res = await axios.get('https://www.sr.apnipaathshaala.in/api/v1/admin/get-all-subscribe-newsletter-email');
             setEmails(res.data.data);
         } catch (error) {
             console.error('There was an error fetching the subscribed emails!', error);
@@ -20,7 +20,7 @@ const AllSubscription = () => {
     // Handle delete email
     const handleDelete = async () => {
         try {
-            await axios.delete(`http://localhost:7000/api/v1/admin/delete-newsletter-email/${selectedEmailId}`);
+            await axios.delete(`https://www.sr.apnipaathshaala.in/api/v1/admin/delete-newsletter-email/${selectedEmailId}`);
             handleFetch();
             setShowDeleteModal(false);
         } catch (error) {

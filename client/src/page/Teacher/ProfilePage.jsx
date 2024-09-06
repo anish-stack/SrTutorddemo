@@ -187,7 +187,7 @@ const ProfilePage = () => {
     const fetchUser = async () => {
         try {
             const response = await axios.get(
-                `http://localhost:7000/api/v1/teacher/Teacher-details/${IdQuery}`
+                `https://www.sr.apnipaathshaala.in/api/v1/teacher/Teacher-details/${IdQuery}`
             );
             console.log(response.data)
             setUser(response.data.data)
@@ -207,7 +207,7 @@ const ProfilePage = () => {
     const fetchSubjects = async (classId) => {
         try {
             const response = await axios.get(
-                `http://localhost:7000/api/v1/admin/Get-Class-Subject/${classId}`
+                `https://www.sr.apnipaathshaala.in/api/v1/admin/Get-Class-Subject/${classId}`
             );
             console.log(response.data)
 
@@ -377,7 +377,7 @@ const ProfilePage = () => {
         }
         try {
             setLoading(true)
-            const response = await axios.post('http://localhost:7000/api/v1/teacher/teacher-profile', formData, {
+            const response = await axios.post('https://www.sr.apnipaathshaala.in/api/v1/teacher/teacher-profile', formData, {
                 headers: {
                     Authorization: `Bearer ${tokenQuery}`
                 }

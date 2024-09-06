@@ -10,6 +10,7 @@ import { setSelectedClass } from "../Slices/SelectedClass.slice";
 import { checkLogin } from "../Slices/LoginSlice";
 import SubjectRequestModel from "./SubjectRequestModel";
 import LoginModal from "./LoginModel";
+import TeacherPost from "../page/TeacherPost";
 function Course() {
   const { isLogin } = useSelector((state) => state.login || {});
   const token = Cookies.get('studentToken') || Cookies.get('teacherToken');
@@ -18,6 +19,8 @@ function Course() {
   const navigate = useNavigate();
   const { data, loading, error } = useSelector((state) => state.Class);
   const [Class, setClass] = useState([]);
+  const [seletctClass, SetselectedClass] = useState([]);
+
   const [tab, setTab] = useState("Class");
   const [subjects, setSubjects] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState({
@@ -29,10 +32,14 @@ function Course() {
   const [currentClassPage, setCurrentClassPage] = useState(1);
   const [currentSubjectPage, setCurrentSubjectPage] = useState(1);
   const [showModal, setShowModal] = useState(false);
+  const [showClass, setShowClassModal] = useState(false);
+
   const [LshowModal, setLShowModal] = useState(false);
 
 
   const handleShow = () => setShowModal(true);
+  const ClasshandleShow = () => setShowClassModal(true);
+
   const LhandleShow = () => setLShowModal(true);
   const LhandleClose = () => {
     setLShowModal(false)
@@ -40,6 +47,8 @@ function Course() {
   };
 
   const handleClose = () => setShowModal(false);
+  const handleClassClose = () => setShowClassModal(false);
+
   useEffect(() => {
     dispatch(ClassSearch());
     dispatch(checkLogin());
@@ -108,7 +117,7 @@ function Course() {
     setCurrentSubjectPage((prev) => prev + direction);
   };
   const handleClassSelect = (item) => {
-    const classRanges = ["I-V", "VI-X", "X-XII"];
+    const classRanges = ["I-V", "VI-IX", "VI-X", "X-XII"];
     const Tab = tab;
     setSelectedSubject({
       Class: item.Class,
@@ -117,15 +126,10 @@ function Course() {
       Subjects: item.Subjects,
     });
     if (classRanges.includes(item.Class)) {
-      console.log(item);
-      dispatch(setSelectedClass(item)); // Dispatch action to store the selected class
 
-      setTimeout(() => {
-        navigate(
-          `/Make-A-Request-For-Course?SourceType=Class&ClassName=${item.Class
-          }&isLogin=${isLogin ? true : false}`
-        );
-      }, 400);
+      SetselectedClass(item)
+      dispatch(setSelectedClass(item)); // Dispatch action to store the selected class
+      ClasshandleShow()
     } else {
       if (token) {
         handleShow();
@@ -295,6 +299,7 @@ function Course() {
             </div>
           </div>
         </div>
+        <TeacherPost isOpen={showClass} OnClose={handleClassClose} item={seletctClass} />
         <SubjectRequestModel
           showModal={showModal}
           subject={selectedSubject}
