@@ -44,17 +44,7 @@ const allowedOrigins = [
     'http://localhost:3000'
 ];
 
-app.use(cors({
-    origin: (origin, callback) => {
-        if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    credentials: true
-}));
+app.use(cors());
 
 // Middleware
 app.use(express.json());
