@@ -35,16 +35,27 @@ const redisClient = redis.createClient({
 
 // CORS Configuration
 const allowedOrigins = [
+    "https://www.srtutorsbureau.com",
+    "https://srtutorsbureau.com",
     "https://www.srtutors.hoverbusinessservices.com",
     "https://www.sradmin.hoverbusinessservices.com",
     "https://srtutors.hoverbusinessservices.com",
     "https://sradmin.hoverbusinessservices.com",
-    "https://www.srtutorsbureau.com",
     'http://localhost:3001',
     'http://localhost:3000'
 ];
 
-app.use(cors());
+app.use(cors({
+    origin: (origin, callback) => {
+        if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true
+}));
 
 // Middleware
 app.use(express.json());
