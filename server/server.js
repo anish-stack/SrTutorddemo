@@ -39,7 +39,6 @@ const allowedOrigins = [
     "https://www.sradmin.hoverbusinessservices.com",
     "https://srtutors.hoverbusinessservices.com",
     "https://sradmin.hoverbusinessservices.com",
-    "www.srtutorsbureau.com",
     "https://www.srtutorsbureau.com",
     'http://localhost:3001',
     'http://localhost:3000'
