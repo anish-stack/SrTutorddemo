@@ -3,6 +3,7 @@ const Testimonial = require('../models/Testinomial.mode')
 const CatchAsync = require('../utils/CatchAsync')
 const sendToken = require('../utils/SendToken')
 const sendEmail = require('../utils/SendEmails')
+const axios = require('axios')
 const streamifier = require('streamifier');
 const Cloudinary = require('cloudinary').v2;
 require('dotenv').config();
@@ -17,9 +18,7 @@ Cloudinary.config({
 
 const crypto = require('crypto')
 
-
-//Student New Register
-exports.StudentRegister = CatchAsync(async (req, res) => {
+async function regsiter(req, res) {
     try {
         const { StudentName, AltPhoneNumber, PhoneNumber, Email, Password, latitude, longitude } = req.body;
 
@@ -28,7 +27,7 @@ exports.StudentRegister = CatchAsync(async (req, res) => {
         if (!StudentName) missingFields.push('Student Name');
         if (!PhoneNumber) missingFields.push('Phone Number');
         if (!Email) missingFields.push('Email');
-        if (!Password) missingFields.push('Password');
+
 
         if (missingFields.length > 0) {
             return res.status(400).json({
@@ -44,10 +43,16 @@ exports.StudentRegister = CatchAsync(async (req, res) => {
                 return res.status(400).json({ message: 'Student with this email already exists' });
             } else {
                 // If not verified, resend the OTP
-                existingStudent.Password = Password;
-                existingStudent.SignInOtp = crypto.randomInt(100000, 999999); // Generate a 6-digit OTP
+                const newOtp = crypto.randomInt(100000, 999999)
+                existingStudent.Password = !Password || PhoneNumber;
+                existingStudent.SignInOtp = newOtp// Generate a 6-digit OTP
                 existingStudent.OtpExpiresTime = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
                 await existingStudent.save();
+
+                const sendOtpOnMobileNumber = await axios.get(`https://2factor.in/API/V1/${process.env.TWOFACTOR_API_KEY}/SMS/${PhoneNumber}/${newOtp}/OTP1`)
+                if (!sendOtpOnMobileNumber) {
+                    return res.status(400).json({ message: 'Failed to send OTP' });
+                }
 
                 const Options = {
                     email: Email,
@@ -59,6 +64,11 @@ exports.StudentRegister = CatchAsync(async (req, res) => {
                                 <p style="font-size: 24px; font-weight: bold; color: #E21C1C; text-align: center; margin: 20px 0;">
                                     ${existingStudent.SignInOtp}
                                 </p>
+                                 ${!Password ? `
+                            <p style="font-size: 24px; font-weight: bold; color: #E21C1C; text-align: center; margin: 20px 0;">
+                                Your Default Password is ${newStudent.PhoneNumber}
+                            </p>
+                        ` : ''}
                                 <p>Please use this OTP to complete your verification process. This OTP is valid for a limited time, so kindly proceed without delay.</p>
                                 <p>If you did not request this OTP, please disregard this message.</p>
                                 <p>Best regards,</p>
@@ -97,32 +107,177 @@ exports.StudentRegister = CatchAsync(async (req, res) => {
         const Options = {
             email: Email,
             subject: 'OTP Verification',
-            message: `<div style="font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f5f5f5; padding: 20px;">
-                        <div style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #E21C1C;">
+            message: `
+                <div style="font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f5f5f5; padding: 20px;">
+                    <div style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #E21C1C;">
                         <h2 style="color: #E21C1C; text-align: center; margin-top: 0;">OTP Verification</h2>
                         <p>Dear ${newStudent.StudentName},</p>
                         <p>We are pleased to inform you that your OTP for verification is:</p>
                         <p style="font-size: 24px; font-weight: bold; color: #E21C1C; text-align: center; margin: 20px 0;">
                             ${newStudent.SignInOtp}
                         </p>
+                        ${!Password ? `
+                            <p style="font-size: 24px; font-weight: bold; color: #E21C1C; text-align: center; margin: 20px 0;">
+                                Your Default Password is ${newStudent.PhoneNumber}
+                            </p>
+                        ` : ''}
                         <p>Please use this OTP to complete your verification process. This OTP is valid for a limited time, so kindly proceed without delay.</p>
                         <p>If you did not request this OTP, please disregard this message.</p>
                         <p>Best regards,</p>
                         <p><strong>S R Tutors</strong></p>
                         <hr style="border: 0; height: 1px; background-color: #E21C1C; margin: 20px 0;">
                         <p style="font-size: 12px; color: #000000; text-align: center;">This is an automated message. Please do not reply.</p>
-                        </div>
-                        </div>
-                                `
+                    </div>
+                </div>
+            `
         };
 
         await sendEmail(Options)
+        const sendOtpOnMobileNumber = await axios.get(`https://2factor.in/API/V1/${process.env.TWOFACTOR_API_KEY}/SMS/${PhoneNumber}/${otp}/OTP1`)
+        if (!sendOtpOnMobileNumber) {
+            return res.status(400).json({ message: 'Failed to send OTP' });
+        }
+
         res.status(201).json({
             success: true,
-            message: 'Please verify Otp For Complete Registration',
+            message: 'Please verify Otp For Complete Registration Otp sends On Email and Phone Number Both',
             data: newStudent
         })
     } catch (error) {
+        console.log(error)
+        return res.status(500).json({ message: 'Internal server error', error: error.message });
+    }
+}
+
+//Student New Register
+exports.StudentRegister = CatchAsync(async (req, res) => {
+    try {
+        const { StudentName, AltPhoneNumber, PhoneNumber, Email, Password, latitude, longitude } = req.body;
+
+        // Check for missing fields
+        const missingFields = [];
+        if (!StudentName) missingFields.push('Student Name');
+        if (!PhoneNumber) missingFields.push('Phone Number');
+        if (!Email) missingFields.push('Email');
+
+
+        if (missingFields.length > 0) {
+            return res.status(400).json({
+                message: 'The following fields are missing: ' + missingFields.join(', ')
+            });
+        }
+
+        // Check if the student already exists
+        const existingStudent = await Student.findOne({ Email });
+        if (existingStudent) {
+            // Check if the student is verified
+            if (existingStudent.isStudentVerified) {
+                return res.status(400).json({ message: 'Student with this email already exists' });
+            } else {
+                // If not verified, resend the OTP
+                const newOtp = crypto.randomInt(100000, 999999)
+                existingStudent.Password = !Password || PhoneNumber;
+                existingStudent.SignInOtp = newOtp// Generate a 6-digit OTP
+                existingStudent.OtpExpiresTime = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
+                await existingStudent.save();
+
+                const sendOtpOnMobileNumber = await axios.get(`https://2factor.in/API/V1/${process.env.TWOFACTOR_API_KEY}/SMS/${PhoneNumber}/${newOtp}/OTP1`)
+                if (!sendOtpOnMobileNumber) {
+                    return res.status(400).json({ message: 'Failed to send OTP' });
+                }
+
+                const Options = {
+                    email: Email,
+                    subject: 'OTP Verification',
+                    message: `<div style="font-family: Arial, sans-serif; padding: 20px; color: #000000; border: 1px solid #E21C1C;">
+                                <h2 style="color: #E21C1C; text-align: center;">OTP Verification</h2>
+                                <p>Dear ${existingStudent.StudentName}</p>
+                                <p>We are pleased to inform you that your OTP for verification is:</p>
+                                <p style="font-size: 24px; font-weight: bold; color: #E21C1C; text-align: center; margin: 20px 0;">
+                                    ${existingStudent.SignInOtp}
+                                </p>
+                                 ${!Password ? `
+                            <p style="font-size: 24px; font-weight: bold; color: #E21C1C; text-align: center; margin: 20px 0;">
+                                Your Default Password is ${newStudent.PhoneNumber}
+                            </p>
+                        ` : ''}
+                                <p>Please use this OTP to complete your verification process. This OTP is valid for a limited time, so kindly proceed without delay.</p>
+                                <p>If you did not request this OTP, please disregard this message.</p>
+                                <p>Best regards,</p>
+                                <p><strong>S R Tutors</strong></p>
+                                <hr style="border: 0; height: 1px; background-color: #E21C1C;">
+                                <p style="font-size: 12px; color: #000000; text-align: center;">This is an automated message. Please do not reply.</p>
+                            </div>`
+                };
+
+                await sendEmail(Options)
+
+                return res.status(200).json({ message: 'OTP resent. Please verify your email.' });
+            }
+        }
+
+
+
+        // Generate OTP
+        const otp = crypto.randomInt(100000, 999999);
+        const otpExpiresTime = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
+        const Image = `https://avatar.iran.liara.run/username?username=${StudentName}`
+        // Create a new student
+        const newStudent = await Student.create({
+            StudentName,
+            PhoneNumber,
+            profilePic: Image,
+            Email,
+            Password,
+            latitude,
+            AltPhoneNumber,
+            longitude,
+            isStudentVerified: false,
+            SignInOtp: otp,
+            OtpExpiresTime: otpExpiresTime
+        });
+
+        const Options = {
+            email: Email,
+            subject: 'OTP Verification',
+            message: `
+                <div style="font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f5f5f5; padding: 20px;">
+                    <div style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #E21C1C;">
+                        <h2 style="color: #E21C1C; text-align: center; margin-top: 0;">OTP Verification</h2>
+                        <p>Dear ${newStudent.StudentName},</p>
+                        <p>We are pleased to inform you that your OTP for verification is:</p>
+                        <p style="font-size: 24px; font-weight: bold; color: #E21C1C; text-align: center; margin: 20px 0;">
+                            ${newStudent.SignInOtp}
+                        </p>
+                        ${!Password ? `
+                            <p style="font-size: 24px; font-weight: bold; color: #E21C1C; text-align: center; margin: 20px 0;">
+                                Your Default Password is ${newStudent.PhoneNumber}
+                            </p>
+                        ` : ''}
+                        <p>Please use this OTP to complete your verification process. This OTP is valid for a limited time, so kindly proceed without delay.</p>
+                        <p>If you did not request this OTP, please disregard this message.</p>
+                        <p>Best regards,</p>
+                        <p><strong>S R Tutors</strong></p>
+                        <hr style="border: 0; height: 1px; background-color: #E21C1C; margin: 20px 0;">
+                        <p style="font-size: 12px; color: #000000; text-align: center;">This is an automated message. Please do not reply.</p>
+                    </div>
+                </div>
+            `
+        };
+
+        await sendEmail(Options)
+        const sendOtpOnMobileNumber = await axios.get(`https://2factor.in/API/V1/${process.env.TWOFACTOR_API_KEY}/SMS/${PhoneNumber}/${otp}/OTP1`)
+        if (!sendOtpOnMobileNumber) {
+            return res.status(400).json({ message: 'Failed to send OTP' });
+        }
+
+        res.status(201).json({
+            success: true,
+            message: 'Please verify Otp For Complete Registration Otp sends On Email and Phone Number Both',
+            data: newStudent
+        })
+    } catch (error) {
+        console.log(error)
         return res.status(500).json({ message: 'Internal server error', error: error.message });
     }
 });
@@ -130,9 +285,10 @@ exports.StudentRegister = CatchAsync(async (req, res) => {
 //Student Verify Otp
 exports.StudentVerifyOtp = CatchAsync(async (req, res) => {
     try {
-        const { Email, otp } = req.body;
-
-        const student = await Student.findOne({ Email });
+        const { PhoneNumber, Email, otp } = req.body;
+        console.log(req.body)
+        const student = await Student.findOne({ Email }) || await Student.findOne({ PhoneNumber });
+        console.log(student)
         if (!student) {
             return res.status(404).json({ message: 'Student not found' });
         }
@@ -148,24 +304,23 @@ exports.StudentVerifyOtp = CatchAsync(async (req, res) => {
 
         await sendToken(student, res, 201);
     } catch (error) {
+        console.log(error)
         return res.status(500).json({ message: 'Internal server error', error: error.message });
     }
 });
 
 //Student Resent Otp
 exports.StudentResendOtp = CatchAsync(async (req, res) => {
-    const { Email } = req.body;
-
-    const student = await Student.findOne({ Email });
+    const { PhoneNumber, Email } = req.body;
+    console.log(req.body)
+    const student = await Student.findOne({ Email }) || await Student.findOne({ PhoneNumber });
     if (!student) {
         return res.status(404).json({ message: 'Student not found' });
     }
 
-    if (student.isStudentVerified) {
-        return res.status(400).json({ message: 'Student already verified' });
-    }
-
-    student.SignInOtp = crypto.randomInt(100000, 999999);
+    console.log(student)
+    const newOtp = crypto.randomInt(100000, 999999)
+    student.SignInOtp = newOtp
     student.OtpExpiresTime = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
     await student.save();
     const Options = {
@@ -189,33 +344,53 @@ exports.StudentResendOtp = CatchAsync(async (req, res) => {
                     </div>
                             `
     };
-    await sendEmail(Options);
+
+    try {
+        const sendOtpOnMobileNumber = await axios.get(`https://2factor.in/API/V1/${process.env.TWOFACTOR_API_KEY}/SMS/${PhoneNumber}/${newOtp}/OTP1`);
+        if (sendOtpOnMobileNumber.data.Status !== 'Success') {
+            return res.status(400).json({ message: 'Failed to send OTP' });
+        }
+    } catch (error) {
+        console.log(error)
+        return res.status(400).json({ message: 'Failed to send OTP' });
+    }
+
+    // Send OTP email if Email is provided
+    if (Email) {
+
+        await sendEmail(Options);
+
+    }
+
     res.status(200).json({ message: 'OTP resent Successful' });
 });
-
 //Student And 
 exports.StudentLogin = CatchAsync(async (req, res) => {
     try {
-        const { Email, Password } = req.body;
-
-        if (!Email || !Password) {
+        const { anyPhoneAndEmail, Password } = req.body;
+        console.log(req.body)
+        if (!anyPhoneAndEmail || !Password) {
             return res.status(403).json({
                 Success: false,
                 message: "Please fill all required fields"
             });
         }
 
+
+        const isEmail = anyPhoneAndEmail.includes('@');
+        const query = isEmail ? { Email: anyPhoneAndEmail } : { PhoneNumber: anyPhoneAndEmail };
+
         // Check if user exists (either Student or Teacher)
-        const CheckUser = await Student.findOne({ Email }) || await Teacher.findOne({ Email });
+        const CheckUser = await Student.findOne(query) || await Teacher.findOne(query);
+
         if (!CheckUser) {
             return res.status(403).json({
                 Success: false,
                 message: "User not found"
             });
         }
-
         // Determine user type and compare password
-        if (CheckUser.Role === 'Student') {
+        if (CheckUser.Role === 'Student' || CheckUser.Role === 'admin') {
             const isPasswordMatch = await CheckUser.comparePassword(Password);
             if (!isPasswordMatch) {
                 return res.status(403).json({
@@ -240,6 +415,87 @@ exports.StudentLogin = CatchAsync(async (req, res) => {
         });
     }
 });
+
+
+
+//check number
+exports.CheckNumber = CatchAsync(async (req, res) => {
+    try {
+        const { userNumber, latitude, longitude } = req.body;
+
+        const checkUser = await Student.findOne({ PhoneNumber: userNumber });
+        if (checkUser) {
+            const otp = crypto.randomInt(100000, 999999);
+            const otpExpiresTime = Date.now() + 10 * 60 * 1000;
+            // const sendOtpOnMobileNumber = await axios.get(`https://2factor.in/API/V1/${process.env.TWOFACTOR_API_KEY}/SMS/${userNumber}/${otp}/OTP1`);
+
+            // // Handle OTP sending failure
+            // if (sendOtpOnMobileNumber.data.Status !== 'Success') {
+            //     return res.status(400).json({ message: 'Failed to send OTP' });
+            // }
+            checkUser.SignInOtp = otp
+            checkUser.OtpExpiresTime = otpExpiresTime
+
+            await checkUser.save()
+            return res.status(201).json({
+                success: 'true',
+                message: 'Otp Send Successful'
+            });
+        }
+
+
+
+        // Check for missing fields
+        const missingFields = [];
+        if (!userNumber) missingFields.push('Phone Number');
+
+        if (missingFields.length > 0) {
+            return res.status(400).json({
+                message: 'The following fields are missing: ' + missingFields.join(', ')
+            });
+        }
+
+        // Generate OTP
+        const otp = crypto.randomInt(100000, 999999);
+        const otpExpiresTime = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
+
+        // Create a new student
+        const newStudent = await Student.create({
+            StudentName: `Student${crypto.randomInt(100, 999)}`,
+            PhoneNumber: userNumber,
+            Email: `Student${crypto.randomInt(100, 999)}@gmail.com`,
+            Password: `Student${crypto.randomInt(100, 999)}`,
+            latitude,
+            AltPhoneNumber: userNumber,
+            longitude,
+            isStudentVerified: false,
+            SignInOtp: otp,
+            OtpExpiresTime: otpExpiresTime
+        });
+
+        // Uncomment and use this after properly defining the email options
+        // await sendEmail(Options);
+
+        // Send OTP via mobile number
+        // const sendOtpOnMobileNumber = await axios.get(`https://2factor.in/API/V1/${process.env.TWOFACTOR_API_KEY}/SMS/${PhoneNumber}/${otp}/OTP1`);
+
+        // // Handle OTP sending failure
+        // if (sendOtpOnMobileNumber.data.Status !== 'Success') {
+        //     return res.status(400).json({ message: 'Failed to send OTP' });
+        // }
+
+        // Send success response
+        res.status(201).json({
+            success: true,
+            message: 'Please verify Otp for complete registration. OTP sent On phone number.',
+            data: newStudent
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Internal server error', error: error.message });
+    }
+});
+
 
 exports.AdminLogin = CatchAsync(async (req, res) => {
     try {
@@ -645,4 +901,33 @@ exports.UpdateTestimonial = CatchAsync(async (req, res) => {
             data: error
         });
     }
+});
+
+
+
+exports.studentDeleteById = CatchAsync(async (req, res) => {
+    const { id } = req.params;
+
+  
+    if (!id) {
+        return res.status(400).json({
+            status: 'fail',
+            message: 'Student ID is required'
+        });
+    }
+
+    const student = await Student.findByIdAndDelete(id);
+
+    if (!student) {
+        return res.status(404).json({
+            status: 'fail',
+            message: 'Student not found'
+        });
+    }
+
+    // Respond with success
+    res.status(204).json({
+        status: 'success',
+        message: 'Student successfully deleted'
+    });
 });

@@ -8,7 +8,7 @@ function StudentInfo() {
 
     const fetchTeacherData = async () => {
         try {
-            const response = await axios.get(`https://www.sr.apnipaathshaala.in/api/v1/student/get-single-student/${id}`)
+            const response = await axios.get(`https://sr.apnipaathshaala.in/api/v1/student/get-single-student/${id}`)
             setStudentDetail(response.data.data)
         } catch (error) {
             console.log(error)
@@ -21,7 +21,7 @@ function StudentInfo() {
   return (
     <div className="min-h-screen bg-gray-100 py-8 px-4">
             <div className="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md">
-                <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Teacher Detail</h2>
+                <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Student Profile Detail</h2>
                 {studentDetail ? (
                     <div className="space-y-4">
                         <div className="bg-gray-50 p-4 rounded-md shadow-sm">

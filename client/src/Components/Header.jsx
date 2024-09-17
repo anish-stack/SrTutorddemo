@@ -41,7 +41,7 @@ function Header() {
 
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState({
-    Email: "",
+    anyPhoneAndEmail: "",
     Password: "",
   });
   const [loading, setLoading] = useState(false);
@@ -83,14 +83,14 @@ function Header() {
       if (modalType === "student") {
         setLoading(true);
         response = await axios.post(
-          "https://www.sr.apnipaathshaala.in/api/v1/student/login",
+          "https://sr.apnipaathshaala.in/api/v1/student/login",
           formData
         );
         userPrefix = "student";
       } else if (modalType === "teacher") {
         setLoading(true);
         response = await axios.post(
-          "https://www.sr.apnipaathshaala.in/api/v1/teacher/Teacher-Login",
+          "https://sr.apnipaathshaala.in/api/v1/teacher/Teacher-Login",
           formData
         );
         userPrefix = "teacher";
@@ -119,7 +119,7 @@ function Header() {
           handleModalClose();
         }, 500); // Close the modal on success
         setFormData({
-          Email: "",
+          anyPhoneAndEmail: "",
           Password: "",
         });
       } else {
@@ -127,6 +127,7 @@ function Header() {
         setLoading(false);
       }
     } catch (error) {
+      console.log(error)
       setLoading(false);
       toast.error(
         "Login failed:",
@@ -180,7 +181,7 @@ function Header() {
                         <li className="">
                           <Link to="services">Services</Link>
                         </li>
-                        <li className="menu-item">
+                        {/* <li className="menu-item">
                           <Link to="#">
                             One-to-One Class{" "}
                             <i className="ri-arrow-down-s-line"></i>
@@ -199,7 +200,7 @@ function Header() {
                               <Link to="#">Apply as Tutor</Link>
                             </li>
                           </ul>
-                        </li>
+                        </li> */}
                         <li className="">
                           <Link to="#">Membership</Link>
                         </li>
@@ -255,13 +256,13 @@ function Header() {
                       </Link>
                     ) : studentToken ? (
                       // Render button for student dashboard
-                      <Link
-                        to={`${modalContent.student.DashboardUrl}`}
+                      <a
+                        href={`${modalContent.student.DashboardUrl}`}
                         style={{ fontSize: "10px" }}
                         className="btn btn-primary"
                       >
                         Student Dashboard
-                      </Link>
+                      </a>
                     ) : (
                       <div className="tgmenu__categories d-none d-md-block">
                         <DropdownButton
@@ -432,13 +433,13 @@ function Header() {
         <div className="modal-body">
           <form onSubmit={handleLogin}>
             <div className="form-group">
-              <label htmlFor="Email">Email address</label>
+              <label htmlFor="Email">Phone Number / Email address</label>
               <input
-                type="email"
+                type="text"
                 className="form-control"
-                id="Email"
-                name="Email"
-                value={formData.Email}
+                id="anyPhoneAndEmail"
+                name="anyPhoneAndEmail"
+                value={formData.anyPhoneAndEmail}
                 onChange={handleChange}
                 required
               />

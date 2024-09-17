@@ -9,7 +9,7 @@ export const loginUser = createAsyncThunk(
     'login/loginUser',
     async (credentials, thunkAPI) => {
         try {
-            const response = await axios.post('https://www.sr.apnipaathshaala.in/api/v1/student/login', credentials);
+            const response = await axios.post('https://sr.apnipaathshaala.in/api/v1/student/login', credentials);
             console.log(response.data)
 
             localStorage.setItem('Sr-user-token', response.data.token);

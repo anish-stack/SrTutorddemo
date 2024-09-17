@@ -4,9 +4,8 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
 const MyLocations = ({ locations }) => {
-    // Initialize state for location and points
-    const [currentLocation, setCurrentLocation] = useState([28.687446456774957, 77.14151483304185]); // Default location
-    const [allPoints, setAllPoints] = useState(locations || []);
+    // Default location (center of the map)
+    const [currentLocation, setCurrentLocation] = useState([28.687446456774957, 77.14151483304185]);
 
     // Define custom icon for markers
     const customIcon = L.divIcon({
@@ -44,22 +43,23 @@ const MyLocations = ({ locations }) => {
                     )}
                     
                     {/* Render all points markers */}
-                    {allPoints.map((point, index) =>
-                        point.lat && point.lng ? (
+                    {locations.map((point, index) => {
+                        const { coordinates } = point.location;
+                        return coordinates && coordinates.length === 2 ? (
                             <Marker
                                 key={index}
+                                position={[coordinates[1], coordinates[0]]}
                                 icon={customIcon}
-                                position={[point.lat, point.lng]}
                             >
                                 <Tooltip direction="top" offset={[0, -20]} opacity={1} permanent>
                                     <span style={{ fontSize: '10px' }}>{`Point ${index + 1}`}</span>
                                 </Tooltip>
                                 <Popup>
-                                    {`Point ${index + 1}: ${point.lat.toFixed(6)}, ${point.lng.toFixed(6)}`}
+                                    {`Point ${index + 1}: ${coordinates[1].toFixed(6)}, ${coordinates[0].toFixed(6)}`}
                                 </Popup>
                             </Marker>
-                        ) : null
-                    )}
+                        ) : null;
+                    })}
                 </MapContainer>
             </div>
         </div>

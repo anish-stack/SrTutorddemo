@@ -47,7 +47,10 @@ function Course() {
   };
 
   const handleClose = () => setShowModal(false);
-  const handleClassClose = () => setShowClassModal(false);
+  const handleClassClose = () => {
+    localStorage.removeItem('formData')
+    setShowClassModal(false)
+  };
 
   useEffect(() => {
     dispatch(ClassSearch());
@@ -128,15 +131,13 @@ function Course() {
     if (classRanges.includes(item.Class)) {
 
       SetselectedClass(item)
-      dispatch(setSelectedClass(item)); // Dispatch action to store the selected class
+      dispatch(setSelectedClass(item));
+      // Dispatch action to store the selected class
       ClasshandleShow()
     } else {
-      if (token) {
-        handleShow();
-        console.log("not open")
-      } else {
-        LhandleShow()
-      }
+
+      handleShow();
+
     }
   };
 
@@ -147,11 +148,9 @@ function Course() {
       Subjects: item,
     });
 
-    if (token) {
+  
       handleShow();
-    } else {
-      LhandleShow()
-    }
+   
   };
 
   if (loading) {
@@ -305,7 +304,7 @@ function Course() {
           subject={selectedSubject}
           handleClose={handleClose}
         />
-        <LoginModal isOpen={LshowModal} onClose={LhandleClose} modalType={"student"} />
+        {/* <LoginModal isOpen={LshowModal} onClose={LhandleClose} modalType={"student"} /> */}
       </section>
     </>
   );

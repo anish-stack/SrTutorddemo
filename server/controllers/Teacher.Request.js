@@ -8,7 +8,7 @@ const CatchAsync = require('../utils/CatchAsync')
 const crypto = require('crypto')
 const sendEmail = require('../utils/SendEmails')
 const { check } = require('express-validator')
-
+const RequestSchema = require('../models/UniversalSchema')
 
 exports.MakeARequestForTeacher = CatchAsync(async (req, res) => {
     try {
@@ -328,31 +328,36 @@ exports.GetPostByStudentId = CatchAsync(async (req, res) => {
             });
         }
 
-        // Fetch posts from SubjectTeacherModel where studentId matches and subjectRequest is true
-        const subjectTeacherPosts = await SubjectTeacherModel.find({
-            studentId: studentId
-        });
+        const posts = await RequestSchema.find({ studentId })
+            .populate({
+                path: 'Class', // Populate the Class field
+                populate: {
+                    path: 'InnerClasses.InnerClass', // Populate InnerClass within InnerClasses
+                    model: 'InnerClass'
+                }
+            })
+            .populate(['Teacher', 'Student']);
 
-        // Fetch posts from ParticularTeacher where studentId matches and particularTeacher is true
-        const particularTeacherPosts = await ParticularTeacher.find({
-            studentId: studentId
-        });
-
-        // Combine both results
-        const combinedPosts = [...subjectTeacherPosts, ...particularTeacherPosts];
+        if (!posts.length) {
+            return res.status(404).json({
+                success: false,
+                message: "No posts found for this student."
+            });
+        }
 
         res.status(200).json({
             success: true,
-            data: combinedPosts
+            data: posts
         });
     } catch (error) {
-        console.error("Error:", error);
+        console.error("Error fetching posts:", error);
         res.status(500).json({
             success: false,
-            message: "Internal Server Error"
+            message: "Internal Server Error. Please try again later."
         });
     }
 });
+
 
 exports.getSubscribed = CatchAsync(async (req, res) => {
     try {

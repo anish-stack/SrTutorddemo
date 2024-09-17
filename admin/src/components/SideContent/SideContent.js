@@ -27,6 +27,7 @@ import EditTemplate from '../../pages/Newsletters/EditTemplete'
 import TeacherInfo from '../../pages/TeacherInfo/TeacherInfo'
 import StudentInfo from '../../pages/StudentInfo/StudentInfo'
 import ClassTeacherRequest from '../../pages/ClassTeacherRequest/ClassTeacherRequest'
+import AllRequest from '../../pages/AllRequest/AllRequest'
 const SideContent = () => {
   return (
     <Routes>
@@ -55,8 +56,9 @@ const SideContent = () => {
       <Route path='/teacher-info/:id' element={<TeacherInfo />} />
       <Route path='/Student-info/:id' element={<StudentInfo />} />
       <Route path='/Manage-Class-teacher-request' element={<ClassTeacherRequest />} />
-
       <Route path='/send-offers' element={<SendOfferMails />} />
+
+      <Route path='/Manage-All-Requests' element={<AllRequest />} />
 
       <Route path='/forbidden' element={<Forbidden />} />
     </Routes>

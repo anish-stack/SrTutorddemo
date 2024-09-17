@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Select from "react-select";
+// import { Modal, Button,  Row,  Container } from "react-bootstrap";
+
 import axios from "axios";
 import Cookies from "js-cookie";
 import { ClassSearch } from "../../Slices/Class.slice";
 import PropTypes from "prop-types";
 import toast from "react-hot-toast";
 import { useGeolocated } from "react-geolocated";
-import { Col, Form } from "react-bootstrap";
+import { Col, Form, Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
-const [loading,setLoading] = useState(false)
+  console.log(teachersData)
+  const [loading, setLoading] = useState(false)
   const [teacherData, setTeacherData] = useState([]);
   const [studentToken, setStudentToken] = useState(null);
   const [locationSuggestions, setLocationSuggestions] = useState([]);
@@ -29,10 +33,17 @@ const [loading,setLoading] = useState(false)
     ClassId: '',
     className: '',
     teacherId: '',
+    locality: '',
+    StudentName: '',
+    StudentEmail: '',
+    StudentContact: '',
     latitude: '',
     longitude: '',
+    teacherId: '',
     isBestFaculty: false,
   });
+  const navigate = useNavigate();
+  const [loginNumber, setLoginNumber] = useState()
   const [classes, setClasses] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [selectedClass, setSelectedClass] = useState("");
@@ -46,16 +57,18 @@ const [loading,setLoading] = useState(false)
     },
     userDecisionTimeout: 5000,
   });
+  const [login, setLogin] = useState(false)
 
-  function CALLACTION() {
-    const { coords, isGeolocationAvailable, isGeolocationEnabled } = useGeolocated({
-      positionOptions: {
-        enableHighAccuracy: true,
-      },
-      userDecisionTimeout: 5000,
-    });
-  }
-
+  const url = new URLSearchParams(window.location.search)
+  const otpValue = url.get('otpSent')
+  const [sessionData, setSessionData] = useState({
+    otpSent: false,
+    number: ''
+  })
+  const [showOtp, setShowOtp] = useState(false)
+  const [otp, setOtp] = useState()
+  const [ClickLatitude, setClickLatitude] = useState(null);
+  const [ClickLongitude, setClickLongitude] = useState(null);
   useEffect(() => {
     if (coords) {
       setFormData(prevState => ({
@@ -65,6 +78,7 @@ const [loading,setLoading] = useState(false)
       }));
     }
   }, [coords]);
+
 
   useEffect(() => {
     if (teachersData) {
@@ -86,7 +100,13 @@ const [loading,setLoading] = useState(false)
     const student = Cookies.get("studentToken");
     setStudentToken(student || null);
   }, []);
-
+  useEffect(() => {
+    if (studentToken) {
+      setLogin(true)
+    } else {
+      setLogin(false)
+    }
+  }, [studentToken])
   useEffect(() => {
     dispatch(ClassSearch());
   }, [dispatch]);
@@ -130,7 +150,7 @@ const [loading,setLoading] = useState(false)
 
   const fetchSubjects = async (classId) => {
     try {
-      const response = await axios.get(`https://www.sr.apnipaathshaala.in/api/v1/admin/Get-Class-Subject/${classId}`);
+      const response = await axios.get(`https://sr.apnipaathshaala.in/api/v1/admin/Get-Class-Subject/${classId}`);
       const fetchedSubjects = response.data.data.Subjects;
 
       if (fetchedSubjects) {
@@ -165,7 +185,12 @@ const [loading,setLoading] = useState(false)
     { value: 'Five Classes a Week', label: 'Five Classes a Week' },
     { value: 'Six Classes a Week', label: 'Six Classes a Week' },
   ];
-
+  const modeoptions = [
+    { value: 'Online Class', label: 'Online Class' },
+    { value: 'Home Tuition at My Home', label: 'Home Tuition at My Home' },
+    { value: 'Willing to travel to Teacher Home', label: 'Willing to travel to Teacher Home' },
+    { value: 'Require Teacher to Travel to My Home', label: 'Require Teacher to Travel to My Home' },
+  ];
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevState => ({
@@ -181,20 +206,39 @@ const [loading,setLoading] = useState(false)
 
 
   };
+  const handleLocationLatAndLngFetch = async (address) => {
+    const options = {
+      method: 'GET',
+      url: `https://sr.apnipaathshaala.in/geocode?address=${address}`
+    };
 
+    try {
+      const response = await axios.request(options);
+      const result = response.data;
+      console.log("Result from us",result)
+      if (result) {
+        // Update state with latitude and longitude from the result
+        setClickLatitude(result?.latitude);
+        setClickLongitude(result?.longitude);
+      }
+      console.log("Result from setClickLatitude",ClickLatitude)
+      console.log("Result from setClickLongitude",ClickLongitude)
+
+    } catch (error) {
+      console.error("Error fetching location coordinates:", error);
+    }
+  };
+  useEffect(() => {
+    console.log("Updated ClickLatitude:", ClickLatitude);
+    console.log("Updated ClickLongitude:", ClickLongitude);
+  }, [ClickLatitude, ClickLongitude]);
+  
   const handleLocationFetch = async (input) => {
     try {
       const res = await axios.get(
-        "https://place-autocomplete1.p.rapidapi.com/autocomplete/json",
-        {
-          params: { input, radius: "500" },
-          headers: {
-            "x-rapidapi-key": "75ad2dad64msh17034f06cc47c06p18295bjsn18e367df005b",
-            "x-rapidapi-host": "place-autocomplete1.p.rapidapi.com",
-          },
-        }
-      );
-      setLocationSuggestions(res.data.predictions || []);
+        `https://sr.apnipaathshaala.in/autocomplete?input=${input}`);
+ 
+      setLocationSuggestions(res.data || []);
     } catch (error) {
       console.error("Error fetching location suggestions:", error);
     }
@@ -212,6 +256,7 @@ const [loading,setLoading] = useState(false)
       ...prevState,
       Location: location.description,
     }));
+    handleLocationLatAndLngFetch(location.description)
     setLocationSuggestions([]);
   };
 
@@ -251,9 +296,17 @@ const [loading,setLoading] = useState(false)
         isValid = false;
         toast.error("Please fill out the Gender field.");
       }
-      if (!formData.VehicleOwned) {
+      if (!formData.StudentName) {
         isValid = false;
-        toast.error("Please indicate if you own a vehicle.");
+        toast.error("Please fill out the Name field.");
+      }
+      if (!formData.StudentEmail) {
+        isValid = false;
+        toast.error("Please fill out the Email field.");
+      }
+      if (!formData.StudentContact) {
+        isValid = false;
+        toast.error("Please fill out the Contact Details field.");
       }
     }
     if (step === 2) {
@@ -302,10 +355,91 @@ const [loading,setLoading] = useState(false)
       setStep(prevStep => prevStep + 1);
     }
   };
+  const handleLoginChange = (e) => {
+    setLoginNumber(e.target.value); // Directly set the value
+  };
 
   const handlePreviousStep = () => {
     setStep(prevStep => prevStep - 1);
   };
+
+
+  const resendOtp = async () => {
+    try {
+
+      const response = await axios.post('https://sr.apnipaathshaala.in/api/v1/student/resent-otp', { PhoneNumber: loginNumber });
+      toast.success(response.data.message);
+
+    } catch (error) {
+      console.log(error)
+      toast.error(error.response?.data?.message || "An error occurred");
+    }
+  };
+
+  const verifyOtp = async () => {
+    try {
+
+      const response = await axios.post('https://sr.apnipaathshaala.in/api/v1/student/Verify-Student', {
+        PhoneNumber: loginNumber,
+        otp
+      });
+      toast.success("Student Verified Successfully");
+      const { token, user } = response.data;
+      console.log(response.data)
+      Cookies.set('studentToken', token, { expires: 1 });
+      Cookies.set('studentUser', JSON.stringify(user), { expires: 1 });
+      sessionStorage.removeItem('OtpSent')
+      sessionStorage.removeItem('number')
+      sessionStorage.removeItem('verified')
+      setStudentToken(token)
+      setLogin(true)
+      setStep(1);
+
+    } catch (error) {
+      console.log(error)
+      toast.error(error.response?.data?.message || "An error occurred");
+    }
+  };
+
+
+  const handleLoginNumberCheck = async (e) => {
+    e.preventDefault()
+
+
+
+    try {
+      const response = await axios.post('https://sr.apnipaathshaala.in/api/v1/student/checkNumber-request', {
+        userNumber: loginNumber
+      })
+      console.log(response.data)
+      setShowOtp(true)
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.set('otpSent', 'true');
+      newUrl.searchParams.set('number', loginNumber);
+      newUrl.searchParams.set('verified', 'false');
+
+      sessionStorage.setItem('OtpSent', true)
+      sessionStorage.setItem('number', loginNumber)
+      sessionStorage.setItem('verified', false)
+
+
+      navigate(`${window.location.pathname}?${newUrl.searchParams.toString()}`, { replace: true });
+    } catch (error) {
+      console.log(error.response)
+
+      if (error.response?.data?.success === false &&
+        error.response?.data?.message === "User with this phone number already exists.") {
+        setShowOtp(true)
+        setStep(1); // Correctly set the state
+      }
+    }
+  }
+
+
+
+
+
+
 
   const handleSubmit = async () => {
     if (!formData.latitude || !formData.longitude) {
@@ -320,23 +454,49 @@ const [loading,setLoading] = useState(false)
 
       }
     }
-    setLoading(true)
+
+    const student = Cookies.get("studentToken");
+    const submittedData = {
+      requestType: "Particular Teacher Request",
+      classId: formData?.ClassId || null,
+      className: formData?.className,
+      subjects: formData?.Subject,
+      interestedInTypeOfClass: formData?.TeachingMode,
+      teacherGenderPreference: formData?.Gender,
+      numberOfSessions: formData?.HowManyClassYouWant,
+      experienceRequired: formData?.TeachingExperience,
+      minBudget: formData?.MinRange,
+      maxBudget: formData?.MaxRange,
+      locality: formData?.locality,
+      startDate: formData?.StartDate,
+      specificRequirement: formData?.SpecificRequirement,
+      location: {
+        type: 'Point',
+        coordinates: [ClickLongitude, ClickLatitude]
+      },
+      teacherId: formData?.teacherId,
+      studentInfo: {
+        studentName: formData.StudentName,
+        contactNumber: formData.StudentContact,
+        emailAddress: formData.StudentEmail,
+      },
+    };
+    console.log("submittedData",submittedData)
+    setLoading(true);
     try {
-      const response = await axios.post('https://www.sr.apnipaathshaala.in/api/v1/student/Make-Particular-request', formData, {
-        headers: {
-          Authorization: `Bearer ${studentToken}`
-        }
-      })
-      window.location.href="/thankYou"
+      const response = await axios.post('https://sr.apnipaathshaala.in/api/v1/student/universal-request', submittedData, {
+        headers: { Authorization: `Bearer ${student || studentToken}` }
+      });
       console.log(response.data)
-      setLoading(false)
+      setLoading(false);
+      toast.success("Request Submit Successful")
 
+      window.location.href = "/thankYou";
     } catch (error) {
-      setLoading(false)
-
-      console.log(error)
+      console.log(error);
+      setLoading(false);
+      toast.error("Server Error, Please try again later.");
     }
-
 
   };
 
@@ -357,14 +517,14 @@ const [loading,setLoading] = useState(false)
     label: cls.label,
   }));
 
-  if (!studentToken) {
-    return (
-      <div className="unauthorized">
-        <h3>Unauthorized Access</h3>
-        <p>Please log in to access this page.</p>
-      </div>
-    );
-  }
+  // if (!studentToken) {
+  //   return (
+  //     <div className="unauthorized">
+  //       <h3>Unauthorized Access</h3>
+  //       <p>Please log in to access this page.</p>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div
@@ -387,384 +547,512 @@ const [loading,setLoading] = useState(false)
               aria-label="Close"
             ></button>
           </div>
-          <div className="modal-body">
-            {step === 1 && (
-              <>
-                <h4>Step 1: Basic Details</h4>
-                <div className="mb-3">
-                  <label htmlFor="Gender" className="form-label">
-                    Gender <span className="text-danger">*</span>
-                  </label>
-                  <select
-                    id="Gender"
-                    required
-                    name="Gender"
-                    value={formData.Gender}
-                    onChange={handleInputChange}
-                    className="form-select"
-                  >
-                    <option value="" disabled>
-                      Select Gender
-                    </option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Any">Any</option>
-                  </select>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="VehicleOwned" className="form-label">
-                    Indicate if you own a vehicle{" "}
-                    <span className="text-danger">*</span>
-                  </label>
-                  <select
-                    id="VehicleOwned"
-                    required
-                    name="VehicleOwned"
-                    value={formData.VehicleOwned}
-                    onChange={handleInputChange}
-                    className="form-select"
-                  >
-                    <option value="" disabled>
-                      Select Vehicle Ownership
-                    </option>
-                    <option value="Yes">Yes</option>
-                    <option value="No">No</option>
-                  </select>
-                </div>
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={handleNextStep}
-                >
-                  Next
-                </button>
-              </>
-            )}
 
-            {step === 2 && (
-              <>
-                <h4>Step 2: Academic Details</h4>
-                <div className="mb-3">
-                  <label htmlFor="Class" className="form-label">
-                    Select the class you are interested in{" "}
-                    <span className="text-danger">*</span>
-                  </label>
-                  <select
-                    id="Class"
-                    value={selectedClass}
-                    onChange={handleClassChange}
-                    className="form-select"
-                  >
-                    <option value="" disabled>
-                      Select Class
-                    </option>
-                    {concatenatedData.map((cls, index) => (
-                      <option key={index} value={cls.id}>
-                        {cls.class}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="Subject" className="form-label">
-                    Choose the subjects you want to learn{" "}
-                    <span className="text-danger">*</span>
-                  </label>
-                  <Select
-                    isMulti
+
+
+
+          <div className="modal-body">
+            {!login ? (
+              <div className="container-fluid">
+                <Form.Group>
+                  <label htmlFor="">Enter Your Contact Number </label>
+                  <Form.Control
+                    type="text"
+                    name="loginNumber"
+                    value={showOtp ? (loginNumber || sessionStorage.getItem('number')) : loginNumber} // Ternary condition for showing value
+                    onChange={handleLoginChange}
                     required
-                    name="Subject"
-                    value={subjectOptions.filter((option) =>
-                      formData.Subject.includes(option.label)
-                    )}
-                    onChange={handleSubjectChange}
-                    options={subjectOptions}
-                    placeholder="Select Subjects"
-                    className="basic-multi-select"
-                    classNamePrefix="select"
                   />
+
+                </Form.Group>
+                {showOtp && (
+                  <Form.Group>
+                    <label htmlFor="">Enter Otp </label>
+                    <Form.Control
+                      type="text"
+                      name="otp"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value)}
+                      required
+                    />
+                  </Form.Group>
+                )}
+                <div className="mt-4 d-flex align-item-center justify-content-between">
+                  {showOtp ? (
+                    <Button onClick={() => verifyOtp(otp)} variant="success" type="button">
+                      {loading ? 'Please Wait....' : 'Verify Number'}
+                    </Button>
+                  ) : (
+                    <Button onClick={handleLoginNumberCheck} variant="success" type="button">
+                      {loading ? 'Please Wait....' : 'Submit'}
+                    </Button>
+                  )}
+
+
+                  <Button onClick={resendOtp} variant="success" type="button">
+                    Resend Otp
+                  </Button>
                 </div>
-                <Col md={6}>
-                  <Form.Group className="mb-3"
-                    required>
-                    <Form.Label>How Many Classes You Want  <b className="text-danger fs-5">*</b></Form.Label>
+
+              </div>
+            ) : <>
+
+              {step === 1 && (
+                <>
+                  <h4>Step 1: Basic Details</h4>
+                  <div className="mb-3">
+                    <label htmlFor="Gender" className="form-label">
+                      Teacher Gender <span className="text-danger">*</span>
+                    </label>
+                    <select
+                      id="Gender"
+                      required
+                      name="Gender"
+                      value={formData.Gender}
+                      onChange={handleInputChange}
+                      className="form-select"
+                    >
+                      <option value="" disabled>
+                        Select Gender
+                      </option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Any">Any</option>
+                    </select>
+                  </div>
+                  <Col md={12}>
+                    <Form.Group className="mb-3"
+                      required>
+                      <Form.Label>Student Name <b className="text-danger fs-5">*</b></Form.Label>
+                      <div className="mb-3">
+
+                        <input
+                          type="text"
+                          id="StudentName"
+                          required
+                          name="StudentName"
+                          value={formData.StudentName}
+                          onChange={handleInputChange}
+                          className="form-control"
+                          placeholder="Enter Your Name"
+                        />
+
+                      </div>
+
+                    </Form.Group>
+                  </Col>
+                  <Col md={12}>
+                    <Form.Group className="mb-3"
+                      required>
+                      <Form.Label>Student Email <b className="text-danger fs-5">*</b></Form.Label>
+                      <div className="mb-3">
+
+                        <input
+                          type="Email"
+                          id="Email"
+                          required
+                          name="StudentEmail"
+                          value={formData.StudentEmail}
+                          onChange={handleInputChange}
+                          className="form-control"
+                          placeholder="Enter Your Email"
+                        />
+
+                      </div>
+
+                    </Form.Group>
+                  </Col>  <Col md={12}>
+                    <Form.Group className="mb-3"
+                      required>
+                      <Form.Label>Contact Details <b className="text-danger fs-5">*</b></Form.Label>
+                      <div className="mb-3">
+
+                        <input
+                          type="text"
+                          id="Contact"
+                          required
+                          name="StudentContact"
+                          value={formData.StudentContact}
+                          onChange={handleInputChange}
+                          className="form-control"
+                          placeholder="Enter Your Contact Details"
+                        />
+
+                      </div>
+
+                    </Form.Group>
+                  </Col>
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={handleNextStep}
+                  >
+                    Next
+                  </button>
+                </>
+              )}
+
+              {step === 2 && (
+                <>
+                  <h4>Step 2: Academic Details</h4>
+                  <div className="mb-3">
+                    <label htmlFor="Class" className="form-label">
+                      Select the class you are interested in{" "}
+                      <span className="text-danger">*</span>
+                    </label>
+                    <select
+                      id="Class"
+                      value={selectedClass}
+                      onChange={handleClassChange}
+                      className="form-select"
+                    >
+                      <option value="" disabled>
+                        Select Class
+                      </option>
+                      {concatenatedData.map((cls, index) => (
+                        <option key={index} value={cls.id}>
+                          {cls.class}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="mb-3">
+                    <label htmlFor="Subject" className="form-label">
+                      Choose the subjects you want to learn{" "}
+                      <span className="text-danger">*</span>
+                    </label>
                     <Select
-                      name="HowManyClassYouWant"
-                      options={ClasessOptions}
-                      onChange={handleSelectChange('HowManyClassYouWant')}
-                      value={ClasessOptions.find(option => option.value === formData.HowManyClassYouWant) || null}
+                      isMulti
+                      required
+                      name="Subject"
+                      value={subjectOptions.filter((option) =>
+                        formData.Subject.includes(option.label)
+                      )}
+                      onChange={handleSubjectChange}
+                      options={subjectOptions}
+                      placeholder="Select Subjects"
+                      className="basic-multi-select"
+                      classNamePrefix="select"
+                    />
+                  </div>
+                  <Col md={6}>
+                    <Form.Group className="mb-3"
+                      required>
+                      <Form.Label>How Many Classes You Want  <b className="text-danger fs-5">*</b></Form.Label>
+                      <Select
+                        name="HowManyClassYouWant"
+                        options={ClasessOptions}
+                        onChange={handleSelectChange('HowManyClassYouWant')}
+                        value={ClasessOptions.find(option => option.value === formData.HowManyClassYouWant) || null}
+                      />
+
+                    </Form.Group>
+                  </Col>
+                  <button
+                    type="button"
+                    className="btn btn-secondary me-2"
+                    onClick={handlePreviousStep}
+                  >
+                    Previous
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={handleNextStep}
+                  >
+                    Next
+                  </button>
+                </>
+              )}
+
+              {step === 3 && (
+                <>
+                  <h4>Step 3: Additional Information</h4>
+                  <div className="mb-3">
+                    <label htmlFor="StartDate" className="form-label">
+                      Preferred Start Date <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      id="StartDate"
+                      required
+                      name="StartDate"
+                      value={formData.StartDate}
+                      onChange={handleInputChange}
+                      className="form-control"
+                      min={new Date().toISOString().split("T")[0]} // This sets the minimum date to today's date
                     />
 
-                  </Form.Group>
-                </Col>
-                <button
-                  type="button"
-                  className="btn btn-secondary me-2"
-                  onClick={handlePreviousStep}
-                >
-                  Previous
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={handleNextStep}
-                >
-                  Next
-                </button>
-              </>
-            )}
+                  </div>
+                  <div className="mb-3">
+                    <label htmlFor="Location" className="form-label">
+                      Write Your Complete Address Where You Want tutor{" "}
+                      <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="locality"
+                      required
+                      name="locality"
+                      value={formData.locality}
+                      onChange={handleInputChange}
+                      className="form-control"
+                      placeholder="Write Your Complete Address Where You Want tutor"
+                    />
 
-            {step === 3 && (
-              <>
-                <h4>Step 3: Additional Information</h4>
-                <div className="mb-3">
-                  <label htmlFor="StartDate" className="form-label">
-                    Preferred Start Date <span className="text-danger">*</span>
-                  </label>
-                  <input
-                    type="date"
-                    id="StartDate"
-                    required
-                    name="StartDate"
-                    value={formData.StartDate}
-                    onChange={handleInputChange}
-                    className="form-control"
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="Location" className="form-label">
-                    Enter your preferred location{" "}
-                    <span className="text-danger">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="Location"
-                    required
-                    name="Location"
-                    value={formData.Location}
-                    onChange={handleInputChange}
-                    className="form-control"
-                    placeholder="Search Location"
-                  />
-                  {locationSuggestions.length > 0 && (
-                    <ul className="list-group mt-2">
-                      {locationSuggestions.map((location) => (
-                        <li
-                          key={location.place_id}
-                          className="list-group-item"
-                          onClick={() => handleLocationSelect(location)}
-                        >
-                          {location.description}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="SpecificRequirement" className="form-label">
-                    Specific Requirement <span className="text-danger">(Optional)</span>
-                  </label>
-                  <textarea
+                  </div>
+                  <div className="mb-3">
+                    <label htmlFor="Location" className="form-label">
+                      Search Your Near By Place{" "}
+                      <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="Location"
+                      required
+                      name="Location"
+                      value={formData.Location}
+                      onChange={handleInputChange}
+                      className="form-control"
+                      placeholder="Search Location"
+                    />
+                    {locationSuggestions.length > 0 && (
+                      <ul className="list-group mt-2">
+                        {locationSuggestions.map((location) => (
+                          <li
+                            key={location.place_id}
+                            className="list-group-item"
+                            onClick={() => handleLocationSelect(location)}
+                          >
+                            {location.description}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                  <div className="mb-3">
+                    <label htmlFor="SpecificRequirement" className="form-label">
+                      Specific Requirement <span className="text-danger">(Optional)</span>
+                    </label>
+                    <textarea
 
-                    id="SpecificRequirement"
+                      id="SpecificRequirement"
 
-                    name="SpecificRequirement"
-                    value={formData.SpecificRequirement}
-                    onChange={handleInputChange}
-                    className="form-control"
-                  />
-                </div>
-                <button
-                  type="button"
-                  className="btn btn-secondary me-2"
-                  onClick={handlePreviousStep}
-                >
-                  Previous
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={handleNextStep}
-                >
-                  Next
-                </button>
-              </>
-            )}
-
-            {step === 4 && (
-              <>
-                <h4>Step 4: Teaching Preferences</h4>
-                <div className="mb-3">
-                  <label htmlFor="TeachingMode" className="form-label">
-                    Choose your preferred teaching mode (e.g., online,
-                    in-person) <span className="text-danger">*</span>
-                  </label>
-                  <select
-                    id="TeachingMode"
-                    required
-                    name="TeachingMode"
-                    value={formData.TeachingMode}
-                    onChange={handleTeachingModeChange}
-                    className="form-select"
+                      name="SpecificRequirement"
+                      value={formData.SpecificRequirement}
+                      onChange={handleInputChange}
+                      className="form-control"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    className="btn btn-secondary me-2"
+                    onClick={handlePreviousStep}
                   >
-                    <option value="" disabled>
-                      Select Teaching Mode
-                    </option>
-                    <option value="Online Class">Online Class</option>
-                    <option value="Home Tuition at My Home">
-                      Home Tuition at My Home
-                    </option>
-                    <option value="Willing to travel to Teacher's Home">
-                      Willing to travel to Teacher's Home
-                    </option>
-                  </select>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="TeachingExperience" className="form-label">
-                    Select the required teaching experience{" "}
-                    <span className="text-danger">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    id="TeachingExperience"
-                    required
-                    name="TeachingExperience"
-                    value={formData.TeachingExperience}
-                    onChange={handleInputChange}
-                    className="form-control"
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="MinRange" className="form-label">
-                    Specify the minimum budget range{" "}
-                    <span className="text-danger">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="MinRange"
-                    required
-                    name="MinRange"
-                    value={formData.MinRange}
-                    onChange={handleRangeChange}
-                    className="form-control"
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="MaxRange" className="form-label">
-                    Specify the maximum budget range{" "}
-                    <span className="text-danger">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="MaxRange"
-                    required
-                    name="MaxRange"
-                    value={formData.MaxRange}
-                    onChange={handleRangeChange}
-                    className="form-control"
-                  />
-                </div>
-                <div className="form-check mb-3">
-                  <input
-                    type="checkbox"
-                    id="isBestFaculty"
-                    checked={formData.isBestFaculty}
-                    onChange={handleBestFacultyChange}
-                    className="form-check-input"
-                  />
-                  <label htmlFor="isBestFaculty" className="form-check-label">
-                    Check if you are looking for the best faculty
-                  </label>
-                </div>
-                <button
-                  type="button"
-                  className="btn btn-secondary me-2"
-                  onClick={handlePreviousStep}
-                >
-                  Previous
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={handleNextStep}
-                >
-                  Next
-                </button>
-              </>
-            )}
+                    Previous
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={handleNextStep}
+                  >
+                    Next
+                  </button>
+                </>
+              )}
 
-            {step === 5 && (
-              <>
-                <h4>Step 5: Review Your Information</h4>
-                <ul className="list-group mb-3">
-                  <li className="list-group-item smallText">
-                    <strong>Gender:</strong> {formData.Gender}
-                  </li>
-                  <li className="list-group-item smallText">
-                    <strong>Vehicle Owned:</strong> {formData.VehicleOwned}
-                  </li>
-                  <li className="list-group-item smallText">
-                    <strong>Class:</strong> {formData.className}
-                  </li>
-                  <li className="list-group-item smallText">
-                    <strong>Subjects:</strong>{" "}
-                    {Array.isArray(formData.Subject)
-                      ? formData.Subject.length > 0
-                        ? formData.Subject.length === 1
-                          ? formData.Subject[0] // Display single subject directly
-                          : formData.Subject.join(", ") // Join multiple subjects with commas
-                        : "No Subject"
-                      : formData.Subject || "No Subject"}
-                  </li>
+              {step === 4 && (
+                <>
+                  <h4>Step 4: Teaching Preferences</h4>
+                  <div className="mb-3">
+                    <label htmlFor="TeachingMode" className="form-label">
+                      Choose your preferred teaching mode (e.g., online,
+                      in-person) <span className="text-danger">*</span>
+                    </label>
+                    <Select
+                          options={modeoptions}
+                          onChange={handleSelectChange("TeachingMode")}
+                          value={modeoptions.find(
+                            (option) => option.value === formData.TeachingMode
+                          )}
+                          className="form-control-sm"
+                        />
+                    {/* <select
+                      id="TeachingMode"
+                      required
+                      name="TeachingMode"
+                      value={formData.TeachingMode}
+                      onChange={handleTeachingModeChange}
+                      className="form-select"
+                    >
+                      <option value="" disabled>
+                        Select Teaching Mode
+                      </option>
+                      <option value="Online Class">Online Class</option>
+                      <option value="Home Tuition at My Home">
+                        Home Tuition at My Home
+                      </option>
+                      <option value="Willing to travel to Teacher's Home">
+                        Willing to travel to Teacher's Home
+                      </option>
+                    </select> */}
+                  </div>
+                  <div className="mb-3">
+                    <label htmlFor="TeachingExperience" className="form-label">
+                      Select the required teaching experience{" "}
+                      <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      id="TeachingExperience"
+                      required
+                      name="TeachingExperience"
+                      value={formData.TeachingExperience}
+                      onChange={handleInputChange}
+                      className="form-control"
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label htmlFor="MinRange" className="form-label">
+                      Specify the minimum budget range{" "}
+                      <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="MinRange"
+                      required
+                      name="MinRange"
+                      value={formData.MinRange}
+                      onChange={handleRangeChange}
+                      className="form-control"
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label htmlFor="MaxRange" className="form-label">
+                      Specify the maximum budget range{" "}
+                      <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="MaxRange"
+                      required
+                      name="MaxRange"
+                      value={formData.MaxRange}
+                      onChange={handleRangeChange}
+                      className="form-control"
+                    />
+                  </div>
+                  <div className="form-check mb-3">
+                    <input
+                      type="checkbox"
+                      id="isBestFaculty"
+                      checked={formData.isBestFaculty}
+                      onChange={handleBestFacultyChange}
+                      className="form-check-input"
+                    />
+                    <label htmlFor="isBestFaculty" className="form-check-label">
+                      Check if you are looking for the best faculty
+                    </label>
+                  </div>
+                  <button
+                    type="button"
+                    className="btn btn-secondary me-2"
+                    onClick={handlePreviousStep}
+                  >
+                    Previous
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={handleNextStep}
+                  >
+                    Next
+                  </button>
+                </>
+              )}
+
+              {step === 5 && (
+                <>
+                  <h4 className="text-center mb-4">Step 5: Review Your Information</h4>
+                  <div className="scrollable-container mb-4">
+                    <ul className="list-group mb-3">
+                      <li className="list-group-item d-flex justify-content-between align-items-center">
+                        <strong>Teacher Gender:</strong> <span>{formData.Gender}</span>
+                      </li>
+
+                      <li className="list-group-item d-flex justify-content-between align-items-center">
+                        <strong>Class:</strong> <span>{formData.className}</span>
+                      </li>
+                      <li className="list-group-item d-flex justify-content-between align-items-center">
+                        <strong>Subjects:</strong>
+                        <span>
+                          {Array.isArray(formData.Subject)
+                            ? formData.Subject.length > 0
+                              ? formData.Subject.length === 1
+                                ? formData.Subject[0]
+                                : formData.Subject.join(", ")
+                              : "No Subject"
+                            : formData.Subject || "No Subject"}
+                        </span>
+                      </li>
+                      <li className="list-group-item d-flex justify-content-between align-items-center">
+                        <strong>Preferred Start Date:</strong> <span>{formData.StartDate}</span>
+                      </li>
+                      <li className="list-group-item d-flex justify-content-between align-items-center">
+                        <strong>Classes You Want:</strong> <span>{formData.HowManyClassYouWant}</span>
+                      </li>
+                      <li className="list-group-item d-flex justify-content-between align-items-center">
+                        <strong>Near By Location:</strong> <span>{formData.Location.substring(0, 12)}</span>
+                      </li>
+                      <li className="list-group-item d-flex justify-content-between align-items-center">
+                        <strong>Current Location:</strong> <span>{formData.locality.substring(0, 7) + ' ....'}</span>
+                      </li>
+                      <li className="list-group-item d-flex justify-content-between align-items-center">
+                        <strong>Teaching Mode:</strong> <span>{formData.TeachingMode}</span>
+                      </li>
+                      <li className="list-group-item d-flex justify-content-between align-items-center">
+                        <strong>Specific Requirement:</strong> <span>{formData.SpecificRequirement || "No Specific Requirement"}</span>
+                      </li>
+                      <li className="list-group-item d-flex justify-content-between align-items-center">
+                        <strong>Teaching Experience:</strong> <span>{formData.TeachingExperience} years</span>
+                      </li>
+                      <li className="list-group-item d-flex justify-content-between align-items-center">
+                        <strong>Minimum Range:</strong> <span>{formData.MinRange}</span>
+                      </li>
+                      <li className="list-group-item d-flex justify-content-between align-items-center">
+                        <strong>Maximum Range:</strong> <span>{formData.MaxRange}</span>
+                      </li>
+                      <li className="list-group-item d-flex justify-content-between align-items-center">
+                        <strong>Is Best Faculty:</strong> <span>{formData.isBestFaculty ? "Yes" : "No"}</span>
+                      </li>
+                    </ul>
+                  </div>
+                  <div className="d-flex justify-content-between">
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={handlePreviousStep}
+                    >
+                      Previous
+                    </button>
+                    <button
+                      type="button"
+                      disabled={loading}
+                      className="btn btn-primary"
+                      onClick={handleSubmit}
+                    >
+                      {loading ? 'Please Wait...' : 'Submit'}
+                    </button>
+                  </div>
+                </>
+
+              )}
+            </>
+            }
 
 
-                  <li className="list-group-item smallText">
-                    <strong>Preferred Start Date:</strong> {formData.StartDate}
-                  </li>
-                  <li className="list-group-item smallText">
-                    <strong>Classes You Want:</strong> {formData.HowManyClassYouWant}
-                  </li>
-                  <li className="list-group-item smallText">
-                    <strong>Location:</strong> {formData.Location}
-                  </li>
-                  <li className="list-group-item smallText">
-                    <strong>Teaching Mode:</strong> {formData.TeachingMode}
-                  </li>
-                  <li className="list-group-item smallText">
-                    <strong>Specific Requirement :</strong> {formData.SpecificRequirement || "No Specific Requirement"}
-                  </li>
-                  <li className="list-group-item smallText">
-                    <strong>Teaching Experience:</strong>{" "}
-                    {formData.TeachingExperience} years
-                  </li>
-                  <li className="list-group-item smallText">
-                    <strong>Minimum Range:</strong> {formData.MinRange}
-                  </li>
-                  <li className="list-group-item smallText">
-                    <strong>Maximum Range:</strong> {formData.MaxRange}
-                  </li>
-                  <li className="list-group-item smallText">
-                    <strong>Is Best Faculty:</strong>{" "}
-                    {formData.isBestFaculty ? "Yes" : "No"}
-                  </li>
-                </ul>
-                <button
-                  type="button"
-                  className="btn btn-secondary me-2"
-                  onClick={handlePreviousStep}
-                >
-                  Previous
-                </button>
-                <button
-                  type="button"
-                  disabled={loading}
-                  className="btn btn-primary"
-                  onClick={handleSubmit}
-                >
-                  {loading ? 'Please Wait...  ':'Submit'}
-                </button>
-              </>
-            )}
+
+
           </div>
         </div>
       </div>

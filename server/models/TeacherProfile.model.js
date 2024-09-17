@@ -14,7 +14,19 @@ const rangeSchema = new mongoose.Schema({
         }
     }
 })
+
+
 const TeacherProfileSchema = new mongoose.Schema({
+    ProfilePic: {
+        url: {
+            type: String,
+            // required: true,
+        },
+        publicId: {
+            type: String,
+            // required: true,
+        }
+    },
     FullName: {
         type: String,
         required: true,
@@ -88,6 +100,10 @@ const TeacherProfileSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    PostForHim:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref:'Request'
+    },
     VehicleOwned: {
         type: Boolean,
         default: false
@@ -95,12 +111,7 @@ const TeacherProfileSchema = new mongoose.Schema({
 
     TeachingMode: {
         type: String,
-        enum: [
-            'Home Tuition at Student\'s Home',
-            'Home Tuition at Your Home',
-            'Institute or Group Tuition',
-            'Online Class'
-        ],
+       
         required: true
     },
     AcademicInformation: [{
@@ -138,8 +149,25 @@ const TeacherProfileSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    DocumentId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Document'
+    },
+    StudentIds: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Student'
+    }],
+    Reviews: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Review'
+    }],
+    srVerifiedTag: {
+        type: Boolean,
+        default: false
+    }
 
 }, { timestamps: true });
+
 
 // Create the Teacher Profile model
 TeacherProfileSchema.index({ 'RangeWhichWantToDoClasses.location': '2dsphere' })

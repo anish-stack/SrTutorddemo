@@ -78,7 +78,7 @@ const TeacherRegistration = () => {
         }
         setLoading(true)
         try {
-            const response = await axios.post('https://www.sr.apnipaathshaala.in/api/v1/teacher/Create-teacher', formData)
+            const response = await axios.post('https://sr.apnipaathshaala.in/api/v1/teacher/Create-teacher', formData)
             console.log(response.data.message)
             toast.success(response.data.message)
             setLoading(false)
@@ -93,7 +93,7 @@ const TeacherRegistration = () => {
 
     const ResendOtp = async () => {
         try {
-            const response = await axios.post('https://www.sr.apnipaathshaala.in/api/v1/teacher/resent-otp', verifyData)
+            const response = await axios.post('https://sr.apnipaathshaala.in/api/v1/teacher/resent-otp', verifyData)
             console.log(response.data)
             toast.success(response.data.message)
         } catch (error) {
@@ -102,7 +102,7 @@ const TeacherRegistration = () => {
     }
     const VerifyOtp = async () => {
         try {
-            const response = await axios.post('https://www.sr.apnipaathshaala.in/api/v1/teacher/Verify-teacher', verifyData)
+            const response = await axios.post('https://sr.apnipaathshaala.in/api/v1/teacher/Verify-teacher', verifyData)
             // console.log(response.data)
             toast.success("Tutor Verified Successful")
             const { token, user } = response.data;

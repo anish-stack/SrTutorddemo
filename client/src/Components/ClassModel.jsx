@@ -2,36 +2,56 @@ import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form, Row, Col, Container } from "react-bootstrap";
 import Select from "react-select";
-import Cookies from 'js-cookie'
-
-import useSessionStorageState from 'use-session-storage-state'
+import Cookies from 'js-cookie';
+import useSessionStorageState from 'use-session-storage-state';
 import LoginModal from "./LoginModel";
 import toast from "react-hot-toast";
-
+import { useNavigate } from "react-router-dom";
 
 const ClassModel = ({ showModal, handleClose, subject }) => {
-  const { Class, Subjects = [], isClass, id } = subject;
+  console.log(subject)
+  const { Class, Subjects = [], isClass } = subject;
+  const navigate = useNavigate();
+  const [loginNumber, setLoginNumber] = useState()
+
   const [locationSuggestions, setLocationSuggestions] = useState([]);
-  const token = Cookies.get('studentToken') || false
+  const token = Cookies.get('studentToken') || false;
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [loading,setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     Subject: [],
     Class: "",
     Location: "",
-    Interested: "", // Home Tuition at My Home, Willing to Travel to Teacher's Home, Online Class
+    Interested: "",
     HowManyClassYouWant: "",
-    MinumBudegt: "",
-    Maxmimu: "",
+    MinimumBudget: "",
+    teacherExperience: "",
+    location: {
+      type: 'Point',
+      coordinates: []
+    },
+    MaximumBudget: "",
     StartDate: "",
-    TeaherGender: "",
-    userconetcIfo: {
+    TeacherGender: "",
+    userContactInfo: {
       Name: "",
       email: "",
-      contactnumver: "",
+      contactNumber: "",
     },
-    specificrequirement: ""
+    specificRequirement: ""
   });
+  const [login, setLogin] = useState(false)
+
+  const url = new URLSearchParams(window.location.search)
+  const otpValue = url.get('otpSent')
+  const [sessionData, setSessionData] = useState({
+    otpSent: false,
+    number: ''
+  })
+  const [showOtp, setShowOtp] = useState(false)
+  const [otp, setOtp] = useState()
+  const [ClickLatitude, setClickLatitude] = useState(null);
+  const [ClickLongitude, setClickLongitude] = useState(null);
   const [storedFormData, setStoredFormData] = useSessionStorageState('beforeLoginData', {
     defaultValue: formData,
   });
@@ -44,6 +64,19 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
       Subject: [], // Clear subject selection on new modal open
     }));
   }, [Class, Subjects]);
+
+  useEffect(() => {
+    if (token) {
+      setLogin(true)
+    } else {
+      setLogin(false)
+    }
+  }, [token])
+
+  const handleLoginChange = (e) => {
+    setLoginNumber(e.target.value); // Directly set the value
+  };
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -68,61 +101,186 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
     setStep(step);
   };
 
+  const handleLocationLatAndLngFetch = async (address) => {
+    const options = {
+      method: 'GET',
+      url: `https://sr.apnipaathshaala.in/geocode?address=${address}`
+    };
+
+    try {
+      const response = await axios.request(options);
+      const result = response.data;
+      console.log(result)
+      if (result && result.length > 0) {
+        setClickLatitude(result.latitude);
+        setClickLongitude(result.longitude);
+      }
+    } catch (error) {
+      console.error("Error fetching location coordinates:", error);
+    }
+  };
+  const handleChangeUserContactInfo = (field, value) => {
+    setFormData({
+      ...formData,
+      userContactInfo: {
+        ...formData.userContactInfo,
+        [field]: value
+      }
+    });
+  };
 
   const handleLocationFetch = async (input) => {
     try {
       const res = await axios.get(
-        "https://place-autocomplete1.p.rapidapi.com/autocomplete/json",
-        {
-          params: { input, radius: "500" },
-          headers: {
-            "x-rapidapi-key": "75ad2dad64msh17034f06cc47c06p18295bjsn18e367df005b",
-            "x-rapidapi-host": "place-autocomplete1.p.rapidapi.com",
-          },
-        }
-      );
-      setLocationSuggestions(res.data.predictions || []);
+        `https://sr.apnipaathshaala.in/autocomplete?input=${input}`);
+ 
+      setLocationSuggestions(res.data || []);
     } catch (error) {
-      console.error("Error fetching location suggestions:", error);
+      if (error.response) {
+        // The request was made and the server responded with a status code outside the 2xx range
+        console.error("Error response from server:", error.response.data);
+        console.error("Status code:", error.response.status);
+        console.error("Headers:", error.response.headers);
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.error("No response received:", error.request);
+      } else {
+        // Something happened in setting up the request that triggered an error
+        console.error("Error in setting up request:", error.message);
+      }
     }
   };
+
   const handleLocationSelect = (location) => {
     setFormData(prevState => ({
       ...prevState,
       Location: location.description,
     }));
+    handleLocationLatAndLngFetch(location.description);
     setLocationSuggestions([]);
   };
+
+
+  const resendOtp = async () => {
+    try {
+
+      const response = await axios.post('https://sr.apnipaathshaala.in/api/v1/student/resent-otp', { PhoneNumber: loginNumber });
+      toast.success(response.data.message);
+
+    } catch (error) {
+      console.log(error)
+      toast.error(error.response?.data?.message || "An error occurred");
+    }
+  };
+
+  const verifyOtp = async () => {
+    try {
+
+      const response = await axios.post('https://sr.apnipaathshaala.in/api/v1/student/Verify-Student', {
+        PhoneNumber: loginNumber,
+        otp
+      });
+      toast.success("Student Verified Successfully");
+      const { token, user } = response.data;
+      console.log(response.data)
+      Cookies.set('studentToken', token, { expires: 1 });
+      Cookies.set('studentUser', JSON.stringify(user), { expires: 1 });
+      sessionStorage.removeItem('OtpSent')
+      sessionStorage.removeItem('number')
+      sessionStorage.removeItem('verified')
+
+      setLogin(true)
+      setStep(1);
+
+    } catch (error) {
+      console.log(error)
+      toast.error(error.response?.data?.message || "An error occurred");
+    }
+  };
+
+
+  const handleLoginNumberCheck = async (e) => {
+    e.preventDefault()
+
+
+
+    try {
+      const response = await axios.post('https://sr.apnipaathshaala.in/api/v1/student/checkNumber-request', {
+        userNumber: loginNumber
+      })
+      console.log(response.data)
+      setShowOtp(true)
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.set('otpSent', 'true');
+      newUrl.searchParams.set('number', loginNumber);
+      newUrl.searchParams.set('verified', 'false');
+
+      sessionStorage.setItem('OtpSent', true)
+      sessionStorage.setItem('number', loginNumber)
+      sessionStorage.setItem('verified', false)
+
+
+      navigate(`${window.location.pathname}?${newUrl.searchParams.toString()}`, { replace: true });
+    } catch (error) {
+      console.log(error.response)
+
+      if (error.response?.data?.success === false &&
+        error.response?.data?.message === "User with this phone number already exists.") {
+        setShowOtp(true)
+        setStep(1); // Correctly set the state
+      }
+    }
+  }
+
+
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const submittedData = {
-      ...formData,
-      Subject: isClass ? formData.Subject : Subjects, // Set to Subjects if not class-based
+      requestType: "Class Teacher",
+      classId: subject?._id || null,
+      className: formData.Class,
+      subjects: isClass ? formData.Subject : Subjects,
+      interestedInTypeOfClass: formData.Interested,
+      teacherGenderPreference: formData.TeacherGender,
+      numberOfSessions: formData.HowManyClassYouWant,
+      experienceRequired: formData.teacherExperience,
+      minBudget: formData.MinimumBudget,
+      maxBudget: formData.MaximumBudget,
+      locality: formData.Location,
+      startDate: formData.StartDate,
+      specificRequirement: formData.specificRequirement,
+      location: {
+        type: 'Point',
+        coordinates: [ClickLongitude, ClickLatitude]
+      },
+      studentInfo: {
+        studentName: formData.userContactInfo.Name,
+        contactNumber: formData.userContactInfo.contactNumber,
+        emailAddress: formData.userContactInfo.email,
+      },
     };
-    setLoading(true)
+    console.log(submittedData)
+    setLoading(true);
     try {
-      const response = await axios.post('https://www.sr.apnipaathshaala.in/api/v1/student/Subject-teacher-Request', submittedData, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-      setLoading(false)
+      const response = await axios.post('https://sr.apnipaathshaala.in/api/v1/student/universal-request', submittedData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      console.log(response.data)
+      setLoading(false);
+      toast.success("Request Submited Successful")
 
-
-      window.location.href = "/thankYou"
+      window.location.href = "/thankYou";
     } catch (error) {
-      console.log(error)
-      setLoading(false)
-
-      toast.error("Server Error Exist Please try After Sometimes")
-
-
+      console.log(error);
+      setLoading(false);
+      toast.error("Server Error, Please try again later.");
     }
-
-
   };
+
   const ClasessOptions = [
     { value: 'Two Classes a Week', label: 'Two Classes a Week' },
     { value: 'Three Classes a Week', label: 'Three Classes a Week' },
@@ -130,19 +288,20 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
     { value: 'Five Classes a Week', label: 'Five Classes a Week' },
     { value: 'Six Classes a Week', label: 'Six Classes a Week' },
   ];
-  const closeLoginModal = () => {
-    setIsLoginModalOpen(false);
-  };
+  const modeoptions = [
+    { value: 'Online Class', label: 'Online Class' },
+    { value: 'Home Tuition at My Home', label: 'Home Tuition at My Home' },
+    { value: 'Willing to travel to Teacher Home', label: 'Willing to travel to Teacher Home' },
+    { value: 'Require Teacher to Travel to My Home', label: 'Require Teacher to Travel to My Home' },
+  ];
 
-  // Ensure Subjects is an array and generate options for the subjects dropdown
+  const closeLoginModal = () => setIsLoginModalOpen(false);
+
   const subjectOptions = Array.isArray(Subjects)
-    ? [
-      { value: "All", label: "All" },
-      ...Subjects.map((sub) => ({
-        value: sub.SubjectName,
-        label: sub.SubjectName,
-      })),
-    ]
+    ? [{ value: "All", label: "All" }, ...Subjects.map(sub => ({
+      value: sub.SubjectName,
+      label: sub.SubjectName,
+    }))]
     : [{ value: "All", label: "All" }];
 
   return (
@@ -152,294 +311,370 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
           <Modal.Title>Class Request Form</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form>
-            {step === 1 && (
-              <Container fluid>
-                <Row className="mb-md-3">
-                  <Col xs={12} md={6}>
-                    <Form.Group className="mb-md-3">
-                      <Form.Label className="">Class (Optional)</Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="Class"
-                        readOnly
-                        value={formData.Class}
-                        onChange={handleChange}
-                        placeholder="Enter Class"
-                        className="form-control-sm"
-                      />
-                    </Form.Group>
-                  </Col>
-                  <Col xs={12} md={6}>
-                    <Form.Group className="mb-md-3">
-                      <Form.Label className="">Subject Name</Form.Label>
-                      <Select
-                        options={subjectOptions}
-                        isMulti
-                        onChange={(selectedOptions) => {
-                          setFormData((prevData) => ({
-                            ...prevData,
-                            Subject: selectedOptions
-                              ? selectedOptions.map((option) => option.value)
-                              : [],
-                          }));
-                        }}
-                        value={subjectOptions.filter((option) =>
-                          formData.Subject.includes(option.value)
+          <Form onSubmit={handleSubmit}>
+            {!login ? (
+              <div className="container-fluid">
+                <Form.Group>
+                  <label htmlFor="">Enter Your Contact Number </label>
+                  <Form.Control
+                    type="text"
+                    name="loginNumber"
+                    value={showOtp ? (loginNumber || sessionStorage.getItem('number')) : loginNumber} // Ternary condition for showing value
+                    onChange={handleLoginChange}
+                    required
+                  />
+
+                </Form.Group>
+                {showOtp && (
+                  <Form.Group>
+                    <label htmlFor="">Enter Otp </label>
+                    <Form.Control
+                      type="text"
+                      name="otp"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value)}
+                      required
+                    />
+                  </Form.Group>
+                )}
+                <div className="mt-4 d-flex align-item-center justify-content-between">
+                  {showOtp ? (
+                    <Button onClick={() => verifyOtp(otp)} variant="success" type="button">
+                      {loading ? 'Please Wait....' : 'Verify Number'}
+                    </Button>
+                  ) : (
+                    <Button onClick={handleLoginNumberCheck} variant="success" type="button">
+                      {loading ? 'Please Wait....' : 'Submit'}
+                    </Button>
+                  )}
+
+
+                  <Button onClick={resendOtp} variant="success" type="button">
+                    Resend Otp
+                  </Button>
+                </div>
+
+              </div>
+            ) : <>
+
+              {step === 1 && (
+                <Container fluid>
+                  <Row className="mb-md-3">
+                    <Col xs={12} md={6}>
+                      <Form.Group className="mb-md-3">
+                        <Form.Label>Class (Optional)</Form.Label>
+                        <Form.Control
+                          type="text"
+                          name="Class"
+                          readOnly
+                          value={formData.Class}
+                          placeholder="Enter Class"
+                          className="form-control-sm"
+                        />
+                      </Form.Group>
+                    </Col>
+                    <Col xs={12} md={6}>
+                      <Form.Group className="mb-md-3">
+                        <Form.Label>Subject Name</Form.Label>
+                        <Select
+                          options={subjectOptions}
+                          isMulti
+                          onChange={(selectedOptions) => {
+                            setFormData((prevData) => ({
+                              ...prevData,
+                              Subject: selectedOptions
+                                ? selectedOptions.map((option) => option.value)
+                                : [],
+                            }));
+                          }}
+                          value={subjectOptions.filter((option) =>
+                            formData.Subject.includes(option.value)
+                          )}
+                          className="form-control-sm"
+                        />
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  <Row className="mb-md-3">
+                    <Col xs={12}>
+                      <div className="mb-3">
+                        <label htmlFor="Location" className="form-label">
+                          Enter your preferred location <span className="text-danger">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          id="Location"
+                          required
+                          name="Location"
+                          value={formData.Location}
+                          onChange={handleChange}
+                          className="form-control"
+                          placeholder="Search Location"
+                        />
+                        {locationSuggestions.length > 0 && (
+                          <ul className="list-group mt-2">
+                            {locationSuggestions.map((location) => (
+                              <li
+                                key={location.place_id}
+                                className="list-group-item"
+                                onClick={() => handleLocationSelect(location)}
+                              >
+                                {location.description}
+                              </li>
+                            ))}
+                          </ul>
                         )}
-                        className="form-control-sm"
-                      />
-                    </Form.Group>
-                  </Col>
-                </Row>
-                <Row className="mb-md-3">
-                  <Col xs={12}>
-                    <div className="mb-3">
-                      <label htmlFor="Location" className="form-label">
-                        Enter your preferred location{" "}
-                        <span className="text-danger">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        id="Location"
-                        required
-                        name="Location"
-                        value={formData.Location}
-                        onChange={handleChange}
-                        className="form-control"
-                        placeholder="Search Location"
-                      />
-                      {locationSuggestions.length > 0 && (
-                        <ul className="list-group mt-2">
-                          {locationSuggestions.map((location) => (
-                            <li
-                              key={location.place_id}
-                              className="list-group-item"
-                              onClick={() => handleLocationSelect(location)}
-                            >
-                              {location.description}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
-                  </Col>
-                </Row>
-                <Row className="mb-md-3">
-                  <Col xs={12}>
-                    <Form.Group className="mb-md-3">
-                      <Form.Label className="">Interested In</Form.Label>
-                      <Select
-                        options={[
-                          { value: "Home Tuition at My Home", label: "Home Tuition at My Home" },
-                          { value: "Willing to Travel to Teacher's Home", label: "Willing to Travel to Teacher's Home" },
-                          { value: "Online Class", label: "Online Class" },
-                        ]}
-                        onChange={handleSelectChange("Interested")}
-                        value={
-                          formData.Interested
-                            ? { value: formData.Interested, label: formData.Interested }
-                            : null
-                        }
-                        className="form-control-sm"
-                      />
-                    </Form.Group>
-                  </Col>
-                </Row>
-              </Container>
-            )}
+                      </div>
+                    </Col>
+                  </Row>
+                  <Row className="mb-md-3">
+                    <Col xs={12} md={6}>
 
-            {step === 2 && (
-              <Container fluid>
-                <Row className="mb-md-3">
-                  <Col md={6}>
-                    <Form.Group className="mb-3"
-                      required>
-                      <Form.Label>How Many Classes You Want  <b className="text-danger fs-5">*</b></Form.Label>
-                      <Select
-                        name="HowManyClassYouWant"
-                        options={ClasessOptions}
-                        onChange={handleSelectChange('HowManyClassYouWant')}
-                        value={ClasessOptions.find(option => option.value === formData.HowManyClassYouWant) || null}
-                      />
+                      <Form.Group>
+                        <Form.Label>Interested In Type Of Classes</Form.Label>
+                        <Select
+                          options={modeoptions}
+                          onChange={handleSelectChange("Interested")}
+                          value={modeoptions.find(
+                            (option) => option.value === formData.Interested
+                          )}
+                          className="form-control-sm"
+                        />
+                      </Form.Group>
+                    </Col>
+                    <Col xs={12} md={6}>
+                      <Form.Group>
 
-                    </Form.Group>
-                  </Col>
-                  <Col xs={12} md={6}>
-                    <Form.Group className="mb-md-3">
-                      <Form.Label className="">Budget (Min)</Form.Label>
-                      <Form.Control
-                        type="number"
-                        name="MinumBudegt"
-                        value={formData.MinumBudegt}
-                        onChange={handleChange}
-                        placeholder="Enter Minimum Budget"
-                        className="form-control-sm"
-                      />
-                    </Form.Group>
-                  </Col>
-                </Row>
-                <Row className="mb-md-3">
-                  <Col xs={12} md={6}>
-                    <Form.Group className="mb-md-3">
-                      <Form.Label className="">Budget (Max)</Form.Label>
-                      <Form.Control
-                        type="number"
-                        name="Maxmimu"
-                        value={formData.Maxmimu}
-                        onChange={handleChange}
-                        placeholder="Enter Maximum Budget"
-                        className="form-control-sm"
-                      />
-                    </Form.Group>
-                  </Col>
-                  <Col xs={12} md={6}>
-                    <Form.Group className="mb-md-3">
-                      <Form.Label className="">Start Date</Form.Label>
-                      <Form.Control
-                        type="date"
-                        name="StartDate"
-                        value={formData.StartDate}
-                        onChange={handleChange}
-                        className="form-control-sm"
-                        min={new Date().toISOString().split('T')[0]}
-                      />
-                    </Form.Group>
-                  </Col>
-                </Row>
-                <Row className="mb-md-3">
-                  <Col xs={12}>
-                    <Form.Group className="mb-md-3">
-                      <Form.Label className="">Teacher Gender Preference</Form.Label>
-                      <Select
-                        options={[
-                          { value: "Male", label: "Male" },
-                          { value: "Female", label: "Female" },
-                          { value: "Any", label: "Any" },
-                        ]}
-                        onChange={handleSelectChange("TeaherGender")}
-                        value={{
-                          value: formData.TeaherGender,
-                          label: formData.TeaherGender,
-                        }}
-                        className="form-control-sm"
-                      />
-                    </Form.Group>
-                  </Col>
-                </Row>
-              </Container>
-            )}
+                        <Form.Label>How Many Classes Do You Want?</Form.Label>
+                        <Select
+                          options={ClasessOptions}
+                          onChange={handleSelectChange("HowManyClassYouWant")}
+                          value={ClasessOptions.find(
+                            (option) => option.value === formData.HowManyClassYouWant
+                          )}
+                          className="form-control-sm"
+                        />
+                      </Form.Group>
+                    </Col>
 
-            {step === 3 && (
-              <Container fluid>
-                <Row className="mb-md-3">
-                  <Col xs={12}>
-                    <Form.Group className="mb-3">
-                      <Form.Label className="">User Contact Info</Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="Name"
-                        value={formData.userconetcIfo.Name}
-                        onChange={(e) =>
-                          setFormData((prevData) => ({
-                            ...prevData,
-                            userconetcIfo: {
-                              ...prevData.userconetcIfo,
-                              Name: e.target.value,
-                            },
-                          }))
-                        }
-                        placeholder="Enter Name"
-                        className="form-control mb-3"
-                      />
-                      <Form.Control
-                        type="email"
-                        name="email"
-                        value={formData.userconetcIfo.email}
-                        onChange={(e) =>
-                          setFormData((prevData) => ({
-                            ...prevData,
-                            userconetcIfo: {
-                              ...prevData.userconetcIfo,
-                              email: e.target.value,
-                            },
-                          }))
-                        }
-                        placeholder="Enter Email"
-                        className="form-control mb-3"
-                      />
-                      <Form.Control
-                        type="text"
-                        name="contactnumver"
-                        value={formData.userconetcIfo.contactnumver}
-                        onChange={(e) =>
-                          setFormData((prevData) => ({
-                            ...prevData,
-                            userconetcIfo: {
-                              ...prevData.userconetcIfo,
-                              contactnumver: e.target.value,
-                            },
-                          }))
-                        }
-                        placeholder="Enter Contact Number"
-                        className="form-control mb-3"
-                      />
-                      <Form.Control
-                        as="textarea"
-                        className="mb-3"
-                        name="specificrequirement"
-                        value={formData.specificrequirement}
-                        onChange={(e) =>
-                          setFormData((prevData) => ({
-                            ...prevData,
-                            specificrequirement: e.target.value,
-                          }))
-                        }
-                        placeholder="Specific Requirement"
-                      />
+                  </Row>
+                  <Row>
+                    <Col>
+                      <Button
+                        variant="primary"
+                        className="btn-sm w-100 mt-3"
+                        onClick={() => handleStepChange(2)}
+                      >
+                        Next Step
+                      </Button>
+                    </Col>
+                  </Row>
+                </Container>
+              )}
+              {step === 2 && (
+                <Container fluid>
+                  <Row className="mb-md-3">
+                    <Col xs={12} md={6}>
+                      <Form.Group className="mb-md-3">
+                        <Form.Label>Minimum Budget (per session)</Form.Label>
+                        <Form.Control
+                          type="number"
+                          name="MinimumBudget"
+                          value={formData.MinimumBudget}
+                          onChange={handleChange}
+                          className="form-control-sm"
+                        />
+                      </Form.Group>
+                    </Col>
+                    <Col xs={12} md={6}>
+                      <Form.Group className="mb-md-3">
+                        <Form.Label>Maximum Budget (per session)</Form.Label>
+                        <Form.Control
+                          type="number"
+                          name="MaximumBudget"
+                          value={formData.MaximumBudget}
+                          onChange={handleChange}
+                          className="form-control-sm"
+                        />
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  <Row className="mb-md-3">
+                    <Col xs={12} md={6}>
+                      <Form.Group className="mb-md-3">
+                        <Form.Label>Teacher Experience (in years)</Form.Label>
+                        <Form.Control
+                          type="number"
+                          name="teacherExperience"
+                          value={formData.teacherExperience}
+                          onChange={handleChange}
+                          className="form-control-sm"
+                        />
+                      </Form.Group>
+                    </Col>
+                    <Col xs={12} md={6}>
+                      <Form.Group className="mb-md-3">
+                        <Form.Label>Teacher Gender Preference</Form.Label>
+                        <Form.Control
+                          as="select"
+                          name="TeacherGender"
+                          value={formData.TeacherGender || ''}
+                          onChange={handleChange}
+                          className="form-control-sm"
+                        >
+                          <option value="">Select Gender Preference</option>
+                          <option value="Male">Male</option>
+                          <option value="Female">Female</option>
+                          <option value="Any">Any</option>
+                        </Form.Control>
+                      </Form.Group>
+                    </Col>
 
-                    </Form.Group>
-                  </Col>
-                </Row>
-              </Container>
-            )}
+                  </Row>
+                  <Row>
+                    <Col xs={12} md={12}>
+                      <Form.Group className="mb-md-3">
+                        <Form.Label>Preferred Start Date</Form.Label>
+                        <Form.Control
+                          type="date"
+                          name="StartDate"
+                          value={formData.StartDate}
+                          onChange={handleChange}
+                          className="form-control-sm"
+                        />
+                      </Form.Group>
+                    </Col>
+                    <Col xs={12}>
+                      <Form.Group className="mb-md-3">
+                        <Form.Label>Specific Requirements</Form.Label>
+                        <Form.Control
+                          as="textarea"
+                          name="specificRequirement"
+                          rows={3}
+                          value={formData.specificRequirement}
+                          onChange={handleChange}
+                          className="form-control-sm"
+                        />
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col xs={6}>
+                      <Button
+                        variant="secondary"
+                        className="btn-sm w-100 mt-3"
+                        onClick={() => handleStepChange(1)}
+                      >
+                        Back
+                      </Button>
+                    </Col>
+                    <Col xs={6}>
+
+                      <Button
+                        variant="primary"
+                        className="btn-sm w-100 mt-3"
+                        onClick={() => handleStepChange(3)}
+                      >
+                        Next Step
+                      </Button>
+
+
+                    </Col>
+                  </Row>
+                </Container>
+              )}
+              {step === 3 && (
+                <Container fluid>
+                  <Row className="mb-md-1">
+                    <Col xs={12} md={12}>
+                      <Form.Group className="mb-md-1">
+                        <Form.Label>Student Name</Form.Label>
+                        <Form.Control
+                          type="text"
+                          name="Name"
+                          value={formData.userContactInfo.Name}
+                          onChange={(e) =>
+                            handleChangeUserContactInfo('Name', e.target.value)
+                          }
+                          required
+                          className="form-control-sm"
+                        />
+                      </Form.Group>
+                    </Col>
+                    <Col xs={12} md={12}>
+                      <Form.Group className="mb-md-1">
+                        <Form.Label>Student Email</Form.Label>
+                        <Form.Control
+                          type="email"
+                          name="email"
+                          value={formData.userContactInfo.email}
+                          onChange={(e) =>
+                            handleChangeUserContactInfo('email', e.target.value)
+                          }
+                          required
+                          className="form-control-sm"
+                        />
+                      </Form.Group>
+                    </Col>
+                    <Col xs={12} md={12}>
+                      <Form.Group className="mb-md-1">
+                        <Form.Label>Student Contact Number</Form.Label>
+                        <Form.Control
+                          type="text"
+                          name="contactNumber"
+                          value={formData.userContactInfo.contactNumber}
+                          onChange={(e) =>
+                            handleChangeUserContactInfo('contactNumber', e.target.value)
+                          }
+                          required
+                          className="form-control-sm"
+                        />
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col xs={6}>
+                      <Button
+                        variant="secondary"
+                        className="btn-sm w-100 mt-3"
+                        onClick={() => handleStepChange(1)}
+                      >
+                        Back
+                      </Button>
+                    </Col>
+                    <Col xs={6}>
+                      <Button
+                        type="submit"
+                        variant="primary"
+                        className="btn-sm w-100 mt-3"
+                        disabled={loading}
+                      >
+                        {loading ? 'Please Wait ...' : ' Submit'}
+                      </Button>
+                    </Col>
+                  </Row>
+                </Container>
+              )}
+            </>
+            }
+
+
           </Form>
         </Modal.Body>
-        <Modal.Footer>
-          {step === 1 && (
-            <Button variant="secondary" onClick={() => handleStepChange(2)}>
-              Next
-            </Button>
-          )}
-          {step === 2 && (
-            <>
-              <Button variant="secondary" onClick={() => handleStepChange(1)}>
-                Back
-              </Button>
-              <Button variant="primary" onClick={() => handleStepChange(3)}>
-                Next
-              </Button>
-            </>
-          )}
-          {step === 3 && (
-            <>
-              <Button variant="secondary" onClick={() => handleStepChange(2)}>
-                Back
-              </Button>
-              <Button variant="primary" disabled={loading} onClick={handleSubmit}>
-               {loading ? 'Please Wait...':'Submit'}
-              </Button>
-            </>
-          )}
-        </Modal.Footer>
       </Modal>
-      <LoginModal
-        isOpen={isLoginModalOpen}
-        modalType="student"
-        onClose={closeLoginModal}
-      />
-    </div>
-  )
-}
 
-export default ClassModel
+      {isLoginModalOpen && (
+        <LoginModal
+          showModal={isLoginModalOpen}
+          handleClose={closeLoginModal}
+          afterLogin={() => {
+            setFormData(storedFormData);
+            handleSubmit();
+          }}
+        />
+      )}
+    </div>
+  );
+};
+
+export default ClassModel;

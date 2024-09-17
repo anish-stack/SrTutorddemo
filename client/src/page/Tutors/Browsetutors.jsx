@@ -1,7 +1,9 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import Loader from '../../Components/Loader';
-
+import { Link } from 'react-router-dom'
+import './teachercard.css'
+import TeacherCard from './TeacherCard';
 const Browsetutors = () => {
     const searchQuery = new URLSearchParams(window.location.search);
     const searchQueryForlat = searchQuery.get('lat');
@@ -38,7 +40,7 @@ const Browsetutors = () => {
 
     const fetchAllSubjects = async () => {
         try {
-            const response = await axios.get("https://www.sr.apnipaathshaala.in/api/v1/admin/Get-All-Subject");
+            const response = await axios.get("https://sr.apnipaathshaala.in/api/v1/admin/Get-All-Subject");
             if (response.data.data) {
                 setSubjects(response.data.data);
             }
@@ -50,12 +52,13 @@ const Browsetutors = () => {
 
     const fetchTutors = async () => {
         try {
-            const response = await axios.get(`https://www.sr.apnipaathshaala.in/api/v1/student/BrowseTutorsNearMe?lat=${searchQueryForlat}&lng=${searchQueryForlng}`, {
+            const response = await axios.get(`https://sr.apnipaathshaala.in/api/v1/student/BrowseTutorsNearMe?lat=${searchQueryForlat}&lng=${searchQueryForlng}`, {
                 params: { ...FilterOptions }
             });
 
             setCount(response.data.count);
             const tutorsData = response.data.results;
+
             setData(tutorsData);
 
             // Extract class IDs for fetching class names
@@ -70,7 +73,7 @@ const Browsetutors = () => {
 
     const FetchTeacherClassNames = async (classIds) => {
         try {
-            const { data } = await axios.get('https://www.sr.apnipaathshaala.in/api/v1/admin/Get-Classes');
+            const { data } = await axios.get('https://sr.apnipaathshaala.in/api/v1/admin/Get-Classes');
             const classData = data.data;
             const matchedClassNames = {};
 
@@ -319,13 +322,13 @@ const Browsetutors = () => {
                             <h5 className="offcanvas-title" id="filterSidebarLabel">
                                 Filter Options
                             </h5>
-                            
+
                             <button
                                 type="button"
                                 className="btn-close"
                                 data-bs-dismiss="offcanvas"
                                 aria-label="Close"
-                              
+
                             ></button>
                         </div>
                         <div className="offcanvas-body">
@@ -334,7 +337,7 @@ const Browsetutors = () => {
                     </div>
 
                     {/* Visible sidebar for larger screens */}
-                    <div className="filter-container p-4 bg-light rounded shadow-sm d-none d-lg-block">
+                    <div style={{ backgroundColor: '#FFFFFF' }} className="filter-container p-4 glass  rounded shadow-sm d-none d-lg-block">
                         <FilterSidebarContent />
                     </div>
                 </div>
@@ -354,61 +357,9 @@ const Browsetutors = () => {
 
                                 return (
                                     <div key={index} className="col-lg-4 col-md-6 mb-4">
-                                        <div className="card  shadow-sm border-0">
-                                            <div className="card-header  text-white d-flex align-items-center">
-                                                <div className="teacher-image me-3">
-                                                    <img
-                                                        src={genderImage}
-                                                        alt="User-Profile-Image"
-                                                        className="img-fluid rounded-circle"
-                                                        style={{ width: '50px', height: '50px' }}
-                                                    />
-                                                </div>
-                                                <div className="teacher-info">
-                                                    <h6 className="teacher-name mb-0">{teacher.FullName}</h6>
-                                                    <p className="teacher-details mb-0">
-                                                        {teacher.TeachingExperience} | {teacher.Gender} |{' '}
-                                                        {new Date(teacher.DOB).toLocaleDateString()}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div className="card-body ">
-                                                <div className="d-flex align-items-center mb-2">
-                                                    <i className="fa fa-graduation-cap me-2"></i>
-                                                    <p className="mb-0">Qualification: {teacher.Qualification}</p>
-                                                </div>
-                                                <div className="d-flex align-items-center mb-2">
-                                                    <i className="fa-solid fa-indian-rupee-sign me-2"></i>
-                                                    <p className="mb-0">Fees: ₹{teacher.ExpectedFees}</p>
-                                                </div>
-                                                <div className="d-flex align-items-center mb-2">
-                                                    <i className="fa fa-book me-2"></i>
-                                                    <p className="mb-0">
-                                                        {teacher.AcademicInformation.reduce(
-                                                            (acc, item) => acc + item.SubjectNames.length - 1,
-                                                            0
-                                                        )}{' '}
-                                                        + Subjects Taught
-                                                    </p>
-                                                </div>
-                                                <div className="d-flex align-items-center mb-2">
-                                                    <i className="fa fa-chalkboard-teacher me-2"></i>
-                                                    <p className="mb-0">Classes: {teacherClasses}</p>
-                                                </div>
-                                                <div className="card-footer col-12 bg-white gap-2 d-flex justify-content-between">
-                                               
-                                                    <button
-                                                        className="btn col-12 btn-primary btn-sm"
-
-                                                    >
-                                                        Contact
-                                                    </button>
-
-                                                </div>
-                                            </div>
-
-                                        </div>
+                                        <TeacherCard classes={teacherClasses} item={teacher} />
                                     </div>
+
                                 );
                             })
                         ) : (

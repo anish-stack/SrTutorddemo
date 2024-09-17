@@ -187,7 +187,7 @@ const ProfilePage = () => {
     const fetchUser = async () => {
         try {
             const response = await axios.get(
-                `https://www.sr.apnipaathshaala.in/api/v1/teacher/Teacher-details/${IdQuery}`
+                `https://sr.apnipaathshaala.in/api/v1/teacher/Teacher-details/${IdQuery}`
             );
             console.log(response.data)
             setUser(response.data.data)
@@ -207,7 +207,7 @@ const ProfilePage = () => {
     const fetchSubjects = async (classId) => {
         try {
             const response = await axios.get(
-                `https://www.sr.apnipaathshaala.in/api/v1/admin/Get-Class-Subject/${classId}`
+                `https://sr.apnipaathshaala.in/api/v1/admin/Get-Class-Subject/${classId}`
             );
             console.log(response.data)
 
@@ -377,7 +377,7 @@ const ProfilePage = () => {
         }
         try {
             setLoading(true)
-            const response = await axios.post('https://www.sr.apnipaathshaala.in/api/v1/teacher/teacher-profile', formData, {
+            const response = await axios.post('https://sr.apnipaathshaala.in/api/v1/teacher/teacher-profile', formData, {
                 headers: {
                     Authorization: `Bearer ${tokenQuery}`
                 }
@@ -385,10 +385,10 @@ const ProfilePage = () => {
             console.log(response.data)
             toast.success("🎉 Profile submitted successfully! Please verify it with the OTP sent to your registered email. 📧");
             setLoading(false)
-            // setTimeout(() => {
+            setTimeout(() => {
 
-            //     window.location.href = `/Teacher-Profile-Verify?token=${tokenQuery}&id=${IdQuery}`
-            // }, 500);
+                window.location.href = `/Teacher-Profile-Verify?token=${tokenQuery}&id=${IdQuery}`
+            }, 500);
         } catch (error) {
             console.log(error)
             setLoading(false)

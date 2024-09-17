@@ -32,7 +32,7 @@ const Dashboard = () => {
     const token = localStorage.getItem('Sr-token');
 
     useEffect(() => {
-        axios.get('https://www.sr.apnipaathshaala.in/api/v1/admin/Get-Dashboard')
+        axios.get('https://sr.apnipaathshaala.in/api/v1/admin/Get-Dashboard')
             .then(response => {
                 if (response.data.success) {
                     setData(response.data.data);
@@ -155,7 +155,7 @@ const Dashboard = () => {
 
     const CleanCaches = async () => {
         try {
-            const response = await axios.get('https://www.sr.apnipaathshaala.in/flush-all-Redis-Cached', {
+            const response = await axios.get('https://sr.apnipaathshaala.in/flush-all-Redis-Cached', {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

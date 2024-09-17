@@ -13,7 +13,10 @@ const Slider = () => {
   const { data, loading, error } = useSelector((state) => state.Class);
   const dispatch = useDispatch();
   const [classes, setClasses] = useState([]);
-  const [selectedClass, setSelectedClass] = useState("");
+  const [selectedClass, setSelectedClass] = useState({
+    classid: '',
+    classNameValue: ''
+  });
   const [subjects, setSubjects] = useState([]);
   const [locationInput, setLocationInput] = useState("");
   const [locationSuggestions, setLocationSuggestions] = useState([]);
@@ -27,6 +30,11 @@ const Slider = () => {
     dispatch(ClassSearch());
   }, [dispatch]);
 
+  const [selectedRole, setSelectedRole] = useState('student');
+  const handleRoleChange = (role) => {
+    setSelectedRole(role);
+
+  };
   useEffect(() => {
     if (data) {
       // Step 1: Filter out specific classes
@@ -75,20 +83,13 @@ const Slider = () => {
 
     if (input.length > 2) {
       try {
+
+
+
         const res = await axios.get(
-          "https://place-autocomplete1.p.rapidapi.com/autocomplete/json",
-          {
-            params: {
-              input: input,
-              radius: "500",
-            },
-            headers: {
-              'x-rapidapi-key': '75ad2dad64msh17034f06cc47c06p18295bjsn18e367df005b',
-              "x-rapidapi-host": "place-autocomplete1.p.rapidapi.com",
-            },
-          }
-        );
-        setLocationSuggestions(res.data.predictions || []);
+          `https://sr.apnipaathshaala.in/autocomplete?input=${input}`);
+        console.log("Google", res.data)
+        setLocationSuggestions(res.data || []);
       } catch (error) {
         console.error("Error fetching location suggestions:", error);
         setLocationSuggestions([]);
@@ -100,14 +101,47 @@ const Slider = () => {
 
   const handleClassChange = (event) => {
     const selectedClassId = event.target.value;
-    setSelectedClass(selectedClassId);
-    fetchSubjects(selectedClassId);
+    const selectedClassObj = concatenatedData.find(cls => cls.id === selectedClassId);
+    console.log(selectedClassObj)
+    if (selectedClassObj) {
+      setSelectedClass({
+        classid: selectedClassObj.id,
+        classNameValue: selectedClassObj.class
+      });
+      fetchSubjects(selectedClassId);
+    }
   };
 
   const handleLocationSelect = (suggestion) => {
     setLocationInput(suggestion);
     setLocationSuggestions([]);
+    handleLocationLatAndLngFetch(suggestion)
   };
+  const [ClickLatitude, setClickLatitude] = useState(null)
+  const [ClickLongitude, setClickLongitude] = useState(null)
+
+  const handleLocationLatAndLngFetch = async (address) => {
+    const options = {
+      method: 'GET',
+      url: `https://sr.apnipaathshaala.in/geocode?address=${address}`
+    };
+
+    try {
+      const response = await axios.request(options);
+      const result = response.data
+      if (result) {
+        setClickLatitude(result ? result.latitude : null);
+        setClickLongitude(result ? result.longitude : null)
+      }
+      console.log(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+
+
+  }
+
+
   const { coords, isGeolocationAvailable, isGeolocationEnabled } = useGeolocated({
     positionOptions: {
       enableHighAccuracy: true,
@@ -132,10 +166,12 @@ const Slider = () => {
     };
 
     const locationParam = cleanAndEncode(locationInput);
-    const classParam = encodeURIComponent(selectedClass);
+    const classParam = encodeURIComponent(selectedClass.classid);
+    const classNameParam = encodeURIComponent(selectedClass.classNameValue);
+
     const subjectParam = encodeURIComponent(selectedSubject);
 
-    window.location.href = `/Search-result?via-home-page&Location=${locationParam}&ClassId=${classParam}&Subject=${subjectParam}&lat=${locationData.lat}&lng=${locationData.lng}`;
+    window.location.href = `/Search-result?role=${selectedRole}&SearchPlaceLat=${ClickLatitude}&SearchPlaceLng=${ClickLongitude}&via-home-page&Location=${locationParam}&ClassId=${classParam}&ClassNameValue=${classNameParam}&Subject=${subjectParam}&lat=${locationData.lat}&lng=${locationData.lng}`;
   };
 
   return (
@@ -152,56 +188,90 @@ const Slider = () => {
                 data-aos-delay={1200}
               />
               <h3 className="title tg-svg">
-                Explore Your{" "}
+                What Are You {''}
                 <span className="position-relative">
                   <span
                     className="svg-icon"
                     id="svg-2"
                     data-svg-icon="/icons/title_shape.svg"
                   />
-                  Skills
+                  looking
                 </span>{" "}
-                With Varieties of Tutors
+                for
               </h3>
+              <div className="col-12 my-3">
+                <div className="row">
+                  <div class="form-check col-md-6 px-5 col-lg-6">
+                    <input onChange={() => handleRoleChange('tutor')} class="form-check-input" type="radio" value={'tutor'} name="flexRadioDefault" id="flexRadioDefault2" checked={selectedRole === 'tutor'} />
+                    <label class="form-check-label text-white" for="flexRadioDefault2">
+                      Student
+                    </label>
+                  </div>
+
+                  <div class="form-check col-md-6 px-5 col-lg-6">
+                    <input onChange={() => handleRoleChange('student')} class="form-check-input" type="radio" name="flexRadioDefault" value={'student'} id="flexRadioDefault1" checked={selectedRole === 'student'} />
+                    <label class="form-check-label text-white" for="flexRadioDefault1">
+                      Tutor
+                    </label>
+                  </div>
+                </div>
+              </div>
               <div className="banner__search-form w-100">
                 <form action="#" className="search-form">
+
                   <div className="search-form__container d-flex gap-2 justify-content-between">
+
                     <div className="row col-12 col-lg-12 col-md-12">
-                      <div className="col-md-4 col-lg-4 mb-2">
-                        <div className="position-relative">
-                          <input
-                            type="text"
-                            name="Location"
-                            value={locationInput}
-                            placeholder="Location . . ."
-                            onChange={(e) => handleLocationFetch(e.target.value)}
-                            className="form-control py-3"
-                          />
-                          {locationSuggestions.length > 0 && (
-                            <div
-                              className="position-absolute top-100 start-0 mt-2 w-100 bg-white border border-secondary rounded shadow-lg overflow-auto"
-                              style={{ maxHeight: "200px" }}
-                            >
-                              <ul className="list-unstyled mb-0">
-                                {locationSuggestions.map((suggestion, index) => (
-                                  <li
-                                    key={index}
-                                    className="p-2 hover:bg-light cursor-pointer"
-                                    onClick={() => handleLocationSelect(suggestion.description)}
-                                  >
-                                    {suggestion.description}
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
+
+
+                      {selectedRole === "student" ? (
+                        <div className="col-md-4 col-lg-4 mb-2">
+                          <div className="position-relative">
+
+
+                            <input
+                              type="text"
+                              name="Location"
+                              value={locationInput}
+                              placeholder="Location . . ."
+                              onChange={(e) => handleLocationFetch(e.target.value)}
+                              className="form-control py-3"
+                            />
+
+                            {locationSuggestions.length > 0 && (
+                              <div
+                                className="position-absolute top-100 start-0 mt-2 w-100 bg-white border border-secondary rounded shadow-lg overflow-auto"
+                                style={{ maxHeight: "200px" }}
+                              >
+                                <ul className="list-unstyled mb-0">
+                                  {locationSuggestions.map((suggestion, index) => (
+                                    <li
+                                      key={index}
+                                      className="p-2 hover:bg-light cursor-pointer"
+                                      onClick={() => handleLocationSelect(suggestion.description)}
+                                    >
+                                      {suggestion.description}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )
+                            }
+
+
+
+
+
+                          </div>
                         </div>
-                      </div>
+                      ) : null}
+
+
                       <div className="col-md-4 col-lg-4 mb-2">
                         <select
                           className="search-form__input form-select py-3 select w-100 class-select"
                           onChange={handleClassChange}
-                          value={selectedClass}
+                          value={selectedClass.classid}
                         >
                           <option value="" disabled>Select Class...</option>
                           {concatenatedData.map((classItem) => (
@@ -211,6 +281,7 @@ const Slider = () => {
                           ))}
                         </select>
                       </div>
+
                       <div className="col-md-4 col-lg-4">
                         <select
                           className="search-form__input form-select py-3 select w-100 subject-select"
@@ -244,14 +315,14 @@ const Slider = () => {
           </div>
           <div className="col-lg-6">
             <div className="banner__images-two">
-           
+
               <img src={bannerShape03} alt="shape" className="shape" data-aos="zoom-in-down" data-aos-delay={800} />
               <div className="banner__images-grid">
                 <div className="banner__images-col" data-aos="fade-up" data-aos-delay={200}>
                   <img src={bannerImg01} alt="img" />
                 </div>
                 <div className="banner__images-col">
-                  <img src={bannerImg02} alt="img" data-aos="fade-left" data-aos-delay={300}/>
+                  <img src={bannerImg02} alt="img" data-aos="fade-left" data-aos-delay={300} />
                   <img src={bannerImg03} alt="img" data-aos="fade-left" data-aos-delay={400} />
                 </div>
               </div>

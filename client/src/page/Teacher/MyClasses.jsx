@@ -8,9 +8,10 @@ import EditClassModel from './EditClassModel';
 import { MdDelete } from "react-icons/md";
 import AddClassModel from './AddClassModel';
 import toast from 'react-hot-toast';
+import { Link } from 'react-router-dom';
 
-const MyClasses = ({ Class }) => {
-    console.log(Class)
+const MyClasses = ({ Class, Profile }) => {
+
     const [comeClass, setClass] = useState([]);
     const [loading, setLoading] = useState(true);
     const [loadingId, setLoadingId] = useState(null);
@@ -97,134 +98,158 @@ const MyClasses = ({ Class }) => {
     };
 
     return (
-        <div className="container myclass-bg px-5 py-2">
-            {error && <Alert variant="danger">{error}</Alert>}
-            <div className="mb-3 text-end addclass-btn-row">
-                <Button variant="primary" onClick={handleOpens} className="btn btn-primary btn-sm myclass-adbtn" style={{ padding: '8px 16px', borderRadius: '5px' }} >
-                    + Add Class
-                </Button>
-            </div>
-
-            <div className="row">
-                {loading ? (
-                    <div>Loading...</div>
-                ) : currentClasses.length > 0 ? (
-                    currentClasses.map((item, index) => (
-                        <div key={index} className="col-md-4 mb-4">
-                            <Card className="glass border-0 h-100 ">
-                                <Card.Body className="d-flex flex-column justify-content-between">
-                                    <div>
-                                        <Card.Title className="h6 mb-2">{item.className}</Card.Title>
-                                        <Card.Subtitle className="text-muted mb-3 small">
-                                            Subjects
-                                        </Card.Subtitle>
-                                        <ul className="list-group list-group-flush mb-3">
-                                            {item.subjects.length === 0 ? (
-                                                <li className="list-group-item text-center">
-                                                    No subjects available. Please add subjects.
-                                                </li>
-                                            ) : (
-                                                item.subjects.map((subject, idx) => (
-                                                    <li
-                                                        key={idx}
-                                                        className="list-group-item d-flex justify-content-between gap-5 align-items-center p-2"
-                                                        style={{ fontSize: "0.85rem" }} // Smaller text size
-                                                    >
-                                                        <span>{subject}</span>
-                                                        <button
-                                                            onClick={() => handleDeleteSubject(item.classid, subject)}
-                                                            className="btn-outline-danger"
-                                                            title="Delete Subject"
-                                                        >
-                                                            <MdDelete />
-                                                        </button>
-                                                    </li>
-                                                ))
-                                            )}
-                                        </ul>
-
-                                    </div>
-
-                                    <div className="text-end">
-                                        {item.subjects.length > 0 ? (
-                                            <>
-                                                <Button
-                                                    variant="outline-primary"
-                                                    className="me-2 btn-sm"
-                                                    style={{ padding: '5px 12px' }}
-                                                    onClick={() => handleOpen(item.classid, item.className, item.subjects)}
-                                                >
-                                                    <CiEdit /> Edit
-                                                </Button>
-                                                <Button
-                                                    variant="outline-danger"
-                                                    className="btn-sm"
-                                                    style={{ padding: '5px 12px' }}
-                                                    onClick={() => handleDelete(item.classid)}
-                                                    disabled={loadingId === item.classid} // Disable button while loading
-                                                >
-                                                    {loadingId === item.classid ? (
-                                                        <>
-                                                            <Spinner animation="border" size="sm" /> Deleting
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <FaTrash /> Delete
-                                                        </>
-                                                    )}
-                                                </Button>
-                                            </>
-                                        ) : (
-                                            <Button
-                                                variant="outline-primary"
-                                                className="me-2 btn-sm"
-                                                style={{ padding: '5px 12px' }}
-                                                onClick={() => handleOpen(item.classid, item.className, item.subjects)}
-                                            >
-                                                <CiEdit /> Add Class
-                                            </Button>
-                                        )}
-                                    </div>
-
-                                </Card.Body>
-                            </Card>
-                        </div>
-                    ))
-                ) : (
-                    <div>No classes available.</div>
-                )}
-            </div>
-
-            {/* Pagination Controls */}
-            {comeClass.length > classesPerPage && (
-                <div className="pagination">
-                    {[...Array(totalPages)].map((_, index) => (
+        <>
+            {Profile?.DocumentId ? (
+                <div className="container myclass-bg px-5 py-2">
+                    {error && <Alert variant="danger">{error}</Alert>}
+                    <div className="mb-3 text-end addclass-btn-row">
                         <Button
-                            key={index}
-                            onClick={() => handlePageChange(index + 1)}
-                            variant={index + 1 === currentPage ? 'primary' : 'outline-primary'}
-                            className="me-2"
+                            variant="primary"
+                            onClick={handleOpens}
+                            className="btn btn-primary btn-sm myclass-adbtn"
+                            style={{ padding: '8px 16px', borderRadius: '5px' }}
                         >
-                            {index + 1}
+                            + Add Class
                         </Button>
-                    ))}
-                </div>
-            )}
+                    </div>
 
-            {/* Edit Class Modal */}
-            <EditClassModel
-                ClassId={modalState.selectedClass}
-                Subjects={modalState.Subjects}
-                ClassName={modalState.ClassName}
-                isOpen={modalState.open}
-                onClose={handleClose}
-            />
-            <AddClassModel
-                isOpen={open}
-                onClose={handleCloseAdd}
-            />
-        </div>
+                    <div className="row">
+                        {loading ? (
+                            <div>Loading...</div>
+                        ) : currentClasses.length > 0 ? (
+                            currentClasses.map((item, index) => (
+                                <div key={index} className="col-md-4 mb-4">
+                                    <Card className="glass border-0 h-100 ">
+                                        <Card.Body className="d-flex flex-column justify-content-between">
+                                            <div>
+                                                <Card.Title className="h6 mb-2">{item.className}</Card.Title>
+                                                <Card.Subtitle className="text-muted mb-3 small">Subjects</Card.Subtitle>
+                                                <ul className="list-group list-group-flush mb-3">
+                                                    {item.subjects.length === 0 ? (
+                                                        <li className="list-group-item text-center">
+                                                            No subjects available. Please add subjects.
+                                                        </li>
+                                                    ) : (
+                                                        item.subjects.map((subject, idx) => (
+                                                            <li
+                                                                key={idx}
+                                                                className="list-group-item d-flex justify-content-between gap-5 align-items-center p-2"
+                                                                style={{ fontSize: "0.85rem" }}
+                                                            >
+                                                                <span>{subject}</span>
+                                                                <button
+                                                                    onClick={() => handleDeleteSubject(item.classid, subject)}
+                                                                    className="btn-outline-danger"
+                                                                    title="Delete Subject"
+                                                                >
+                                                                    <MdDelete />
+                                                                </button>
+                                                            </li>
+                                                        ))
+                                                    )}
+                                                </ul>
+                                            </div>
+
+                                            <div className="text-end">
+                                                {item.subjects.length > 0 ? (
+                                                    <>
+                                                        <Button
+                                                            variant="outline-primary"
+                                                            className="me-2 btn-sm"
+                                                            style={{ padding: '5px 12px' }}
+                                                            onClick={() => handleOpen(item.classid, item.className, item.subjects)}
+                                                        >
+                                                            <CiEdit /> Edit
+                                                        </Button>
+                                                        <Button
+                                                            variant="outline-danger"
+                                                            className="btn-sm"
+                                                            style={{ padding: '5px 12px' }}
+                                                            onClick={() => handleDelete(item.classid)}
+                                                            disabled={loadingId === item.classid}
+                                                        >
+                                                            {loadingId === item.classid ? (
+                                                                <>
+                                                                    <Spinner animation="border" size="sm" /> Deleting
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <FaTrash /> Delete
+                                                                </>
+                                                            )}
+                                                        </Button>
+                                                    </>
+                                                ) : (
+                                                    <Button
+                                                        variant="outline-primary"
+                                                        className="me-2 btn-sm"
+                                                        style={{ padding: '5px 12px' }}
+                                                        onClick={() => handleOpen(item.classid, item.className, item.subjects)}
+                                                    >
+                                                        <CiEdit /> Add Class
+                                                    </Button>
+                                                )}
+                                            </div>
+                                        </Card.Body>
+                                    </Card>
+                                </div>
+                            ))
+                        ) : (
+                            <div>No classes available.</div>
+                        )}
+                    </div>
+
+                    {comeClass.length > classesPerPage && (
+                        <div className="pagination">
+                            {[...Array(totalPages)].map((_, index) => (
+                                <Button
+                                    key={index}
+                                    onClick={() => handlePageChange(index + 1)}
+                                    variant={index + 1 === currentPage ? 'primary' : 'outline-primary'}
+                                    className="me-2"
+                                >
+                                    {index + 1}
+                                </Button>
+                            ))}
+                        </div>
+                    )}
+
+                    <EditClassModel
+                        ClassId={modalState.selectedClass}
+                        Subjects={modalState.Subjects}
+                        ClassName={modalState.ClassName}
+                        isOpen={modalState.open}
+                        onClose={handleClose}
+                    />
+                    <AddClassModel
+                        isOpen={open}
+                        onClose={handleCloseAdd}
+                    />
+                </div>
+            ) : (
+                <div className="w-100">
+                    <div className="container p-5">
+                        <div className=" mb-4">
+                            <h1 className="mb-3">Start Teaching by Uploading Necessary Documents</h1>
+                            <p className="text-muted">Why Are Documents Important?</p>
+                        </div>
+                        <div className="mb-4">
+                            <p className="lead">
+                                <strong>Ans:</strong> For student safety and verification purposes, we require these documents.
+                            </p>
+                        </div>
+                        <div className="">
+                            <a href="#Documents" className="btn btn-primary">
+                                Upload Documents
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            )}
+        </>
     );
+
 };
 
 export default MyClasses;

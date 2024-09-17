@@ -28,7 +28,7 @@ const TeacherProfileOtp = () => {
         setError('');
         try {
             const res = await axios.post(
-                'https://www.sr.apnipaathshaala.in/api/v1/teacher/Verify-profile-otp',
+                'https://sr.apnipaathshaala.in/api/v1/teacher/Verify-profile-otp',
                 { otp }, // OTP should be sent as an object
                 {
                     headers: {
@@ -38,6 +38,9 @@ const TeacherProfileOtp = () => {
             );
             console.log(res.data);
             toast.success("🎉 Profile verified successfully!");
+            setTimeout(() => {
+                window.location.href="/Teacher-dashboard?login=true"
+            }, 1200);
         } catch (error) {
             setError('Invalid OTP or verification failed.');
             toast.error("❌ Verification failed. Please try again.");
@@ -52,7 +55,7 @@ const TeacherProfileOtp = () => {
         setError('');
         try {
             const res = await axios.post(
-                'https://www.sr.apnipaathshaala.in/api/v1/teacher/profile-otp',
+                'https://sr.apnipaathshaala.in/api/v1/teacher/profile-otp',
                 {},
                 {
                     headers: {

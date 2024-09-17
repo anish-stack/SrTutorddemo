@@ -1,0 +1,13 @@
+.scrollable {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  .scrollable-container {
+    max-height: 400px; /* Adjust height as needed */
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    padding: 10px;
+  }
+  
