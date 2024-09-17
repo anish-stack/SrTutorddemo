@@ -39,6 +39,8 @@ const allowedOrigins = [
     "https://www.sradmin.hoverbusinessservices.com",
     "https://srtutors.hoverbusinessservices.com",
     "https://sradmin.hoverbusinessservices.com",
+    "www.srtutorsbureau.com",
+    "https://www.srtutorsbureau.com",
     'http://localhost:3001',
     'http://localhost:3000'
 ];
@@ -118,39 +120,39 @@ app.get('/autocomplete', async (req, res) => {
 
 app.get('/geocode', async (req, res) => {
     const { address } = req.query; // Get address from query parameters
-  
+
     if (!address) {
-      return res.status(400).send({ error: 'Address is required' });
+        return res.status(400).send({ error: 'Address is required' });
     }
-  
+
     try {
-      // Make a request to Google Geocoding API
-      const response = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
-        params: {
-          address: address,
-        key: "AIzaSyBQ-6XL1bXfYt7_7inMBOFXLg5Zmram81o"
-        },
-      });
-  
-      if (response.data.status === 'OK') {
-        const location = response.data.results[0].geometry.location;
-        const lat = location.lat;
-        const lng = location.lng;
-  
-        // Send the lat and lng back to the client
-        res.json({
-          latitude: lat,
-          longitude: lng,
-          formatted_address: response.data.results[0].formatted_address,
+        // Make a request to Google Geocoding API
+        const response = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
+            params: {
+                address: address,
+                key: "AIzaSyBQ-6XL1bXfYt7_7inMBOFXLg5Zmram81o"
+            },
         });
-      } else {
-        res.status(404).json({ error: 'No results found for the provided address' });
-      }
+
+        if (response.data.status === 'OK') {
+            const location = response.data.results[0].geometry.location;
+            const lat = location.lat;
+            const lng = location.lng;
+
+            // Send the lat and lng back to the client
+            res.json({
+                latitude: lat,
+                longitude: lng,
+                formatted_address: response.data.results[0].formatted_address,
+            });
+        } else {
+            res.status(404).json({ error: 'No results found for the provided address' });
+        }
     } catch (error) {
-      console.error('Error fetching geocoding data:', error);
-      res.status(500).send({ error: 'Server error' });
+        console.error('Error fetching geocoding data:', error);
+        res.status(500).send({ error: 'Server error' });
     }
-  });
+});
 
 app.use((err, req, res, next) => {
     if (err.name === 'ValidationError') {
