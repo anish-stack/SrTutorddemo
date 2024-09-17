@@ -7,26 +7,39 @@ import LoginModal from "./LoginModel";
 import useSessionStorageState from 'use-session-storage-state'
 import toast from "react-hot-toast";
 import Loader from "./Loader";
+import { useNavigate } from "react-router-dom";
 const SubjectModel = ({ showModal, handleClose, subject }) => {
+    console.log(subject)
 
     const token = Cookies.get('studentToken') || false
+    const navigate = useNavigate();
+    const [loginNumber, setLoginNumber] = useState()
+    const [login, setLogin] = useState(false)
 
-    const [login, setLogin] = useState(true)
-
+    const url = new URLSearchParams(window.location.search)
+    const otpValue = url.get('otpSent')
+    const [sessionData, setSessionData] = useState({
+        otpSent: false,
+        number: ''
+    })
     const [isLoading, setLoading] = useState(false)
     const { Class, Subjects = [], isClass, id } = subject || {}; // Default Subjects to an empty array if it's not an array
     const [locationSuggestions, setLocationSuggestions] = useState([]);
+    const [showOtp, setShowOtp] = useState(false)
+    const [otp, setOtp] = useState()
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
     const [formData, setFormData] = useState({
         Subject: [],
         Class: "",
         Location: "",
-        Interested: "", // Home Tuition at My Home, Willing to Travel to Teacher's Home, Online Class
+        Interested: "",
         HowManyClassYouWant: "",
+        experienceRequired: "",
         MinumBudegt: "",
         Maxmimu: "",
         StartDate: "",
         TeaherGender: "",
+        currentAddress: '',
         userconetcIfo: {
             Name: "",
             email: "",
@@ -37,16 +50,31 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
     const [storedFormData, setStoredFormData] = useSessionStorageState('beforeLoginDataSubject', {
         defaultValue: formData,
     });
-    const ClasessOptions = [
+    const numberOfSessionsOptions = [
         { value: 'Two Classes a Week', label: 'Two Classes a Week' },
         { value: 'Three Classes a Week', label: 'Three Classes a Week' },
         { value: 'Four Classes a Week', label: 'Four Classes a Week' },
         { value: 'Five Classes a Week', label: 'Five Classes a Week' },
         { value: 'Six Classes a Week', label: 'Six Classes a Week' },
     ];
-    const [loginShow, setLoginShow] = useState(false)
-    const [step, setStep] = useState(1);
 
+    const interestedInTypeOfClassOptions = [
+        { value: 'Online Class', label: 'Online Class' },
+        { value: 'Home Tuition at My Home', label: 'Home Tuition at My Home' },
+        { value: 'Willing to travel to Teacher Home', label: 'Willing to travel to Teacher Home' },
+        { value: 'Require Teacher to Travel to My Home', label: 'Require Teacher to Travel to My Home' },
+    ];
+    const [loginShow, setLoginShow] = useState(false)
+    const [ClickLatitude, setClickLatitude] = useState(null);
+    const [ClickLongitude, setClickLongitude] = useState(null);
+    const [step, setStep] = useState(1);
+    useEffect(() => {
+        if (token) {
+            setLogin(true)
+        } else {
+            setLogin(false)
+        }
+    }, [token])
     useEffect(() => {
         setFormData((prevData) => ({
             ...prevData,
@@ -79,7 +107,7 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
         // Validation based on the current step
         if (step === 1) {
             // Validate fields for step 1
-            if (!formData.Interested || !formData.Location) {
+            if (!formData.Location) {
                 toast.error("Please fill all required fields.");
                 valid = false;
             }
@@ -92,8 +120,8 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
             if (formData.MinumBudegt <= 499) {
                 toast.error("Minimum budget must be at least 500.");
                 valid = false;
-            }  
-         
+            }
+
             if (!formData.StartDate) {
                 toast.error("Start date is required.");
                 valid = false;
@@ -109,30 +137,48 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
             setStep(nextStep);
         }
     };
+    const handleLocationLatAndLngFetch = async () => {
+        const address = formData.Location
+        const options = {
+            method: 'GET',
+            url: `https://sr.apnipaathshaala.in/geocode?address=${address}`
+        };
+
+        try {
+            const response = await axios.request(options);
+            const result = response.data;
+            console.log(result)
+            if (result && result.length > 0) {
+                setClickLatitude(result.latitude);
+                setClickLongitude(result.longitude);
+            }
+        } catch (error) {
+            console.error("Error fetching location coordinates:", error);
+        }
+    };
 
 
     const handleLocationFetch = async (input) => {
         try {
             const res = await axios.get(
-                "https://place-autocomplete1.p.rapidapi.com/autocomplete/json",
-                {
-                    params: { input, radius: "500" },
-                    headers: {
-                        "x-rapidapi-key": "75ad2dad64msh17034f06cc47c06p18295bjsn18e367df005b",
-                        "x-rapidapi-host": "place-autocomplete1.p.rapidapi.com",
-                    },
-                }
-            );
-            setLocationSuggestions(res.data.predictions || []);
+                `https://sr.apnipaathshaala.in/autocomplete?input=${input}`);
+
+            setLocationSuggestions(res.data || []);
         } catch (error) {
             console.error("Error fetching location suggestions:", error);
         }
+    };
+
+
+    const handleLoginChange = (e) => {
+        setLoginNumber(e.target.value); // Directly set the value
     };
     const handleLocationSelect = (location) => {
         setFormData(prevState => ({
             ...prevState,
             Location: location.description,
         }));
+        handleLocationLatAndLngFetch(location.description)
         setLocationSuggestions([]);
     };
     const validateForm = () => {
@@ -150,31 +196,127 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
 
         return { valid, errors };
     };
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const submittedData = {
-            ...formData,
-            Subject: isClass ? formData.Subject : Subjects,
-        };
-        setLoading(true)
+
+    const resendOtp = async () => {
         try {
-            const response = await axios.post('https://www.sr.apnipaathshaala.in/api/v1/student/Subject-teacher-Request', submittedData,{
-                headers:{
-                    Authorization:`Bearer ${token}`
-                }
-            })
-            console.log(response)
-            setLoading(false)
-            window.location.href="/thankYou"
+
+            const response = await axios.post('https://sr.apnipaathshaala.in/api/v1/student/resent-otp', { PhoneNumber: loginNumber });
+            toast.success(response.data.message);
+
         } catch (error) {
             console.log(error)
-            toast.error("Server Error Exist Please try After Sometimes")
-            setLoading(false)
+            toast.error(error.response?.data?.message || "An error occurred");
+        }
+    };
 
+    const verifyOtp = async () => {
+        try {
+
+            const response = await axios.post('https://sr.apnipaathshaala.in/api/v1/student/Verify-Student', {
+                PhoneNumber: loginNumber,
+                otp
+            });
+            toast.success("Student Verified Successfully");
+            const { token, user } = response.data;
+            console.log(response.data)
+            Cookies.set('studentToken', token, { expires: 1 });
+            Cookies.set('studentUser', JSON.stringify(user), { expires: 1 });
+            sessionStorage.removeItem('OtpSent')
+            sessionStorage.removeItem('number')
+            sessionStorage.removeItem('verified')
+
+            setLogin(true)
+            setStep(1);
+
+        } catch (error) {
+            console.log(error)
+            toast.error(error.response?.data?.message || "An error occurred");
+        }
+    };
+
+
+    const handleLoginNumberCheck = async (e) => {
+        e.preventDefault()
+
+
+
+        try {
+            const response = await axios.post('https://sr.apnipaathshaala.in/api/v1/student/checkNumber-request', {
+                userNumber: loginNumber
+            })
+            console.log(response.data)
+            setShowOtp(true)
+            const newUrl = new URL(window.location.href);
+            newUrl.searchParams.set('otpSent', 'true');
+            newUrl.searchParams.set('number', loginNumber);
+            newUrl.searchParams.set('verified', 'false');
+
+            sessionStorage.setItem('OtpSent', true)
+            sessionStorage.setItem('number', loginNumber)
+            sessionStorage.setItem('verified', false)
+
+
+            navigate(`${window.location.pathname}?${newUrl.searchParams.toString()}`, { replace: true });
+        } catch (error) {
+            console.log(error.response)
+
+            if (error.response?.data?.success === false &&
+                error.response?.data?.message === "User with this phone number already exists.") {
+                setShowOtp(true)
+                setStep(1); // Correctly set the state
+            }
+        }
+    }
+
+
+
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        console.log(formData)
+
+        const submitedData = {
+            requestType: "Subject Teacher",
+            classId: null,
+            className: formData.Class,
+            subjects: isClass ? [formData.Subject] : [Subjects],
+            interestedInTypeOfClass: formData.Interested,
+            teacherGenderPreference: formData.TeaherGender,
+            numberOfSessions: formData.HowManyClassYouWant,
+            experienceRequired: formData.experienceRequired,
+            minBudget: formData.MinumBudegt,
+            maxBudget: formData.Maxmimu || '1000',
+            locality: formData.Location,
+            startDate: formData.StartDate,
+            specificRequirement: formData.specificrequirement,
+            currentAddress: formData.currentAddress || null,
+            location: {
+                type: 'Point',
+                coordinates: [ClickLongitude || 0, ClickLatitude || 0]
+            },
+            studentInfo: {
+                studentName: formData.userconetcIfo.Name,
+                contactNumber: formData.userconetcIfo.contactnumver,
+                emailAddress: formData.userconetcIfo.email
+            }
+        };
+
+        setLoading(true)
+        try {
+            const response = await axios.post('https://sr.apnipaathshaala.in/api/v1/student/universal-request', submitedData, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            console.log(response.data)
+            setLoading(false);
+            toast.success("Request Submited Successful")
+            window.location.href = "/thankYou";
+        } catch (error) {
+            console.log(error);
+            setLoading(false);
+            toast.error("Server Error, Please try again later.");
         }
 
 
-        // console.log("Form Data Submitted:", submittedData);
     };
 
     const closeLoginModal = () => {
@@ -195,20 +337,66 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
 
     return (
         <div>
-            {login ? (
-                <Modal show={login ? showModal : ''} onHide={handleClose} size="lg" centered>
-                    <Modal.Header closeButton>
-                        <Modal.Title>Subject Request Form</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <Form>
+
+            <Modal show={showModal} onHide={handleClose} size="lg" centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Subject Request Form</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+
+                        {!login ? (
+                            <div className="container-fluid">
+                                <Form.Group>
+                                    <label htmlFor="">Enter Your Contact Number </label>
+                                    <Form.Control
+                                        type="text"
+                                        name="loginNumber"
+                                        value={showOtp ? (loginNumber || sessionStorage.getItem('number')) : loginNumber} // Ternary condition for showing value
+                                        onChange={handleLoginChange}
+                                        required
+                                    />
+
+                                </Form.Group>
+                                {showOtp && (
+                                    <Form.Group>
+                                        <label htmlFor="">Enter Otp </label>
+                                        <Form.Control
+                                            type="text"
+                                            name="otp"
+                                            value={otp}
+                                            onChange={(e) => setOtp(e.target.value)}
+                                            required
+                                        />
+                                    </Form.Group>
+                                )}
+                                <div className="mt-4 d-flex align-item-center justify-content-between">
+                                    {showOtp ? (
+                                        <Button onClick={() => verifyOtp(otp)} variant="success" type="button">
+                                            {isLoading ? 'Please Wait....' : 'Verify Number'}
+                                        </Button>
+                                    ) : (
+                                        <Button onClick={handleLoginNumberCheck} variant="success" type="button">
+                                            {isLoading ? 'Please Wait....' : 'Submit'}
+                                        </Button>
+                                    )}
+
+
+                                    <Button onClick={resendOtp} variant="success" type="button">
+                                        Resend Otp
+                                    </Button>
+                                </div>
+
+                            </div>
+                        ) : <>
                             {step === 1 && (
                                 <Container>
                                     <Row>
                                         <Col md={12}>
-                                            <Form.Group className="mb-3"
+                                            <Form.Group className="mb-1"
                                                 required>
-                                                <Form.Label>Subject</Form.Label>
+                                                {/* <Form.Label>Subject</Form.Label> */}
+                                                <label className="mb-1" htmlFor="">Subject</label>
                                                 <Form.Control
                                                     type="text"
                                                     name="Subject"
@@ -221,9 +409,10 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
                                     </Row>
                                     <Row>
                                         <Col md={12}>
-                                            <Form.Group className="mb-3"
+                                            <Form.Group className="mb-1"
                                                 required>
-                                                <Form.Label>Class</Form.Label>
+                                                <label className="mb-1" htmlFor="">Class</label>
+
                                                 <Form.Control
                                                     type="text"
                                                     name="Class"
@@ -234,12 +423,30 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
                                             </Form.Group>
                                         </Col>
                                     </Row>
+                                    <Row>
+                                        <Col md={12}>
+                                            <Form.Group className="mb-1"
+                                                required>
+                                                <label className="mb-1" htmlFor="">Current Address</label>
+
+
+                                                <Form.Control
+                                                    type="text"
+                                                    name="currentAddress"
+                                                    onChange={handleChange}
+                                                    value={formData.currentAddress}
+                                                    placeholder="Enter Your Current Address Where You Want Teacher"
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                    </Row>
+
                                     <Row className="mb-md-3">
                                         <Col xs={12}>
-                                            <div className="mb-3"
+                                            <div className="mb-1"
                                                 required>
                                                 <label htmlFor="Location" className="form-label">
-                                                    Enter your preferred location{" "}
+                                                    Enter your Near By  location{" "}
                                                     <b className="text-danger fs-5">*</b>
                                                 </label>
                                                 <input
@@ -268,59 +475,47 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
                                             </div>
                                         </Col>
                                     </Row>
-                                    <Row>
-                                        <Col md={12}>
-                                            <Form.Group className="mb-3"
-                                                required>
-                                                <Form.Label>Interested In  <b className="text-danger fs-5">*</b></Form.Label>
-                                                <Select
-                                                    options={[
-                                                        {
-                                                            value: "Home Tuition at My Home",
-                                                            label: "Home Tuition at My Home",
-                                                        },
-                                                        {
-                                                            value: "Willing to Travel to Teacher's Home",
-                                                            label: "Willing to Travel to Teacher's Home",
-                                                        },
-                                                        { value: "Online Class", label: "Online Class" },
-                                                    ]}
-                                                    onChange={handleSelectChange("Interested")}
-                                                    value={
-                                                        formData.Interested
-                                                            ? {
-                                                                value: formData.Interested,
-                                                                label: formData.Interested,
-                                                            }
-                                                            : null
-                                                    }
-                                                />
-                                            </Form.Group>
-                                        </Col>
-                                    </Row>
+
                                 </Container>
                             )}
 
                             {step === 2 && (
                                 <Container>
                                     <Row>
-                                        <Col md={6}>
-                                            <Form.Group className="mb-3"
+                                        <Col md={12}>
+                                            <Form.Group className="mb-1"
                                                 required>
-                                                <Form.Label>How Many Classes You Want  <b className="text-danger fs-5">*</b></Form.Label>
+                                                <label className="mb-1" htmlFor="">Interested In <b className="text-danger fs-5">*</b> </label>
+
+
+                                                <Select
+                                                    name="Interested"
+                                                    options={interestedInTypeOfClassOptions}
+                                                    onChange={handleSelectChange('Interested')}
+                                                    required
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        <Col md={6}>
+                                            <Form.Group className="mb-1"
+                                                required>
+                                                <label className="mb-1" htmlFor="">How Many Classes You Want  <b className="text-danger fs-5">*</b></label>
+
                                                 <Select
                                                     name="HowManyClassYouWant"
-                                                    options={ClasessOptions}
+                                                    options={numberOfSessionsOptions}
                                                     onChange={handleSelectChange('HowManyClassYouWant')}
-                                                    value={ClasessOptions.find(option => option.value === formData.HowManyClassYouWant) || null}
+
                                                 />
-                                               
+
                                             </Form.Group>
                                         </Col>
                                         <Col md={6}>
-                                            <Form.Group className="mb-3"
+                                            <Form.Group className="mb-1"
                                                 required>
-                                                <Form.Label>Budget (Min)  <b className="text-danger fs-5">*</b></Form.Label>
+                                                <label className="mb-1" htmlFor="">Budget (Min)  <b className="text-danger fs-5">*</b></label>
                                                 <Form.Control
                                                     type="number"
                                                     name="MinumBudegt"
@@ -333,9 +528,10 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
                                     </Row>
                                     <Row>
                                         <Col md={6}>
-                                            <Form.Group className="mb-3"
+                                            <Form.Group className="mb-1"
                                                 required>
-                                                <Form.Label>Budget (Max)  <b className="text-danger fs-5">*</b></Form.Label>
+                                                <label className="mb-1" htmlFor="">Budget (Max)  <b className="text-danger fs-5">*</b></label>
+
                                                 <Form.Control
                                                     type="number"
                                                     name="Maxmimu"
@@ -346,9 +542,9 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
                                             </Form.Group>
                                         </Col>
                                         <Col md={6}>
-                                            <Form.Group className="mb-3"
+                                            <Form.Group className="mb-1"
                                                 required>
-                                                <Form.Label>Start Date  <b className="text-danger fs-5">*</b></Form.Label>
+                                                <label className="mb-1" htmlFor="">Preferred Start Date   <b className="text-danger fs-5">*</b></label>
                                                 <Form.Control
                                                     type="date"
                                                     name="StartDate"
@@ -359,11 +555,24 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
                                             </Form.Group>
                                         </Col>
                                     </Row>
+                                    <Col md={12}>
+                                        <Form.Group className="mb-1"
+                                            required>
+                                            <label className="mb-1" htmlFor="">Teacher Experience   <b className="text-danger fs-5">*</b></label>
+                                            <Form.Control
+                                                type="number"
+                                                name="experienceRequired"
+                                                value={formData.experienceRequired}
+                                                onChange={handleChange}
+
+                                            />
+                                        </Form.Group>
+                                    </Col>
                                     <Row>
                                         <Col md={12}>
-                                            <Form.Group className="mb-3"
+                                            <Form.Group className="mb-1"
                                                 required>
-                                                <Form.Label>Teacher Gender Preference  <b className="text-danger fs-5">*</b></Form.Label>
+                                                <label className="mb-1" htmlFor="">Teacher Gender Preference  <b className="text-danger fs-5">*</b></label>
                                                 <Select
                                                     options={[
                                                         { value: "Male", label: "Male" },
@@ -385,7 +594,7 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
                                 <Container>
                                     <Row>
                                         <Col md={12}>
-                                            <Form.Group className="mb-3"
+                                            <Form.Group className="mb-1"
                                                 required>
                                                 <Form.Label>User Contact Info  <b className="text-danger fs-5">*</b></Form.Label>
                                                 <Form.Control
@@ -441,7 +650,7 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
                                                 />
                                                 <Form.Control
                                                     as="textarea"
-                                                    className="mb-3"
+                                                    className="mb-1"
                                                     required
                                                     name="specificrequirement"
                                                     value={formData.specificrequirement}
@@ -460,8 +669,12 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
                                     </Row>
                                 </Container>
                             )}
-                        </Form>
-                    </Modal.Body>
+                        </>
+                        }
+                    </Form>
+                </Modal.Body>
+                {login && (
+
                     <Modal.Footer>
                         {step === 1 && (
                             <Button variant="secondary" onClick={() => handleStepChange(2)}>
@@ -489,14 +702,10 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
                             </>
                         )}
                     </Modal.Footer>
-                </Modal>
-            ) : (
-                <LoginModal
-                    isOpen={isLoginModalOpen}
-                    modalType="student"
-                    onClose={closeLoginModal}
-                />
-            )}
+                )}
+
+            </Modal>
+
 
 
         </div>

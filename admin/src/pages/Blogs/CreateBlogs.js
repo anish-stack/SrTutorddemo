@@ -61,7 +61,7 @@ const CreateBlogs = () => {
         try {
             const token = localStorage.getItem('Sr-token');
             await toast.promise(
-                axios.post('https://www.sr.apnipaathshaala.in/api/v1/admin/Create-Blog', formDataToSubmit, {
+                axios.post('https://sr.apnipaathshaala.in/api/v1/admin/Create-Blog', formDataToSubmit, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                         'Authorization': `Bearer ${token}`

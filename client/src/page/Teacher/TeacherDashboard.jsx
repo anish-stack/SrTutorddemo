@@ -7,7 +7,14 @@ import CompleteProfile from './CompleteProfile'
 import MyClasses from './MyClasses'
 import MyLocations from './MyLocations';
 import EditClassModel from './EditClassModel';
+import ImageUploader from 'react-image-upload'
+import 'react-image-upload/dist/index.css'
 import gif from './open-gift.gif'
+import toast from 'react-hot-toast';
+import UploadDocuments from './UploadDocuments';
+import StudentRequest from './StudentRequest';
+import AcceptRequetsByYou from './AcceptRequest';
+import SubscribedStudent from './SubscribedStudent';
 const TeacherDashboard = () => {
     const locations = window.location.hash
 
@@ -18,7 +25,46 @@ const TeacherDashboard = () => {
     const [teacherClass, setClass] = useState(null);
     const [teachingLocations, setTeachingLocations] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [profileFile, setProfileFile] = useState({})
     const navigate = useNavigate();
+    const [showUploader, setShowUploader] = useState(false);
+
+    // Toggle image uploader on double-click
+    const handleDoubleClick = () => {
+        setShowUploader(true);
+    };
+    const handleUploadProfilePic = async () => {
+        const fileViaUpload = profileFile.file;
+        const formData = new FormData();
+        formData.append('image', fileViaUpload);
+
+        setLoading(true)
+        try {
+            const response = await axios.post(
+                `https://sr.apnipaathshaala.in/api/v1/teacher/teacher-profile-pic/${profileInfo.TeacherUserId}`,
+                formData, // Send formData directly here
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }
+            );
+            console.log(response.data);
+            setLoading(false)
+
+            toast.success("Profile Pic Uploaded Successfully");
+            setTimeout((
+                window.location.reload()
+            ), 700)
+        } catch (error) {
+            console.error(error);
+            setLoading(false)
+
+        } finally {
+            setLoading(false)
+
+        }
+    };
 
     useEffect(() => {
         if (locations === "") {
@@ -34,11 +80,13 @@ const TeacherDashboard = () => {
         else if (locations === "#resetLocation") {
             setActiveTab('resetLocation')
 
+        } else if (locations === "#Documents") {
+            setActiveTab('Documents')
         }
         else if (locations === "#editProfile") {
             setActiveTab('editProfile')
 
-        }else if(locations === "#activity"){
+        } else if (locations === "#activity") {
             setActiveTab('activity')
         }
     }, [locations])
@@ -60,7 +108,7 @@ const TeacherDashboard = () => {
         if (teacherToken && teacherUser) {
             const handleFetch = async () => {
                 try {
-                    const { data } = await axios.get(`https://www.sr.apnipaathshaala.in/api/v1/teacher/Get-Teacher/${teacherUser._id}`, {
+                    const { data } = await axios.get(`https://sr.apnipaathshaala.in/api/v1/teacher/Get-Teacher/${teacherUser._id}`, {
                         headers: {
                             Authorization: `Bearer ${teacherToken}`,
                         },
@@ -81,7 +129,7 @@ const TeacherDashboard = () => {
         if (teacherToken && teacherUser) {
             const handleClassFetch = async () => {
                 try {
-                    const { data } = await axios.get(`https://www.sr.apnipaathshaala.in/api/v1/teacher/Get-My-Classes`, {
+                    const { data } = await axios.get(`https://sr.apnipaathshaala.in/api/v1/teacher/Get-My-Classes`, {
                         headers: {
                             Authorization: `Bearer ${teacherToken}`,
                         },
@@ -97,12 +145,22 @@ const TeacherDashboard = () => {
             handleClassFetch();
         }
     }, [teacherToken, teacherUser]);
+    function getImageFileObject(imageFile) {
+        const file = imageFile
+        if (file) {
 
+            setProfileFile(file)
+        } else {
+            toast.error("Please Upload image")
+        }
+    }
+
+    function runAfterImageDelete(file) {
+        console.log({ file })
+    }
     // Redirect to login if no token
 
-    if (loading) {
-        return <div>Loading...</div>;
-    }
+
 
     if (!teacherToken) {
         return (
@@ -162,14 +220,40 @@ const TeacherDashboard = () => {
                         </li>
                         <li className="nav-item">
                             <a
-                                className={`nav-link ${activeTab === 'editProfile' ? 'active' : ''}`}
-                                href="#editProfile"
-                                onClick={() => setActiveTab('editProfile')}
+                                className={`nav-link ${activeTab === 'Documents' ? 'active' : ''}`}
+                                href="#Documents"
+                                onClick={() => setActiveTab('Documents')}
                             >
-                                Edit Profile
+                                My Documents
                             </a>
                         </li>
-
+                        <li className="nav-item">
+                            <a
+                                className={`nav-link ${activeTab === 'Subscribed' ? 'active' : ''}`}
+                                href="#Subscribed"
+                                onClick={() => setActiveTab('Subscribed')}
+                            >
+                                Subscribed Students
+                            </a>
+                        </li>
+                        <li className="nav-item">
+                            <a
+                                className={`nav-link ${activeTab === 'Request' ? 'active' : ''}`}
+                                href="#Request"
+                                onClick={() => setActiveTab('Request')}
+                            >
+                                Request For You
+                            </a>
+                        </li>
+                        <li className="nav-item">
+                            <a
+                                className={`nav-link ${activeTab === 'accepted' ? 'active' : ''}`}
+                                href="#Request"
+                                onClick={() => setActiveTab('accepted')}
+                            >
+                                Accepted Request
+                            </a>
+                        </li>
                         <li className="nav-item">
                             <a
                                 className={`nav-link ${activeTab === 'activity' ? 'active' : ''}`}
@@ -179,6 +263,7 @@ const TeacherDashboard = () => {
                                 Activity
                             </a>
                         </li>
+
                     </ul>
                 </div>
                 <div className='col-md-9'>
@@ -187,11 +272,46 @@ const TeacherDashboard = () => {
                             <div className="row">
                                 <div className="teacher-profile position-relative   ">
                                     <div className="teacher-image ">
-                                        <div className='image-div'>
-                                            <img
-                                                src={teacherUser.gender === 'Female' ? "https://img.freepik.com/free-photo/woman-teaching-classroom_23-2151696438.jpg?t=st=1724232283~exp=1724235883~hmac=d01096c59b0d03a03a6020486c0b7c1823a6e76bf18c2b8fed75fee81449b614&w=360" : 'https://img.freepik.com/free-photo/man-wearing-waistcoat-reading-book_1368-3209.jpg?t=st=1724234252~exp=1724237852~hmac=2e3feea5181e91b45675ac8f9defead4d16f9bab1e8cf54ad4b2051ea2e7bd7b&w=360'}
-                                                alt="Teacher Profile"
-                                            />
+                                        <div className="image-div">
+                                            {profileInfo?.ProfilePic && !showUploader ? (
+                                                <>
+                                                    <img
+                                                        src={profileInfo?.ProfilePic?.url}
+                                                        alt="Teacher Profile"
+                                                        style={{ height: 200, width: 200, borderRadius: '50%', objectFit: 'cover' }}
+                                                        onDoubleClick={handleDoubleClick} // Trigger uploader on double-click
+                                                    />
+                                                    <p style={{ fontSize: 12 }}>*For Update Image Double Click Your Image</p>
+                                                </>
+                                            ) : (
+                                                <div>
+                                                    <ImageUploader
+                                                        style={{ height: 200, width: 200, borderRadius: '60%' }}
+                                                        onFileAdded={(img) => getImageFileObject(img)}
+                                                        onFileRemoved={(img) => runAfterImageDelete(img)}
+                                                    />
+                                                </div>
+                                            )}
+
+                                            <div>
+                                                {Object.keys(profileFile).length === 0 ? null : (
+                                                    <button
+                                                        disabled={loading}
+                                                        onClick={handleUploadProfilePic}
+                                                        className="btn-upload"
+                                                    >
+                                                        {loading ? (
+                                                            <>
+                                                                Please Wait...
+
+                                                            </>
+                                                        ) : (
+                                                            'Upload Profile Picture'
+                                                        )}
+                                                    </button>
+                                                )}
+                                            </div>
+
                                         </div>
                                     </div>
                                     <div className="teacher-basic-details">
@@ -221,7 +341,7 @@ const TeacherDashboard = () => {
                         <CompleteProfile title={"Complete "} readable={true} profileInfo={profileInfo} />
                     )}
                     {activeTab === 'showClass' && (
-                        <MyClasses Class={teacherClass} />
+                        <MyClasses Profile={profileInfo} Class={teacherClass} />
                     )}
                     {activeTab === 'resetLocation' && (
                         <MyLocations locations={teachingLocations} />
@@ -229,26 +349,39 @@ const TeacherDashboard = () => {
                     {activeTab === 'editProfile' && (
                         <CompleteProfile title={"Edit"} readable={false} profileInfo={profileInfo} />
                     )}
+                    {activeTab === 'Request' && (
+                        <StudentRequest id={profileInfo._id} />
+                    )}
+                    {activeTab === 'accepted' && (
+                        <AcceptRequetsByYou />
+                    )}
+
+                    {activeTab === 'Subscribed' && (
+                        <SubscribedStudent />
+                    )}
+                    {activeTab === 'Documents' && (
+                        <UploadDocuments Document={profileInfo?.DocumentId} Profile={profileInfo} />
+                    )}
                     {activeTab === 'activity' && (
-                       <div className="activity-section text-center p-5 rounded shadow-lg bg-white">
-            
-                       <div className='mb-4'>
-                         <img src={gif} alt="Special Feature" className="w-25 img-fluid" />
-                       </div>
-                       <h3 className="mb-3">Unlock Exclusive Features with <span className='text-center text-danger'>Sr Tutors</span></h3>
-                       <p className="mb-4 text-muted">
-                         Upgrade to a paid membership to access exclusive features and attract more students.
-                       </p>
-                       <div className="d-flex justify-content-center">
-                         <button
-                           onClick={() => navigate('/upgrade')}
-                           className="btn btn-primary btn-lg"
-                         >
-                           Upgrade Now
-                         </button>
-                       </div>
-                     </div>
-                     
+                        <div className="activity-section text-center p-5 rounded shadow-lg bg-white">
+
+                            <div className='mb-4'>
+                                <img src={gif} alt="Special Feature" className="w-25 img-fluid" />
+                            </div>
+                            <h3 className="mb-3">Unlock Exclusive Features with <span className='text-center text-danger'>Sr Tutors</span></h3>
+                            <p className="mb-4 text-muted">
+                                Upgrade to a paid membership to access exclusive features and attract more students.
+                            </p>
+                            <div className="d-flex justify-content-center">
+                                <button
+                                    onClick={() => navigate('/upgrade')}
+                                    className="btn btn-primary btn-lg"
+                                >
+                                    Upgrade Now
+                                </button>
+                            </div>
+                        </div>
+
                     )}
                 </div>
             </div >

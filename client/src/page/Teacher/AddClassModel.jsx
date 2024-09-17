@@ -48,7 +48,7 @@ const AddClassModel = ({ isOpen, onClose }) => {
     const fetchSubjects = useCallback(async (classId) => {
         try {
             const response = await axios.get(
-                `https://www.sr.apnipaathshaala.in/api/v1/admin/Get-Class-Subject/${classId}`,
+                `https://sr.apnipaathshaala.in/api/v1/admin/Get-Class-Subject/${classId}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setSubjects(response.data.data.Subjects || []);
@@ -82,7 +82,7 @@ const AddClassModel = ({ isOpen, onClose }) => {
                 Subjects: selectedSubjects
             };
           
-            const response = await axios.post('https://www.sr.apnipaathshaala.in/api/v1/teacher/Add-Class-Subject', payload, {
+            const response = await axios.post('https://sr.apnipaathshaala.in/api/v1/teacher/Add-Class-Subject', payload, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }

@@ -12,18 +12,18 @@ const TeacherSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    AltNumber:{
+    AltNumber: {
         type: String,
     },
     Email: {
         type: String,
         required: true,
-        unique:true,
+        unique: true,
         lowercase: true,
         trim: true,
-       
+
     },
-    Age:{
+    Age: {
         type: String
     },
     DOB: {
@@ -34,7 +34,7 @@ const TeacherSchema = new mongoose.Schema({
         required: true,
         minlength: 4
     },
-    gender:{
+    gender: {
         type: String,
     },
     isTeacherVerified: {
@@ -54,6 +54,10 @@ const TeacherSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'TeacherProfile'
     },
+    Reviews: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Review'
+    }],
     Role: {
         type: String,
         default: "Teacher"

@@ -8,7 +8,7 @@ function TeacherInfo() {
 
     const fetchTeacherData = async () => {
         try {
-            const response = await axios.get(`https://www.sr.apnipaathshaala.in/api/v1/teacher/Teacher-details/${id}`)
+            const response = await axios.get(`https://sr.apnipaathshaala.in/api/v1/teacher/Teacher-details/${id}`)
             setTeacherDetail(response.data.data)
         } catch (error) {
             console.log(error)

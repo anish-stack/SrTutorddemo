@@ -19,7 +19,7 @@ const SideHeader = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get('https://www.sr.apnipaathshaala.in/api/v1/student/admin-teacher-Request', {
+                const response = await axios.get('https://sr.apnipaathshaala.in/api/v1/student/admin-teacher-Request', {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -35,7 +35,7 @@ const SideHeader = () => {
 
         const fetchDataParticular = async () => {
             try {
-                const response = await axios.get('https://www.sr.apnipaathshaala.in/api/v1/student/admin-particular-Request', {
+                const response = await axios.get('https://sr.apnipaathshaala.in/api/v1/student/admin-particular-Request', {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 console.log(response.data.data)
@@ -96,20 +96,20 @@ const SideHeader = () => {
                                 <i className="fa-solid fa-image mr-3"></i>
                                 <Link to={'/Manage-Banners'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Manage Banners</Link>
                             </li>
-                            <li className="flex items-center">
+                            {/* <li className="flex items-center">
                                 <i className="fa-solid fa-book-open mr-3"></i>
                                 <Link to={'/Manage-Class-teacher-request'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Manage Class Teacher Request</Link>
-                            </li>
-                            <li className="flex items-center">
+                            </li> */}
+                            {/* <li className="flex items-center">
                                 <i className="fa-solid fa-user-edit mr-3"></i>
 
                                 <Link to={'/Manage-Teacher-Requests'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Manage Teacher Requests</Link>
                                 <span className='bg-red-500 text-white text-center w-5 text-sm rounded-[50%] '>{pdata || 0}</span>
 
-                            </li>
+                            </li> */}
                             <li className="flex items-center ">
                                 <i className="fa-solid fa-user-edit  z-20 mr-3"></i>
-                                <Link to={'/Subject-Teacher-Requests'} className="text-lg relative truncate lg:text-base hover:text-red-600 transition-colors">Subject Teacher Requests</Link>
+                                <Link to={'/Manage-All-Requests'} className="text-lg relative truncate lg:text-base hover:text-red-600 transition-colors">Manage Requests</Link>
                                 <span className='bg-red-500 text-white text-center w-5 text-sm rounded-[50%] '>{data || 0}</span>
                             </li>
                             <li className="flex items-center">

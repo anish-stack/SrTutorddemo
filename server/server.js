@@ -11,7 +11,8 @@ const TeacherRouter = require("./routes/Teacher.routes");
 const connectDb = require('./config/db');
 const { info, error } = require('./utils/Logger');
 const redis = require("redis");
-
+const universal = require("./routes/universal.routes");
+const axios = require('axios')
 const redisClient = redis.createClient({
     url: `redis://${process.env.REDIS_HOST || 'localhost'}:${process.env.REDIS_PORT || 6379}`
 });
@@ -93,6 +94,63 @@ app.get("/Flush-all-Redis-Cached", async (req, res) => {
 app.use("/api/v1/student", StudentRouter);
 app.use("/api/v1/teacher", TeacherRouter);
 app.use("/api/v1/admin", AdminRouter);
+app.use("/api/v1/uni", universal);
+app.get('/autocomplete', async (req, res) => {
+    try {
+        const { input } = req.query;
+        const response = await axios.get(
+            `https://maps.googleapis.com/maps/api/place/autocomplete/json`,
+            {
+                params: {
+                    input,
+                    radius: 500,
+                    key: "AIzaSyBQ-6XL1bXfYt7_7inMBOFXLg5Zmram81o"
+                }
+            }
+        );
+        res.json(response.data.predictions);
+    } catch (error) {
+        console.error('Error making Google API request:', error);
+        res.status(500).send('Server error');
+    }
+});
+
+
+app.get('/geocode', async (req, res) => {
+    const { address } = req.query; // Get address from query parameters
+  
+    if (!address) {
+      return res.status(400).send({ error: 'Address is required' });
+    }
+  
+    try {
+      // Make a request to Google Geocoding API
+      const response = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
+        params: {
+          address: address,
+        key: "AIzaSyBQ-6XL1bXfYt7_7inMBOFXLg5Zmram81o"
+        },
+      });
+  
+      if (response.data.status === 'OK') {
+        const location = response.data.results[0].geometry.location;
+        const lat = location.lat;
+        const lng = location.lng;
+  
+        // Send the lat and lng back to the client
+        res.json({
+          latitude: lat,
+          longitude: lng,
+          formatted_address: response.data.results[0].formatted_address,
+        });
+      } else {
+        res.status(404).json({ error: 'No results found for the provided address' });
+      }
+    } catch (error) {
+      console.error('Error fetching geocoding data:', error);
+      res.status(500).send({ error: 'Server error' });
+    }
+  });
 
 app.use((err, req, res, next) => {
     if (err.name === 'ValidationError') {

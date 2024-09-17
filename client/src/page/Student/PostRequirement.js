@@ -108,7 +108,7 @@ const PostRequirement = () => {
     console.log(classId);
     try {
       const response = await axios.get(
-        `https://www.sr.apnipaathshaala.in/api/v1/admin/Get-Class-Subject/${classId}`
+        `https://sr.apnipaathshaala.in/api/v1/admin/Get-Class-Subject/${classId}`
       );
       setSubjects(response.data.data.Subjects);
     } catch (error) {
@@ -124,7 +124,7 @@ const PostRequirement = () => {
           params: { input, radius: "500" },
           headers: {
             "x-rapidapi-key":
-              "75ad2dad64msh17034f06cc47c06p18295bjsn18e367df005b",
+              "46a23c05dfmsh3499dbe84b6c422p14123bjsn1d256138130a",
             "x-rapidapi-host": "place-autocomplete1.p.rapidapi.com",
           },
         }

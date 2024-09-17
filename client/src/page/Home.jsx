@@ -11,11 +11,14 @@ import Ourmentor from "../Components/Ourmentor";
 import Testimonials from "../Components/Testimonials";
 import Homeblog from "../Components/Homeblog";
 import Joinus from "../Components/Joinus";
+import Marquee from "../Components/SlidingText/marquee";
+import SlidingData from "../Components/SlidingText/SlidingData";
 
 function Home(){
     return(
         <>
         <Slider />
+        <SlidingData/>
         <Quickaction />
         <About />
         <Course />

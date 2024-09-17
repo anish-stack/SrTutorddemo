@@ -21,7 +21,7 @@ const EditClass = () => {
 
     const fetchClass = async () => {
         try {
-            const response = await axios.get(`https://www.sr.apnipaathshaala.in/api/v1/admin/Get-Classes`);
+            const response = await axios.get(`https://sr.apnipaathshaala.in/api/v1/admin/Get-Classes`);
             const data = response.data.data;
             const filterData = data.find(item => item._id === id);
             console.log(filterData);
@@ -98,7 +98,7 @@ const EditClass = () => {
     const handleSubjectNameEdit = async (subjectId, updatedSubjectName) => {
         try {
             const response = await axios.post(
-                `https://www.sr.apnipaathshaala.in/api/v1/admin/Edit-Subject/${id}`,
+                `https://sr.apnipaathshaala.in/api/v1/admin/Edit-Subject/${id}`,
                 {
                     SubjectId: subjectId,
                     UpdatedSubjectName: updatedSubjectName
@@ -122,7 +122,7 @@ const EditClass = () => {
         e.preventDefault();
         setLoading(true)
         try {
-            const response = await axios.put(`https://www.sr.apnipaathshaala.in/api/v1/admin/Edit-Class/${id}`, {
+            const response = await axios.put(`https://sr.apnipaathshaala.in/api/v1/admin/Edit-Class/${id}`, {
                 UpdatedClassName: formData.Class,
                 UpdatedInnerClasses: formData.InnerClasses
             }, {
@@ -146,7 +146,7 @@ const EditClass = () => {
     const handleDeleteSubject = async (subject_id) => {
         try {
             await toast.promise(
-                axios.delete(`https://www.sr.apnipaathshaala.in/api/v1/admin/delete-Class/${id}/${subject_id}`, {
+                axios.delete(`https://sr.apnipaathshaala.in/api/v1/admin/delete-Class/${id}/${subject_id}`, {
                     headers: {
                         Authorization: `Bearer ${Token}`
                     }

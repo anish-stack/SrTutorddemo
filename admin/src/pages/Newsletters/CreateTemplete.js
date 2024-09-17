@@ -11,7 +11,7 @@ const CreateTemplate = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('https://www.sr.apnipaathshaala.in/api/v1/admin/add-template', {
+            await axios.post('https://sr.apnipaathshaala.in/api/v1/admin/add-template', {
                 subject,
                 message: content,
             });

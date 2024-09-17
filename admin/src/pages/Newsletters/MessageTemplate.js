@@ -13,7 +13,7 @@ const MessageTemplate = () => {
     // Fetch all templates
     const handleFetchTemplates = async () => {
         try {
-            const res = await axios.get('https://www.sr.apnipaathshaala.in/api/v1/admin/get-all-templates');
+            const res = await axios.get('https://sr.apnipaathshaala.in/api/v1/admin/get-all-templates');
 
             setTemplates(res.data.data || []);
         } catch (error) {
@@ -24,7 +24,7 @@ const MessageTemplate = () => {
     // Handle delete template
     const handleDeleteTemplate = async () => {
         try {
-            await axios.delete(`https://www.sr.apnipaathshaala.in/api/v1/admin/delete-template/${selectedTemplate._id}`);
+            await axios.delete(`https://sr.apnipaathshaala.in/api/v1/admin/delete-template/${selectedTemplate._id}`);
             handleFetchTemplates();
             setShowDeleteModal(false);
             toast.success('Template deleted successfully!');
@@ -38,7 +38,7 @@ const MessageTemplate = () => {
     const handleSendTemplate = async (_id) => {
         setIsLoading(true)
         try {
-            await axios.post('https://www.sr.apnipaathshaala.in/api/v1/admin/send-emails-in-batches', {
+            await axios.post('https://sr.apnipaathshaala.in/api/v1/admin/send-emails-in-batches', {
                 id: _id
             });
             toast.success('Emails sent successfully!');

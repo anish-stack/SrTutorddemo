@@ -5,7 +5,23 @@ const CatchAsync = require("../utils/CatchAsync");
 const sendToken = require("../utils/SendToken");
 const sendEmail = require("../utils/SendEmails");
 const crypto = require("crypto");
+const Mongoose = require('mongoose');
+const DocumentSchema = require("../models/Document.model");
+const Cloudinary = require('cloudinary').v2;
+require('dotenv').config();
+const streamifier = require('streamifier')
+const SubjectTeacherRequest = require('../models/SubjectRequest')
+const TeacherRequest = require('../models/TeacherRequest.model')
+const ClassRequest = require('../models/ClassRequest')
+const axios = require('axios');
+const Request = require("../models/UniversalSchema");
 
+// Configure Cloudinary
+Cloudinary.config({
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_SECRET_KEY,
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME
+});
 //Teacher New Register
 exports.TeacherRegister = CatchAsync(async (req, res) => {
   try {
@@ -98,7 +114,7 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
       SignInOtp: otp,
       OtpExpiresTime: otpExpiresTime,
     });
- 
+
     const Options = {
       email: Email,
       subject: "OTP Verification",
@@ -143,6 +159,7 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
       .json({ message: "Internal server error", error: error.message });
   }
 });
+
 //Teacher Verify Otp
 exports.TeacherVerifyOtp = CatchAsync(async (req, res) => {
   try {
@@ -241,9 +258,9 @@ exports.TeacherResendOtp = CatchAsync(async (req, res) => {
 //Teacher And Teacher Login
 exports.TeacherLogin = CatchAsync(async (req, res) => {
   try {
-    const { Email, Password } = req.body;
-
-    if (!Email || !Password) {
+    const { anyPhoneAndEmail, Password } = req.body;
+    console.log(req.body)
+    if (!anyPhoneAndEmail || !Password) {
       return res.status(403).json({
         Success: false,
         message: "Please fill all required fields",
@@ -251,7 +268,7 @@ exports.TeacherLogin = CatchAsync(async (req, res) => {
     }
 
     // Check if user exists (either Teacher or Teacher)
-    const CheckUser = await Teacher.findOne({ Email });
+    const CheckUser = await Teacher.findOne({ Email: anyPhoneAndEmail });
     if (!CheckUser) {
       return res.status(403).json({
         Success: false,
@@ -630,6 +647,200 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
   }
 });
 
+//Add Profile Pic
+
+exports.AddProfilePic = async (req, res) => {
+  try {
+    const { teacherId } = req.params;  // Get teacherId from params
+    if (!teacherId) {
+      return res.status(403).json({
+        message: "No Teacher Available",
+      });
+    }
+
+    console.log(teacherId);
+
+    // Adjust query to find by TeacherUserId, not by _id
+    const TeacherFind = await TeacherProfile.findOne({ TeacherUserId: teacherId });  // Use findOne and pass the correct field
+    if (!TeacherFind) {
+      return res.status(403).json({
+        message: "No Teacher Found",
+      });
+    }
+
+    console.log(TeacherFind);
+
+    const ProfilePic = req.file;
+    console.log(req.file);
+
+    if (!ProfilePic) {
+      return res.status(403).json({
+        message: "No file uploaded",
+      });
+    }
+
+    console.log(ProfilePic);
+
+    const uploadFromBuffer = (buffer) => {
+      return new Promise((resolve, reject) => {
+        let stream = Cloudinary.uploader.upload_stream((error, result) => {
+          if (result) {
+            resolve(result);
+          } else {
+            reject(error);
+          }
+        });
+        streamifier.createReadStream(buffer).pipe(stream);
+      });
+    };
+
+    const uploadResult = await uploadFromBuffer(ProfilePic.buffer);
+    const ProfilePicUrl = uploadResult.url;
+    const ProfilePicPublicId = uploadResult.public_id;
+
+    // Update the teacher's profile pic
+    TeacherFind.ProfilePic = {
+      url: ProfilePicUrl,
+      publicId: ProfilePicPublicId
+    };
+
+    await TeacherFind.save();
+    res.status(201).json({
+      message: "Profile Pic Updated",
+    });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      error: error.message,
+      message: "Internal server error",
+    });
+  }
+};
+
+
+exports.AddDocument = async (req, res) => {
+  try {
+    // Get parameters from the request
+    const { teacherId } = req.params;
+    const { DocumentType } = req.query;
+
+
+    // Predefined valid document types
+    const preDefineTypes = ["Aadhaar", "Pan", "Voter Card", "Passport"];
+
+    // Check if the document type is valid
+    if (!preDefineTypes.includes(DocumentType)) {
+      return res.status(400).json({
+        message: "Invalid Document Type. Please provide a valid type: Aadhaar, Pan, Voter Card, or Passport.",
+      });
+    }
+
+    // Check if teacher ID is provided
+    if (!teacherId) {
+      return res.status(400).json({
+        message: "Teacher ID is required.",
+      });
+    }
+
+    // Find the teacher profile
+    const TeacherFind = await TeacherProfile.findOne({ TeacherUserId: teacherId });
+    if (!TeacherFind) {
+      return res.status(404).json({
+        message: "No Teacher found with the provided ID.",
+      });
+    }
+
+    // Handle Document file upload
+    const DocumentFile = req.files?.Document?.[0];
+    if (!DocumentFile) {
+      return res.status(400).json({
+        message: "No Document file uploaded. Please upload an identity document.",
+      });
+    }
+
+    // Handle Qualification file upload
+    const QualificationFile = req.files?.Qualification?.[0];
+    if (!QualificationFile) {
+      return res.status(400).json({
+        message: "No Qualification document uploaded. Please upload a qualification document.",
+      });
+    }
+
+    // Function to upload a file from buffer to Cloudinary
+    const uploadFromBuffer = (buffer) => {
+      return new Promise((resolve, reject) => {
+        let stream = Cloudinary.uploader.upload_stream((error, result) => {
+          if (error) {
+            console.error("Cloudinary upload error: ", error);
+            return reject(new Error("Failed to upload file to Cloudinary."));
+          }
+          resolve(result);
+        });
+        streamifier.createReadStream(buffer).pipe(stream);
+      });
+    };
+
+    // Upload Document to Cloudinary
+    let documentUploadResult;
+    try {
+      documentUploadResult = await uploadFromBuffer(DocumentFile.buffer);
+    } catch (error) {
+      console.error("Error uploading identity document: ", error);
+      return res.status(500).json({
+        message: "Error uploading identity document to Cloudinary.",
+        error: error.message,
+      });
+    }
+
+    // Upload Qualification to Cloudinary
+    let qualificationUploadResult;
+    try {
+      qualificationUploadResult = await uploadFromBuffer(QualificationFile.buffer);
+    } catch (error) {
+      console.error("Error uploading qualification document: ", error);
+      return res.status(500).json({
+        message: "Error uploading qualification document to Cloudinary.",
+        error: error.message,
+      });
+    }
+    console.log(qualificationUploadResult)
+    // Create new document entry
+    const newDocument = new DocumentSchema({
+      identityDocument: {
+        DocumentType: DocumentType,
+        DocumentImageUrl: documentUploadResult.secure_url, // Use secure_url from Cloudinary
+        DocumentPublicId: documentUploadResult.public_id,
+      },
+      QualificationDocument: {
+        QualificationImageUrl: qualificationUploadResult?.secure_url,
+        QualificationPublicId: qualificationUploadResult?.public_id,
+      },
+      TeacherId: TeacherFind?.TeacherUserId,
+      TeacherProfileId: TeacherFind?._id
+    });
+
+    // Save the document reference in Teacher's profile
+    TeacherFind.DocumentId = newDocument._id;
+    await TeacherFind.save();
+    await newDocument.save()
+    res.status(201).json({
+      message: "Documents uploaded successfully, and teacher profile updated.",
+      document: newDocument,
+    });
+    console.log("Documents uploaded successfully, and teacher profile updated.")
+  } catch (error) {
+    console.error("Error uploading documents: ", error);
+    res.status(500).json({
+      message: "Server error occurred while uploading documents.",
+      error: error.message,
+    });
+  }
+};
+
+
+
+
 //Verify Otp Given By Teacher
 exports.TeacherVerifyProfileOtp = CatchAsync(async (req, res) => {
   try {
@@ -829,7 +1040,7 @@ exports.updateTeacherProfile = CatchAsync(async (req, res) => {
         if (Gender !== undefined) TeachersMain.gender = Gender;
         if (ContactNumber !== undefined) TeachersMain.PhoneNumber = ContactNumber;
         if (AlternateContact !== undefined) TeachersMain.AltNumber = AlternateContact;
-        console.log(TeachersMain)
+
         await TeachersMain.save();
       }
     }
@@ -863,7 +1074,11 @@ exports.GetTeacherProfileId = CatchAsync(async (req, res) => {
     // Fetch profile from database
     const teacherProfile = await TeacherProfile.findOne({
       TeacherUserId: TeacherId,
-    });
+    }).populate('DocumentId');
+
+
+    console.log(teacherProfile)
+
     if (!teacherProfile) {
       return res.status(404).json({
         success: false,
@@ -925,7 +1140,9 @@ exports.GetAllTeacherProfile = CatchAsync(async (req, res) => {
     }
 
     // Fetch profile from database
-    const teacherProfile = await TeacherProfile.find();
+    const teacherProfile = await TeacherProfile.find().populate({
+      path: "AcademicInformation.ClassId",  // Populating the ClassId inside the AcademicInformation array
+    });
 
     if (!teacherProfile) {
       return res.status(404).json({
@@ -1172,74 +1389,78 @@ exports.AdvancedQueryForFindingTeacher = CatchAsync(async (req, res) => {
   }
 });
 
-
-
-
 exports.SearchByMinimumCondition = CatchAsync(async (req, res) => {
   try {
-    const { lat, lng } = req.query
-    console.log(req.query)
-    if (!lat || !lng) {
+    const { lat, lng, SearchPlaceLat, SearchPlaceLng, role, ClassNameValue, } = req.query;
+
+    // Validate latitude and longitude
+    if (!lat || !lng || !SearchPlaceLat || !SearchPlaceLng) {
       return res.status(400).json({ message: 'Latitude and longitude are required.' });
     }
-    const latitude = parseFloat(lat);
-    const longitude = parseFloat(lng);
 
-    if (isNaN(latitude) || isNaN(longitude)) {
-      return res.status(400).json({ message: 'Valid latitude and longitude are required.' });
+    const userLat = parseFloat(lat);
+    const userLng = parseFloat(lng);
+    const searchPlaceLat = parseFloat(SearchPlaceLat);
+    const searchPlaceLng = parseFloat(SearchPlaceLng);
+
+    // if (isNaN(userLat) || isNaN(userLng) || isNaN(searchPlaceLat) || isNaN(searchPlaceLng)) {
+    //   return res.status(400).json({ message: 'Valid latitude and longitude are required.' });
+    // }
+
+    const { ClassId, Subject } = req.params
+    if (!ClassId || !Subject) {
+      return res.status(400).json({ message: 'ClassId and Subject are required.' });
     }
-    const { Location, ClassId, Subject } = req.params;
 
-    const AllTeacher = await TeacherProfile.find();
-
-    let locationResults;
+    const objectClass = new Mongoose.Types.ObjectId(ClassId);
 
     const userLocation = {
       type: 'Point',
-      coordinates: [parseFloat(lng), parseFloat(lat)]
+      coordinates: [searchPlaceLng, searchPlaceLat]
     };
 
-    locationResults = await TeacherProfile.find({
-      'RangeWhichWantToDoClasses.location': {
-        $near: {
-          $geometry: userLocation,
-          $maxDistance: 5000
+    let finalResults = [];
+
+    if (role === 'student') {
+      // Fetch teacher profiles within the specified range
+      const locationResults = await TeacherProfile.find({
+        'RangeWhichWantToDoClasses.location': {
+          $near: {
+            $geometry: userLocation,
+            $maxDistance: 5000
+          }
         }
+      });
+
+      // Flatten the AcademicInformation array and filter based on ClassId and Subject
+      finalResults = locationResults.filter(profile => {
+        const academicInfo = profile.AcademicInformation || [];
+        return academicInfo.some(item => {
+          return item.ClassId instanceof Mongoose.Types.ObjectId
+            ? item.ClassId.equals(objectClass) && item.SubjectNames.includes(Subject)
+            : false;
+        });
+      });
+    } else if (role === 'tutor') {
+
+      const { data } = await axios.get('https://sr.apnipaathshaala.in/api/v1/uni/get-all-universal-Request')
+      const CombinedData = data?.data
+      const findTeacherRequest = CombinedData.filter(item => item.className === ClassNameValue && item.subjects.includes(Subject))
+
+
+      if (findTeacherRequest.length === 0) {
+        return res.status(404).json({ message: 'No teachers found.' });
       }
-    });
-    console.log(locationResults)
-    if (ClassId && Subject) {
-
-      let finalResults = locationResults.filter((teacher) => {
-        // Check if teacher has AcademicInformation
-        const academicInfo = teacher.AcademicInformation;
-        console.log("academicInfo", academicInfo);
-        // Check if ClassId matches
-        const classMatches = academicInfo.some(
-          (info) => info.ClassId.toString() === ClassId
-        );
-
-        // If ClassId matches, then check if Subject is in SubjectNames
-        if (classMatches) {
-          return academicInfo.some((info) => info.SubjectNames.includes(Subject));
-        }
-
-        return false;
-      });
-
-      const count = finalResults.length;
-
-      // Respond with the filtered results and count
-      return res.status(200).json({
-        success: true,
-        count: count,
-        results: locationResults,
-      });
+      console.log("findTeacherRequest", findTeacherRequest)
+      finalResults = findTeacherRequest;
+    } else {
+      return res.status(400).json({ message: 'Invalid role.' });
     }
 
+    // Return results
     res.status(200).json({
       success: true,
-      count: count,
+      count: finalResults.length,
       results: finalResults,
     });
   } catch (error) {
@@ -1250,7 +1471,6 @@ exports.SearchByMinimumCondition = CatchAsync(async (req, res) => {
     });
   }
 });
-
 
 exports.BrowseTutorsNearMe = CatchAsync(async (req, res) => {
   try {
@@ -1286,12 +1506,14 @@ exports.BrowseTutorsNearMe = CatchAsync(async (req, res) => {
       'RangeWhichWantToDoClasses.location': {
         $near: {
           $geometry: userLocation,
-          $maxDistance: 10000 // 5km radius in meters
+          $maxDistance: 10000 // 10km radius in meters
         }
       }
     })
-      .skip((page - 1) * limit)
-      .limit(limit);
+
+      .skip((page - 1) * limit) // Pagination - skip results
+      .limit(limit) // Pagination - limit results
+      .exec(); // Execute the query
     // Apply additional filters
     if (Gender) {
       locationResults = locationResults.filter(teacher => teacher.Gender === Gender);
@@ -1392,14 +1614,14 @@ exports.getMyClass = CatchAsync(async (req, res) => {
     }
 
     const academicInfo = teacherProfile.AcademicInformation;
-    console.log(academicInfo)
+
     // Process each academic info entry
     const allClasses = await Promise.all(
       academicInfo.map(async (info) => {
         try {
 
           let classInfo = await Class.findOne({ _id: info.ClassId }).lean();
-          console.log(classInfo)
+
           if (classInfo) {
             // If class is found, filter subjects based on AcademicInformation
             return {
@@ -1437,7 +1659,7 @@ exports.getMyClass = CatchAsync(async (req, res) => {
         }
       })
     );
-    console.log(allClasses)
+
     // Filter out null or empty results
     const validClasses = allClasses.filter(cls => cls !== null && cls.classid && cls.className);
 
@@ -1462,70 +1684,45 @@ exports.getMyClass = CatchAsync(async (req, res) => {
 
 
 exports.addMyClassMore = CatchAsync(async (req, res) => {
-  try {
-    const teacherId = req.user.id;
-    const { classId, Subjects } = req.body;
-
-    // Fetch teacher profile
-    const teacherProfile = await TeacherProfile.findOne({ TeacherUserId: teacherId }).select('AcademicInformation');
-
-    if (!teacherProfile) {
-      return res.status(404).json({ message: "Teacher not found" });
-    }
-
-    const academicInfo = teacherProfile.AcademicInformation;
-
-    // Find the index of the classId in the academic information
-    const classIndex = academicInfo.findIndex(item => item.ClassId.toString() === classId.toString());
-
-    if (classIndex > -1) {
-      // ClassId exists in the academic information
-      const existingClass = academicInfo[classIndex];
-      const existingSubjects = new Set(existingClass.SubjectNames);
-
-      // Find new subjects to add
-      const newSubjects = Subjects.filter(subject => !existingSubjects.has(subject));
-
-      if (newSubjects.length > 0) {
-        // Update the existing class with new subjects
-        existingClass.SubjectNames = [...existingClass.SubjectNames, ...newSubjects];
-        await TeacherProfile.updateOne(
-          { TeacherUserId: teacherId, 'AcademicInformation.ClassId': classId },
-          { $set: { 'AcademicInformation.$.SubjectNames': existingClass.SubjectNames } }
-        );
-      }
-
-      return res.status(200).json({
-        status: 'success',
-        message: 'Subjects updated successfully'
-      });
-    } else {
-      // ClassId does not exist in the academic information
-      const newEntry = {
-        ClassId: classId,
-        SubjectNames: Subjects
-      };
-
-      await TeacherProfile.updateOne(
-        { TeacherUserId: teacherId },
-        { $push: { AcademicInformation: newEntry } }
-      );
-
-      return res.status(200).json({
-        status: 'success',
-        message: 'Class and subjects added successfully'
-      });
-    }
-
-  } catch (error) {
-    console.error('Error adding class and subjects:', error);
-    res.status(500).json({
-      status: 'error',
-      message: 'Internal server error',
-      error: error.message
-    });
+  const teacherId = req.user.id;
+  const { classId, Subjects } = req.body;
+  
+  // Basic validation
+  if (!classId || !Subjects || !Array.isArray(Subjects)) {
+    return res.status(400).json({ message: "Invalid classId or Subjects format" });
   }
+
+  // Fetch teacher profile
+  const teacherProfile = await TeacherProfile.findOne({ TeacherUserId: teacherId }).select('AcademicInformation');
+
+  if (!teacherProfile) {
+    return res.status(404).json({ message: "Teacher not found" });
+  }
+
+  // New entry to push
+  const newEntry = {
+    ClassId: classId,
+    SubjectNames: Subjects
+  };
+
+  // Update the teacher's academic information
+  const updatedProfile = await TeacherProfile.findOneAndUpdate(
+    { TeacherUserId: teacherId },
+    { $push: { AcademicInformation: newEntry } },
+    { new: true } // This returns the updated document
+  );
+
+  if (!updatedProfile) {
+    return res.status(500).json({ message: "Failed to update teacher profile" });
+  }
+
+  return res.status(200).json({
+    status: 'success',
+    message: 'Class and subjects added successfully',
+    updatedProfile // Optionally return the updated profile if needed
+  });
 });
+
 
 
 
@@ -1565,7 +1762,7 @@ exports.deleteSubjectOfTeacher = CatchAsync(async (req, res) => {
 
 exports.deleteClassOfTeacher = CatchAsync(async (req, res) => {
   try {
-    console.log("I am Hit");
+
     const { ClassId } = req.body;
     const TeacherId = req.user.id; // Assuming TeacherId is provided in params
 
@@ -1610,5 +1807,34 @@ exports.deleteClassOfTeacher = CatchAsync(async (req, res) => {
       message: 'Internal Server Error',
       error: error.message
     });
+  }
+});
+
+
+exports.AllData = CatchAsync(async (req, res) => {
+  try {
+    // Fetch data from all models
+    const subjectRequests = await Request.find();
+
+    // Send response
+    res.status(200).json({ success: true, data: subjectRequests });
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+
+exports.SingleAllData = CatchAsync(async (req, res) => {
+  try {
+    // Fetch data from all models
+    const { id } = req.params
+    const subjectRequests = await Request.findById(id);
+
+    // Send response
+    res.status(200).json({ success: true, data: subjectRequests });
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ success: false, message: error.message });
   }
 });

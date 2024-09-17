@@ -26,6 +26,14 @@ const ClassRequestSchema = new mongoose.Schema({
         type: Number,
         required: true  // Add validation if needed
     },
+    longitude: {
+        // Corrected field name
+        type: Number,
+    },
+    latitude: {
+        // Corrected field name
+        type: Number,
+    },
     currentAddress: {
         type: String,
         required: true  // Add validation if needed
@@ -53,7 +61,7 @@ const ClassRequestSchema = new mongoose.Schema({
     },
     studentId: {  // Fixed typo from `studnetId` to `studentId`
         type: mongoose.Schema.Types.ObjectId,
-        ref:'Student',
+        ref: 'Student',
         required: true  // Add validation if needed
     },
     allDetailsCorrect: {
@@ -71,16 +79,16 @@ const ClassRequestSchema = new mongoose.Schema({
     },
     commentByAdmin: [
         {
-          comment: {
-            type: String
-           
-          },
-          date: {
-            type: Date,
-            default: Date.now,
-          },
+            comment: {
+                type: String
+
+            },
+            date: {
+                type: Date,
+                default: Date.now,
+            },
         },
-      ],
+    ],
 });
 
 module.exports = mongoose.model('ClassRequest', ClassRequestSchema);

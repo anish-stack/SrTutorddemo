@@ -20,7 +20,7 @@ const AllCitys = () => {
 
     const fetchData = async () => {
         try {
-            const response = await axios.get('https://www.sr.apnipaathshaala.in/api/v1/admin/get-City');
+            const response = await axios.get('https://sr.apnipaathshaala.in/api/v1/admin/get-City');
             if (response.data.success) {
                 setCities(response.data.data);
             }
@@ -51,7 +51,7 @@ const AllCitys = () => {
         if (formData.file) data.append('image', formData.file);
         setLoading(true)
         try {
-            const response = await axios.post('https://www.sr.apnipaathshaala.in/api/v1/admin/Create-City', data, {
+            const response = await axios.post('https://sr.apnipaathshaala.in/api/v1/admin/Create-City', data, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -73,7 +73,7 @@ const AllCitys = () => {
         if (!selectedCity) return;
         setLoading(true)
         try {
-            await axios.delete(`https://www.sr.apnipaathshaala.in/api/v1/admin/delete-City/${selectedCity._id}`);
+            await axios.delete(`https://sr.apnipaathshaala.in/api/v1/admin/delete-City/${selectedCity._id}`);
             fetchData();
             setIsConfirmModalOpen(false);
             toast.success("City deleted successfully.");
@@ -93,7 +93,7 @@ const AllCitys = () => {
         if (formData.file) data.append('image', formData.file);
         setLoading(true)
         try {
-            await axios.put(`https://www.sr.apnipaathshaala.in/api/v1/admin/update-City/${selectedCity._id}`, data, {
+            await axios.put(`https://sr.apnipaathshaala.in/api/v1/admin/update-City/${selectedCity._id}`, data, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }

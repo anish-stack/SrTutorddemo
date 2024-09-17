@@ -11,7 +11,7 @@ export const AllTeacher = createAsyncThunk(
     'Teacher/AllTeacher',
     async (_, thunkAPI) => {
         try {
-            const response = await axios.get('https://www.sr.apnipaathshaala.in/api/v1/teacher/Get-Teacher', {
+            const response = await axios.get('https://sr.apnipaathshaala.in/api/v1/teacher/Get-Teacher', {
                 headers: {
                     Authorization: `Bearer ${Token}`
                 }
@@ -29,7 +29,7 @@ export const SingleTeacher = createAsyncThunk(
     'Teacher/SingleTeacher',
     async (id, thunkAPI) => {
         try {
-            const response = await axios.get(`https://www.sr.apnipaathshaala.in/api/v1/teacher/Get-Teacher/${id}`, {
+            const response = await axios.get(`https://sr.apnipaathshaala.in/api/v1/teacher/Get-Teacher/${id}`, {
                 headers: {
                     Authorization: `Bearer ${Token}`
                 }

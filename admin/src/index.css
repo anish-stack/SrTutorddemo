@@ -83,6 +83,42 @@
   .checkbox-wrapper-12 .cbx input:checked + label + svg path {
     stroke-dashoffset: 0;
   }
+  .custom-list {
+    padding-left: 0;
+    list-style: none;
+  }
+  
+  .custom-list li {
+    position: relative;
+    padding-left: 2.5rem;
+    background: #f8f9fa;
+    border-radius: 0.5rem;
+    border: 1px solid #e9ecef;
+    padding: 10px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .custom-check-icon {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #28a745;
+    font-size: 1.2rem;
+  }
+  
+
+  
+  .list-unstyled {
+    padding-left: 0;
+    list-style: none;
+  }
+  
+  .loading-message {
+    font-size: 1.2rem;
+    color: #6c757d;
+  }
   
   @-moz-keyframes splash-12 {
     40% {

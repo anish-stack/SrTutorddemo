@@ -6295,6 +6295,7 @@ fieldset:disabled .btn {
     display: flex;
     flex-direction: column;
     width: 100%;
+    z-index: 9999999;
     pointer-events: auto;
     background-color: #fff;
     background-clip: padding-box;

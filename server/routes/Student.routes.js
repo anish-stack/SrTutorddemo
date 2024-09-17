@@ -9,6 +9,8 @@ const {
   StudentPasswordOtpResent,
   getAllStudents,
   getSingleStudent,
+  CheckNumber,
+  studentDeleteById,
 } = require("../controllers/Student.registration");
 const StudentRouter = express.Router();
 const isAdmin = require("../middlewares/admin");
@@ -44,7 +46,8 @@ const {
   ToggleDealDone,
   deleteRequest,
 } = require("../controllers/SubectRequestController");
-const { BrowseTutorsNearMe } = require("../controllers/Teacher.registration");
+const { BrowseTutorsNearMe, AllData, SingleAllData } = require("../controllers/Teacher.registration");
+const { CreateUniversalRequest } = require("../controllers/ExtraController");
 
 //User Actions With
 StudentRouter.post("/Create-Student", StudentRegister);
@@ -95,7 +98,13 @@ StudentRouter.post('/Class-Accept-Request/:requestId/:action', toggleClassReques
 StudentRouter.post('/Class-comment-Request', addAdminComments);
 StudentRouter.get('/Class-Get-Comments/:id', getCommentsForRequest);
 
+StudentRouter.get('/AllData', AllData)
+StudentRouter.get('/SingleAllData/:id', SingleAllData)
 
+StudentRouter.post('/universal-request',Protect, CreateUniversalRequest)
+StudentRouter.post('/checkNumber-request', CheckNumber)
+
+StudentRouter.delete('/studentDelete/:id',studentDeleteById)
 
 
 

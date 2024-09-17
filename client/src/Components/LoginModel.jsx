@@ -9,7 +9,7 @@ import SubjectModel from "./SubjectModel";
 const LoginModal = ({ isOpen, modalType, onClose }) => {
 
   const [formData, setFormData] = useState({
-    Email: "",
+    anyPhoneAndEmail: "",
     Password: "",
   });
 
@@ -36,13 +36,13 @@ const LoginModal = ({ isOpen, modalType, onClose }) => {
   
       if (modalType === "student") {
         response = await axios.post(
-          "https://www.sr.apnipaathshaala.in/api/v1/student/login",
+          "https://sr.apnipaathshaala.in/api/v1/student/login",
           formData
         );
         userPrefix = "student";
       } else if (modalType === "teacher") {
         response = await axios.post(
-          "https://www.sr.apnipaathshaala.in/api/v1/teacher/Teacher-Login",
+          "https://sr.apnipaathshaala.in/api/v1/teacher/Teacher-Login",
           formData
         );
         userPrefix = "teacher";
@@ -72,7 +72,7 @@ const LoginModal = ({ isOpen, modalType, onClose }) => {
           Email: "",
           Password: "",
         });
-  
+        onClose()
         // Replace window.reload with navigation if needed
         setTimeout(() => {
           close();
@@ -82,10 +82,12 @@ const LoginModal = ({ isOpen, modalType, onClose }) => {
         toast.error("Login failed: No response data");
       }
     } catch (error) {
+      onClose()
       toast.error(
         `Login failed: ${error.response ? error.response.data : error.message}`
       );
     } finally {
+      onClose()
       setLoading(false);
     }
   };
@@ -111,6 +113,7 @@ const LoginModal = ({ isOpen, modalType, onClose }) => {
       <Modal
         isOpen={isOpen}
         onRequestClose={close}
+        
         contentLabel={modalContent[modalType]?.title}
         className="modal-content"
         overlayClassName="modal-overlay"
@@ -140,13 +143,13 @@ const LoginModal = ({ isOpen, modalType, onClose }) => {
         <div className="modal-body">
           <form onSubmit={handleLogin}>
             <div className="form-group">
-              <label htmlFor="Email">Email address</label>
+              <label htmlFor="anyPhoneAndEmail">Email address</label>
               <input
                 type="email"
                 className="form-control"
-                id="Email"
-                name="Email"
-                value={formData.Email}
+                id="anyPhoneAndEmail"
+                name="anyPhoneAndEmail"
+                value={formData.anyPhoneAndEmail}
                 onChange={handleChange}
                 required
               />

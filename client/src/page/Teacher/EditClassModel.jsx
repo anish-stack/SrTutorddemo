@@ -18,7 +18,7 @@ const EditClassModel = ({ isOpen, onClose, ClassId, ClassName, Subjects }) => {
         setLoading(true);
         try {
             const { data } = await axios.get(
-                `https://www.sr.apnipaathshaala.in/api/v1/admin/Get-Class-Subject/${ClassId}`
+                `https://sr.apnipaathshaala.in/api/v1/admin/Get-Class-Subject/${ClassId}`
             );
             const filteredSubjects = data.data.Subjects.filter(
                 (subject) => !Subjects.includes(subject.SubjectName)
@@ -55,7 +55,7 @@ const EditClassModel = ({ isOpen, onClose, ClassId, ClassName, Subjects }) => {
                 Subjects: selectedSubjects
             };
             // console.log(payload)
-            const response = await axios.post('https://www.sr.apnipaathshaala.in/api/v1/teacher/Add-Class-Subject', payload, {
+            const response = await axios.post('https://sr.apnipaathshaala.in/api/v1/teacher/Add-Class-Subject', payload, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }

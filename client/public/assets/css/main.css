@@ -47,6 +47,7 @@
   Typography css start
 ===============================*/
 body {
+  overflow-x: auto;
   font-family: var(--tg-body-font-family);
   font-size: var(--tg-body-font-size);
   font-weight: var(--tg-fw-regular);
@@ -876,6 +877,8 @@ textarea {
 .tg-header__area .mobile-nav-toggler {
   position: relative;
   float: right;
+  top: 4%;
+  left: 2%;
   font-size: 35px;
   cursor: pointer;
   line-height: 1;
@@ -1029,7 +1032,7 @@ textarea {
   display: -webkit-flex;
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
+  /* flex-wrap: wrap; */
   justify-content: flex-start;
 }
 @media (max-width: 991.98px) {

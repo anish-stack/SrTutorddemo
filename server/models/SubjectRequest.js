@@ -58,6 +58,14 @@ const subjectTeacherRequestSchema = new mongoose.Schema(
       enum: ["Male", "Female", "Any"],
       required: true,
     },
+    longitude: {
+      // Corrected field name
+      type: Number,
+    },
+    latitude: {
+      // Corrected field name
+      type: Number,
+    },
     userContactInfo: {
       name: {
         type: String,

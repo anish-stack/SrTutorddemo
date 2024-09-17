@@ -1,9 +1,10 @@
 const express = require('express')
-const { TeacherRegister, TeacherVerifyOtp, TeacherResendOtp, TeacherPasswordChangeRequest, TeacherPasswordOtpResent, TeacherVerifyPasswordOtp, TeacherLogin, AddProfileDetailsOfVerifiedTeacher, TeacherProfileResendOtp, TeacherVerifyProfileOtp, updateTeacherProfile, GetTeacherProfileId, GetAllTeacherProfile, GetAllTeacher, AdvancedQueryForFindingTeacher, SearchByMinimumCondition, SingleTeacher, getMyClass, deleteClassOfTeacher, addMyClassMore, SubjectDelete, deleteSubjectOfTeacher } = require('../controllers/Teacher.registration')
+const { TeacherRegister, TeacherVerifyOtp, TeacherResendOtp, TeacherPasswordChangeRequest, TeacherPasswordOtpResent, TeacherVerifyPasswordOtp, TeacherLogin, AddProfileDetailsOfVerifiedTeacher, TeacherProfileResendOtp, TeacherVerifyProfileOtp, updateTeacherProfile, GetTeacherProfileId, GetAllTeacherProfile, GetAllTeacher, AdvancedQueryForFindingTeacher, SearchByMinimumCondition, SingleTeacher, getMyClass, deleteClassOfTeacher, addMyClassMore, SubjectDelete, deleteSubjectOfTeacher, AddProfilePic, AddDocument } = require('../controllers/Teacher.registration')
 const Protect = require('../middlewares/Auth')
 const TeacherRouter = express.Router()
 const multer = require('multer');
 const { UploadXlsxFileAndExtractData, UploadXlsxFileAndExtractDataStudent } = require('../controllers/TeacherUpload');
+const { singleUploadImage, UploadViaFieldName } = require('../middlewares/multer');
 const upload = multer({ dest: 'files/' });
 //User Actions With 
 TeacherRouter.post('/Create-teacher', TeacherRegister)
@@ -16,6 +17,10 @@ TeacherRouter.post('/teacher-Password-Change-Request', TeacherPasswordChangeRequ
 TeacherRouter.post('/teacher-Password-resend-otp', TeacherPasswordOtpResent)
 TeacherRouter.post('/teacher-Password-Verify-Otp', TeacherVerifyPasswordOtp)
 TeacherRouter.post('/teacher-profile', Protect, AddProfileDetailsOfVerifiedTeacher)
+TeacherRouter.post('/teacher-profile-pic/:teacherId', singleUploadImage, AddProfilePic)
+TeacherRouter.post('/teacher-document/:teacherId', UploadViaFieldName([{ name: 'Document', maxLength: '1' }, { name: 'Qualification', maxLength: '1' }]),AddDocument)
+
+
 TeacherRouter.post('/profile-otp', Protect, TeacherProfileResendOtp)
 TeacherRouter.post('/Verify-profile-otp', Protect, TeacherVerifyProfileOtp)
 TeacherRouter.put('/update-profile-details', Protect, updateTeacherProfile)
@@ -23,15 +28,17 @@ TeacherRouter.get('/Get-Teacher/:id', Protect, GetTeacherProfileId)
 TeacherRouter.get('/Get-My-Classes', Protect, getMyClass)
 
 TeacherRouter.get('/Get-Teacher-Profile', Protect, GetAllTeacherProfile)
+TeacherRouter.get('/Get-Teacher-By-Profile', GetAllTeacherProfile)
+
 TeacherRouter.get('/Get-Teacher', Protect, GetAllTeacher)
 TeacherRouter.post('/Add-Class-Subject', Protect, addMyClassMore)
 TeacherRouter.delete('/delete-Subject', Protect, deleteSubjectOfTeacher)
 
 
 TeacherRouter.post('/Get-Advanced-search', AdvancedQueryForFindingTeacher)
-TeacherRouter.get('/Get-Min-search/:Location/:ClassId/:Subject', SearchByMinimumCondition)
+TeacherRouter.get('/Get-Min-search/:ClassId/:Subject', SearchByMinimumCondition)
 
-TeacherRouter.delete('/deleteClassOfTeacher', Protect,deleteClassOfTeacher)
+TeacherRouter.delete('/deleteClassOfTeacher', Protect, deleteClassOfTeacher)
 
 
 TeacherRouter.post('/upload-xlsx', upload.single('file'), UploadXlsxFileAndExtractData)
