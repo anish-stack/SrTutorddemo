@@ -7,7 +7,7 @@ const { UploadXlsxFileAndExtractData, UploadXlsxFileAndExtractDataStudent } = re
 const { singleUploadImage, UploadViaFieldName } = require('../middlewares/multer');
 const upload = multer({ dest: 'files/' });
 //User Actions With 
-TeacherRouter.post('/Create-teacher', TeacherRegister)
+TeacherRouter.post('/Create-teacher', UploadViaFieldName([{ name: 'Document', maxLength: '1' }, { name: 'Qualification', maxLength: '1' }]), TeacherRegister)
 TeacherRouter.post('/Verify-teacher', TeacherVerifyOtp)
 TeacherRouter.post('/resent-otp', TeacherResendOtp)
 TeacherRouter.post('/Teacher-Login', TeacherLogin)
@@ -18,7 +18,7 @@ TeacherRouter.post('/teacher-Password-resend-otp', TeacherPasswordOtpResent)
 TeacherRouter.post('/teacher-Password-Verify-Otp', TeacherVerifyPasswordOtp)
 TeacherRouter.post('/teacher-profile', Protect, AddProfileDetailsOfVerifiedTeacher)
 TeacherRouter.post('/teacher-profile-pic/:teacherId', singleUploadImage, AddProfilePic)
-TeacherRouter.post('/teacher-document/:teacherId', UploadViaFieldName([{ name: 'Document', maxLength: '1' }, { name: 'Qualification', maxLength: '1' }]),AddDocument)
+TeacherRouter.post('/teacher-document/:teacherId', UploadViaFieldName([{ name: 'Document', maxLength: '1' }, { name: 'Qualification', maxLength: '1' }]), AddDocument)
 
 
 TeacherRouter.post('/profile-otp', Protect, TeacherProfileResendOtp)

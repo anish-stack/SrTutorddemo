@@ -218,7 +218,7 @@ const TeacherDashboard = () => {
                                 Location
                             </a>
                         </li>
-                        <li className="nav-item">
+                        {/* <li className="nav-item">
                             <a
                                 className={`nav-link ${activeTab === 'Documents' ? 'active' : ''}`}
                                 href="#Documents"
@@ -226,7 +226,7 @@ const TeacherDashboard = () => {
                             >
                                 My Documents
                             </a>
-                        </li>
+                        </li> */}
                         <li className="nav-item">
                             <a
                                 className={`nav-link ${activeTab === 'Subscribed' ? 'active' : ''}`}
@@ -359,9 +359,9 @@ const TeacherDashboard = () => {
                     {activeTab === 'Subscribed' && (
                         <SubscribedStudent />
                     )}
-                    {activeTab === 'Documents' && (
+                    {/* {activeTab === 'Documents' && (
                         <UploadDocuments Document={profileInfo?.DocumentId} Profile={profileInfo} />
-                    )}
+                    )} */}
                     {activeTab === 'activity' && (
                         <div className="activity-section text-center p-5 rounded shadow-lg bg-white">
 

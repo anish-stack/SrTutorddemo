@@ -99,7 +99,7 @@ const MyClasses = ({ Class, Profile }) => {
 
     return (
         <>
-            {Profile?.DocumentId ? (
+         
                 <div className="container myclass-bg px-5 py-2">
                     {error && <Alert variant="danger">{error}</Alert>}
                     <div className="mb-3 text-end addclass-btn-row">
@@ -226,27 +226,8 @@ const MyClasses = ({ Class, Profile }) => {
                         onClose={handleCloseAdd}
                     />
                 </div>
-            ) : (
-                <div className="w-100">
-                    <div className="container p-5">
-                        <div className=" mb-4">
-                            <h1 className="mb-3">Start Teaching by Uploading Necessary Documents</h1>
-                            <p className="text-muted">Why Are Documents Important?</p>
-                        </div>
-                        <div className="mb-4">
-                            <p className="lead">
-                                <strong>Ans:</strong> For student safety and verification purposes, we require these documents.
-                            </p>
-                        </div>
-                        <div className="">
-                            <a href="#Documents" className="btn btn-primary">
-                                Upload Documents
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-            )}
+          
+            
         </>
     );
 

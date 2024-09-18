@@ -58,6 +58,35 @@ const TeacherSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Review'
     }],
+    identityDocument: {
+        DocumentType: {
+            type: String,
+            default: "Aadhaar",
+            enum: ["Aadhaar", "Pan", "Voter Card", "Passport"]
+        },
+        DocumentImageUrl: {
+            type: String,
+            required: true
+        },
+        DocumentPublicId: {
+            type: String,
+            required: true
+        }
+    },
+    QualificationDocument: {
+        QualificationImageUrl: {
+            type: String,
+            required: true
+        },
+        QualificationPublicId: {
+            type: String,
+            required: true
+        }
+    },
+    DocumentStatus:{
+        type:Boolean,
+        default:false
+    },
     Role: {
         type: String,
         default: "Teacher"
