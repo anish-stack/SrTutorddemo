@@ -8,6 +8,8 @@ const app = express();
 const StudentRouter = require("./routes/Student.routes");
 const AdminRouter = require("./routes/Admin.routes");
 const TeacherRouter = require("./routes/Teacher.routes");
+const leadRoutes = require('./routes/Jd.routes'); 
+
 const connectDb = require('./config/db');
 const { info, error } = require('./utils/Logger');
 const redis = require("redis");
@@ -92,6 +94,7 @@ app.get("/Flush-all-Redis-Cached", async (req, res) => {
         });
     }
 });
+app.use('/api/leads', leadRoutes); 
 
 app.use("/api/v1/student", StudentRouter);
 app.use("/api/v1/teacher", TeacherRouter);
