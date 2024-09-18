@@ -78,3 +78,22 @@
 .verified-tag i {
   margin-right: 4px;
 }
+
+
+
+@media screen and (max-width:768px) {
+  .teacher-profile{
+    flex-direction: column;
+  }
+  .teacher-image {
+    width: 100%;
+  
+}
+.teacher-basic-details {
+  width: 100%;
+}
+}
+.map-container{
+  position: relative;
+  z-index: -9;
+}

@@ -25,7 +25,6 @@ Cloudinary.config({
 //Teacher New Register
 exports.TeacherRegister = CatchAsync(async (req, res) => {
   try {
-    // console.log(req.body);
     const {
       TeacherName,
       PhoneNumber,
@@ -37,7 +36,16 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
       AltNumber,
     } = req.body;
 
-    // Check for missing fields
+    const { DocumentType } = req.query;
+
+    const preDefineTypes = ["Aadhaar", "Pan", "Voter Card", "Passport"];
+
+    if (!preDefineTypes.includes(DocumentType)) {
+      return res.status(400).json({
+        message: "Invalid Document Type. Please provide a valid type: Aadhaar, Pan, Voter Card, or Passport.",
+      });
+    }
+
     const missingFields = [];
     if (!TeacherName) missingFields.push("Teacher Name");
     if (!PhoneNumber) missingFields.push("Phone Number");
@@ -49,23 +57,18 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
 
     if (missingFields.length > 0) {
       return res.status(400).json({
-        message:
-          "The following fields are missing: " + missingFields.join(", "),
+        message: "The following fields are missing: " + missingFields.join(", "),
       });
     }
 
-    // Check if the Teacher already exists
     const existingTeacher = await Teacher.findOne({ Email });
     if (existingTeacher) {
       if (existingTeacher.isTeacherVerified) {
-        return res
-          .status(400)
-          .json({ message: "Teacher with this email already exists" });
+        return res.status(400).json({ message: "Teacher with this email already exists" });
       } else {
-        // If not verified, resend the OTP
         existingTeacher.Password = Password;
-        existingTeacher.SignInOtp = crypto.randomInt(100000, 999999); // Generate a 6-digit OTP
-        existingTeacher.OtpExpiresTime = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
+        existingTeacher.SignInOtp = crypto.randomInt(100000, 999999);
+        existingTeacher.OtpExpiresTime = Date.now() + 10 * 60 * 1000;
         await existingTeacher.save();
 
         const Options = {
@@ -74,11 +77,11 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
           message: `<div style="font-family: Arial, sans-serif; padding: 20px; color: #000000; border: 1px solid #E21C1C;">
                                 <h2 style="color: #E21C1C; text-align: center;">OTP Verification</h2>
                                 <p>Dear ${existingTeacher.TeacherName},</p>
-                                <p>We are pleased to inform you that your OTP for verification is:</p>
+                                <p>Your OTP for verification is:</p>
                                 <p style="font-size: 24px; font-weight: bold; color: #E21C1C; text-align: center; margin: 20px 0;">
                                     ${existingTeacher.SignInOtp}
                                 </p>
-                                <p>Please use this OTP to complete your verification process. This OTP is valid for a limited time, so kindly proceed without delay.</p>
+                                <p>This OTP is valid for a limited time.</p>
                                 <p>If you did not request this OTP, please disregard this message.</p>
                                 <p>Best regards,</p>
                                 <p><strong>S R Tutors</strong></p>
@@ -90,17 +93,65 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
         await sendEmail(Options);
 
         return res.status(200).json({
-          message:
-            "Already have this email ID. OTP resent. Please verify your email.",
+          message: "OTP resent. Please verify your email.",
         });
       }
     }
 
-    // Generate OTP
-    const otp = crypto.randomInt(100000, 999999);
-    const otpExpiresTime = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
+    const DocumentFile = req.files?.Document?.[0];
+    console.log("DocumentFile",DocumentFile)
+    const QualificationFile = req.files?.Qualification?.[0];
+    console.log("QualificationFile",QualificationFile)
+    if (!DocumentFile) {
+      return res.status(400).json({
+        message: "No Document file uploaded. Please upload an identity document.",
+      });
+    }
 
-    // Create a new Teacher
+    if (!QualificationFile) {
+      return res.status(400).json({
+        message: "No Qualification document uploaded. Please upload a qualification document.",
+      });
+    }
+
+    const uploadFromBuffer = (buffer) => {
+      return new Promise((resolve, reject) => {
+        let stream = Cloudinary.uploader.upload_stream((error, result) => {
+          if (error) {
+            console.error("Cloudinary upload error: ", error);
+            return reject(new Error("Failed to upload file to Cloudinary."));
+          }
+          resolve(result);
+        });
+        streamifier.createReadStream(buffer).pipe(stream);
+      });
+    };
+
+    let documentUploadResult;
+    try {
+      documentUploadResult = await uploadFromBuffer(DocumentFile.buffer);
+    } catch (error) {
+      console.error("Error uploading identity document: ", error);
+      return res.status(500).json({
+        message: "Error uploading identity document to Cloudinary.",
+        error: error.message,
+      });
+    }
+
+    let qualificationUploadResult;
+    try {
+      qualificationUploadResult = await uploadFromBuffer(QualificationFile.buffer);
+    } catch (error) {
+      console.error("Error uploading qualification document: ", error);
+      return res.status(500).json({
+        message: "Error uploading qualification document to Cloudinary.",
+        error: error.message,
+      });
+    }
+
+    const otp = crypto.randomInt(100000, 999999);
+    const otpExpiresTime = Date.now() + 10 * 60 * 1000;
+
     const newTeacher = await Teacher.create({
       TeacherName,
       PhoneNumber,
@@ -110,6 +161,15 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
       gender,
       AltNumber,
       DOB,
+      identityDocument: {
+        DocumentType,
+        DocumentImageUrl: documentUploadResult.secure_url,
+        DocumentPublicId: documentUploadResult.public_id,
+      },
+      QualificationDocument: {
+        QualificationImageUrl: qualificationUploadResult?.secure_url,
+        QualificationPublicId: qualificationUploadResult?.public_id,
+      },
       isTeacherVerified: false,
       SignInOtp: otp,
       OtpExpiresTime: otpExpiresTime,
@@ -122,43 +182,35 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
                         <div style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #E21C1C;">
                         <h2 style="color: #E21C1C; text-align: center; margin-top: 0;">OTP Verification</h2>
                         <p>Dear ${newTeacher.TeacherName},</p>
-                        <p>We are pleased to inform you that your OTP for verification is:</p>
+                        <p>Your OTP for verification is:</p>
                         <p style="font-size: 24px; font-weight: bold; color: #E21C1C; text-align: center; margin: 20px 0;">
                             ${newTeacher.SignInOtp}
                         </p>
-                        <p>Please use this OTP to complete your verification process. This OTP is valid for a limited time, so kindly proceed without delay.</p>
+                        <p>This OTP is valid for a limited time.</p>
                         <p>If you did not request this OTP, please disregard this message.</p>
                         <p>Best regards,</p>
                         <p><strong>S R Tutors</strong></p>
                         <hr style="border: 0; height: 1px; background-color: #E21C1C; margin: 20px 0;">
                         <p style="font-size: 12px; color: #000000; text-align: center;">This is an automated message. Please do not reply.</p>
                         </div>
-                        </div>
-                                `,
+                    </div>`,
     };
 
-    const redisClient = req.app.locals.redis;
-
-    if (!redisClient) {
-      throw new Error("Redis client is not available.");
-    }
-
-    // Clear cache
-    // await newTeacher.save()
-    await redisClient.del("Teacher");
     await sendEmail(Options);
+console.log("newTeacher",newTeacher)
 
     res.status(201).json({
-      success: true,
-      message: "Please verify OTP to complete registration.",
-      data: newTeacher,
+      message: "Teacher registered successfully. Please verify your email.",
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Internal server error", error: error.message });
+    console.error("Registration error: ", error);
+    res.status(500).json({
+      message: "Error occurred during registration.",
+      error: error.message,
+    });
   }
 });
+
 
 //Teacher Verify Otp
 exports.TeacherVerifyOtp = CatchAsync(async (req, res) => {
@@ -1686,7 +1738,7 @@ exports.getMyClass = CatchAsync(async (req, res) => {
 exports.addMyClassMore = CatchAsync(async (req, res) => {
   const teacherId = req.user.id;
   const { classId, Subjects } = req.body;
-  
+
   // Basic validation
   if (!classId || !Subjects || !Array.isArray(Subjects)) {
     return res.status(400).json({ message: "Invalid classId or Subjects format" });
