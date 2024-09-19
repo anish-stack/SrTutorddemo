@@ -104,7 +104,7 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
   const handleLocationLatAndLngFetch = async (address) => {
     const options = {
       method: 'GET',
-      url: `https://sr.apnipaathshaala.in/geocode?address=${address}`
+      url: `https://api.srtutorsbureau.com/geocode?address=${address}`
     };
 
     try {
@@ -132,7 +132,7 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
   const handleLocationFetch = async (input) => {
     try {
       const res = await axios.get(
-        `https://sr.apnipaathshaala.in/autocomplete?input=${input}`);
+        `https://api.srtutorsbureau.com/autocomplete?input=${input}`);
  
       setLocationSuggestions(res.data || []);
     } catch (error) {
@@ -164,7 +164,7 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
   const resendOtp = async () => {
     try {
 
-      const response = await axios.post('https://sr.apnipaathshaala.in/api/v1/student/resent-otp', { PhoneNumber: loginNumber });
+      const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/resent-otp', { PhoneNumber: loginNumber });
       toast.success(response.data.message);
 
     } catch (error) {
@@ -176,7 +176,7 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
   const verifyOtp = async () => {
     try {
 
-      const response = await axios.post('https://sr.apnipaathshaala.in/api/v1/student/Verify-Student', {
+      const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/Verify-Student', {
         PhoneNumber: loginNumber,
         otp
       });
@@ -205,7 +205,7 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
 
 
     try {
-      const response = await axios.post('https://sr.apnipaathshaala.in/api/v1/student/checkNumber-request', {
+      const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/checkNumber-request', {
         userNumber: loginNumber
       })
       console.log(response.data)
@@ -266,7 +266,7 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
     console.log(submittedData)
     setLoading(true);
     try {
-      const response = await axios.post('https://sr.apnipaathshaala.in/api/v1/student/universal-request', submittedData, {
+      const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/universal-request', submittedData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       console.log(response.data)

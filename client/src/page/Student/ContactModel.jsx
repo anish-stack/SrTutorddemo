@@ -150,7 +150,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
 
   const fetchSubjects = async (classId) => {
     try {
-      const response = await axios.get(`https://sr.apnipaathshaala.in/api/v1/admin/Get-Class-Subject/${classId}`);
+      const response = await axios.get(`https://api.srtutorsbureau.com/api/v1/admin/Get-Class-Subject/${classId}`);
       const fetchedSubjects = response.data.data.Subjects;
 
       if (fetchedSubjects) {
@@ -209,7 +209,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
   const handleLocationLatAndLngFetch = async (address) => {
     const options = {
       method: 'GET',
-      url: `https://sr.apnipaathshaala.in/geocode?address=${address}`
+      url: `https://api.srtutorsbureau.com/geocode?address=${address}`
     };
 
     try {
@@ -236,7 +236,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
   const handleLocationFetch = async (input) => {
     try {
       const res = await axios.get(
-        `https://sr.apnipaathshaala.in/autocomplete?input=${input}`);
+        `https://api.srtutorsbureau.com/autocomplete?input=${input}`);
  
       setLocationSuggestions(res.data || []);
     } catch (error) {
@@ -367,7 +367,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
   const resendOtp = async () => {
     try {
 
-      const response = await axios.post('https://sr.apnipaathshaala.in/api/v1/student/resent-otp', { PhoneNumber: loginNumber });
+      const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/resent-otp', { PhoneNumber: loginNumber });
       toast.success(response.data.message);
 
     } catch (error) {
@@ -379,7 +379,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
   const verifyOtp = async () => {
     try {
 
-      const response = await axios.post('https://sr.apnipaathshaala.in/api/v1/student/Verify-Student', {
+      const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/Verify-Student', {
         PhoneNumber: loginNumber,
         otp
       });
@@ -408,7 +408,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
 
 
     try {
-      const response = await axios.post('https://sr.apnipaathshaala.in/api/v1/student/checkNumber-request', {
+      const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/checkNumber-request', {
         userNumber: loginNumber
       })
       console.log(response.data)
@@ -484,7 +484,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
     console.log("submittedData",submittedData)
     setLoading(true);
     try {
-      const response = await axios.post('https://sr.apnipaathshaala.in/api/v1/student/universal-request', submittedData, {
+      const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/universal-request', submittedData, {
         headers: { Authorization: `Bearer ${student || studentToken}` }
       });
       console.log(response.data)

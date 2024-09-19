@@ -41,7 +41,7 @@ const TeacherDashboard = () => {
         setLoading(true)
         try {
             const response = await axios.post(
-                `https://sr.apnipaathshaala.in/api/v1/teacher/teacher-profile-pic/${profileInfo.TeacherUserId}`,
+                `https://api.srtutorsbureau.com/api/v1/teacher/teacher-profile-pic/${profileInfo.TeacherUserId}`,
                 formData, // Send formData directly here
                 {
                     headers: {
@@ -108,7 +108,7 @@ const TeacherDashboard = () => {
         if (teacherToken && teacherUser) {
             const handleFetch = async () => {
                 try {
-                    const { data } = await axios.get(`https://sr.apnipaathshaala.in/api/v1/teacher/Get-Teacher/${teacherUser._id}`, {
+                    const { data } = await axios.get(`https://api.srtutorsbureau.com/api/v1/teacher/Get-Teacher/${teacherUser._id}`, {
                         headers: {
                             Authorization: `Bearer ${teacherToken}`,
                         },
@@ -129,7 +129,7 @@ const TeacherDashboard = () => {
         if (teacherToken && teacherUser) {
             const handleClassFetch = async () => {
                 try {
-                    const { data } = await axios.get(`https://sr.apnipaathshaala.in/api/v1/teacher/Get-My-Classes`, {
+                    const { data } = await axios.get(`https://api.srtutorsbureau.com/api/v1/teacher/Get-My-Classes`, {
                         headers: {
                             Authorization: `Bearer ${teacherToken}`,
                         },

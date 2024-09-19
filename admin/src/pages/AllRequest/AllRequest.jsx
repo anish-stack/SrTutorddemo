@@ -28,7 +28,7 @@ const AllRequest = () => {
     useEffect(() => {
         const fetchRequest = async () => {
             try {
-                const response = await axios.get('https://sr.apnipaathshaala.in/api/v1/uni/get-all-universal-Request', {
+                const response = await axios.get('https://api.srtutorsbureau.com/api/v1/uni/get-all-universal-Request', {
                     headers: {
                         Authorization: `Bearer ${Token}`
                     }
@@ -85,7 +85,7 @@ const AllRequest = () => {
 
     const UpdateStatusByAdmin = async (requestId, status) => {
         try {
-            const response = await axios.post('https://sr.apnipaathshaala.in/api/v1/uni/Accept-Request', {
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/uni/Accept-Request', {
                 requestId,
                 status,
                 requestType: "admin"
@@ -142,7 +142,7 @@ const AllRequest = () => {
             // If the user confirms, proceed with the delete request
             if (result.isConfirmed) {
                 // Send delete request to the server
-                const response = await axios.delete(`https://sr.apnipaathshaala.in/api/v1/uni/delete-Request/${requestId}`);
+                const response = await axios.delete(`https://api.srtutorsbureau.com/api/v1/uni/delete-Request/${requestId}`);
 
                 // Check if deletion was successful
                 if (response.data.status === 'success') {

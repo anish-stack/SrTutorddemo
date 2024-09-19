@@ -40,7 +40,7 @@ const Browsetutors = () => {
 
     const fetchAllSubjects = async () => {
         try {
-            const response = await axios.get("https://sr.apnipaathshaala.in/api/v1/admin/Get-All-Subject");
+            const response = await axios.get("https://api.srtutorsbureau.com/api/v1/admin/Get-All-Subject");
             if (response.data.data) {
                 setSubjects(response.data.data);
             }
@@ -52,7 +52,7 @@ const Browsetutors = () => {
 
     const fetchTutors = async () => {
         try {
-            const response = await axios.get(`https://sr.apnipaathshaala.in/api/v1/student/BrowseTutorsNearMe?lat=${searchQueryForlat}&lng=${searchQueryForlng}`, {
+            const response = await axios.get(`https://api.srtutorsbureau.com/api/v1/student/BrowseTutorsNearMe?lat=${searchQueryForlat}&lng=${searchQueryForlng}`, {
                 params: { ...FilterOptions }
             });
 
@@ -73,7 +73,7 @@ const Browsetutors = () => {
 
     const FetchTeacherClassNames = async (classIds) => {
         try {
-            const { data } = await axios.get('https://sr.apnipaathshaala.in/api/v1/admin/Get-Classes');
+            const { data } = await axios.get('https://api.srtutorsbureau.com/api/v1/admin/Get-Classes');
             const classData = data.data;
             const matchedClassNames = {};
 

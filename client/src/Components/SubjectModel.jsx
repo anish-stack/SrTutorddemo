@@ -141,7 +141,7 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
         const address = formData.Location
         const options = {
             method: 'GET',
-            url: `https://sr.apnipaathshaala.in/geocode?address=${address}`
+            url: `https://api.srtutorsbureau.com/geocode?address=${address}`
         };
 
         try {
@@ -161,7 +161,7 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
     const handleLocationFetch = async (input) => {
         try {
             const res = await axios.get(
-                `https://sr.apnipaathshaala.in/autocomplete?input=${input}`);
+                `https://api.srtutorsbureau.com/autocomplete?input=${input}`);
 
             setLocationSuggestions(res.data || []);
         } catch (error) {
@@ -200,7 +200,7 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
     const resendOtp = async () => {
         try {
 
-            const response = await axios.post('https://sr.apnipaathshaala.in/api/v1/student/resent-otp', { PhoneNumber: loginNumber });
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/resent-otp', { PhoneNumber: loginNumber });
             toast.success(response.data.message);
 
         } catch (error) {
@@ -212,7 +212,7 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
     const verifyOtp = async () => {
         try {
 
-            const response = await axios.post('https://sr.apnipaathshaala.in/api/v1/student/Verify-Student', {
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/Verify-Student', {
                 PhoneNumber: loginNumber,
                 otp
             });
@@ -241,7 +241,7 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
 
 
         try {
-            const response = await axios.post('https://sr.apnipaathshaala.in/api/v1/student/checkNumber-request', {
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/checkNumber-request', {
                 userNumber: loginNumber
             })
             console.log(response.data)
@@ -303,7 +303,7 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
 
         setLoading(true)
         try {
-            const response = await axios.post('https://sr.apnipaathshaala.in/api/v1/student/universal-request', submitedData, {
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/universal-request', submitedData, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             console.log(response.data)

@@ -24,7 +24,7 @@ const AdvancedSearchModel = ({ Show, handleCloseAdvancedClick }) => {
     // Fetch all subjects from the API
     const handleFetch = async () => {
         try {
-            const res = await axios.get('https://sr.apnipaathshaala.in/api/v1/admin/Get-All-Subject');
+            const res = await axios.get('https://api.srtutorsbureau.com/api/v1/admin/Get-All-Subject');
             setAllSubject(res.data.data);
         } catch (error) {
             console.log(error);

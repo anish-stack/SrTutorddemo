@@ -14,7 +14,7 @@ const StudentRequest = ({ id }) => {
 
     const fetchData = async (page) => {
         try {
-            const response = await axios.get(`https://sr.apnipaathshaala.in/api/v1/uni/get-Request-teacher?id=${id}&page=${page}&limit=8`);
+            const response = await axios.get(`https://api.srtutorsbureau.com/api/v1/uni/get-Request-teacher?id=${id}&page=${page}&limit=8`);
             const filteredData = response.data.data.filter(request => request.teacherAcceptThis === 'pending');
             setData(filteredData);
             console.log(filteredData)
@@ -26,7 +26,7 @@ const StudentRequest = ({ id }) => {
 
     const handleAcceptOrDecline = async (requestId, status) => {
         try {
-            await axios.post(`https://sr.apnipaathshaala.in/api/v1/uni/Accept-Request`, {
+            await axios.post(`https://api.srtutorsbureau.com/api/v1/uni/Accept-Request`, {
                 requestId,
                 status,
                 requestType: "teacher"

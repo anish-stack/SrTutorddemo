@@ -28,7 +28,7 @@ const TeacherProfileOtp = () => {
         setError('');
         try {
             const res = await axios.post(
-                'https://sr.apnipaathshaala.in/api/v1/teacher/Verify-profile-otp',
+                'https://api.srtutorsbureau.com/api/v1/teacher/Verify-profile-otp',
                 { otp }, // OTP should be sent as an object
                 {
                     headers: {
@@ -55,7 +55,7 @@ const TeacherProfileOtp = () => {
         setError('');
         try {
             const res = await axios.post(
-                'https://sr.apnipaathshaala.in/api/v1/teacher/profile-otp',
+                'https://api.srtutorsbureau.com/api/v1/teacher/profile-otp',
                 {},
                 {
                     headers: {

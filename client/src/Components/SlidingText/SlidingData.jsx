@@ -12,7 +12,7 @@ const SlidingData = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('https://sr.apnipaathshaala.in/api/v1/student/AllData');
+        const response = await axios.get('https://api.srtutorsbureau.com/api/v1/student/AllData');
         console.log(response.data.data)
         setData(response.data.data); // Assuming the data is in response.data.data
         setLoading(false);

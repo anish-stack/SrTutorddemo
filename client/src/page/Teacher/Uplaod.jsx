@@ -45,7 +45,7 @@ const Upload = () => {
         setLoading(true);
         try {
             const response = await axios.post(
-                `https://sr.apnipaathshaala.in/api/v1/teacher/teacher-document?DocumentType=${formData.DocumentType}`,
+                `https://api.srtutorsbureau.com/api/v1/teacher/teacher-document?DocumentType=${formData.DocumentType}`,
                 data,
                 {
                     headers: {

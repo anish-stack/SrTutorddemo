@@ -32,7 +32,7 @@ const StudentDetails = ({ student, teacher }) => {
     const FetchData = async () => {
         try {
             setLoading(true);
-            const { data } = await axios.get(`https://sr.apnipaathshaala.in/api/v1/student/SingleAllData/${id}`);
+            const { data } = await axios.get(`https://api.srtutorsbureau.com/api/v1/student/SingleAllData/${id}`);
             console.log(data.data);
             if (data.data) {
                 setData(data.data);

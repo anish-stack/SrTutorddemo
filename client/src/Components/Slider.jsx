@@ -62,7 +62,7 @@ const Slider = () => {
   const fetchSubjects = async (classId) => {
     try {
       const response = await axios.get(
-        `https://sr.apnipaathshaala.in/api/v1/admin/Get-Class-Subject/${classId}`
+        `https://api.srtutorsbureau.com/api/v1/admin/Get-Class-Subject/${classId}`
       );
       setSubjects(response.data.data.Subjects || []);
     } catch (error) {
@@ -87,7 +87,7 @@ const Slider = () => {
 
 
         const res = await axios.get(
-          `https://sr.apnipaathshaala.in/autocomplete?input=${input}`);
+          `https://api.srtutorsbureau.com/autocomplete?input=${input}`);
         console.log("Google", res.data)
         setLocationSuggestions(res.data || []);
       } catch (error) {
@@ -123,7 +123,7 @@ const Slider = () => {
   const handleLocationLatAndLngFetch = async (address) => {
     const options = {
       method: 'GET',
-      url: `https://sr.apnipaathshaala.in/geocode?address=${address}`
+      url: `https://api.srtutorsbureau.com/geocode?address=${address}`
     };
 
     try {
