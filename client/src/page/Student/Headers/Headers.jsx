@@ -60,7 +60,7 @@ const Headers = () => {
 
     const MyPost = async () => {
         try {
-            const { data } = await axios.get('https://sr.apnipaathshaala.in/api/v1/student/Get-My-Post', {
+            const { data } = await axios.get('https://api.srtutorsbureau.com/api/v1/student/Get-My-Post', {
                 headers: {
                     Authorization: `Bearer ${studentToken}`
                 },
@@ -81,7 +81,7 @@ const Headers = () => {
 
     const MySubscribed = async () => {
         try {
-            const { data } = await axios.get('https://sr.apnipaathshaala.in/api/v1/student/Get-My-Subscribed-Teacher', {
+            const { data } = await axios.get('https://api.srtutorsbureau.com/api/v1/student/Get-My-Subscribed-Teacher', {
                 headers: {
                     Authorization: `Bearer ${studentToken}`
                 }

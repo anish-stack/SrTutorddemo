@@ -145,7 +145,7 @@ const ContactTeacherModalWithoutToken = ({ isOpen, isClose, teachersData }) => {
 
     const fetchSubjects = async (classId) => {
         try {
-            const response = await axios.get(`https://sr.apnipaathshaala.in/api/v1/admin/Get-Class-Subject/${classId}`);
+            const response = await axios.get(`https://api.srtutorsbureau.com/api/v1/admin/Get-Class-Subject/${classId}`);
             const fetchedSubjects = response.data.data.Subjects;
 
             if (fetchedSubjects) {
@@ -334,7 +334,7 @@ const ContactTeacherModalWithoutToken = ({ isOpen, isClose, teachersData }) => {
         }
         setLoading(true)
         try {
-            const response = await axios.post('https://sr.apnipaathshaala.in/api/v1/student/Make-Particular-request', formData, {
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/Make-Particular-request', formData, {
                 headers: {
                     Authorization: `Bearer ${studentToken}`
                 }

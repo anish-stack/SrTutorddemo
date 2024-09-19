@@ -21,7 +21,7 @@ const ClassTeacherRequest = () => {
     const fetchData = async () => {
         setLoading(true);
         try {
-            const response = await axios.get('https://sr.apnipaathshaala.in/api/v1/student/Class-Teacher-Request');
+            const response = await axios.get('https://api.srtutorsbureau.com/api/v1/student/Class-Teacher-Request');
             setData(response.data.data);
             setDataError(false);
         } catch (error) {
@@ -35,7 +35,7 @@ const ClassTeacherRequest = () => {
     const fetchComments = async (id) => {
         console.log(id)
         try {
-            const response = await axios.get(`https://sr.apnipaathshaala.in/api/v1/student/Class-Get-Comments/${id}`);
+            const response = await axios.get(`https://api.srtutorsbureau.com/api/v1/student/Class-Get-Comments/${id}`);
             setComments(response.data.comments);
         } catch (error) {
             console.log(error)
@@ -50,7 +50,7 @@ const ClassTeacherRequest = () => {
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this request?')) {
             try {
-                await axios.delete(`https://sr.apnipaathshaala.in/api/v1/student/Class-Delete-Request/${id}`);
+                await axios.delete(`https://api.srtutorsbureau.com/api/v1/student/Class-Delete-Request/${id}`);
                 toast.success('Request deleted successfully');
                 fetchData(); // Refresh data after deletion
             } catch (error) {
@@ -61,7 +61,7 @@ const ClassTeacherRequest = () => {
 
     const handleUpdate = async (id, status) => {
         try {
-            await axios.post(`https://sr.apnipaathshaala.in/api/v1/student/Class-Accept-Request/${id}/${status}`);
+            await axios.post(`https://api.srtutorsbureau.com/api/v1/student/Class-Accept-Request/${id}/${status}`);
             toast.success('Request updated successfully');
             fetchData(); // Refresh data after update
         } catch (error) {
@@ -96,7 +96,7 @@ const ClassTeacherRequest = () => {
         setCommentLoading(true);
         setCommentError('');
         try {
-            await axios.post(`https://sr.apnipaathshaala.in/api/v1/student/Class-comment-Request`, {
+            await axios.post(`https://api.srtutorsbureau.com/api/v1/student/Class-comment-Request`, {
                 requestId: selectedRequestId, comment
             });
             toast.success('Comment added successfully');

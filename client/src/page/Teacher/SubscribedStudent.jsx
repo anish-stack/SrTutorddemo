@@ -12,7 +12,7 @@ const SubscribedStudent = () => {
 
     const fetchData = async () => {
         try {
-            const response = await axios.get('https://sr.apnipaathshaala.in/api/v1/uni/get-Request-teacher?id=66c58a1cf86a080a13569ad9&page=1&limit=8');
+            const response = await axios.get('https://api.srtutorsbureau.com/api/v1/uni/get-Request-teacher?id=66c58a1cf86a080a13569ad9&page=1&limit=8');
             const filteredData = response.data.data.filter(request => request.dealDone === true && request.teacherAcceptThis !== 'declined');
             setData(filteredData);
         } catch (error) {

@@ -1495,7 +1495,7 @@ exports.SearchByMinimumCondition = CatchAsync(async (req, res) => {
       });
     } else if (role === 'tutor') {
 
-      const { data } = await axios.get('https://sr.apnipaathshaala.in/api/v1/uni/get-all-universal-Request')
+      const { data } = await axios.get('https://api.srtutorsbureau.com/api/v1/uni/get-all-universal-Request')
       const CombinedData = data?.data
       const findTeacherRequest = CombinedData.filter(item => item.className === ClassNameValue && item.subjects.includes(Subject))
 

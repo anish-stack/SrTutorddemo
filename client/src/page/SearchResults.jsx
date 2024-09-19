@@ -49,7 +49,7 @@ const SearchResults = () => {
       const fetchResults = async () => {
         try {
           const response = await axios.get(
-            `https://sr.apnipaathshaala.in/api/v1/teacher/Get-Min-search/${classIdParam}/${subjectParam}?lat=${latParam}&lng=${longParam}&ClassNameValue=${ClassNameValue}&role=${role}&SearchPlaceLat=${SearchPlaceLat}&SearchPlaceLng=${SearchPlaceLng}`
+            `https://api.srtutorsbureau.com/api/v1/teacher/Get-Min-search/${classIdParam}/${subjectParam}?lat=${latParam}&lng=${longParam}&ClassNameValue=${ClassNameValue}&role=${role}&SearchPlaceLat=${SearchPlaceLat}&SearchPlaceLng=${SearchPlaceLng}`
           );
           ;
           const tutorsData = response.data.results;
@@ -92,7 +92,7 @@ const SearchResults = () => {
 
   const FetchTeacherClassNames = async (classIds) => {
     try {
-      const { data } = await axios.get("https://sr.apnipaathshaala.in/api/v1/admin/Get-Classes");
+      const { data } = await axios.get("https://api.srtutorsbureau.com/api/v1/admin/Get-Classes");
       const classData = data.data;
       let matchedClassNames = {};
 

@@ -8,7 +8,7 @@ const app = express();
 const StudentRouter = require("./routes/Student.routes");
 const AdminRouter = require("./routes/Admin.routes");
 const TeacherRouter = require("./routes/Teacher.routes");
-const leadRoutes = require('./routes/Jd.routes'); 
+const leadRoutes = require('./routes/Jd.routes');
 
 const connectDb = require('./config/db');
 const { info, error } = require('./utils/Logger');
@@ -38,6 +38,8 @@ const redisClient = redis.createClient({
 // CORS Configuration
 const allowedOrigins = [
     "https://www.srtutorsbureau.com",
+    "https://www.admin.srtutorsbureau.com",
+    "https://admin.srtutorsbureau.com",
     "https://srtutorsbureau.com",
     "https://www.srtutors.hoverbusinessservices.com",
     "https://www.sradmin.hoverbusinessservices.com",
@@ -94,7 +96,7 @@ app.get("/Flush-all-Redis-Cached", async (req, res) => {
         });
     }
 });
-app.use('/api/leads', leadRoutes); 
+app.use('/api/jd', leadRoutes);
 
 app.use("/api/v1/student", StudentRouter);
 app.use("/api/v1/teacher", TeacherRouter);

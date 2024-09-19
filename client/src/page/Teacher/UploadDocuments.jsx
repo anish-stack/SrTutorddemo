@@ -52,7 +52,7 @@ const UploadDocuments = ({ Document, Profile }) => {
         setLoading(true);
         try {
             const response = await axios.post(
-                `https://sr.apnipaathshaala.in/api/v1/teacher/teacher-document/${Profile?.TeacherUserId}?DocumentType=${formData.DocumentType}`,
+                `https://api.srtutorsbureau.com/api/v1/teacher/teacher-document/${Profile?.TeacherUserId}?DocumentType=${formData.DocumentType}`,
                 data,
                 {
                     headers: {

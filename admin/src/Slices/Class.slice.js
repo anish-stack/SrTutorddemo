@@ -14,7 +14,7 @@ export const ClassSearch = createAsyncThunk(
 
         try {
             // Make the request with the token in the headers
-            const response = await axios.get('https://sr.apnipaathshaala.in/api/v1/admin/Get-Classes',
+            const response = await axios.get('https://api.srtutorsbureau.com/api/v1/admin/Get-Classes',
 
                 {
                     headers: {
