@@ -5,7 +5,7 @@ const JustdialLead = require('../models/JustidialFormet');  // Corrected model n
 exports.CreateLead = async (req, res) => {
     try {
         const {
-            leadtype, prefix, name, mobile, phone, email, date, category, city, area, brancharea,
+           leadid, leadtype, prefix, name, mobile, phone, email, date, category, city, area, brancharea,
             dncmobile, dncphone, company, pincode, time, branchpin, parentid
         } = req.body;
 
@@ -25,7 +25,7 @@ exports.CreateLead = async (req, res) => {
         }
 
         // Generate unique lead ID using UUID
-        const leadid = uuidv4();
+        
 
         // Create a new lead
         const newLead = new JustdialLead({
