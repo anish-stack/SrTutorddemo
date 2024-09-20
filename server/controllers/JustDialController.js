@@ -15,7 +15,7 @@ exports.CreateLead = async (req, res) => {
         if (!prefix) emptyFields.push('prefix');
         if (!name) emptyFields.push('name');
         if (!mobile) emptyFields.push('mobile');
-        if (!email) emptyFields.push('email');
+
         if (!category) emptyFields.push('category');
         if (!city) emptyFields.push('city');
         if (!area) emptyFields.push('area');
@@ -53,10 +53,17 @@ exports.CreateLead = async (req, res) => {
         // Save the lead to the database
         await newLead.save();
 
-        return res.status(201).json({ message: 'Lead created successfully', newLead });
+        return res.status(201).json({
+            success: true,
+            message: 'Lead created successfully',
+            data: newLead
+        });
 
     } catch (error) {
-        return res.status(500).json({ message: 'Server error', error: error.message });
+        return res.status(500).json({ 
+            success: true,
+             message: 'Internal Server Error',
+              error: error.message });
     }
 };
 
