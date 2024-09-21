@@ -6,6 +6,9 @@ import { useEffect, useState, lazy, Suspense } from "react";
 import StudentDetails from "./page/Student/StudentDetails";
 import Cookies from 'js-cookie'
 import HomeLoader from "./Components/HomeLoader";
+import Privacypolicy from "./page/Policy/Privacypolicy";
+import PlansAndTerms from "./page/Policy/PlansAndTerms";
+import RefundPolicy from "./page/Policy/RefundPolicy";
 // Lazy load components
 const Home = lazy(() => import("./page/Home"));
 const Aboutus = lazy(() => import("./page/Aboutus"));
@@ -97,6 +100,11 @@ function App() {
           <Route path="/Teacher-Profile-Verify" element={<TeacherProfileOtp />} />
           <Route path="/Browse-Tutors" element={<Browsetutors />} />
           <Route path="/Student-Info" element={<StudentDetails student={studentLogin} teacher={login} />} />
+          <Route path="/Privacy" element={<Privacypolicy />} />
+          <Route path="/Term-&-Conditions" element={<PlansAndTerms />} />
+          <Route path="/Refund-and-Cancellation-Policy" element={<RefundPolicy />} />
+
+
 
           <Route path="/*" element={<PageNotFound />} />
           <Route path="/teacher-Profile/Details/:id" element={<TeacherProfileModal />} />
