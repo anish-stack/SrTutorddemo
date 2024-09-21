@@ -94,22 +94,22 @@ function Footer() {
                                     <h4 className="fw-title">Resources</h4>
                                     <ul className="list-wrap">
                                         <li>
-                                            <Link  to="/about-us">About</Link>
+                                            <Link to="/about-us">About</Link>
                                         </li>
                                         <li>
-                                            <Link  to="/contact-us">Contact</Link>
+                                            <Link to="/contact-us">Contact</Link>
+                                        </li>
+                                        {/* <li>
+                                            <Link to="/Help">Help Center</Link>
+                                        </li> */}
+                                        <li>
+                                            <Link to="/Refund-and-Cancellation-Policy">Refund and Cancellation Policy</Link>
                                         </li>
                                         <li>
-                                            <Link  to="/Help">Help Center</Link>
+                                            <Link to="/Term-&-Conditions">Term-&-Conditions</Link>
                                         </li>
                                         <li>
-                                            <Link  to="/Refunds">Refund</Link>
-                                        </li>
-                                        <li>
-                                            <Link  to="/Conditions">Conditions</Link>
-                                        </li>
-                                        <li>
-                                            <Link  to="/Privacy">Privacy Policy</Link>
+                                            <Link to="/Privacy">Privacy Policy</Link>
                                         </li>
                                     </ul>
                                 </div>
