@@ -1244,3 +1244,11 @@ html {
   filter: blur(15px);
 }
 
+.tc-list {
+  background: #eee;
+  padding: 30px;
+  border: #ccc solid 1px;
+}
+.tc-list li{
+  margin-bottom: 22px;
+}
