@@ -1181,7 +1181,7 @@ html {
   }
 }
 .btn-contact {
-  background-color: #ffc107;
+  background-color: #f60c23;
   color: #ffffff;
   outline: none;
   border: none;
@@ -1192,10 +1192,10 @@ html {
 
 .marquee__card {
   padding: 15px;
-  background-color: #ffffff;
+  background-color: #ffeded;
   border-radius: 10px;
   height: 250px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgb(229 222 222 / 42%);
   min-width: 250px;
   max-width: 300px;
 }
