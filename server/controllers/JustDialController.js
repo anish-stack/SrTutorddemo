@@ -10,19 +10,7 @@ exports.CreateLead = async (req, res) => {
         } = req.body;
 
         // Check for empty required fields
-        const emptyFields = [];
-        if (!leadtype) emptyFields.push('leadtype');
-        if (!prefix) emptyFields.push('prefix');
-        if (!name) emptyFields.push('name');
-        if (!mobile) emptyFields.push('mobile');
-
-        if (!category) emptyFields.push('category');
-        if (!city) emptyFields.push('city');
-        if (!area) emptyFields.push('area');
-
-        if (emptyFields.length > 0) {
-            return res.status(400).json({ message: 'Please fill all required fields', emptyFields });
-        }
+      
 
         // Generate unique lead ID using UUID
         

@@ -3,24 +3,24 @@ const mongoose = require('mongoose');
 const leadSchema = new mongoose.Schema({
   leadid: {
     type: String,
-    required: true
+   
   },
   leadtype: {
     type: String,
-    required: true
+   
   },
   prefix: {
     type: String,
     enum: ['Mr', 'Ms', 'Dr'],
-    required: true
+   
   },
   name: {
     type: String,
-    required: true
+   
   },
   mobile: {
     type: String,
-    required: true
+    required:true
   },
   phone: {
     type: String
@@ -34,15 +34,15 @@ const leadSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    required: true
+   
   },
   city: {
     type: String,
-    required: true
+   
   },
   area: {
     type: String,
-    required: true
+   
   },
   brancharea: {
     type: String
@@ -50,12 +50,12 @@ const leadSchema = new mongoose.Schema({
   dncmobile: {
     type: Number,
     enum: [0, 1],
-    required: true
+   
   },
   dncphone: {
     type: Number,
     enum: [0, 1],
-    required: true
+   
   },
   company: {
     type: String
