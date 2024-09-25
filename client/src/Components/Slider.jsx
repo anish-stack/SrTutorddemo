@@ -171,7 +171,7 @@ const Slider = () => {
 
     const subjectParam = encodeURIComponent(selectedSubject);
 
-    window.location.href = `/Search-result?role=${selectedRole}&SearchPlaceLat=${ClickLatitude || locationData.lat }&SearchPlaceLng=${ClickLongitude || locationData.lng}&via-home-page&Location=${locationParam}&ClassId=${classParam}&ClassNameValue=${classNameParam}&Subject=${subjectParam}&lat=${locationData.lat}&lng=${locationData.lng}`;
+    window.location.href = `/Search-result?role=${selectedRole}&SearchPlaceLat=${ClickLatitude || locationData.lat}&SearchPlaceLng=${ClickLongitude || locationData.lng}&via-home-page&Location=${locationParam}&ClassId=${classParam}&ClassNameValue=${classNameParam}&Subject=${subjectParam}&lat=${locationData.lat}&lng=${locationData.lng}`;
   };
 
   return (
@@ -224,47 +224,47 @@ const Slider = () => {
                     <div className="row col-12 col-lg-12 col-md-12">
 
 
-                      {selectedRole === "student" ? (
-                        <div className="col-md-4 col-lg-4 mb-2">
-                          <div className="position-relative">
+
+                      <div className="col-md-4 col-lg-4 mb-2">
+                        <div className="position-relative">
 
 
-                            <input
-                              type="text"
-                              name="Location"
-                              value={locationInput}
-                              placeholder="Location . . ."
-                              onChange={(e) => handleLocationFetch(e.target.value)}
-                              className="form-control py-3"
-                            />
+                          <input
+                            type="text"
+                            name="Location"
+                            value={locationInput}
+                            placeholder="Location . . ."
+                            onChange={(e) => handleLocationFetch(e.target.value)}
+                            className="form-control py-3"
+                          />
 
-                            {locationSuggestions.length > 0 && (
-                              <div
-                                className="position-absolute top-100 start-0 mt-2 w-100 bg-white border border-secondary rounded shadow-lg overflow-auto"
-                                style={{ maxHeight: "200px" }}
-                              >
-                                <ul className="list-unstyled mb-0">
-                                  {locationSuggestions.map((suggestion, index) => (
-                                    <li
-                                      key={index}
-                                      className="p-2 hover:bg-light cursor-pointer"
-                                      onClick={() => handleLocationSelect(suggestion.description)}
-                                    >
-                                      {suggestion.description}
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )
-                            }
-
-
+                          {locationSuggestions.length > 0 && (
+                            <div
+                              className="position-absolute top-100 start-0 mt-2 w-100 bg-white border border-secondary rounded shadow-lg overflow-auto"
+                              style={{ maxHeight: "200px" }}
+                            >
+                              <ul className="list-unstyled mb-0">
+                                {locationSuggestions.map((suggestion, index) => (
+                                  <li
+                                    key={index}
+                                    className="p-2 hover:bg-light cursor-pointer"
+                                    onClick={() => handleLocationSelect(suggestion.description)}
+                                  >
+                                    {suggestion.description}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )
+                          }
 
 
 
-                          </div>
+
+
                         </div>
-                      ) : null}
+                      </div>
+
 
 
                       <div className="col-md-4 col-lg-4 mb-2">
@@ -273,7 +273,7 @@ const Slider = () => {
                           onChange={handleClassChange}
                           value={selectedClass.classid}
                         >
-                          <option value="" disabled>Select Class...</option>
+                          <option value="" >Select Class...</option>
                           {concatenatedData.map((classItem) => (
                             <option key={classItem.id} value={classItem.id}>
                               {classItem.class}
@@ -288,7 +288,7 @@ const Slider = () => {
                           placeholder="Subject . . ."
                           onChange={handleSubjectChange}
                         >
-                          <option value="" disabled>Select Subject...</option>
+                          <option value="" >Select Subject...</option>
                           {subjects.map((subject) => (
                             <option key={subject._id} value={subject._id}>
                               {subject.SubjectName}
@@ -314,13 +314,13 @@ const Slider = () => {
             </div>
           </div>
           <div className="col-lg-6 center">
-          
-             
-             
-                  <img src={backSvg} alt="img" />
-         
-         
-         
+
+
+
+            <img src={backSvg} alt="img" />
+
+
+
           </div>
         </div>
       </div>

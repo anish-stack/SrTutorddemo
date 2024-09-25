@@ -55,7 +55,7 @@ const SearchResults = () => {
           const tutorsData = response.data.results;
           setResults(response.data.results);
           const ids = tutorsData.flatMap((item) => item.AcademicInformation);
-          setClassIds(ids); // Update class IDs
+          setClassIds(ids);
           FetchTeacherClassNames(ids)
           setCount(response.data.count);
         } catch (error) {
@@ -140,7 +140,7 @@ const SearchResults = () => {
 
 
   const handleContactClick = (teacher) => {
-    if(teacher){
+    if (teacher) {
 
       setSelectedTeacher({
         gender: teacher.Gender,
