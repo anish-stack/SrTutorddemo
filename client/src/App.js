@@ -9,6 +9,7 @@ import HomeLoader from "./Components/HomeLoader";
 import Privacypolicy from "./page/Policy/Privacypolicy";
 import PlansAndTerms from "./page/Policy/PlansAndTerms";
 import RefundPolicy from "./page/Policy/RefundPolicy";
+import ForgetPassword from "./Components/ForgetPassword";
 // Lazy load components
 const Home = lazy(() => import("./page/Home"));
 const Aboutus = lazy(() => import("./page/Aboutus"));
@@ -104,6 +105,7 @@ function App() {
           <Route path="/Term-&-Conditions" element={<PlansAndTerms />} />
           <Route path="/Refund-and-Cancellation-Policy" element={<RefundPolicy />} />
 
+          <Route path="/Forget-Password" element={<ForgetPassword />} />
 
 
           <Route path="/*" element={<PageNotFound />} />

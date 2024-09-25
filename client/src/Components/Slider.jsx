@@ -171,14 +171,14 @@ const Slider = () => {
 
     const subjectParam = encodeURIComponent(selectedSubject);
 
-    window.location.href = `/Search-result?role=${selectedRole}&SearchPlaceLat=${ClickLatitude}&SearchPlaceLng=${ClickLongitude}&via-home-page&Location=${locationParam}&ClassId=${classParam}&ClassNameValue=${classNameParam}&Subject=${subjectParam}&lat=${locationData.lat}&lng=${locationData.lng}`;
+    window.location.href = `/Search-result?role=${selectedRole}&SearchPlaceLat=${ClickLatitude || locationData.lat }&SearchPlaceLng=${ClickLongitude || locationData.lng}&via-home-page&Location=${locationParam}&ClassId=${classParam}&ClassNameValue=${classNameParam}&Subject=${subjectParam}&lat=${locationData.lat}&lng=${locationData.lng}`;
   };
 
   return (
     <section className="banner-area-two banner-bg-two" data-background={bannerImg01}>
-      <div className="container-fluid">
+      <div className="container-fluid center">
         <div className="row px-4 align-items-center">
-          <div className="col-lg-6">
+          <div className="col-lg-6 center">
             <div className="banner__content-two hero-contact-left">
               <img
                 src={bannerShape03}
@@ -313,7 +313,7 @@ const Slider = () => {
               </div>
             </div>
           </div>
-          <div className="col-lg-6">
+          <div className="col-lg-6 center">
           
              
              

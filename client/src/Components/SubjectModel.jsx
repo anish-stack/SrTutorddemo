@@ -36,6 +36,7 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
         HowManyClassYouWant: "",
         experienceRequired: "",
         MinumBudegt: "",
+        ClassLangUage:"",
         Maxmimu: "",
         StartDate: "",
         TeaherGender: "",
@@ -279,6 +280,7 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
             requestType: "Subject Teacher",
             classId: null,
             className: formData.Class,
+            ClassLangUage:formData.ClassLangUage,
             subjects: isClass ? [formData.Subject] : [Subjects],
             interestedInTypeOfClass: formData.Interested,
             teacherGenderPreference: formData.TeaherGender,
@@ -423,6 +425,23 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
                                             </Form.Group>
                                         </Col>
                                     </Row>
+                                    <Col md={12}>
+                                        <Form.Group className="mb-3"
+                                            required>
+                                            <Form.Label>In Which Language You Want To Do Class <b className="text-danger fs-5">*</b></Form.Label>
+                                            <input
+                                                type="text"
+                                                id="Contact"
+                                                required
+                                                name="ClassLangUage"
+                                                value={formData.ClassLangUage}
+                                                onChange={handleChange}
+                                                className="form-control"
+                                                placeholder="Enter Your Language For Classe"
+                                            />
+
+                                        </Form.Group>
+                                    </Col>
                                     <Row>
                                         <Col md={12}>
                                             <Form.Group className="mb-1"

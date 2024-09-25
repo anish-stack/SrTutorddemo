@@ -31,7 +31,7 @@ const MyLocations = ({ locations }) => {
                         attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     />
-                    
+
                     {/* Render current location marker if available */}
                     {currentLocation && (
                         <Marker
@@ -41,25 +41,39 @@ const MyLocations = ({ locations }) => {
                             <Popup>Your current location</Popup>
                         </Marker>
                     )}
-                    
-                    {/* Render all points markers */}
-                    {locations.map((point, index) => {
-                        const { coordinates } = point.location;
-                        return coordinates && coordinates.length === 2 ? (
-                            <Marker
-                                key={index}
-                                position={[coordinates[1], coordinates[0]]}
-                                icon={customIcon}
-                            >
-                                <Tooltip direction="top" offset={[0, -20]} opacity={1} permanent>
-                                    <span style={{ fontSize: '10px' }}>{`Point ${index + 1}`}</span>
-                                </Tooltip>
-                                <Popup>
-                                    {`Point ${index + 1}: ${coordinates[1].toFixed(6)}, ${coordinates[0].toFixed(6)}`}
-                                </Popup>
-                            </Marker>
-                        ) : null;
-                    })}
+{locations && locations.length > 0 ? (
+    // If there are valid locations, map over them and render markers
+    locations.map((point, index) => {
+        const { location } = point;
+        const coordinates = location && location.coordinates;
+
+        // Check if coordinates are valid
+        const hasValidCoordinates = coordinates && Array.isArray(coordinates) && coordinates.length === 2;
+
+        return (
+            <Marker
+                key={index}
+                position={hasValidCoordinates ? [coordinates[1], coordinates[0]] : [0, 0]} // Fallback position
+                icon={customIcon}
+            >
+                <Tooltip direction="top" offset={[0, -20]} opacity={1} permanent>
+                    <span style={{ fontSize: '10px' }}>
+                        {hasValidCoordinates ? `Point ${index + 1}` : 'No location found'}
+                    </span>
+                </Tooltip>
+                <Popup>
+                    {hasValidCoordinates
+                        ? `Point ${index + 1}: ${coordinates[1].toFixed(6)}, ${coordinates[0].toFixed(6)}`
+                        : 'No location found for this point'}
+                </Popup>
+            </Marker>
+        );
+    })
+) : (
+    // If no valid locations are found, display this message
+    <div>No locations available</div>
+)}
+
                 </MapContainer>
             </div>
         </div>

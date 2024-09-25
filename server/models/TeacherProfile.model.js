@@ -45,8 +45,7 @@ const TeacherProfileSchema = new mongoose.Schema({
         unique: true
     },
     AlternateContact: {
-        type: String,
-        unique: true
+        type: String
     },
     PermanentAddress: {
         HouseNo: {

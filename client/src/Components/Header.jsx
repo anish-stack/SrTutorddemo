@@ -105,7 +105,7 @@ function Header() {
         // Check if the teacher needs to complete their profile
         if (userPrefix === 'teacher') {
           const checkProfileId = user.TeacherProfile;
-          console.log(checkProfileId)
+         
           if (!checkProfileId) {
             window.location.href = `/Complete-profile?token=${token}&encoded=${user._id}`;
             return; // Exit early if redirecting
@@ -140,13 +140,13 @@ function Header() {
     student: {
       title: "Find Perfect Home Tutors",
       url: "/Student-register?source=home",
-      forgetPassword: "/Student-forget-Password?source=home",
+      forgetPassword: "/Forget-Password?source=home&type-student",
       DashboardUrl: `/Student-dashboard?login=${studentToken ? true : false}`,
     },
     teacher: {
       title: "Go Check Students Are Coming",
       url: "/teacher-register?source=home",
-      forgetPassword: "/teacher-forget-Password?source=home",
+      forgetPassword: "/Forget-Password?source=home&type-teacher",
       DashboardUrl: `/Teacher-dashboard?login=${teacherToken ? true : false}`,
     },
   };
@@ -201,9 +201,9 @@ function Header() {
                             </li>
                           </ul>
                         </li> */}
-                        <li className="">
+                        {/* <li className="">
                           <Link to="#">Membership</Link>
-                        </li>
+                        </li> */}
                         <li className="">
                           <Link to="contact-us">Contact us</Link>
                         </li>

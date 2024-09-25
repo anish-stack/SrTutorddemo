@@ -28,7 +28,7 @@ const TeacherDashboard = () => {
     const [profileFile, setProfileFile] = useState({})
     const navigate = useNavigate();
     const [showUploader, setShowUploader] = useState(false);
-
+    const teacherDetails = Cookies.get('teacherUser');
     // Toggle image uploader on double-click
     const handleDoubleClick = () => {
         setShowUploader(true);
@@ -113,7 +113,7 @@ const TeacherDashboard = () => {
                             Authorization: `Bearer ${teacherToken}`,
                         },
                     });
-                    console.log(data.data)
+                    // console.log(data.data)
                     setProfileInfo(data.data);
                     // console.log(data.data.RangeWhichWantToDoClasses);
                     setTeachingLocations(data?.data?.RangeWhichWantToDoClasses || [])
@@ -160,7 +160,11 @@ const TeacherDashboard = () => {
     }
     // Redirect to login if no token
 
-
+    // if (!teacherDetails.checkProfileId) {
+    //     window.location.href = `/Complete-profile?token=${teacherToken}&encoded=${teacherUser?._id}`;
+    //     return; // Exit early after redirecting
+    // }
+    
 
     if (!teacherToken) {
         return (
@@ -350,14 +354,14 @@ const TeacherDashboard = () => {
                         <CompleteProfile title={"Edit"} readable={false} profileInfo={profileInfo} />
                     )}
                     {activeTab === 'Request' && (
-                        <StudentRequest id={profileInfo._id} />
+                        <StudentRequest id={profileInfo?._id} />
                     )}
                     {activeTab === 'accepted' && (
-                        <AcceptRequetsByYou />
+                        <AcceptRequetsByYou id={profileInfo?._id} />
                     )}
 
                     {activeTab === 'Subscribed' && (
-                        <SubscribedStudent />
+                        <SubscribedStudent id={profileInfo?._id} />
                     )}
                     {/* {activeTab === 'Documents' && (
                         <UploadDocuments Document={profileInfo?.DocumentId} Profile={profileInfo} />

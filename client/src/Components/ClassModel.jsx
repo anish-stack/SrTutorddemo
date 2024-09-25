@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
 const ClassModel = ({ showModal, handleClose, subject }) => {
-  console.log(subject)
+
   const { Class, Subjects = [], isClass } = subject;
   const navigate = useNavigate();
   const [loginNumber, setLoginNumber] = useState()
@@ -22,6 +22,7 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
     Subject: [],
     Class: "",
     Location: "",
+    ClassLangUage: "",
     Interested: "",
     HowManyClassYouWant: "",
     MinimumBudget: "",
@@ -110,11 +111,19 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
     try {
       const response = await axios.request(options);
       const result = response.data;
-      console.log(result)
-      if (result && result.length > 0) {
-        setClickLatitude(result.latitude);
-        setClickLongitude(result.longitude);
+      if (result.latitude && result.longitude) {
+        setFormData((prevData) => ({
+          ...prevData,
+          location: {
+            type: 'Point',
+            coordinates: [result.latitude, result.longitude]
+          }
+        }));
+        console.log("FormData at location lat and long", formData)
+      } else {
+        console.error("Invalid location data:", result);
       }
+
     } catch (error) {
       console.error("Error fetching location coordinates:", error);
     }
@@ -133,7 +142,7 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
     try {
       const res = await axios.get(
         `https://api.srtutorsbureau.com/autocomplete?input=${input}`);
- 
+
       setLocationSuggestions(res.data || []);
     } catch (error) {
       if (error.response) {
@@ -243,6 +252,9 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
       requestType: "Class Teacher",
       classId: subject?._id || null,
       className: formData.Class,
+      ClassLangUage: formData.ClassLangUage,
+
+
       subjects: isClass ? formData.Subject : Subjects,
       interestedInTypeOfClass: formData.Interested,
       teacherGenderPreference: formData.TeacherGender,
@@ -253,10 +265,7 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
       locality: formData.Location,
       startDate: formData.StartDate,
       specificRequirement: formData.specificRequirement,
-      location: {
-        type: 'Point',
-        coordinates: [ClickLongitude, ClickLatitude]
-      },
+      location: formData.location,
       studentInfo: {
         studentName: formData.userContactInfo.Name,
         contactNumber: formData.userContactInfo.contactNumber,
@@ -395,6 +404,23 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
                       </Form.Group>
                     </Col>
                   </Row>
+                  <Col md={12}>
+                    <Form.Group className="mb-3"
+                      required>
+                      <Form.Label>In Which Language You Want To Do Class <b className="text-danger fs-5">*</b></Form.Label>
+                      <input
+                        type="text"
+                        id="Contact"
+                        required
+                        name="ClassLangUage"
+                        value={formData.ClassLangUage}
+                        onChange={handleChange}
+                        className="form-control"
+                        placeholder="Enter Your Language For Classe"
+                      />
+
+                    </Form.Group>
+                  </Col>
                   <Row className="mb-md-3">
                     <Col xs={12}>
                       <div className="mb-3">

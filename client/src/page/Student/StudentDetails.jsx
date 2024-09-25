@@ -110,7 +110,7 @@ const StudentDetails = ({ student, teacher }) => {
                                 </div>
                                 <li className="mb-3 l">
                                     <strong className="text-secondary">Student Waiting For You: </strong>
-                                    <span className="text-dark">{data?.dealDone ? 'Yes' : 'No'}</span>
+                                    <span className="text-dark">{data?.dealDone ? 'Studnet Got a Teacher' : 'Studnet Waiting For Your Request'}</span>
                                 </li>
                             </ul>
                         </div>
