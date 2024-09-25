@@ -2388,7 +2388,17 @@ textarea {
     display: block;
   }
 }
+
+.center{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .banner-bg-two {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 100px 0 120px;
   background-position: center;
   background-size: cover;
@@ -5986,12 +5996,18 @@ textarea {
 /*=============================
     13. Mentor
 ===============================*/
+.overflow{
+  overflow: hidden;
+
+}
 .mentors__item {
   border: 1px solid #D7DCE3;
   box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.06);
   border-radius: 10px;
+  overflow: hidden;
   background: var(--tg-common-color-white);
-  max-width: 270px;
+  max-width: 240px;
+  max-height: 340px;
   margin: 0 auto 30px;
 }
 .mentors__img {
@@ -6008,6 +6024,7 @@ textarea {
   -o-border-radius: 50%;
   -ms-border-radius: 50%;
   border-radius: 50%;
+  width: 120px;
   box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.06);
 }
 .mentors__social {
@@ -9646,10 +9663,7 @@ blockquote p {
   border-bottom: none!important;
 }
 
-.form-label,.form-control{
-  /* padding: 10px 15px!important; */
-  height: calc(3.2rem + 2px)!important;
-}
+
 
 
 

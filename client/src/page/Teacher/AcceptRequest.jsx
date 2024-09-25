@@ -14,7 +14,7 @@ const AcceptRequetsByYou = ({ id }) => {
 
     const fetchData = async (page) => {
         try {
-            const response = await axios.get(`https://api.srtutorsbureau.com/api/v1/uni/get-Request-teacher?id=66c58a1cf86a080a13569ad9&page=${page}&limit=8`);
+            const response = await axios.get(`https://api.srtutorsbureau.com/api/v1/uni/get-Request-teacher?id=${id}&page=${page}&limit=8`);
             const filteredData = response.data.data.filter(request => request.teacherAcceptThis === 'accepted');
             setData(filteredData);
             setTotalPages(Math.ceil((response.data.total || 0) / 8)); // Ensure total is valid
@@ -40,6 +40,8 @@ const AcceptRequetsByYou = ({ id }) => {
                                 <tr>
                                     <th>Class Name</th>
                                     <th>Interested In</th>
+                                    <th>Subjects </th>
+
                                     <th>Sessions</th>
                                     <th>Budget</th>
                                     <th>Locality</th>
@@ -53,6 +55,7 @@ const AcceptRequetsByYou = ({ id }) => {
                                     <tr key={request._id}>
                                         <td>{request.className}</td>
                                         <td>{request.interestedInTypeOfClass}</td>
+                                        <td>{request.subjects.join(',') ||'Not-Available' }</td>
                                         <td>{request.numberOfSessions}</td>
                                         <td>{request.minBudget} - {request.maxBudget}</td>
                                         <td>{request.locality}</td>
@@ -106,7 +109,17 @@ const AcceptRequetsByYou = ({ id }) => {
                     </div>
                 </>
             ) : (
-                <p>No requests found.</p>
+                <div className="no-requests-container text-center mt-5">
+                <div className="alert alert-info py-4">
+                  <h4 className="alert-heading">No Requests Found</h4>
+                  <p className="mb-4">
+                    Currently, there are no requests available. Please check back later.
+                  </p>
+                  {/* <a href="/make-request" className="btn btn-primary px-4 py-2">
+                    Make a New Request
+                  </a> */}
+                </div>
+              </div>
             )}
         </div>
     );

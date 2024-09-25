@@ -12,7 +12,7 @@ const StudentRegistration = () => {
     const [formData, setFormData] = useState({
         StudentName: '',
         PhoneNumber: '',
-        AltPhoneNumber: '',
+
         Email: '',
         Password: ''
     });
@@ -20,12 +20,12 @@ const StudentRegistration = () => {
         Email: '',
         otp: ''
     });
-    const[showModel,setShowModal] = useState(false)
+    const [showModel, setShowModal] = useState(false)
     const [modelOpen, setModelOpen] = useState(false);
     const [loading, setLoading] = useState(false);
 
     const handleClose = () => setModelOpen(false);
-    const loginModelClose = ()=> setShowModal(false)
+    const loginModelClose = () => setShowModal(false)
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prevData => ({
@@ -70,10 +70,13 @@ const StudentRegistration = () => {
     };
 
     const resendOtp = async () => {
+        setLoading(true);
         try {
             const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/resent-otp', { Email: verifyData.Email });
             toast.success(response.data.message);
+            setLoading(false);
         } catch (error) {
+            setLoading(false);
             console.log(error)
             toast.error(error.response?.data?.message || "An error occurred");
         }
@@ -87,7 +90,7 @@ const StudentRegistration = () => {
             console.log(response.data)
             Cookies.set('studentToken', token, { expires: 1 });
             Cookies.set('studentUser', JSON.stringify(user), { expires: 1 });
-          window.location.href="/"
+            window.location.href = "/"
         } catch (error) {
             toast.error(error.response?.data?.message || "An error occurred");
         }
@@ -105,7 +108,7 @@ const StudentRegistration = () => {
                         <div className="card ">
                             <div className="row g-0">
                                 <div className="col-md-6 d-none d-md-block">
-                                <img
+                                    <img
                                         src={ip}
                                         alt="Sample"
                                         className="img-fluid "
@@ -136,7 +139,7 @@ const StudentRegistration = () => {
                                                 </div>
                                             </div>
                                             <div className="row">
-                                                <div className="mb-3 col-md-6">
+                                                <div className="mb-3 col-md-12">
                                                     <div className="form-floating">
                                                         <input
                                                             type="text"
@@ -151,21 +154,7 @@ const StudentRegistration = () => {
                                                         <label htmlFor="PhoneNumber">Phone Number</label>
                                                     </div>
                                                 </div>
-                                                <div className="mb-3 col-md-6">
-                                                    <div className="form-floating">
-                                                        <input
-                                                            type="text"
-                                                            className="form-control"
-                                                            id="AltPhoneNumber"
-                                                            name="AltPhoneNumber"
-                                                            value={formData.AltPhoneNumber}
-                                                            onChange={handleChange}
-                                                            required
-                                                            placeholder="Alternate Number"
-                                                        />
-                                                        <label htmlFor="AltPhoneNumber">Alternate Number</label>
-                                                    </div>
-                                                </div>
+
                                             </div>
                                             <div className="mb-3">
                                                 <div className="form-floating">
@@ -256,7 +245,7 @@ const StudentRegistration = () => {
                     </Modal.Footer>
                 </Modal>
             )}
-                    <LoginModal isOpen={showModel} onClose={handleClose} modalType={"student"} />
+            <LoginModal isOpen={showModel} onClose={handleClose} modalType={"student"} />
 
         </>
     );

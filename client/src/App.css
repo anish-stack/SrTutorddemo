@@ -283,7 +283,7 @@ html {
   .notshow {
     display: none !important;
   }
-  .form-label,
+
   .form-control {
     height: calc(2.8rem + 2px) !important;
   }
@@ -1197,7 +1197,7 @@ html {
   height: 250px;
   box-shadow: 0 4px 6px rgb(229 222 222 / 42%);
   min-width: 250px;
-  max-width: 300px;
+  max-width: 250px;
 }
 
 .marquee__card h5 {

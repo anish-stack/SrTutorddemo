@@ -4,7 +4,10 @@ const SendEmail = require("../utils/SendEmails");
 
 // Define the unified Request schema
 const RequestSchema = new mongoose.Schema(
-    {
+    {   
+        ClassLangUage:{
+            type: String,
+        },
         requestId: {
             type: String,
         },

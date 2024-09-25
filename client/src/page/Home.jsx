@@ -20,11 +20,11 @@ function Home(){
         <Slider />
         <SlidingData/>
         <Quickaction />
-        <About />
+        {/* <About /> */}
         <Course />
         <Hiringtutor />
         <Whysrtutor />
-        <Discountarea />
+        {/* <Discountarea /> */}
         <Workarea />
         <Ourmentor />
         <Testimonials />

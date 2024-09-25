@@ -15,7 +15,6 @@ const TeacherRegistration = () => {
         DOB: '',
         Age: '',
         gender: '',
-        AltNumber: '',
         DocumentType: 'Aadhaar',
         DocumentImage: null, // file for identity document
         QualificationDocument: null // file for qualification document
@@ -98,7 +97,7 @@ const TeacherRegistration = () => {
         data.append('Password', formData.Password);
         data.append('DOB', formData.DOB);
         data.append('gender', formData.gender);
-        data.append('AltNumber', formData.AltNumber);
+      
 
         data.append('Document', formData.DocumentImage);
         data.append('Qualification', formData.QualificationDocument);
@@ -197,24 +196,7 @@ const TeacherRegistration = () => {
                                                     <label htmlFor="phoneNumber">Phone Number</label>
                                                 </div>
                                             </div>
-                                            <div className="mb-3 col-md-6">
-                                                <div className="form-floating">
-                                                    <input
-                                                        type="text"
-                                                        className="form-control"
-                                                        id="altNumber"
-                                                        name="AltNumber"
-                                                        value={formData.AltNumber}
-                                                        onChange={handleChange}
-                                                        required
-                                                        placeholder="Alternate Number"
-                                                    />
-                                                    <label htmlFor="altNumber">Alternate Number</label>
-                                                </div>
-                                            </div>
-                                        </div>
-    
-                                        <div className="mb-3">
+                                            <div className="mb-3  col-md-6">
                                             <div className="form-floating">
                                                 <input
                                                     type="email"
@@ -229,6 +211,9 @@ const TeacherRegistration = () => {
                                                 <label htmlFor="email">Email</label>
                                             </div>
                                         </div>
+                                        </div>
+    
+                                      
     
                                         <div className="mb-3">
                                             <div className="form-floating">
@@ -282,7 +267,7 @@ const TeacherRegistration = () => {
                                             </div>
                                         )}
     
-                                        <div className="mb-4">
+                                        <div className="mb-1">
                                             <label className="form-label">Gender</label>
                                             <div className="row">
                                                 <div className="col-md-4">
@@ -342,7 +327,7 @@ const TeacherRegistration = () => {
                                         <div className="mb-4">
                                             <Card className="p-3">
                                                 <h5>For Identical Verification</h5>
-                                                <Row className="mb-3">
+                                                <Row className="mb-1">
                                                     <Col>
                                                         <Form.Check
                                                             type="radio"
@@ -363,29 +348,11 @@ const TeacherRegistration = () => {
                                                             onChange={(e) => setFormData({ ...formData, DocumentType: e.target.value })}
                                                         />
                                                     </Col>
-                                                    <Col>
-                                                        <Form.Check
-                                                            type="radio"
-                                                            label="Voter Card"
-                                                            name="documentType"
-                                                            value="Voter Card"
-                                                            checked={formData.DocumentType === 'Voter Card'}
-                                                            onChange={(e) => setFormData({ ...formData, DocumentType: e.target.value })}
-                                                        />
-                                                    </Col>
-                                                    <Col>
-                                                        <Form.Check
-                                                            type="radio"
-                                                            label="Passport"
-                                                            name="documentType"
-                                                            value="Passport"
-                                                            checked={formData.DocumentType === 'Passport'}
-                                                            onChange={(e) => setFormData({ ...formData, DocumentType: e.target.value })}
-                                                        />
-                                                    </Col>
+                                                   
+                                                   
                                                 </Row>
     
-                                                <Form.Group className="mb-3">
+                                                <Form.Group className="">
                                                     <Form.Label>Upload Identity Document</Form.Label>
                                                     <Form.Control
                                                         type="file"

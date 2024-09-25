@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 const StudentCardForTeacher = ({ result }) => {
     const [showModal, setShowModal] = useState(false);
     const [selectedStudent, setSelectedStudent] = useState(null);
-
+   
     const handleShow = (student) => {
         setSelectedStudent(student);
         setShowModal(true);
@@ -22,11 +22,12 @@ const StudentCardForTeacher = ({ result }) => {
     };
 
     return (
-        <div className="container my-4">
-            <div className="row  gap-2">
-                {result.map((student, index) => (
+        <div className="container-fluid mx-auto my-4">
+            <div className="row mx-auto " style={{gap:0}}>
+                {result.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+.map((student, index) => (
 
-                    <div key={index} className='py-2 position-relative gap-2 hs col-md-3 px-1 glass'>
+                    <div key={index} className='py-2 col-lg-3 position-relative col-md-4 hs mb-2 mr-1 gap-1 col-12 position-relative gap-0 hs  px-1 glass'>
 
                         <div style={{ cursor: 'pointer' }} className="profile-section py-1 ">
                             <div className="book-img text-end">
@@ -42,10 +43,10 @@ const StudentCardForTeacher = ({ result }) => {
                                 </div>
                                 <div className="card-body p-0 text-sm-center  text-center">
                                     <div className="profile-name w-100 d-flex align-item-center flex-column justify-content-center text-center">
-                                        <h4 className="text-black text-center mb-0 fw-bold">{student.studentName || "Amelia Jackson"}</h4>
+                                        <h4 className="text-black text-center mb-0 fw-bold">{student.studentInfo.studentName || "Amelia Jackson"}</h4>
 
                                         <p className="fs-14 text-gray-200">
-                                            {student.SpecificRequirement || null}
+                                            {student.specificRequirement || null}
 
                                         </p>
 
@@ -66,7 +67,7 @@ const StudentCardForTeacher = ({ result }) => {
                                             <i className="fas fa-phone-alt text-yellow-500" style={{ fontSize: '18px' }}></i>
                                         </div>
                                         <div className="contact-desc">
-                                            <a href="tel:+1 4078461474" className="text-black fw-5">
+                                            <a href="tel: 9811382915 " className="text-black fw-5">
                                                 I Want {student.teacherGender} Teacher
                                             </a>
                                         </div>
@@ -136,13 +137,13 @@ const StudentCardForTeacher = ({ result }) => {
                                 <li key={subject._id}>{subject}</li>
                             ))}
                         </ul>
-                        <p><strong>Interested In:</strong> {selectedStudent.interested}</p>
-                        <p><strong>Teacher Preference:</strong> {selectedStudent.teacherGender}</p>
+                        <p><strong>Interested In:</strong> {selectedStudent.interestedInTypeOfClass}</p>
+                        <p><strong>Teacher Preference:</strong> {selectedStudent.teacherGenderPreference}</p>
                         <p><strong>Number of Sessions:</strong> {selectedStudent.numberOfSessions}</p>
                         <p><strong>Budget:</strong> {selectedStudent.minBudget} - {selectedStudent.maxBudget}</p>
-                        <p><strong>Locality:</strong> {selectedStudent.location}</p>
+                        {/* <p><strong>Locality:</strong> {selectedStudent.location}</p> */}
                         {/* <p><strong>Start Date:</strong> {selectedStudent.StartDate}</p> */}
-                        <p><strong>Specific Requirements:</strong> {selectedStudent.userContactInfo.specificRequirement}</p>
+                        <p><strong>Specific Requirements:</strong> {selectedStudent.specificRequirement}</p>
                         {/* <p><strong>Post Verified:</strong> {selectedStudent.PostIsVerifiedOrNot ? 'Yes' : 'No'}</p> */}
                     </Modal.Body>
                     <Modal.Footer>

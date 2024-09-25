@@ -104,7 +104,7 @@ const AllStudents = () => {
     return (
         <div className="p-4">
             <h1 className="text-xl font-bold mb-4">All Students</h1>
-            
+
             {/* Filtering */}
             <div className="mb-4">
                 <input
@@ -116,19 +116,10 @@ const AllStudents = () => {
                 />
             </div>
 
-            {/* Sorting */}
-            <div className="mb-4">
-                <select
-                    value={sort}
-                    onChange={(e) => setSort(e.target.value)}
-                    className="p-2 border border-gray-300 rounded"
-                >
-                    <option value="createdAt">Sort by Created Date</option>
-                    {/* Add more sorting options here if needed */}
-                </select>
-            </div>
+          
+           
 
-            <table className="min-w-full text-center bg-white border border-gray-200">
+            <table className="min-w-full text-start bg-white border border-gray-200">
                 <thead>
                     <tr>
                         <th className="py-2 px-4 border-b">Name</th>
@@ -143,7 +134,7 @@ const AllStudents = () => {
                 <tbody>
                     {currentStudents.map(student => (
                         <tr className="text-center" key={student._id}>
-                            <td className="py-2 h-11 px-4 border-b">{student.StudentName}</td>
+                            <td className="py-2 capitalize h-11 px-4 border-b">{student.StudentName}</td>
                             <td className="py-2 h-11 px-4 border-b">{student.PhoneNumber}</td>
                             <td className="py-2 h-11 px-4 border-b">{student.Email}</td>
                             <td className="h-11 px-4 border-b flex items-center justify-center">

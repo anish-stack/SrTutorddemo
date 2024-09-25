@@ -60,6 +60,7 @@ const SingleRequestModel = ({ isOpen, SelectedData, onClose }) => {
                         <p><strong>Request Type:</strong> {data.requestType || 'N/A'}</p>
                         <p><strong>Class:</strong> {data.className || 'N/A'}</p>
                         <p><strong>Subjects:</strong> {data.subjects?.join(', ') || 'N/A'}</p>
+                        <p><strong>Subject language:</strong> {data?.ClassLangUage || 'N/A'}</p>
                         <p><strong>Type of Class:</strong> {data.interestedInTypeOfClass || 'N/A'}</p>
                         <p><strong>Teacher Gender Preference:</strong> {data.teacherGenderPreference || 'N/A'}</p>
                         <p><strong>Number of Sessions:</strong> {data.numberOfSessions || 'N/A'}</p>

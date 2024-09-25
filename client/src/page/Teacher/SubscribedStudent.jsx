@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Card,Alert, Container, Row, Col } from 'react-bootstrap';
 import './SubscribedStudent.css'; // Custom CSS for animations and styles
 
-const SubscribedStudent = () => {
+const SubscribedStudent = ({id}) => {
     const [data, setData] = useState([]);
 
     useEffect(() => {
@@ -12,7 +12,7 @@ const SubscribedStudent = () => {
 
     const fetchData = async () => {
         try {
-            const response = await axios.get('https://api.srtutorsbureau.com/api/v1/uni/get-Request-teacher?id=66c58a1cf86a080a13569ad9&page=1&limit=8');
+            const response = await axios.get(`https://api.srtutorsbureau.com/api/v1/uni/get-Request-teacher?id=${id}&page=1&limit=8`);
             const filteredData = response.data.data.filter(request => request.dealDone === true && request.teacherAcceptThis !== 'declined');
             setData(filteredData);
         } catch (error) {
@@ -28,33 +28,44 @@ const SubscribedStudent = () => {
             </Alert>
         ) : (
             <Row>
-                {data.map(item => (
-                    <Col md={6} lg={4} key={item._id} className="mb-4">
-                        <Card className={`custom-card ${item.teacherAcceptThis === 'accepted' ? 'accepted' : 'pending'}`}>
-                            <Card.Body>
-                                <Card.Title>{item.className}</Card.Title>
-                                <Card.Subtitle className="mb-2 text-muted">
-                                    Student: {item.studentInfo.studentName}
-                                </Card.Subtitle>
-                                <Card.Text>
-                                    <strong>Contact:</strong> {item.studentInfo.contactNumber}<br />
-                                    <strong>Email:</strong> {item.studentInfo.emailAddress}<br />
-                                    <strong>Class Type:</strong> {item.interestedInTypeOfClass}<br />
-                                    <strong>Sessions:</strong> {item.numberOfSessions}<br />
-                                    <strong>Budget:</strong> {item.minBudget} - {item.maxBudget}<br />
-                                    <strong>Locality:</strong> {item.locality}<br />
-                                    <strong>Start Date:</strong> {new Date(item.startDate).toLocaleDateString()}
-                                </Card.Text>
-                                <Card.Footer>
-                                    <span className={`badge ${item.dealDone ? 'badge-success' : 'badge-secondary'}`}>
-                                        {item.dealDone ? 'Deal Done' : 'Pending'}
-                                    </span>
-                                </Card.Footer>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                ))}
-            </Row>
+            {data && data.length > 0 ? (
+              data.map((item) => (
+                <Col md={6} lg={4} key={item._id} className="mb-4">
+                  <Card className={`custom-card ${item.teacherAcceptThis === 'accepted' ? 'accepted' : 'pending'}`}>
+                    <Card.Body>
+                      <Card.Title>{item.className}</Card.Title>
+                      <Card.Subtitle className="mb-2 text-muted">
+                        Student: {item.studentInfo.studentName}
+                      </Card.Subtitle>
+                      <Card.Text>
+                        <strong>Contact:</strong> {item.studentInfo.contactNumber}
+                        <br />
+                        <strong>Email:</strong> {item.studentInfo.emailAddress}
+                        <br />
+                        <strong>Class Type:</strong> {item.interestedInTypeOfClass}
+                        <br />
+                        <strong>Sessions:</strong> {item.numberOfSessions}
+                        <br />
+                        <strong>Budget:</strong> {item.minBudget} - {item.maxBudget}
+                        <br />
+                        <strong>Locality:</strong> {item.locality}
+                        <br />
+                        <strong>Start Date:</strong> {new Date(item.startDate).toLocaleDateString()}
+                      </Card.Text>
+                      <Card.Footer>
+                        <span className={`badge ${item.dealDone ? 'badge-success' : 'badge-secondary'}`}>
+                          {item.dealDone ? 'Deal Done' : 'Pending'}
+                        </span>
+                      </Card.Footer>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              ))
+            ) : (
+              <p>No data available</p>
+            )}
+          </Row>
+          
         )}
     </Container>
     );

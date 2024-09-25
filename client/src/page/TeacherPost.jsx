@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { Button, Form, Modal, Container } from "react-bootstrap";
+import { Button, Form, Modal, Container, Col } from "react-bootstrap";
 import Select from "react-select";
 import Cookies from 'js-cookie';
 import toast from "react-hot-toast";
@@ -17,6 +17,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
             contactNumber: '',
             emailAddress: ''
         },
+        ClassLangUage: '',
         teacherGenderPreference: 'Male', // default
         numberOfSessions: '',
         experienceRequired: '',
@@ -108,7 +109,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
         const options = {
             method: 'GET',
             url: `https://api.srtutorsbureau.com/geocode?address=${address}`
-          };
+        };
 
         try {
             const response = await axios.request(options);
@@ -196,6 +197,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
             interestedInTypeOfClass: formData.interestedInTypeOfClass.value,
             teacherGenderPreference: formData.teacherGenderPreference,
             numberOfSessions: formData.numberOfSessions.value,
+            ClassLangUage: formData.ClassLangUage,
             experienceRequired: formData.experienceRequired,
             minBudget: formData.minBudget,
             maxBudget: formData.maxBudget || '1000',
@@ -453,6 +455,23 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
                                                     required
                                                 />
                                             </Form.Group>
+                                            <Col md={12}>
+                                                <Form.Group className="mb-3"
+                                                    required>
+                                                    <Form.Label>In Which Language You Want To Do Class <b className="text-danger fs-5">*</b></Form.Label>
+                                                    <input
+                                                        type="text"
+                                                        id="Contact"
+                                                        required
+                                                        name="ClassLangUage"
+                                                        value={formData.ClassLangUage}
+                                                        onChange={handleChange}
+                                                        className="form-control"
+                                                        placeholder="Enter Your Language For Classe"
+                                                    />
+
+                                                </Form.Group>
+                                            </Col>
                                         </div>
                                     )}
 
@@ -555,7 +574,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
                                                 />
                                             </Form.Group>
                                             <Form.Group>
-                                                <Form.Label>Location</Form.Label>
+                                                <Form.Label>Nearby Place</Form.Label>
                                                 <input
                                                     type="text"
                                                     id="locality"

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-
+import toast from 'react-hot-toast'
 const AllotTeacher = ({ isOpen, SelectedRequest, onClose }) => {
     console.log(SelectedRequest)
     const [teacherId, setTeacherId] = useState('');
@@ -13,9 +13,11 @@ const AllotTeacher = ({ isOpen, SelectedRequest, onClose }) => {
                 requestId: SelectedRequest._id,
                 teacherId,
             });
-            console.log(data);
+            toast.success("Teacher Alloted Successful")
+            onClose()
         } catch (error) {
             console.log(error);
+            toast.error("Plaese try Again")
         }
     };
 

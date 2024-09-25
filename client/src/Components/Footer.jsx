@@ -69,19 +69,25 @@ function Footer() {
                                             <li className="number">sachinkumarsrtb@yahoo.in</li>
                                             <li className="number">+91 9811382915 | 9899247916</li>
                                             <li className="socials">
-                                                <a href="#">
+                                                <a  target="_blank" href="https://www.facebook.com/SRTutorsbureau">
                                                     <i className="fab fa-facebook-f" />
                                                 </a>
-                                                <a href="#">
+                                                <a  target="_blank" href="https://x.com/i/flow/login?redirect_after_login=%2FSR_TUTORS">
                                                     <i className="fab fa-twitter" />
                                                 </a>
-                                                <a href="#">
-                                                    <i className="fab fa-whatsapp" />
+                                                <a
+                                                     target="_blank" href="https://wa.me/+9811382915" // Correct WhatsApp link format
+                                                   
+                                                    rel="noopener noreferrer"  // Improves security by preventing the new page from accessing your window object
+                                                    aria-label="Chat on WhatsApp"
+                                                >
+                                                    <i className="fab fa-whatsapp text-green-500 text-xl" /> {/* Optional: Add some Tailwind classes for styling */}
                                                 </a>
-                                                <a href="#">
+
+                                                <a  target="_blank" href="https://in.linkedin.com/in/sr-tutors-bureau-b92384116">
                                                     <i className="fab fa-linkedin-in" />
                                                 </a>
-                                                <a href="#">
+                                                <a  target="_blank" href="#">
                                                     <i className="fab fa-youtube" />
                                                 </a>
                                             </li>

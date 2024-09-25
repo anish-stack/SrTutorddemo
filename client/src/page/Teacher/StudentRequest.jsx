@@ -55,6 +55,7 @@ const StudentRequest = ({ id }) => {
                                 <tr>
                                     <th>Class Name</th>
                                     <th>Interested In</th>
+                                    <th>Subjects </th>
                                     <th>Sessions</th>
                                     <th>Budget</th>
                                     <th>Locality</th>
@@ -67,7 +68,9 @@ const StudentRequest = ({ id }) => {
                                 {data.map(request => (
                                     <tr key={request._id}>
                                         <td>{request.className}</td>
+
                                         <td>{request.interestedInTypeOfClass}</td>
+                                        <td>{request.subjects.join(',') || 'Not-Available'}</td>
                                         <td>{request.numberOfSessions}</td>
                                         <td>{request.minBudget} - {request.maxBudget}</td>
                                         <td>{request.locality}</td>
@@ -133,7 +136,15 @@ const StudentRequest = ({ id }) => {
                     </div>
                 </>
             ) : (
-                <p>No requests found.</p>
+                <div className="no-requests-container text-center mt-5">
+                    <div className="alert alert-info py-4">
+                        <h4 className="alert-heading">No Requests Found</h4>
+                        <p className="mb-4">
+                            Currently, there are no requests available. Please check back later.
+                        </p>
+
+                    </div>
+                </div>
             )}
         </div>
     );
