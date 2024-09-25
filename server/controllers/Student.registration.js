@@ -311,59 +311,62 @@ exports.StudentVerifyOtp = CatchAsync(async (req, res) => {
 
 //Student Resent Otp
 exports.StudentResendOtp = CatchAsync(async (req, res) => {
-    const { PhoneNumber, Email } = req.body;
-    console.log(req.body)
-    const student = await Student.findOne({ Email }) || await Student.findOne({ PhoneNumber });
-    if (!student) {
-        return res.status(404).json({ message: 'Student not found' });
-    }
-
-    console.log(student)
-    const newOtp = crypto.randomInt(100000, 999999)
-    student.SignInOtp = newOtp
-    student.OtpExpiresTime = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
-    await student.save();
-    const Options = {
-        email: Email,
-        subject: 'Resent OTP For Verification',
-        message: `<div style="font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f5f5f5; padding: 20px;">
-                    <div style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #E21C1C;">
-                    <h2 style="color: #E21C1C; text-align: center; margin-top: 0;">OTP Verification</h2>
-                    <p>Dear ${student.StudentName},</p>
-                    <p>We are pleased to inform you that your OTP for verification is:</p>
-                    <p style="font-size: 24px; font-weight: bold; color: #E21C1C; text-align: center; margin: 20px 0;">
-                        ${student.SignInOtp}
-                    </p>
-                    <p>Please use this OTP to complete your verification process. This OTP is valid for a limited time, so kindly proceed without delay.</p>
-                    <p>If you did not request this OTP, please disregard this message.</p>
-                    <p>Best regards,</p>
-                    <p><strong>S R Tutors</strong></p>
-                    <hr style="border: 0; height: 1px; background-color: #E21C1C; margin: 20px 0;">
-                    <p style="font-size: 12px; color: #000000; text-align: center;">This is an automated message. Please do not reply.</p>
-                    </div>
-                    </div>
-                            `
-    };
-
     try {
-        const sendOtpOnMobileNumber = await axios.get(`https://2factor.in/API/V1/${process.env.TWOFACTOR_API_KEY}/SMS/${PhoneNumber}/${newOtp}/OTP1`);
+        console.log("I am hit");
+        const { PhoneNumber, Email } = req.body;
+        console.log(req.body);
+
+        const student = await Student.findOne({ Email }) || await Student.findOne({ PhoneNumber });
+        if (!student) {
+            return res.status(404).json({ message: 'Student not found' });
+        }
+
+        console.log(student);
+        const newOtp = crypto.randomInt(100000, 999999);
+        student.SignInOtp = newOtp;
+        student.OtpExpiresTime = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
+        await student.save();
+
+        const Options = {
+            email: Email,
+            subject: 'Resent OTP For Verification',
+            message: `<div style="font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f5f5f5; padding: 20px;">
+                        <div style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #E21C1C;">
+                        <h2 style="color: #E21C1C; text-align: center; margin-top: 0;">OTP Verification</h2>
+                        <p>Dear ${student.StudentName},</p>
+                        <p>We are pleased to inform you that your OTP for verification is:</p>
+                        <p style="font-size: 24px; font-weight: bold; color: #E21C1C; text-align: center; margin: 20px 0;">
+                            ${student.SignInOtp}
+                        </p>
+                        <p>Please use this OTP to complete your verification process. This OTP is valid for a limited time, so kindly proceed without delay.</p>
+                        <p>If you did not request this OTP, please disregard this message.</p>
+                        <p>Best regards,</p>
+                        <p><strong>S R Tutors</strong></p>
+                        <hr style="border: 0; height: 1px; background-color: #E21C1C; margin: 20px 0;">
+                        <p style="font-size: 12px; color: #000000; text-align: center;">This is an automated message. Please do not reply.</p>
+                        </div>
+                        </div>`
+        };
+
+        console.log(process.env.TWO_FACTOR_API_KEY);
+
+        const sendOtpOnMobileNumber = await axios.get(`https://2factor.in/API/V1/${process.env.TWO_FACTOR_API_KEY}/SMS/${PhoneNumber}/${newOtp}/OTP1`);
         if (sendOtpOnMobileNumber.data.Status !== 'Success') {
             return res.status(400).json({ message: 'Failed to send OTP' });
         }
+
+        // Send OTP email if Email is provided
+        if (Email) {
+            await sendEmail(Options);
+        }
+
+        res.status(200).json({ message: 'OTP resent successfully' });
     } catch (error) {
-        console.log(error)
-        return res.status(400).json({ message: 'Failed to send OTP' });
+        console.error("Error in StudentResendOtp:", error);
+        res.status(500).json({ message: 'Internal server error' });
     }
-
-    // Send OTP email if Email is provided
-    if (Email) {
-
-        await sendEmail(Options);
-
-    }
-
-    res.status(200).json({ message: 'OTP resent Successful' });
 });
+
 //Student And 
 exports.StudentLogin = CatchAsync(async (req, res) => {
     try {
