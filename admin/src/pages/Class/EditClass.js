@@ -241,54 +241,63 @@ const EditClass = () => {
                 </div>
             )}
 
-            {activeTab === 'subjects' && (
-                <div>
-                    <div className="max-w-7xl mx-auto p-2">
-                        <div className="bg-white p-4 rounded-lg shadow-xl">
-                            <h2 className="text-2xl font-semibold mb-4">Edit Subjects</h2>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                {formData.Subjects.map((subject, index) => (
-                                    <div key={index} className="items-center space-y-2 sm:space-y-0 sm:space-x-3 mb-4 p-4 border border-gray-200 rounded-lg shadow-sm bg-white">
-                                        <input
-                                            type="text"
-                                            name="SubjectName"
-                                            value={subject.SubjectName || ''}
-                                            onChange={(e) => handleChange(e, index, 'subject')}
-                                            className="p-3 border w-full border-gray-300 rounded-lg flex-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                            placeholder="Subject Name"
-                                            required
-                                        />
-                                        <div className="flex mt-5 items-center justify-between">
-                                            <button
-                                                type="button"
-                                                onClick={() => handleDeleteSubject(subject._id)}
-                                                className="whitespace-nowrap gap-1 mt-2 flex items-center justify-center rounded border text-xs border-red-400 bg-gradient-to-r from-red-100 to-red-200 px-4 py-1 font-semibold text-red-600 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-offset-2 active:opacity-100 transition duration-150"
-                                                disabled={formData.Subjects.length <= 1}
-                                            >
-                                                Remove <IoIosRemoveCircleOutline />
-                                            </button>
-                                            <button
-                                                type="button"
-                                                onClick={() => handleSubjectNameEdit(subject._id, subject.SubjectName)}
-                                                className="whitespace-nowrap gap-1 mt-2 text-xs flex items-center justify-center rounded border border-green-400 bg-gradient-to-r from-green-100 to-green-200 px-4 py-1 font-semibold text-green-600 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-green-300 focus:ring-offset-2 active:opacity-100 transition duration-150"
-                                            >
-                                                Update <RxUpdate />
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
+{activeTab === 'subjects' && (
+    <div>
+        <div className="max-w-7xl mx-auto p-2">
+            <div className="bg-white p-4 rounded-lg shadow-xl">
+                <h2 className="text-2xl font-semibold mb-4">Edit Subjects</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {formData.Subjects.map((subject, index) => (
+                        <div
+                            key={index}
+                            className="items-center relative space-y-2 sm:space-y-0 sm:space-x-3 mb-4 p-4 border border-gray-200 rounded-lg shadow-sm bg-white"
+                        >
+                            <input
+                                type="text"
+                                name="SubjectName"
+                                value={subject.SubjectName || ''}
+                                onChange={(e) => handleChange(e, index, 'subject')}
+                                className="p-3 border w-full border-gray-300 rounded-lg flex-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                placeholder="Subject Name"
+                                required
+                            />
+                            <div className="flex mt-5 items-center justify-between">
+                                <button
+                                    type="button"
+                                    onClick={() => subject._id ? handleDeleteSubject(subject._id) : removeSubject(index)}
+                                    className="whitespace-nowrap gap-1 mt-2 flex items-center justify-center rounded border text-xs border-red-400 bg-gradient-to-r from-red-100 to-red-200 px-4 py-1 font-semibold text-red-600 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-offset-2 active:opacity-100 transition duration-150"
+                                    disabled={formData.Subjects.length <= 1}
+                                >
+                                    Remove <IoIosRemoveCircleOutline />
+                                </button>
+                                
+                                <button
+                                    type="button"
+                                    onClick={() => handleSubjectNameEdit(subject._id, subject.SubjectName)}
+                                    className="whitespace-nowrap gap-1 mt-2 text-xs flex items-center justify-center rounded border border-green-400 bg-gradient-to-r from-green-100 to-green-200 px-4 py-1 font-semibold text-green-600 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-green-300 focus:ring-offset-2 active:opacity-100 transition duration-150"
+                                >
+                                    Update <RxUpdate />
+                                </button>
                             </div>
-                            <button
-                                type="button"
-                                onClick={addSubject}
-                                className="w-full flex justify-center cursor-pointer items-center gap-1 rounded border border-green-300 bg-gradient-to-b from-green-50 to-green-200 px-4 py-2 font-semibold hover:opacity-90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-green-300 focus-visible:ring-offset-2 active:opacity-100"
-                            >
-                                Add Subject <IoMdAdd />
-                            </button>
                         </div>
-                    </div>
+                    ))}
                 </div>
-            )}
+                {/* <div className='grid grid-cols-1 '>
+                
+                    <button
+                        type="button"
+                        onClick={addSubject}
+                        className="w-full flex justify-center cursor-pointer items-center gap-1 rounded border border-green-300 bg-gradient-to-b from-green-50 to-green-200 px-4 py-2 font-semibold hover:opacity-90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-green-300 focus-visible:ring-offset-2 active:opacity-100"
+                    >
+                        Add Subject <IoMdAdd />
+                    </button>
+                </div> */}
+            </div>
+        </div>
+    </div>
+)}
+
+
         </>
     );
 }

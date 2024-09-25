@@ -66,21 +66,21 @@ const TeacherSchema = new mongoose.Schema({
         },
         DocumentImageUrl: {
             type: String,
-            required: true
+            
         },
         DocumentPublicId: {
             type: String,
-            required: true
+            
         }
     },
     QualificationDocument: {
         QualificationImageUrl: {
             type: String,
-            required: true
+            
         },
         QualificationPublicId: {
             type: String,
-            required: true
+            
         }
     },
     DocumentStatus:{

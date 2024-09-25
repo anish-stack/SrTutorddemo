@@ -53,7 +53,6 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
     if (!Password) missingFields.push("Password");
     if (!DOB) missingFields.push("Date of Birth");
     if (!gender) missingFields.push("Gender");
-    if (!AltNumber) missingFields.push("Alternate Number");
 
     if (missingFields.length > 0) {
       return res.status(400).json({
@@ -99,9 +98,9 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
     }
 
     const DocumentFile = req.files?.Document?.[0];
-    console.log("DocumentFile",DocumentFile)
+
     const QualificationFile = req.files?.Qualification?.[0];
-    console.log("QualificationFile",QualificationFile)
+
     if (!DocumentFile) {
       return res.status(400).json({
         message: "No Document file uploaded. Please upload an identity document.",
@@ -197,7 +196,7 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
     };
 
     await sendEmail(Options);
-console.log("newTeacher",newTeacher)
+    console.log("newTeacher", newTeacher)
 
     res.status(201).json({
       message: "Teacher registered successfully. Please verify your email.",
@@ -499,30 +498,28 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
 
     } = req.body;
     const ranges = RangeWhichWantToDoClasses.flatMap((range) => range)
-    console.log(ranges)
+    const emptyFields = [];
 
     // Validate that all required fields are present and not empty
-    if (
-      !FullName ||
-      !DOB ||
-      !Gender ||
-      !ContactNumber ||
-      !AlternateContact ||
-      !PermanentAddress ||
-      !CurrentAddress ||
-      !Qualification ||
-      !TeachingExperience ||
-      !ExpectedFees ||
-      !TeachingMode ||
-      !AcademicInformation ||
+    if (!FullName) emptyFields.push('FullName');
+    if (!DOB) emptyFields.push('DOB');
+    if (!Gender) emptyFields.push('Gender');
+    if (!ContactNumber) emptyFields.push('ContactNumber');
+    if (!PermanentAddress) emptyFields.push('PermanentAddress');
+    if (!CurrentAddress) emptyFields.push('CurrentAddress');
+    if (!Qualification) emptyFields.push('Qualification');
+    if (!TeachingExperience) emptyFields.push('TeachingExperience');
+    if (!ExpectedFees) emptyFields.push('ExpectedFees');
+    if (!TeachingMode) emptyFields.push('TeachingMode');
+    if (!AcademicInformation) emptyFields.push('AcademicInformation');
+    if (!RangeWhichWantToDoClasses) emptyFields.push('RangeWhichWantToDoClasses');
 
-      !RangeWhichWantToDoClasses
-    ) {
-      return res
-        .status(400)
-        .json({ message: "All fields are required and must not be empty" });
+    // If there are any missing fields, return an error
+    if (emptyFields.length > 0) {
+      return res.status(400).json({
+        message: `Please complete the following required fields: ${emptyFields.join(', ')}`,
+      });
     }
-
     // Validate that PermanentAddress and CurrentAddress contain required sub-fields
     const requiredAddressFields = [
       "HouseNo",
@@ -1244,7 +1241,7 @@ exports.GetAllTeacher = CatchAsync(async (req, res) => {
     }
 
     // Fetch Teacher from database
-    const teacher = await Teacher.find();
+    const teacher = await Teacher.find().populate('TeacherProfile');
 
     if (!teacher) {
       return res.status(404).json({
@@ -1272,7 +1269,13 @@ exports.GetAllTeacher = CatchAsync(async (req, res) => {
 
 exports.GetTopTeacher = CatchAsync(async (req, res) => {
   try {
-    const teachers = await Teacher.find({ isTopTeacher: true });
+    // Fetching top teachers with a populated TeacherProfile
+    const teachers = await Teacher.find({
+      isTopTeacher: true,
+      TeacherProfile: { $exists: true } // Ensures TeacherProfile is not null or undefined
+    }).populate('TeacherProfile'); // Populate the associated TeacherProfile model
+
+    // If no teachers found, send a 404 response
     if (!teachers || teachers.length === 0) {
       return res.status(404).json({
         success: false,
@@ -1280,28 +1283,31 @@ exports.GetTopTeacher = CatchAsync(async (req, res) => {
       });
     }
 
-    // Randomly select 10 teachers
+    // Randomly select up to 12 teachers
     const randomTeachers = teachers
       .sort(() => 0.5 - Math.random())
       .slice(0, 12);
 
+    // Send the selected teachers in the response
     res.status(200).json({
       success: true,
-      message: "Teacher fetched successfully from DB",
+      message: "Teachers fetched successfully from DB",
       data: randomTeachers,
     });
   } catch (error) {
+    // Handle any errors during fetching
     res.status(500).json({
       success: false,
-      message: "Error fetching teacher",
+      message: "Error fetching teachers",
       error: error.message,
     });
   }
 });
 
+
 exports.AdvancedQueryForFindingTeacher = CatchAsync(async (req, res) => {
   try {
-    const query = req.body; // Extract the query from the request body
+    const query = req.body;
     let results = [];
     // console.log(query)
     // 1. Filter by Gender
@@ -1503,7 +1509,7 @@ exports.SearchByMinimumCondition = CatchAsync(async (req, res) => {
       if (findTeacherRequest.length === 0) {
         return res.status(404).json({ message: 'No teachers found.' });
       }
-      console.log("findTeacherRequest", findTeacherRequest)
+      // console.log("findTeacherRequest", findTeacherRequest)
       finalResults = findTeacherRequest;
     } else {
       return res.status(400).json({ message: 'Invalid role.' });

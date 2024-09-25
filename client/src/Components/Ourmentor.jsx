@@ -3,6 +3,9 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
+import s from './s.jpg'
+import g from './g.webp'
+
 function Ourmentor() {
 
     const [mentor, setMentors] = useState([]);
@@ -10,7 +13,7 @@ function Ourmentor() {
     const fetchteacher = async () => {
         try {
             const response = await axios.get('https://api.srtutorsbureau.com/api/v1/admin/Get-top-teacher');
-            console.log(response.data)
+            console.log("Teacher data", response.data)
             setMentors(response.data.data);
         } catch (error) {
             console.error("Failed to fetch testimonials", error);
@@ -77,7 +80,7 @@ function Ourmentor() {
                             </div>
                             <div className="col-md-4">
                                 <div className="tg-button-wrap justify-content-center justify-content-md-end">
-                                    <Link to="#" className="btn btn-border tg-svg">
+                                    <Link to="Browse-Tutors?lat=28.69095122910227&lng=77.15180900514962" className="btn btn-border tg-svg">
                                         <span className="text">All Instructors</span>{" "}
                                         <span
                                             className="svg-icon"
@@ -91,14 +94,14 @@ function Ourmentor() {
                     </div>
                     <div className="row justify-content-center">
                         {
-                            mentor && mentor.map((item, index) => (
+                            mentor && mentor.reverse().slice(0, 4).map((item, index) => (
 
-                                <div key={index} className="col-xl-3 col-lg-4 col-md-5 col-sm-6">
-                                    <div className="mentors__item">
+                                <div key={index} className="col-xl-3 col-lg-4 col-md-5 overflow col-sm-6">
+                                    <div className="mentors__item overflow position-relative">
                                         <div className="mentors__img">
                                             <Link to="#">
                                                 <img
-                                                    src={item.gender === 'Female' ? 'https://i.ibb.co/THt3vk2/girl.jpg' : 'https://i.ibb.co/fkvB73W/boy.jpg'}
+                                                    src={item.gender === 'Female' ? g : s}
                                                     alt="mentor"
                                                 />
                                             </Link>
@@ -124,11 +127,15 @@ function Ourmentor() {
                                                         <i className="flaticon-user-1" /> {item.totalStudent ? ` +` : `${Math.floor(Math.random() * 81) + 20} +`}
                                                     </li>
 
-                                                    <li className="rating"><i className={"flaticon-user-1"} /><span className="rating-count">{item.mentor_rating}</span></li>
+                                                    <li className="rating"><i className={"flaticon-star"} /><span className="rating-count">⭐⭐⭐⭐⭐</span></li>
                                                 </ul>
                                             </div>
+                                            <div className='teacher-tag'>
+                                        <span style={{fontSize:10}}>Sr Tutors Verified</span>
+                                    </div>
                                         </div>
                                     </div>
+                                   
                                 </div>
 
                             ))

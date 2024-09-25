@@ -5,6 +5,7 @@ import Loading from '../../components/Loading/Loading';
 import { MdVerifiedUser } from "react-icons/md";
 import { IoIosCloseCircle } from "react-icons/io";
 import { Link } from 'react-router-dom'
+import axios from 'axios'
 import AdvancedSearchModel from './AdvancedSearchModel';
 const PAGE_SIZE = 10; // Number of teachers per page
 
@@ -65,6 +66,19 @@ const Teacher = () => {
         setFilteredData(filtered);
         setCurrentPage(1); // Reset to first page after filtering
     };
+
+    const makeVerifed = async (teacherId, stauts) => {
+        try {
+            const res = await axios.post(`https://api.srtutorsbureau.com/api/v1/uni/Make-teacher-Verified?teacherId=${teacherId}&status=${stauts}`)
+            dispatch(AllTeacher());
+        } catch (error) {
+            console.log(error)
+
+        }
+    }
+
+
+
     const handleProfiledTeacherFilter = (e) => {
         const checked = e.target.checked;
         const filtered = teacherData.filter(teacher =>
@@ -86,7 +100,7 @@ const Teacher = () => {
     const startIndex = (currentPage - 1) * PAGE_SIZE;
     const paginatedData = (filteredData || []).slice(startIndex, startIndex + PAGE_SIZE);
     const totalPages = Math.ceil((filteredData || []).length / PAGE_SIZE);
-
+    console.log(paginatedData)
     return (
         <div className="w-full h-screen overflow-auto py-5 px-4">
             <h2 className="text-xl font-semibold mb-4">All Teachers</h2>
@@ -175,7 +189,7 @@ const Teacher = () => {
                     <p className='ml-2'> Show Which have Profiled Teachers</p>
                 </label>
                 <div>
-                    <button onClick={handleAdvancedClick}  className='bg-indigo-400 px-2 py-2 text-white text-sm rounded-3xl'>Advanced Search</button>
+                    <button onClick={handleAdvancedClick} className='bg-indigo-400 px-2 py-2 text-white text-sm rounded-3xl'>Advanced Search</button>
                 </div>
             </div>
 
@@ -198,16 +212,28 @@ const Teacher = () => {
                                 <td className="py-1 whitespace-nowrap px-4 text-sm text-gray-600">{teacher.PhoneNumber}</td>
                                 <td className="py-1 whitespace-nowrap px-4 text-sm text-gray-600">{teacher.Email}</td>
                                 {/* <td className="py-1 whitespace-nowrap px-4 text-sm text-gray-600">{teacher.isTeacherVerified ? 'Yes' : 'No'}</td> */}
-                                <td className="py-2 px-4 text-center border-b">{teacher.isTeacherVerified ? <MdVerifiedUser className='text-3xl  text-green-400'/> : <IoIosCloseCircle className='text-3xl  text-red-400'/>}</td>
+                                <td className="py-2 px-4 text-center border-b">{teacher.isTeacherVerified ? <MdVerifiedUser className='text-3xl  text-green-400' /> : <IoIosCloseCircle className='text-3xl  text-red-400' />}</td>
 
                                 <td className="py-1 whitespace-nowrap px-4 text-sm">
                                     {teacher.TeacherProfile ? (
-                                        <Link
-                                            to={`${teacher._id}`}
-                                            className="inline-flex whitespace-nowrap overflow-hidden cursor-pointer items-center gap-1 rounded border border-slate-300 bg-gradient-to-b from-slate-50 to-slate-200 px-4 py-2 font-semibold hover:opacity-90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-300 focus-visible:ring-offset-2 active:opacity-100"
-                                        >
-                                            Check Profile
-                                        </Link>
+                                        <>
+                                            <Link
+                                                to={`${teacher._id}`}
+                                                className="inline-flex mr-4 whitespace-nowrap overflow-hidden cursor-pointer items-center gap-1 rounded border border-slate-300 bg-gradient-to-b from-slate-50 to-slate-200 px-4 py-2 font-semibold hover:opacity-90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-300 focus-visible:ring-offset-2 active:opacity-100"
+                                            >
+                                                Check Profile
+                                            </Link>
+                                            {teacher.TeacherProfile.srVerifiedTag ? (
+                                                <button className="bg-green-500 text-white font-semibold py-2 px-4 rounded hover:bg-green-600 transition duration-200">
+                                                    SR Verified
+                                                </button>
+                                            ) : (
+                                                <button onClick={() => makeVerifed(teacher.TeacherProfile._id, true)} className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600 transition duration-200">
+                                                    Make SR Verified
+                                                </button>
+                                            )}
+
+                                        </>
                                     ) : (
                                         <button
                                             disabled={true}
@@ -241,7 +267,7 @@ const Teacher = () => {
                     Next
                 </button>
             </div>
-            <AdvancedSearchModel handleCloseAdvancedClick={handleCloseAdvancedClick} Show={show}/>
+            <AdvancedSearchModel handleCloseAdvancedClick={handleCloseAdvancedClick} Show={show} />
         </div>
     );
 };

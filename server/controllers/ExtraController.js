@@ -11,12 +11,12 @@ exports.CreateUniversalRequest = CatchAsync(async (req, res) => {
         const studentId = req.user.id;
 
         const {
-            requestType, classId, VehicleOwned, className, subjects,
+            ClassLangUage, requestType, classId, VehicleOwned, className, subjects,
             interestedInTypeOfClass, studentInfo, teacherGenderPreference,
             numberOfSessions, experienceRequired, minBudget, maxBudget,
             locality, startDate, specificRequirement, location, teacherId
         } = req.body;
-            console.log("request body",req.body)
+        console.log("request body", req.body)
         // Create a unique request ID using crypto
         const requestId = crypto.randomInt(1000, 9999);
 
@@ -29,6 +29,7 @@ exports.CreateUniversalRequest = CatchAsync(async (req, res) => {
             VehicleOwned,
             className,
             subjects,
+            ClassLangUage,
             interestedInTypeOfClass,
             studentInfo,
             teacherGenderPreference,
@@ -44,7 +45,7 @@ exports.CreateUniversalRequest = CatchAsync(async (req, res) => {
         });
 
         // Save the request to the database
-        console.log("newRequest newRequest",newRequest)
+        console.log("newRequest newRequest", newRequest)
 
         if (teacherId) {
             const teacher = await TeacherProfile.findOne({ TeacherUserId: teacherId }).populate('TeacherUserId');
@@ -150,7 +151,7 @@ exports.CreateUniversalRequest = CatchAsync(async (req, res) => {
                         </html>
                     `
                 };
-                newRequest.teacherId=teacher._id
+                newRequest.teacherId = teacher._id
                 try {
                     const mess = await sendEmail(sendTeacherEmailOption);
                     if (mess === true) {
@@ -284,7 +285,7 @@ exports.CreateUniversalRequest = CatchAsync(async (req, res) => {
 
 
         await newRequest.save();
-        console.log("save newRequest",newRequest)
+        console.log("save newRequest", newRequest)
         // Send a success response
         res.status(201).json({
             status: 'success',
@@ -620,6 +621,7 @@ exports.AddTeacherIdInThis = CatchAsync(async (req, res) => {
 exports.MakeTeacherVerified = CatchAsync(async (req, res) => {
     try {
         const { teacherId, status } = req.query
+        console.log(req.query)
         if (!teacherId) {
             return res.status(402).json({
                 success: false,
@@ -643,7 +645,17 @@ exports.MakeTeacherVerified = CatchAsync(async (req, res) => {
             })
         }
         //toggle status
-        findTeacher.srVerifiedTag = !status
+        findTeacher.srVerifiedTag = status
+        await findTeacher.save()
+        const redisClient = req.app.locals.redis;
+
+        if (!redisClient) {
+            throw new Error("Redis client is not available.");
+        }
+
+        // Check if Teacher is cached
+        await redisClient.del(`Teacher`);
+        console.log(findTeacher)
         res.status(201).json({
             success: true,
             message: 'Teacher has Verified Successful'

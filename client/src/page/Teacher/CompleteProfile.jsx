@@ -1,11 +1,16 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
-import { Button } from 'react-bootstrap';
+import { Button, Container, Row, Col } from 'react-bootstrap';
 import Cookies from 'js-cookie';
 import toast from 'react-hot-toast';
 
 const CompleteProfile = ({ profileInfo, readable, title }) => {
     const token = Cookies.get('teacherToken');
+    const teacherUser = Cookies.get('teacherUser');
+    const parsed = JSON.parse(teacherUser)
+
+
+
 
     // Initialize state with profileInfo
     const [formData, setFormData] = useState({
@@ -114,7 +119,26 @@ const CompleteProfile = ({ profileInfo, readable, title }) => {
     };
 
     if (!profileInfo) {
-        return <div>Loading...</div>;
+        return <Container className="text-center mt-5">
+            <Row>
+                <Col md={12}>
+                    <div className="alert alert-warning py-4">
+                        <h4 className="alert-heading">Profile Incomplete</h4>
+                        <p className="mb-4">
+                            You have not completed your profile yet. Please complete your profile to enjoy all features.
+                        </p>
+                        <Button
+                            variant="primary"
+                            href={`/Complete-profile?token=${token}&encoded=${parsed?._id}`}
+                            className="px-4 py-2"
+                        >
+                            {/* window.location.href = `/Complete-profile?token=${token}&encoded=${user._id}`; */}
+                            Complete Profile
+                        </Button>
+                    </div>
+                </Col>
+            </Row>
+        </Container>
     }
 
     return (
@@ -347,18 +371,18 @@ const CompleteProfile = ({ profileInfo, readable, title }) => {
                     </div>
                 )}
 
-               {title === 'Edit' ? (
-                <div className="mb-3 text-end">
-                <Button
-                    variant="primary"
-                    type="submit"
-                    className="btn w-100 btn-primary btn-sm"
-                    style={{ padding: '12px 16px', borderRadius: '5px' }}
-                >
-                    Edit Profile Details
-                </Button>
-            </div>
-               ):null }
+                {title === 'Edit' ? (
+                    <div className="mb-3 text-end">
+                        <Button
+                            variant="primary"
+                            type="submit"
+                            className="btn w-100 btn-primary btn-sm"
+                            style={{ padding: '12px 16px', borderRadius: '5px' }}
+                        >
+                            Edit Profile Details
+                        </Button>
+                    </div>
+                ) : null}
             </form>
         </div>
     );

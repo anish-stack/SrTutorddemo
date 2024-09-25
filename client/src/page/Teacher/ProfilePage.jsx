@@ -71,6 +71,7 @@ const ProfilePage = () => {
         }],
         ranges: []
     });
+    const [isAddressSame, setIsAddressSame] = useState(false);
     const [currentLocation, setCurrentLocation] = useState([28.687446456774957, 77.14151483304185]);  //Default location
     const [allPoints, setAllPoints] = useState([]);
     const [errorMessage, setErrorMessage] = useState(null);
@@ -184,6 +185,36 @@ const ProfilePage = () => {
             setConcatenatedData(combinedData);
         }
     }, [data]);
+
+
+
+    const handleAddressSame = (e) => {
+        const { checked } = e.target; // Get the checked status of the checkbox
+        setIsAddressSame(checked); // Update the state for whether the address is the same
+
+        if (checked) {
+
+            setFormData((prevData) => ({
+                ...prevData,
+                CurrentAddress: { ...prevData.PermanentAddress },
+                isAddressSame: true
+            }));
+        } else {
+
+            setFormData((prevData) => ({
+                ...prevData,
+                CurrentAddress: {
+                    HouseNo: '',
+                    District: '',
+                    LandMark: '',
+                    Pincode: ''
+                },
+                isAddressSame: false
+            }));
+        }
+    };
+
+
     const fetchUser = async () => {
         try {
             const response = await axios.get(
@@ -351,6 +382,7 @@ const ProfilePage = () => {
             if (!formData.TeachingMode) newErrors.TeachingMode = 'Teaching mode is required';
         }
 
+        Object.values(newErrors).forEach((error) => toast.error(error));
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -367,10 +399,13 @@ const ProfilePage = () => {
                     ...prevData,
                     RangeWhichWantToDoClasses: [allPoints]
                 }));
-
+               
 
             } else {
+
+                alert('Are You Sure')
                 console.error("allPoints is not defined or is undefined");
+                
             }
         } else {
             console.log("Form validation failed. Errors:", errors);
@@ -451,7 +486,7 @@ const ProfilePage = () => {
                         </div>
 
                         <div className="col-md-6 mb-3">
-                            <label className="form-label" htmlFor="AlternateContact">Alternate Contact Number</label>
+                            <label className="form-label" htmlFor="AlternateContact">Alternate Contact Number (optional)</label>
                             <input type="text" className={`form-control`} name="AlternateContact" id="AlternateContact" placeholder="Enter Your Alternate Contact Number" value={formData.AlternateContact} onChange={handleChange} />
 
                         </div>
@@ -524,7 +559,16 @@ const ProfilePage = () => {
                             {errors.PermanentAddressPincode && <div className="invalid-feedback">{errors.PermanentAddressPincode}</div>}
                         </div>
                     </div>
-
+                    <div>
+                        <label>
+                            <input
+                                type="checkbox"
+                                checked={isAddressSame}
+                                onChange={handleAddressSame}
+                            />
+                            Same as Permanent Address
+                        </label>
+                    </div>
 
                     {/* Current Address */}
                     <h6 className=" fw-bold">Current Address (*) </h6>
@@ -622,6 +666,10 @@ const ProfilePage = () => {
 
                                 {errors[`AcademicSubjectNames-${index}`] && <div className="text-danger">{errors[`AcademicSubjectNames-${index}`]}</div>}
                             </div>
+                            <div className="col-md-3 mb-3">
+                                <button type="button" className="btn btn-primary" onClick={() => handleRemoveClass(index)}>Remove Class</button>
+
+                            </div>
                         </div>
                     ))}
                 </div>
@@ -649,7 +697,7 @@ const ProfilePage = () => {
 
 
 
-                    <div className="map-container">
+                    <div className="map-container" style={{position:'relative',zIndex:1}}>
                         <MapContainer
                             center={currentLocation}
                             zoom={12}

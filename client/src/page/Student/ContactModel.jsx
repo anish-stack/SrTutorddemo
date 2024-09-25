@@ -26,6 +26,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
     Location: "",
     Subject: [],
     MinRange: 0,
+    ClassLangUage:'',
     StartDate: "",
     MaxRange: 0,
     SpecificRequirement: "",
@@ -463,6 +464,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
       classId: formData?.ClassId || null,
       className: formData?.className,
       subjects: formData?.Subject,
+      ClassLangUage:formData.ClassLangUage,
       interestedInTypeOfClass: formData?.TeachingMode,
       teacherGenderPreference: formData?.Gender,
       numberOfSessions: formData?.HowManyClassYouWant,
@@ -737,7 +739,24 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
                       classNamePrefix="select"
                     />
                   </div>
-                  <Col md={6}>
+                  <Col md={12}>
+                    <Form.Group className="mb-3"
+                      required>
+                      <Form.Label>In Which Language You Want To Do Class <b className="text-danger fs-5">*</b></Form.Label>
+                      <input
+                          type="text"
+                          id="Contact"
+                          required
+                          name="ClassLangUage"
+                          value={formData.ClassLangUage}
+                          onChange={handleInputChange}
+                          className="form-control"
+                          placeholder="Enter Your Language For Classe"
+                        />
+
+                    </Form.Group>
+                  </Col>
+                  <Col md={12}>
                     <Form.Group className="mb-3"
                       required>
                       <Form.Label>How Many Classes You Want  <b className="text-danger fs-5">*</b></Form.Label>
