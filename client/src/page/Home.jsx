@@ -28,7 +28,7 @@ function Home(){
         <Workarea />
         <Ourmentor />
         <Testimonials />
-        <Homeblog />
+        {/* <Homeblog /> */}
         <Joinus />
         </>
     )

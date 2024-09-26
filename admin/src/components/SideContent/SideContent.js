@@ -42,9 +42,9 @@ const SideContent = () => {
       <Route path='/Add-New-Class' element={<AddNewsClass />} />
       <Route path='/Edit-Class/:id' element={<EditClass />} />
       <Route path='/Manage-Student' element={<AllStudents />} />
-      <Route path='/Manage-Blogs' element={<AllBlogs />} />
-      <Route path='/create-blog' element={<CreateBlogs />} />
-      <Route path='/Edit-Blog/:id' element={<EditBlog />} />
+      {/* <Route path='/Manage-Blogs' element={<AllBlogs />} /> */}
+      {/* <Route path='/create-blog' element={<CreateBlogs />} /> */}
+      {/* <Route path='/Edit-Blog/:id' element={<EditBlog />} /> */}
       <Route path='/Manage-Banners' element={<AllBanners />} />
       <Route path='/Manage-Reviews' element={<AllTestinomial />} />
       <Route path='/create-Review' element={<CreateReview />} />

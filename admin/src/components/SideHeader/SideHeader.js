@@ -87,10 +87,10 @@ const SideHeader = () => {
                                 <i className="fa-solid fa-chalkboard-teacher mr-3"></i>
                                 <a href={'/Manage-Justdial'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Manage Justdial</a>
                             </li>
-                            <li className="flex items-center">
+                            {/* <li className="flex items-center">
                                 <i className="fa-solid fa-blog mr-3"></i>
                                 <Link to={'/Manage-Blogs'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Manage Blogs</Link>
-                            </li>
+                            </li> */}
                             <li className="flex items-center">
                                 <i className="fa-solid fa-star mr-3"></i>
                                 <Link to={'/Manage-Reviews'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Manage Reviews</Link>
