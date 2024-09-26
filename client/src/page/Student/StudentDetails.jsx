@@ -5,6 +5,7 @@ import 'leaflet/dist/leaflet.css'; // Import leaflet CSS
 import L from 'leaflet';
 import Toast from 'react-bootstrap/Toast';
 import LoginModal from '../../Components/LoginModel';
+import Loader from '../../Components/Loader';
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
     iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
@@ -14,8 +15,8 @@ L.Icon.Default.mergeOptions({
 
 const StudentDetails = ({ student, teacher }) => {
 
-    console.log(student)
-    console.log(teacher)
+    // console.log(student)
+    // console.log(teacher)
 
     const isBlurred = !teacher;
     const [showLoginModel, setShowLoginModel] = useState(false)
@@ -69,7 +70,7 @@ const StudentDetails = ({ student, teacher }) => {
     return (
         <div className='detail-container'>
             {loading ? (
-                <div className="text-center">Loading...</div>
+                <Loader/>
             ) : data ? (
                 <div className={`container mx-auto mt-4 pt-5 ${isBlurred ? 'blurThis' : ''}`}
                     style={isBlurred ? { filter: 'blur(15px)', pointerEvents: 'none' } : {}}>

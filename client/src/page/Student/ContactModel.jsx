@@ -12,7 +12,7 @@ import { useGeolocated } from "react-geolocated";
 import { Col, Form, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
-  console.log(teachersData)
+  // console.log(teachersData)
   const [loading, setLoading] = useState(false)
   const [teacherData, setTeacherData] = useState([]);
   const [studentToken, setStudentToken] = useState(null);
@@ -26,7 +26,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
     Location: "",
     Subject: [],
     MinRange: 0,
-    ClassLangUage:'',
+    ClassLangUage: '',
     StartDate: "",
     MaxRange: 0,
     SpecificRequirement: "",
@@ -139,7 +139,9 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
 
   useEffect(() => {
     if (formData.ClassId) {
+      console.log("id", formData.ClassId)
       const selectedClass = concatenatedData.find(item => item.id === formData.ClassId);
+      console.log("i am done", selectedClass)
       if (selectedClass) {
         setFormData(prevFormData => ({
           ...prevFormData,
@@ -216,14 +218,14 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
     try {
       const response = await axios.request(options);
       const result = response.data;
-      console.log("Result from us",result)
+      console.log("Result from us", result)
       if (result) {
         // Update state with latitude and longitude from the result
         setClickLatitude(result?.latitude);
         setClickLongitude(result?.longitude);
       }
-      console.log("Result from setClickLatitude",ClickLatitude)
-      console.log("Result from setClickLongitude",ClickLongitude)
+      console.log("Result from setClickLatitude", ClickLatitude)
+      console.log("Result from setClickLongitude", ClickLongitude)
 
     } catch (error) {
       console.error("Error fetching location coordinates:", error);
@@ -233,12 +235,12 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
     console.log("Updated ClickLatitude:", ClickLatitude);
     console.log("Updated ClickLongitude:", ClickLongitude);
   }, [ClickLatitude, ClickLongitude]);
-  
+
   const handleLocationFetch = async (input) => {
     try {
       const res = await axios.get(
         `https://api.srtutorsbureau.com/autocomplete?input=${input}`);
- 
+
       setLocationSuggestions(res.data || []);
     } catch (error) {
       console.error("Error fetching location suggestions:", error);
@@ -464,7 +466,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
       classId: formData?.ClassId || null,
       className: formData?.className,
       subjects: formData?.Subject,
-      ClassLangUage:formData.ClassLangUage,
+      ClassLangUage: formData.ClassLangUage,
       interestedInTypeOfClass: formData?.TeachingMode,
       teacherGenderPreference: formData?.Gender,
       numberOfSessions: formData?.HowManyClassYouWant,
@@ -485,7 +487,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
         emailAddress: formData.StudentEmail,
       },
     };
-    console.log("submittedData",submittedData)
+    console.log("submittedData", submittedData)
     setLoading(true);
     try {
       const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/universal-request', submittedData, {
@@ -714,10 +716,11 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
                         Select Class
                       </option>
                       {concatenatedData.map((cls, index) => (
-                        <option key={index} value={cls.id}>
+                        <option key={index} value={cls.id ? cls.id : cls._id}>
                           {cls.class}
                         </option>
                       ))}
+
                     </select>
                   </div>
                   <div className="mb-3">
@@ -744,15 +747,15 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
                       required>
                       <Form.Label>In Which Language You Want To Do Class <b className="text-danger fs-5">*</b></Form.Label>
                       <input
-                          type="text"
-                          id="Contact"
-                          required
-                          name="ClassLangUage"
-                          value={formData.ClassLangUage}
-                          onChange={handleInputChange}
-                          className="form-control"
-                          placeholder="Enter Your Language For Classe"
-                        />
+                        type="text"
+                        id="Contact"
+                        required
+                        name="ClassLangUage"
+                        value={formData.ClassLangUage}
+                        onChange={handleInputChange}
+                        className="form-control"
+                        placeholder="Enter Your Language For Classe"
+                      />
 
                     </Form.Group>
                   </Col>
@@ -891,13 +894,13 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
                       in-person) <span className="text-danger">*</span>
                     </label>
                     <Select
-                          options={modeoptions}
-                          onChange={handleSelectChange("TeachingMode")}
-                          value={modeoptions.find(
-                            (option) => option.value === formData.TeachingMode
-                          )}
-                          className="form-control-sm"
-                        />
+                      options={modeoptions}
+                      onChange={handleSelectChange("TeachingMode")}
+                      value={modeoptions.find(
+                        (option) => option.value === formData.TeachingMode
+                      )}
+                      className="form-control-sm"
+                    />
                     {/* <select
                       id="TeachingMode"
                       required
@@ -1001,9 +1004,14 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
                         <strong>Teacher Gender:</strong> <span>{formData.Gender}</span>
                       </li>
 
-                      <li className="list-group-item d-flex justify-content-between align-items-center">
-                        <strong>Class:</strong> <span>{formData.className}</span>
-                      </li>
+                      {
+                        formData.className? (
+                          <li className="list-group-item d-flex justify-content-between align-items-center">
+                          <strong>Class:</strong> <span>{formData.className}</span>
+                        </li>
+                        ):null
+                      }
+                   
                       <li className="list-group-item d-flex justify-content-between align-items-center">
                         <strong>Subjects:</strong>
                         <span>

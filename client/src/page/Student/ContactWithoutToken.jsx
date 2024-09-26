@@ -48,14 +48,6 @@ const ContactTeacherModalWithoutToken = ({ isOpen, isClose, teachersData }) => {
         userDecisionTimeout: 5000,
     });
 
-    function CALLACTION() {
-        const { coords, isGeolocationAvailable, isGeolocationEnabled } = useGeolocated({
-            positionOptions: {
-                enableHighAccuracy: true,
-            },
-            userDecisionTimeout: 5000,
-        });
-    }
 
     useEffect(() => {
         if (coords) {
@@ -197,23 +189,30 @@ const ContactTeacherModalWithoutToken = ({ isOpen, isClose, teachersData }) => {
 
     };
 
+    
     const handleLocationFetch = async (input) => {
         try {
             const res = await axios.get(
-                "https://place-autocomplete1.p.rapidapi.com/autocomplete/json",
-                {
-                    params: { input, radius: "500" },
-                    headers: {
-                        "x-rapidapi-key": "46a23c05dfmsh3499dbe84b6c422p14123bjsn1d256138130a",
-                        "x-rapidapi-host": "place-autocomplete1.p.rapidapi.com",
-                    },
-                }
-            );
-            setLocationSuggestions(res.data.predictions || []);
+                `https://api.srtutorsbureau.com/autocomplete?input=${input}`);
+
+            setLocationSuggestions(res.data || []);
         } catch (error) {
-            console.error("Error fetching location suggestions:", error);
+            if (error.response) {
+                // The request was made and the server responded with a status code outside the 2xx range
+                console.error("Error response from server:", error.response.data);
+                console.error("Status code:", error.response.status);
+                console.error("Headers:", error.response.headers);
+            } else if (error.request) {
+                // The request was made but no response was received
+                console.error("No response received:", error.request);
+            } else {
+                // Something happened in setting up the request that triggered an error
+                console.error("Error in setting up request:", error.message);
+            }
         }
     };
+
+
 
     const handleTeachingModeChange = (e) => {
         setFormData(prevState => ({
@@ -266,7 +265,7 @@ const ContactTeacherModalWithoutToken = ({ isOpen, isClose, teachersData }) => {
                 isValid = false;
                 toast.error("Please fill out the Gender field.");
             }
-            
+
         }
         if (step === 2) {
             if (!selectedClass) {

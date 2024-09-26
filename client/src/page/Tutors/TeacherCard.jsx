@@ -194,7 +194,8 @@ const TeacherCard = ({ classes, item, tokenStudent, showBio }) => {
             </div>
 
             <TeacherProfileModal isOpen={isOpen} teacherClasses={classes} isClose={handleClose} item={selectedTeacher} />
-            <ContactTeacherModalWithoutToken isOpen={ContactIsOpen} isClose={handleContactOpen} teachersData={item} />
+            // <ContactTeacherModalWithoutToken isOpen={ContactIsOpen} isClose={handleContactOpen} teachersData={item} />
+            <ContactTeacherModal isClose={handleContactOpen} isOpen={ContactIsOpen} teachersData={item}   />
         </>
     )
 }

@@ -1613,8 +1613,12 @@ exports.BrowseTutorsNearMe = CatchAsync(async (req, res) => {
     }
 
     if (verified) {
-      const isVerified = verified === 'true';
-      locationResults = locationResults.filter(teacher => teacher.isAllDetailVerified === isVerified);
+      if (verified === 'Both') {
+        // No filtering needed for "Both"
+      } else {
+        const isVerified = verified === 'true';
+        locationResults = locationResults.filter(teacher => teacher.isAllDetailVerified === isVerified);
+      }
     }
 
     if (Subject) {
