@@ -15,6 +15,7 @@ import UploadDocuments from './UploadDocuments';
 import StudentRequest from './StudentRequest';
 import AcceptRequetsByYou from './AcceptRequest';
 import SubscribedStudent from './SubscribedStudent';
+import Upload from './Uplaod';
 const TeacherDashboard = () => {
     const locations = window.location.hash
 
@@ -164,7 +165,7 @@ const TeacherDashboard = () => {
     //     window.location.href = `/Complete-profile?token=${teacherToken}&encoded=${teacherUser?._id}`;
     //     return; // Exit early after redirecting
     // }
-    
+
 
     if (!teacherToken) {
         return (
@@ -238,6 +239,15 @@ const TeacherDashboard = () => {
                                 onClick={() => setActiveTab('Subscribed')}
                             >
                                 Subscribed Students
+                            </a>
+                        </li>
+                        <li className="nav-item">
+                            <a
+                                className={`nav-link ${activeTab === 'Document' ? 'active' : ''}`}
+                                href="#Document"
+                                onClick={() => setActiveTab('Document')}
+                            >
+                                Documents
                             </a>
                         </li>
                         <li className="nav-item">
@@ -346,6 +356,9 @@ const TeacherDashboard = () => {
                     )}
                     {activeTab === 'showClass' && (
                         <MyClasses Profile={profileInfo} Class={teacherClass} />
+                    )}
+                    {activeTab === 'Document' && (
+                        <Upload teacherId={profileInfo} />
                     )}
                     {activeTab === 'resetLocation' && (
                         <MyLocations locations={teachingLocations} />

@@ -178,10 +178,10 @@ function Header() {
                         <li className="">
                           <Link to="about-us">About Us</Link>
                         </li>
-                        <li className="">
+                        {/* <li className="">
                           <Link to="services">Services</Link>
-                        </li>
-                        {/* <li className="menu-item">
+                        </li> */}
+                        <li className="menu-item">
                           <Link to="#">
                             One-to-One Class{" "}
                             <i className="ri-arrow-down-s-line"></i>
@@ -194,13 +194,13 @@ function Header() {
                               <Link to="#">Hire a Tutor</Link>
                             </li>
                             <li>
-                              <Link to="#">Tutor Section</Link>
+                              <Link to="/Browse-Tutors?lat=28.691029628579727&lng=77.1517630851126">Tutor Section</Link>
                             </li>
                             <li>
-                              <Link to="#">Apply as Tutor</Link>
+                              <Link to="/teacher-register?source=home">Apply as Tutor</Link>
                             </li>
                           </ul>
-                        </li> */}
+                        </li>
                         {/* <li className="">
                           <Link to="#">Membership</Link>
                         </li> */}

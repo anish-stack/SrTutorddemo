@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { SingleTeacher } from '../../Slices/Teacher.slice'; // Adjust path if necessary
-
+import axios from 'axios'
+import toast from 'react-hot-toast';
 const ProfileOfTeacher = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
@@ -40,7 +41,19 @@ const ProfileOfTeacher = () => {
         console.log(formData)
 
     };
-    console.log(teacherData)
+    const handleVerify = async (teacherId, status) => {
+        try {
+            const { data } = await axios.post(`https://api.srtutorsbureau.com/api/v1/teacher/Make-Document-verified`, {
+                teacherId: teacherId,
+                status: status
+            })
+            toast.success('Document Verifed Succesful')
+            dispatch(SingleTeacher(id));
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
 
     if (loading) {
         return <div>Loading...</div>;
@@ -200,6 +213,82 @@ const ProfileOfTeacher = () => {
 
                     </div>
                 </div>
+            </div>
+            <div className="p-6 bg-white shadow-md rounded-lg">
+                {teacherData.TeacherUserId ? (
+                    <div className='relative'>
+                        <div className='flex items-baseline justify-around'>
+                            {/* Qualification Document Section */}
+                            <div className="mb-6">
+                                <p className="text-lg font-semibold text-gray-700 mb-2">
+                                    Qualification Document:
+                                </p>
+                                {teacherData?.TeacherUserId?.QualificationDocument?.QualificationImageUrl ? (
+                                    <a
+                                        href={teacherData.TeacherUserId.QualificationDocument.QualificationImageUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        <img
+                                            src={teacherData.TeacherUserId.QualificationDocument.QualificationImageUrl}
+                                            alt="Qualification Document"
+                                            className="w-full max-h-36 max-w-xs rounded-md border border-gray-300 shadow-sm cursor-pointer"
+                                        />
+                                    </a>
+                                ) : (
+                                    <p className="text-sm text-red-500">No qualification document uploaded.</p>
+                                )}
+                            </div>
+
+                            {/* Identity Document Section */}
+                            <div className="mb-6">
+                                <p className="text-lg font-semibold text-gray-700 mb-2">Identity Document:</p>
+                                <p className="text-sm text-gray-600">
+                                    {teacherData?.TeacherUserId?.identityDocument?.DocumentType || "No document type available"}
+                                </p>
+                                {teacherData?.TeacherUserId?.identityDocument?.DocumentImageUrl ? (
+                                    <a
+                                        href={teacherData.TeacherUserId.identityDocument.DocumentImageUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        <img
+                                            src={teacherData.TeacherUserId.identityDocument.DocumentImageUrl}
+                                            alt="Identity Document"
+                                            className="w-full max-h-36 max-w-xs rounded-md border border-gray-300 shadow-sm cursor-pointer"
+                                        />
+                                    </a>
+                                ) : (
+                                    <p className="text-sm text-red-500">No identity document uploaded.</p>
+                                )}
+                            </div>
+
+                            <span
+                                className={`absolute top-0 right-0 transform translate-x-2 -translate-y-2 px-3 py-1 text-xs font-semibold rounded-full ${teacherData?.TeacherUserId?.DocumentStatus ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                    }`}
+                            >
+                                {teacherData?.TeacherUserId?.DocumentStatus ? 'Verified' : 'Not Verified'}
+                            </span>
+                        </div>
+
+                        <div className="flex justify-end">
+                            {
+                                teacherData?.TeacherUserId?.DocumentStatus ? null : (
+                                    <button
+                                        className="px-4 py-2 bg-green-500 text-white text-sm font-medium rounded-md hover:bg-green-600 transition duration-200 ease-in-out"
+                                        onClick={() => handleVerify(teacherData?.TeacherUserId?._id, true)}
+                                    >
+                                        Mark as Verified
+                                    </button>
+                                )
+                            }
+
+                        </div>
+
+                    </div>
+                ) : (
+                    <div className="text-center absolute text-gray-500">No teacher data available.</div>
+                )}
             </div>
 
             <div className="mb-6">

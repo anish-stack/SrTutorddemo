@@ -776,7 +776,7 @@ exports.AddDocument = async (req, res) => {
 
 
     // Predefined valid document types
-    const preDefineTypes = ["Aadhaar", "Pan", "Voter Card", "Passport"];
+    const preDefineTypes = ["Aadhaar", "Pan"];
 
     // Check if the document type is valid
     if (!preDefineTypes.includes(DocumentType)) {
@@ -793,7 +793,7 @@ exports.AddDocument = async (req, res) => {
     }
 
     // Find the teacher profile
-    const TeacherFind = await TeacherProfile.findOne({ TeacherUserId: teacherId });
+    const TeacherFind = await Teacher.findById(teacherId);
     if (!TeacherFind) {
       return res.status(404).json({
         message: "No Teacher found with the provided ID.",
@@ -855,27 +855,23 @@ exports.AddDocument = async (req, res) => {
     }
     console.log(qualificationUploadResult)
     // Create new document entry
-    const newDocument = new DocumentSchema({
-      identityDocument: {
-        DocumentType: DocumentType,
-        DocumentImageUrl: documentUploadResult.secure_url, // Use secure_url from Cloudinary
-        DocumentPublicId: documentUploadResult.public_id,
-      },
-      QualificationDocument: {
+    TeacherFind.identityDocument = {
+      DocumentType: DocumentType,
+      DocumentImageUrl: documentUploadResult.secure_url, // Use secure_url from Cloudinary
+      DocumentPublicId: documentUploadResult.public_id,
+    },
+      TeacherFind.QualificationDocument = {
         QualificationImageUrl: qualificationUploadResult?.secure_url,
         QualificationPublicId: qualificationUploadResult?.public_id,
-      },
-      TeacherId: TeacherFind?.TeacherUserId,
-      TeacherProfileId: TeacherFind?._id
-    });
+      }
 
-    // Save the document reference in Teacher's profile
-    TeacherFind.DocumentId = newDocument._id;
+
+
     await TeacherFind.save();
-    await newDocument.save()
+
     res.status(201).json({
       message: "Documents uploaded successfully, and teacher profile updated.",
-      document: newDocument,
+      document: TeacherFind,
     });
     console.log("Documents uploaded successfully, and teacher profile updated.")
   } catch (error) {
@@ -1116,14 +1112,10 @@ exports.GetTeacherProfileId = CatchAsync(async (req, res) => {
     }
 
 
-
-
-
-
     // Fetch profile from database
     const teacherProfile = await TeacherProfile.findOne({
       TeacherUserId: TeacherId,
-    }).populate('DocumentId');
+    }).populate('TeacherUserId');
 
 
     console.log(teacherProfile)
@@ -1262,6 +1254,43 @@ exports.GetAllTeacher = CatchAsync(async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error fetching teacher",
+      error: error.message,
+    });
+  }
+});
+
+exports.MarkDocumentStatus = CatchAsync(async (req, res) => {
+  try {
+    const { teacherId, status } = req.body;
+
+    // Find the teacher by ID
+    const findTeacher = await Teacher.findById(teacherId);
+
+    // If teacher is not found, return a 404 error
+    if (!findTeacher) {
+      return res.status(404).json({
+        success: false,
+        message: "Teacher not found",
+      });
+    }
+
+    // Update the teacher's document status
+    findTeacher.DocumentStatus = status;
+
+    // Save the changes
+    await findTeacher.save();
+
+    // Return success response
+    res.status(200).json({
+      success: true,
+      message: "Document status updated successfully",
+      teacher: findTeacher,
+    });
+  } catch (error) {
+    // Catch and handle any error that occurs during the process
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while updating document status",
       error: error.message,
     });
   }

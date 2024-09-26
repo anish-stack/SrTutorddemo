@@ -36,7 +36,7 @@ const AllRequest = () => {
                 // console.log(response.data.data)
                 setAllData(response.data.data);
                 const sortedData = response.data.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-                    console.log(sortedData)
+                console.log(sortedData)
                 setFilteredData(sortedData);
             } catch (err) {
                 setError('Failed to fetch requests.');
@@ -191,6 +191,23 @@ const AllRequest = () => {
         setSelectedRequest({})
     }
 
+    const handleDealDone = async (id) => {
+        try {
+            await axios.post(`https://api.srtutorsbureau.com/api/v1/uni/deal-done-Request`, {
+                requestId: id, status: true
+            })
+            setAllData((prevData) =>
+                prevData.map((request) =>
+                    request._id === id ? { ...request, dealDone: true } : request
+                )
+            );
+            toast.success("Student Subscribed Successful")
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+
     const handleChange = (event, requestId) => {
         const newStatus = event.target.value;
         UpdateStatusByAdmin(requestId, newStatus);
@@ -303,10 +320,24 @@ const AllRequest = () => {
                                                     </Tooltip>
 
                                                 </td>
-                                                <td className="whitespace-nowrap px-6 py-4">
-                                                    <span onClick={() => handleCommentModelOpen(request)} className="text-gray-900 cursor-pointer m-2"><i class="fa-regular fa-pen-to-square"></i></span>
-                                                    <Link onClick={() => handleOpen(request)} className="text-blue-500 cursor-pointer m-2"><i class="fa-regular fa-eye"></i></Link>
-                                                    <span onClick={() => DeleteRequest(request._id)} className="text-red-500 cursor-pointer p-0 m-2"><i class="fa-solid fa-trash"></i></span>
+                                                <td className="whitespace-nowrap px-6  py-4">
+                                                    <div className='flex'>
+                                                        <Tooltip message={request.dealDone ? 'Deal Completed' : 'Deal Pending'}>
+                                                            {request.dealDone ? (
+                                                                <span className="text-gray-900 cursor-pointer m-2">
+                                                                    <i className="fa-regular fa-thumbs-up"></i>
+                                                                </span>
+                                                            ) : (
+                                                                <span onClick={() => handleDealDone(request._id)} className="text-gray-900 cursor-pointer m-2">
+                                                                    <i className="fa-regular fa-thumbs-down"></i>
+                                                                </span>
+                                                            )}
+                                                        </Tooltip>
+                                                        <span onClick={() => handleCommentModelOpen(request)} className="text-gray-900 cursor-pointer m-2"><i class="fa-regular fa-pen-to-square"></i></span>
+                                                        <Link onClick={() => handleOpen(request)} className="text-blue-500 cursor-pointer m-2"><i class="fa-regular fa-eye"></i></Link>
+                                                        <span onClick={() => DeleteRequest(request._id)} className="text-red-500 cursor-pointer p-0 m-2"><i class="fa-solid fa-trash"></i></span>
+
+                                                    </div>
                                                 </td>
                                             </tr>
                                         ))}
@@ -316,19 +347,19 @@ const AllRequest = () => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div >
 
             {/* Pagination */}
-            <div className="mt-4 flex justify-between items-center">
+            < div className="mt-4 flex justify-between items-center" >
                 <button onClick={() => handlePageChange(page - 1)} disabled={page === 1} className="bg-blue-500 text-white px-4 py-2 rounded">Previous</button>
                 <span>Page {page} of {totalPages}</span>
                 <button onClick={() => handlePageChange(page + 1)} disabled={page === totalPages} className="bg-blue-500 text-white px-4 py-2 rounded">Next</button>
-            </div>
+            </div >
 
             <SingleRequestModel isOpen={open} SelectedData={selectedRequest} onClose={handleClose} />
             <CommentModel isOpen={commentModel} onClose={handleCommentModelClose} selected={selectedComment} />
             <AllotTeacher isOpen={AllotTeacherModel} onClose={handleCommentModelClose} SelectedRequest={selectedComment} />
-        </div>
+        </div >
     );
 };
 

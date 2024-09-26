@@ -34,6 +34,8 @@ export const SingleTeacher = createAsyncThunk(
                     Authorization: `Bearer ${Token}`
                 }
             });
+            console.log("Manage Teachert,",response.data)
+
             return response.data; // Return the data needed
         } catch (error) {
             console.log(error);

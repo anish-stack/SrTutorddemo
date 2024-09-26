@@ -201,6 +201,7 @@ const Teacher = () => {
                             <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">Phone</th>
                             <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">Email</th>
                             <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">Verified</th>
+                            {/* <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">Profile</th> */}
 
                             <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">Profile</th>
                         </tr>

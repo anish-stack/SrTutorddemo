@@ -114,7 +114,7 @@ function Whysrtutor() {
                                         </li>
                                     </ul>
                                 </div>
-                                <div className="tg-button-wrap">
+                                {/* <div className="tg-button-wrap">
                                     <a href="#!" className="btn tg-svg">
                                         <span className="text">See All Categories</span>{" "}
                                         <span
@@ -123,7 +123,7 @@ function Whysrtutor() {
                                             data-svg-icon="assets/img/icons/btn-arrow.svg"
                                         />
                                     </a>
-                                </div>
+                                </div> */}
                                 <img
                                     src="assets/img/objects/online_04.png"
                                     alt="shape"

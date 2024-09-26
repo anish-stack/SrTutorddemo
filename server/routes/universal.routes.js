@@ -2,6 +2,7 @@ const express = require('express')
 const isAdmin = require('../middlewares/admin')
 const Protect = require("../middlewares/Auth");
 const { AcceptRequest, GetRequestFromTeacherId, getUniverSalRequestAccordingToQuery, getSingleUniverSalRequest, AddComment, getAllUniversalRequest, MakeTeacherVerified, DeleteComment, AddTeacherIdInThis, UpdateComment, dealDoneRequest, deleteUniverSalRequest, getAllCommentsOfRequest, PerformAdvancedSearch } = require('../controllers/ExtraController');
+const { CreateContact, GetAllContact, DeleteContact } = require('../controllers/WebPage.controller');
 const universal = express.Router()
 
 
@@ -22,7 +23,9 @@ universal.get('/get-Request-teacher', GetRequestFromTeacherId)
 universal.get('/perform-advance-search', PerformAdvancedSearch)
 
 
-
+universal.post('/create-contact', CreateContact); 
+universal.get('/get-all-contacts', GetAllContact); 
+universal.delete('/delete-contact/:id', DeleteContact); 
 
 
 
