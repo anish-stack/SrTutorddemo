@@ -30,6 +30,7 @@ import ClassTeacherRequest from '../../pages/ClassTeacherRequest/ClassTeacherReq
 import AllRequest from '../../pages/AllRequest/AllRequest'
 import AllContact from '../../pages/Contact/AllContact'
 import Profile from '../../pages/Profile/Profile'
+import JdAllLeads from '../../pages/Justdial/JdAllLeads'
 const SideContent = () => {
   return (
     <Routes>
@@ -49,6 +50,8 @@ const SideContent = () => {
       <Route path='/create-Review' element={<CreateReview />} />
       <Route path='/Manage-Teacher-Requests' element={<TeacherRequest />} />
       <Route path='/Subject-Teacher-Requests' element={<SubjectTeacher />} />
+      <Route path='/Manage-Justdial' element={<JdAllLeads />} />
+
       <Route path='/Login-By-redirect' element={<Login />} />
       <Route path='/Manage-City' element={<AllCitys />} />
       <Route path='/all-subscribers' element={<AllSubcription />} />

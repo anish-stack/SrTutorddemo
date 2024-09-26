@@ -5,12 +5,12 @@ const JustdialLead = require('../models/JustidialFormet');  // Corrected model n
 exports.CreateLead = async (req, res) => {
     try {
         const {
-           leadid, leadtype, prefix, name, mobile, phone, email, date, category, city, area, brancharea,
+            leadid, leadtype, prefix, name, mobile, phone, email, date, category, city, area, brancharea,
             dncmobile, dncphone, company, pincode, time, branchpin, parentid
         } = req.body;
 
 
-        
+
 
         // Create a new lead
         const newLead = new JustdialLead({
@@ -45,10 +45,11 @@ exports.CreateLead = async (req, res) => {
         });
 
     } catch (error) {
-        return res.status(500).json({ 
+        return res.status(500).json({
             success: true,
-             message: 'Internal Server Error',
-              error: error.message });
+            message: 'Internal Server Error',
+            error: error.message
+        });
     }
 };
 
@@ -66,5 +67,26 @@ exports.getLead = async (req, res) => {
 
     } catch (error) {
         return res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+exports.getAllLead = async (req, res) => {
+    try {
+        // Fetch all leads and sort them by date and time
+        const leads = await JustdialLead.find().sort({ date: -1, time: -1 }); // Sort in descending order
+
+        // Check if leads exist
+        if (leads.length === 0) {
+            return res.status(404).json({ message: 'No leads found' });
+        }
+
+        // Send the leads in the response
+        res.status(200).json({
+            success: true,
+            data: leads
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Internal server error', error: error.message });
     }
 };
