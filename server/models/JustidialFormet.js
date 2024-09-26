@@ -11,7 +11,6 @@ const leadSchema = new mongoose.Schema({
   },
   prefix: {
     type: String,
-    enum: ['Mr', 'Ms', 'Dr'],
    
   },
   name: {
@@ -19,9 +18,8 @@ const leadSchema = new mongoose.Schema({
    
   },
   mobile: {
-    type: String,
-    required:true
-  },
+    type: String
+    },
   phone: {
     type: String
   },
@@ -48,14 +46,10 @@ const leadSchema = new mongoose.Schema({
     type: String
   },
   dncmobile: {
-    type: Number,
-    enum: [0, 1],
-   
+    type: Number   
   },
   dncphone: {
-    type: Number,
-    enum: [0, 1],
-   
+    type: Number   
   },
   company: {
     type: String

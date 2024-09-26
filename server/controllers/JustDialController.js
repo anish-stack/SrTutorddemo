@@ -9,10 +9,7 @@ exports.CreateLead = async (req, res) => {
             dncmobile, dncphone, company, pincode, time, branchpin, parentid
         } = req.body;
 
-        // Check for empty required fields
-      
 
-        // Generate unique lead ID using UUID
         
 
         // Create a new lead
