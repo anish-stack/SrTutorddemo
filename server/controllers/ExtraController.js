@@ -47,241 +47,241 @@ exports.CreateUniversalRequest = CatchAsync(async (req, res) => {
         // Save the request to the database
         console.log("newRequest newRequest", newRequest)
 
-        if (teacherId) {
-            const teacher = await TeacherProfile.findOne({ TeacherUserId: teacherId }).populate('TeacherUserId');
+        // if (teacherId) {
+        //     const teacher = await TeacherProfile.findOne({ TeacherUserId: teacherId }).populate('TeacherUserId');
 
-            if (teacher) {
-                teacher.PostForHim = newRequest._id;
+        //     if (teacher) {
+        //         teacher.PostForHim = newRequest._id;
 
-                await teacher.save();
+        //         await teacher.save();
 
-                const sendTeacherEmailOption = {
-                    email: teacher.TeacherUserId.Email,
-                    subject: 'New Request For You',
-                    message: `
-                        <html>
-                        <head>
-                            <style>
-                                body {
-                                    font-family: Arial, sans-serif;
-                                    color: #333;
-                                    line-height: 1.6;
-                                    margin: 0;
-                                    padding: 0;
-                                }
-                                .container {
-                                    max-width: 600px;
-                                    margin: 0 auto;
-                                    padding: 20px;
-                                    background-color: #f9f9f9;
-                                    border-radius: 8px;
-                                    border: 1px solid #ddd;
-                                }
-                                h1, h2 {
-                                    color: #4CAF50;
-                                }
-                                .header {
-                                    background-color: #4CAF50;
-                                    color: #fff;
-                                    padding: 10px;
-                                    border-radius: 8px 8px 0 0;
-                                }
-                                .content {
-                                    padding: 20px;
-                                    background-color: #fff;
-                                    border-radius: 0 0 8px 8px;
-                                }
-                                .footer {
-                                    text-align: center;
-                                    padding: 10px;
-                                    background-color: #4CAF50;
-                                    color: #fff;
-                                    border-radius: 0 0 8px 8px;
-                                }
-                                .footer a {
-                                    color: #fff;
-                                    text-decoration: none;
-                                    font-weight: bold;
-                                }
-                                .button {
-                                    display: inline-block;
-                                    padding: 10px 20px;
-                                    margin: 10px 0;
-                                    color: #fff;
-                                    background-color: #4CAF50;
-                                    border-radius: 5px;
-                                    text-decoration: none;
-                                }
-                                .list-item {
-                                    margin-bottom: 10px;
-                                }
-                                .list-item strong {
-                                    display: block;
-                                    color: #333;
-                                }
-                            </style>
-                        </head>
-                        <body>
-                            <div class="container">
-                                <div class="header">
-                                    <h1>New Request Notification</h1>
-                                </div>
-                                <div class="content">
-                                    <h2>Dear ${teacher.TeacherUserId.name},</h2>
-                                    <p>We have received a new request for you. Below are the details:</p>
-                                    <ul>
-                                        <li class="list-item"><strong>Request Id:</strong> ${newRequest.requestId}</li>
-                                        <li class="list-item"><strong>Class Name:</strong> ${req.body.className}</li>
-                                        <li class="list-item"><strong>Subjects:</strong> ${Array.isArray(req.body.subjects) ? req.body.subjects.join(", ") : 'N/A'}</li>                   
-                                        <li class="list-item"><strong>Start Date:</strong> ${req.body.startDate}</li>
-                                        <li class="list-item"><strong>Current Address:</strong> ${req.body.locality}</li>
-                                        <li class="list-item"><strong>Near By Location:</strong> ${req.body.location}</li>
-                                        <li class="list-item"><strong>Specific Requirement:</strong> ${req.body.specificRequirement || 'None'}</li>
-                                        <li class="list-item"><strong>Budget:</strong> ${req.body.minBudget} - ${req.body.maxBudget}</li>
-                                    </ul>
-                                    <p>Please review the request and get back to us with your availability.</p>
-                                    <a href="https://www.example.com" class="button">View Request</a>
-                                </div>
-                                <div class="footer">
-                                    <p>Thank you for using our platform!</p>
-                                    <p><a href="https://www.example.com">Visit our website</a> | <a href="mailto:support@example.com">Contact Support</a></p>
-                                </div>
-                            </div>
-                        </body>
-                        </html>
-                    `
-                };
-                newRequest.teacherId = teacher._id
-                try {
-                    const mess = await sendEmail(sendTeacherEmailOption);
-                    if (mess === true) {
+        //         const sendTeacherEmailOption = {
+        //             email: teacher.TeacherUserId.Email,
+        //             subject: 'New Request For You',
+        //             message: `
+        //                 <html>
+        //                 <head>
+        //                     <style>
+        //                         body {
+        //                             font-family: Arial, sans-serif;
+        //                             color: #333;
+        //                             line-height: 1.6;
+        //                             margin: 0;
+        //                             padding: 0;
+        //                         }
+        //                         .container {
+        //                             max-width: 600px;
+        //                             margin: 0 auto;
+        //                             padding: 20px;
+        //                             background-color: #f9f9f9;
+        //                             border-radius: 8px;
+        //                             border: 1px solid #ddd;
+        //                         }
+        //                         h1, h2 {
+        //                             color: #4CAF50;
+        //                         }
+        //                         .header {
+        //                             background-color: #4CAF50;
+        //                             color: #fff;
+        //                             padding: 10px;
+        //                             border-radius: 8px 8px 0 0;
+        //                         }
+        //                         .content {
+        //                             padding: 20px;
+        //                             background-color: #fff;
+        //                             border-radius: 0 0 8px 8px;
+        //                         }
+        //                         .footer {
+        //                             text-align: center;
+        //                             padding: 10px;
+        //                             background-color: #4CAF50;
+        //                             color: #fff;
+        //                             border-radius: 0 0 8px 8px;
+        //                         }
+        //                         .footer a {
+        //                             color: #fff;
+        //                             text-decoration: none;
+        //                             font-weight: bold;
+        //                         }
+        //                         .button {
+        //                             display: inline-block;
+        //                             padding: 10px 20px;
+        //                             margin: 10px 0;
+        //                             color: #fff;
+        //                             background-color: #4CAF50;
+        //                             border-radius: 5px;
+        //                             text-decoration: none;
+        //                         }
+        //                         .list-item {
+        //                             margin-bottom: 10px;
+        //                         }
+        //                         .list-item strong {
+        //                             display: block;
+        //                             color: #333;
+        //                         }
+        //                     </style>
+        //                 </head>
+        //                 <body>
+        //                     <div class="container">
+        //                         <div class="header">
+        //                             <h1>New Request Notification</h1>
+        //                         </div>
+        //                         <div class="content">
+        //                             <h2>Dear ${teacher.TeacherUserId.name},</h2>
+        //                             <p>We have received a new request for you. Below are the details:</p>
+        //                             <ul>
+        //                                 <li class="list-item"><strong>Request Id:</strong> ${newRequest.requestId}</li>
+        //                                 <li class="list-item"><strong>Class Name:</strong> ${req.body.className}</li>
+        //                                 <li class="list-item"><strong>Subjects:</strong> ${Array.isArray(req.body.subjects) ? req.body.subjects.join(", ") : 'N/A'}</li>                   
+        //                                 <li class="list-item"><strong>Start Date:</strong> ${req.body.startDate}</li>
+        //                                 <li class="list-item"><strong>Current Address:</strong> ${req.body.locality}</li>
+        //                                 <li class="list-item"><strong>Near By Location:</strong> ${req.body.location}</li>
+        //                                 <li class="list-item"><strong>Specific Requirement:</strong> ${req.body.specificRequirement || 'None'}</li>
+        //                                 <li class="list-item"><strong>Budget:</strong> ${req.body.minBudget} - ${req.body.maxBudget}</li>
+        //                             </ul>
+        //                             <p>Please review the request and get back to us with your availability.</p>
+        //                             <a href="https://www.example.com" class="button">View Request</a>
+        //                         </div>
+        //                         <div class="footer">
+        //                             <p>Thank you for using our platform!</p>
+        //                             <p><a href="https://www.example.com">Visit our website</a> | <a href="mailto:support@example.com">Contact Support</a></p>
+        //                         </div>
+        //                     </div>
+        //                 </body>
+        //                 </html>
+        //             `
+        //         };
+        //         newRequest.teacherId = teacher._id
+        //         try {
+        //             const mess = await sendEmail(sendTeacherEmailOption);
+        //             if (mess === true) {
 
-                        newRequest.isTeacherEmailSend = true;
-                    } else {
-                        newRequest.isTeacherEmailSend = false;
-                    }
+        //                 newRequest.isTeacherEmailSend = true;
+        //             } else {
+        //                 newRequest.isTeacherEmailSend = false;
+        //             }
 
-                } catch (error) {
-                    newRequest.isTeacherEmailSend = false;
-                    console.error('Error sending email to teacher:', error);
-                }
-            }
-        }
+        //         } catch (error) {
+        //             newRequest.isTeacherEmailSend = false;
+        //             console.error('Error sending email to teacher:', error);
+        //         }
+        //     }
+        // }
         // console.log(studentInfo.emailAddress)
-        const sendStudentEmailOption = {
-            email: studentInfo.emailAddress,
-            subject: 'Thanks For Requesting a Teacher',
-            message: `
-                <html>
-                <head>
-                    <style>
-                        body {
-                            font-family: Arial, sans-serif;
-                            color: #333;
-                            line-height: 1.6;
-                            margin: 0;
-                            padding: 0;
-                        }
-                        .container {
-                            max-width: 600px;
-                            margin: 0 auto;
-                            padding: 20px;
-                            background-color: #f9f9f9;
-                            border-radius: 8px;
-                            border: 1px solid #ddd;
-                        }
-                        h1, h2 {
-                            color: #4CAF50;
-                        }
-                        .header {
-                            background-color: #4CAF50;
-                            color: #fff;
-                            padding: 10px;
-                            border-radius: 8px 8px 0 0;
-                        }
-                        .content {
-                            padding: 20px;
-                            background-color: #fff;
-                            border-radius: 0 0 8px 8px;
-                        }
-                        .footer {
-                            text-align: center;
-                            padding: 10px;
-                            background-color: #4CAF50;
-                            color: #fff;
-                            border-radius: 0 0 8px 8px;
-                        }
-                        .footer a {
-                            color: #fff;
-                            text-decoration: none;
-                            font-weight: bold;
-                        }
-                        .button {
-                            display: inline-block;
-                            padding: 10px 20px;
-                            margin: 10px 0;
-                            color: #fff;
-                            background-color: #4CAF50;
-                            border-radius: 5px;
-                            text-decoration: none;
-                        }
-                        .list-item {
-                            margin-bottom: 10px;
-                        }
-                        .list-item strong {
-                            display: block;
-                            color: #333;
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="container">
-                        <div class="header">
-                            <h1>Request Received</h1>
-                        </div>
-                        <div class="content">
-                            <h2>Dear ${newRequest.studentInfo.studentName},</h2>
-                            <p>Thank you for your request. Here are the details:</p>
-                            <ul>
-                                <li class="list-item"><strong>Request Id:</strong> ${newRequest.requestId}</li>
-                                <li class="list-item"><strong>Class Name:</strong> ${req.body.className}</li>
-                                <li class="list-item"><strong>Subjects:</strong> ${Array.isArray(req.body.subjects) ? req.body.subjects.join(", ") : 'N/A'}</li>                   
-                                <li class="list-item"><strong>Start Date:</strong> ${req.body.startDate}</li>
-                                <li class="list-item"><strong>Current Address:</strong> ${req.body.locality}</li>
-                                <li class="list-item"><strong>Near By Location:</strong> ${req.body.location}</li>
-                                <li class="list-item"><strong>Specific Requirement:</strong> ${req.body.specificRequirement || 'None'}</li>
-                                <li class="list-item"><strong>Budget:</strong> ${req.body.minBudget} - ${req.body.maxBudget}</li>
-                            </ul>
-                            <p>We will contact you soon.</p>
-                            <a href="https://www.example.com" class="button">View Your Request</a>
-                        </div>
-                        <div class="footer">
-                            <p>Thank you for using our platform!</p>
-                            <p><a href="https://www.example.com">Visit our website</a> | <a href="mailto:support@example.com">Contact Support</a></p>
-                        </div>
-                    </div>
-                </body>
-                </html>
-            `
-        };
+        // const sendStudentEmailOption = {
+        //     email: studentInfo.emailAddress,
+        //     subject: 'Thanks For Requesting a Teacher',
+        //     message: `
+        //         <html>
+        //         <head>
+        //             <style>
+        //                 body {
+        //                     font-family: Arial, sans-serif;
+        //                     color: #333;
+        //                     line-height: 1.6;
+        //                     margin: 0;
+        //                     padding: 0;
+        //                 }
+        //                 .container {
+        //                     max-width: 600px;
+        //                     margin: 0 auto;
+        //                     padding: 20px;
+        //                     background-color: #f9f9f9;
+        //                     border-radius: 8px;
+        //                     border: 1px solid #ddd;
+        //                 }
+        //                 h1, h2 {
+        //                     color: #4CAF50;
+        //                 }
+        //                 .header {
+        //                     background-color: #4CAF50;
+        //                     color: #fff;
+        //                     padding: 10px;
+        //                     border-radius: 8px 8px 0 0;
+        //                 }
+        //                 .content {
+        //                     padding: 20px;
+        //                     background-color: #fff;
+        //                     border-radius: 0 0 8px 8px;
+        //                 }
+        //                 .footer {
+        //                     text-align: center;
+        //                     padding: 10px;
+        //                     background-color: #4CAF50;
+        //                     color: #fff;
+        //                     border-radius: 0 0 8px 8px;
+        //                 }
+        //                 .footer a {
+        //                     color: #fff;
+        //                     text-decoration: none;
+        //                     font-weight: bold;
+        //                 }
+        //                 .button {
+        //                     display: inline-block;
+        //                     padding: 10px 20px;
+        //                     margin: 10px 0;
+        //                     color: #fff;
+        //                     background-color: #4CAF50;
+        //                     border-radius: 5px;
+        //                     text-decoration: none;
+        //                 }
+        //                 .list-item {
+        //                     margin-bottom: 10px;
+        //                 }
+        //                 .list-item strong {
+        //                     display: block;
+        //                     color: #333;
+        //                 }
+        //             </style>
+        //         </head>
+        //         <body>
+        //             <div class="container">
+        //                 <div class="header">
+        //                     <h1>Request Received</h1>
+        //                 </div>
+        //                 <div class="content">
+        //                     <h2>Dear ${newRequest.studentInfo.studentName},</h2>
+        //                     <p>Thank you for your request. Here are the details:</p>
+        //                     <ul>
+        //                         <li class="list-item"><strong>Request Id:</strong> ${newRequest.requestId}</li>
+        //                         <li class="list-item"><strong>Class Name:</strong> ${req.body.className}</li>
+        //                         <li class="list-item"><strong>Subjects:</strong> ${Array.isArray(req.body.subjects) ? req.body.subjects.join(", ") : 'N/A'}</li>                   
+        //                         <li class="list-item"><strong>Start Date:</strong> ${req.body.startDate}</li>
+        //                         <li class="list-item"><strong>Current Address:</strong> ${req.body.locality}</li>
+        //                         <li class="list-item"><strong>Near By Location:</strong> ${req.body.location}</li>
+        //                         <li class="list-item"><strong>Specific Requirement:</strong> ${req.body.specificRequirement || 'None'}</li>
+        //                         <li class="list-item"><strong>Budget:</strong> ${req.body.minBudget} - ${req.body.maxBudget}</li>
+        //                     </ul>
+        //                     <p>We will contact you soon.</p>
+        //                     <a href="https://www.example.com" class="button">View Your Request</a>
+        //                 </div>
+        //                 <div class="footer">
+        //                     <p>Thank you for using our platform!</p>
+        //                     <p><a href="https://www.example.com">Visit our website</a> | <a href="mailto:support@example.com">Contact Support</a></p>
+        //                 </div>
+        //             </div>
+        //         </body>
+        //         </html>
+        //     `
+        // };
 
-        try {
-            const mes = await sendEmail(sendStudentEmailOption);
+        // try {
+        //     const mes = await sendEmail(sendStudentEmailOption);
 
-            newRequest.isStudentEmailSend = true;
-            // console.log(mes);
-            if (mes === true) {
+        //     newRequest.isStudentEmailSend = true;
+        //     // console.log(mes);
+        //     if (mes === true) {
 
-                newRequest.isStudentEmailSend = true;
-            } else {
-                newRequest.isStudentEmailSend = false;
-            }
+        //         newRequest.isStudentEmailSend = true;
+        //     } else {
+        //         newRequest.isStudentEmailSend = false;
+        //     }
 
 
-        } catch (error) {
-            newRequest.isStudentEmailSend = false;
-            console.error('Error sending email to student:', error);
-        }
+        // } catch (error) {
+        //     newRequest.isStudentEmailSend = false;
+        //     console.error('Error sending email to student:', error);
+        // }
 
 
         await newRequest.save();
