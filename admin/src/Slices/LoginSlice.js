@@ -13,6 +13,8 @@ export const loginUser = createAsyncThunk(
             console.log(response.data)
             if (response.data.user.Role === 'admin') {
                 localStorage.setItem('Sr-token', response.data.token);
+                localStorage.setItem('Sr-token-user', JSON.stringify(response.data.user));
+
             } else {
                 window.location.href = "/forbidden?SpyLogin=true"
             }
@@ -38,6 +40,8 @@ const loginSlice = createSlice({
         logout: (state) => {
             state.isLogin = false;
             localStorage.removeItem('Sr-token'); // Clear the token on logout
+            localStorage.removeItem('Sr-token-user'); // Clear the token on logout
+            
             toast.success('Logged out successfully!'); // Notify user on successful logout
         },
         checkLogin: (state) => {

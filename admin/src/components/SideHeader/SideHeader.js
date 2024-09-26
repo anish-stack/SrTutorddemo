@@ -73,7 +73,7 @@ const SideHeader = () => {
                             </li>
                             <li className="flex items-center">
                                 <i className="fa-solid fa-chalkboard-teacher mr-3"></i>
-                                <Link to={'/Manage-Teacher'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Manage Teacher</Link>
+                                <a href={'/Manage-Teacher'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Manage Teacher</a>
                             </li>
                             <li className="flex items-center">
                                 <i className="fa-solid fa-user-graduate mr-3"></i>
@@ -140,7 +140,10 @@ const SideHeader = () => {
                                 </ul>
                             </li>
 
-
+                            <li className="flex items-center">
+                                <i className="fa-solid fa-phone mr-3"></i>
+                                <Link to={'/Manage-Contact'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Manage Contact</Link>
+                            </li>
                             <li className="flex items-center">
                                 <i className="fa-solid fa-user-cog mr-3"></i>
                                 <Link to={'/Manage-Profile'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Manage Profile</Link>

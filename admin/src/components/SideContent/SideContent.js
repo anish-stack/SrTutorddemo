@@ -28,6 +28,8 @@ import TeacherInfo from '../../pages/TeacherInfo/TeacherInfo'
 import StudentInfo from '../../pages/StudentInfo/StudentInfo'
 import ClassTeacherRequest from '../../pages/ClassTeacherRequest/ClassTeacherRequest'
 import AllRequest from '../../pages/AllRequest/AllRequest'
+import AllContact from '../../pages/Contact/AllContact'
+import Profile from '../../pages/Profile/Profile'
 const SideContent = () => {
   return (
     <Routes>
@@ -59,6 +61,10 @@ const SideContent = () => {
       <Route path='/send-offers' element={<SendOfferMails />} />
 
       <Route path='/Manage-All-Requests' element={<AllRequest />} />
+      <Route path='/Manage-Contact' element={<AllContact />} />
+      <Route path='/Manage-Profile' element={<Profile />} />
+
+
 
       <Route path='/forbidden' element={<Forbidden />} />
     </Routes>

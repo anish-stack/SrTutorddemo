@@ -11,6 +11,7 @@ const Newsletter = require('../models/NewsLetterModal');
 const streamifier = require('streamifier');
 const CatchAsync = require('../utils/CatchAsync');
 const Cloudinary = require('cloudinary').v2;
+const Contact = require('../models/ContactUsModel')
 require('dotenv').config();
 
 // Configure Cloudinary
@@ -428,6 +429,73 @@ exports.AnalyticalData = CatchAsync(async (req, res) => {
             success: false,
             message: "An error occurred while fetching analytical data.",
             error: error.message,
+        });
+    }
+});
+
+exports.CreateContact = CatchAsync(async (req, res) => {
+    try {
+        const { Name, Email, Phone, Subject, Message } = req.body;
+
+        // Create a new contact entry
+        const newContact = await Contact.create({ Name, Email, Phone, Subject, Message });
+
+        return res.status(201).json({
+            success: true,
+            data: newContact
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: 'Server error. Unable to create contact.'
+        });
+    }
+});
+
+// Get all contacts sorted by timestamps
+exports.GetAllContact = CatchAsync(async (req, res) => {
+    try {
+        const contacts = await Contact.find().sort({ createdAt: -1 }); // Retrieve all contacts sorted by createdAt in descending order
+
+        return res.status(200).json({
+            success: true,
+            data: contacts
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: 'Server error. Unable to retrieve contacts.'
+        });
+    }
+});
+
+
+// Delete a contact by ID
+exports.DeleteContact = CatchAsync(async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Find and delete the contact
+        const deletedContact = await Contact.findByIdAndDelete(id);
+
+        if (!deletedContact) {
+            return res.status(404).json({
+                success: false,
+                message: 'Contact not found.'
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: 'Contact deleted successfully.'
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: 'Server error. Unable to delete contact.'
         });
     }
 });

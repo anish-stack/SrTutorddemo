@@ -1,7 +1,37 @@
 import React, { Component } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
-
+import axios from 'axios'
+import toast from 'react-hot-toast'
 function Contactus() {
+    const [formData,setFormData] = useState({
+        Name:'',
+        Email:'',
+        Phone:'',
+        Subject:'',
+        Message:''
+    })
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault(); // Prevent the default form submission
+        try {
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/uni/create-contact', formData);
+            if (response.data.success) {
+                toast.success("Your message has been sent successfully! We will get back to you shortly.");
+                setFormData({ Name: '', Email: '', Phone: '', Subject: '', Message: '' }); // Reset form fields
+            } else {
+                toast.error("Failed to send the message.");
+            }
+        } catch (error) {
+            console.error("Error sending message:", error);
+            toast.error("An error occurred. Please try again later.");
+        }
+    };
+
     return (
         <>
             <main className="main-area fix">
@@ -92,66 +122,75 @@ function Contactus() {
                                 </div>
                             </div>
                             <div className="col-lg-7">
-                                <div className="contact-form-wrap">
-                                    <h4 className="title">Get in Touch</h4>
-                                    <form id="contact-form" action="assets/mail.php" method="POST">
-                                        <div className="row">
-                                            <div className="col-md-6">
-                                                <div className="form-grp">
-                                                    <input
-                                                        name="name"
-                                                        type="text"
-                                                        placeholder="Name *"
-                                                        required=""
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="col-md-6">
-                                                <div className="form-grp">
-                                                    <input
-                                                        name="email"
-                                                        type="email"
-                                                        placeholder="E-mail *"
-                                                        required=""
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="col-md-6">
-                                                <div className="form-grp">
-                                                    <input
-                                                        name="phone"
-                                                        type="number"
-                                                        placeholder="Phone *"
-                                                        required=""
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="col-md-6">
-                                                <div className="form-grp">
-                                                    <input
-                                                        name="subject"
-                                                        type="text"
-                                                        placeholder="Your Subject *"
-                                                        required=""
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="form-grp">
-                                            <textarea
-                                                name="message"
-                                                placeholder="Message"
-                                                required=""
-                                                defaultValue={""}
-                                            />
-                                        </div>
-                                        <button type="submit" className="btn">
-                                            Send Message
-                                        </button>
-                                    </form>
-                                    <p className="ajax-response mb-0" />
-                                </div>
+            <div className="contact-form-wrap">
+                <h4 className="title">Get in Touch</h4>
+                <form id="contact-form" onSubmit={handleSubmit}>
+                    <div className="row">
+                        <div className="col-md-6">
+                            <div className="form-grp">
+                                <input
+                                    name="Name"
+                                    type="text"
+                                    placeholder="Name *"
+                                    value={formData.Name}
+                                    onChange={handleChange}
+                                    required
+                                />
                             </div>
+                        </div>
+                        <div className="col-md-6">
+                            <div className="form-grp">
+                                <input
+                                    name="Email"
+                                    type="email"
+                                    placeholder="E-mail *"
+                                    value={formData.Email}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </div>
+                        </div>
+                        <div className="col-md-6">
+                            <div className="form-grp">
+                                <input
+                                    name="Phone"
+                                    type="number"
+                                    placeholder="Phone *"
+                                    value={formData.Phone}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </div>
+                        </div>
+                        <div className="col-md-6">
+                            <div className="form-grp">
+                                <input
+                                    name="Subject"
+                                    type="text"
+                                    placeholder="Your Subject *"
+                                    value={formData.Subject}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="form-grp">
+                        <textarea
+                            name="Message"
+                            placeholder="Message"
+                            value={formData.Message}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    <button type="submit" className="btn">
+                        Send Message
+                    </button>
+                </form>
+                <p className="ajax-response mb-0" />
+            </div>
+        </div>
                         </div>
                     </div>
                 </section>
