@@ -426,28 +426,6 @@ exports.CheckNumber = CatchAsync(async (req, res) => {
     try {
         const { userNumber, latitude, longitude } = req.body;
 
-        const checkUser = await Student.findOne({ PhoneNumber: userNumber });
-        if (checkUser) {
-            const otp = crypto.randomInt(100000, 999999);
-            const otpExpiresTime = Date.now() + 10 * 60 * 1000;
-            const sendOtpOnMobileNumber = await axios.get(`https://2factor.in/API/V1/${process.env.TWOFACTOR_API_KEY}/SMS/${userNumber}/${otp}/OTP1`);
-
-            // Handle OTP sending failure
-            if (sendOtpOnMobileNumber.data.Status !== 'Success') {
-                return res.status(400).json({ message: 'Failed to send OTP' });
-            }
-            checkUser.SignInOtp = otp
-            checkUser.OtpExpiresTime = otpExpiresTime
-
-            await checkUser.save()
-            return res.status(201).json({
-                success: 'true',
-                message: 'Otp Send Successful'
-            });
-        }
-
-
-
         // Check for missing fields
         const missingFields = [];
         if (!userNumber) missingFields.push('Phone Number');
@@ -458,46 +436,64 @@ exports.CheckNumber = CatchAsync(async (req, res) => {
             });
         }
 
-        // Generate OTP
+        // Check if the user exists
+        const checkUser = await Student.findOne({ PhoneNumber: userNumber });
         const otp = crypto.randomInt(100000, 999999);
         const otpExpiresTime = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
 
-        // Create a new student
-        const newStudent = await Student.create({
-            StudentName: `Student${crypto.randomInt(100, 999)}`,
-            PhoneNumber: userNumber,
-            Email: `Student${crypto.randomInt(100, 999)}@gmail.com`,
-            Password: `Student${crypto.randomInt(100, 999)}`,
-            latitude,
-            AltPhoneNumber: userNumber,
-            longitude,
-            isStudentVerified: false,
-            SignInOtp: otp,
-            OtpExpiresTime: otpExpiresTime
-        });
+        if (checkUser) {
+            const sendOtpOnMobileNumber = await axios.get(`https://2factor.in/API/V1/${process.env.TWOFACTOR_API_KEY}/SMS/${userNumber}/${otp}/OTP1`);
 
-        // Uncomment and use this after properly defining the email options
-        // await sendEmail(Options);
+            // Handle OTP sending failure
+            if (sendOtpOnMobileNumber.data.Status !== 'Success') {
+                return res.status(400).json({ message: 'Failed to send OTP' });
+            }
 
-        // Send OTP via mobile number
-        const sendOtpOnMobileNumber = await axios.get(`https://2factor.in/API/V1/${process.env.TWOFACTOR_API_KEY}/SMS/${PhoneNumber}/${otp}/OTP1`);
+            // Update user with new OTP
+            checkUser.SignInOtp = otp;
+            checkUser.OtpExpiresTime = otpExpiresTime;
 
-        // // Handle OTP sending failure
-        if (sendOtpOnMobileNumber.data.Status !== 'Success') {
-            return res.status(400).json({ message: 'Failed to send OTP' });
+            await checkUser.save();
+            return res.status(200).json({
+                success: true,
+                message: 'OTP sent successfully.'
+            });
+        } else {
+            // Create a new student
+            const newStudent = await Student.create({
+                StudentName: `Student${crypto.randomInt(100, 999)}`,
+                PhoneNumber: userNumber,
+                Email: `Student${crypto.randomInt(100, 999)}@gmail.com`,
+                Password: `Student${crypto.randomInt(100, 999)}`,
+                latitude,
+                AltPhoneNumber: userNumber,
+                longitude,
+                isStudentVerified: false,
+                SignInOtp: otp,
+                OtpExpiresTime: otpExpiresTime
+            });
+
+            // Send OTP via mobile number
+            const sendOtpOnMobileNumber = await axios.get(`https://2factor.in/API/V1/${process.env.TWOFACTOR_API_KEY}/SMS/${userNumber}/${otp}/OTP1`);
+
+            // Handle OTP sending failure
+            if (sendOtpOnMobileNumber.data.Status !== 'Success') {
+                return res.status(400).json({ message: 'Failed to send OTP' });
+            }
+
+            // Send success response
+            res.status(201).json({
+                success: true,
+                message: 'Please verify OTP for complete registration. OTP sent to phone number.',
+                data: newStudent
+            });
         }
-
-        // Send success response
-        res.status(201).json({
-            success: true,
-            message: 'Please verify Otp for complete registration. OTP sent On phone number.',
-            data: newStudent
-        });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'Internal server error', error: error.message });
     }
 });
+
 
 
 exports.AdminLogin = CatchAsync(async (req, res) => {
