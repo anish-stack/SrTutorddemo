@@ -144,7 +144,7 @@ function Header() {
       DashboardUrl: `/Student-dashboard?login=${studentToken ? true : false}`,
     },
     teacher: {
-      title: "Go Check Students Are Coming",
+      title: "Become Part of our Team",
       url: "/teacher-register?source=home",
       forgetPassword: "/Forget-Password?source=home&type-teacher",
       DashboardUrl: `/Teacher-dashboard?login=${teacherToken ? true : false}`,

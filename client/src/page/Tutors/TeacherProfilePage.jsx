@@ -11,27 +11,42 @@ const TeacherProfileModal = ({ isOpen, isClose, item, teacherClasses }) => {
 
     const reviews = [
         {
-            name: "John Doe",
-            class: "5th Grade",
-            review: "The teacher is amazing and explains concepts clearly.",
+            name: "Ravi Sharma",
+            class: "10th Grade",
+            review: "A fantastic tutor! His teaching methods made complex topics easy to understand.",
             rating: 5,
-            image: "https://randomuser.me/api/portraits/men/12.jpg"
+            image: "https://i.ibb.co/kHdpqDC/studentsss.png"
         },
         {
-            name: "Jane Smith",
-            class: "6th Grade",
-            review: "Engaging and interactive lessons, highly recommended!",
+            name: "Priya Gupta",
+            class: "9th Grade",
+            review: "Highly knowledgeable and patient. She takes the time to ensure every student understands the material.",
+            rating: 5,
+            image: "https://i.ibb.co/kHdpqDC/studentsss.png"
+        },
+        {
+            name: "Arjun Mehta",
+            class: "11th Grade",
+            review: "The best teacher I've had! His enthusiasm for the subject makes learning enjoyable.",
             rating: 4,
-            image: "https://randomuser.me/api/portraits/women/44.jpg"
+            image: "https://i.ibb.co/kHdpqDC/studentsss.png"
         },
         {
-            name: "Alex Johnson",
-            class: "7th Grade",
-            review: "The teacher really helped me improve my grades!",
+            name: "Anjali Verma",
+            class: "12th Grade",
+            review: "An excellent tutor who provides valuable insights and support. Highly recommend!",
             rating: 5,
-            image: "https://randomuser.me/api/portraits/men/45.jpg"
+            image: "https://i.ibb.co/kHdpqDC/studentsss.png"
         },
+        {
+            name: "Suresh Reddy",
+            class: "10th Grade",
+            review: "Great mentor! His practical examples helped me grasp the subject better.",
+            rating: 4,
+            image: "https://i.ibb.co/kHdpqDC/studentsss.png"
+        }
     ];
+    
 
     return (
         <div className='w-100 mt-5'>

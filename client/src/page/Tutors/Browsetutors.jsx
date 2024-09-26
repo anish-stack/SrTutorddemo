@@ -115,20 +115,29 @@ const Browsetutors = () => {
             setCurrentPage(page);
         }
     };
-
     const handleFilterChange = (e) => {
         const { name, value, type, checked } = e.target;
 
         if (name === 'Gender' && type === 'checkbox') {
             setFilterOptions(prev => ({
                 ...prev,
-                [name]: checked ? value : ''  // Reset gender if unchecked
+                [name]: checked ? value : '' // Reset gender if unchecked
             }));
         } else if (name === 'verified' && type === 'checkbox') {
-            setFilterOptions(prev => ({
-                ...prev,
-                [name]: checked ? JSON.parse(value) : ''
-            }));
+            // Handle verified checkbox logic
+            if (value === 'Both') {
+                // If 'Both' is checked, set the filter to 'Both'
+                setFilterOptions(prev => ({
+                    ...prev,
+                    verified: checked ? 'Both' : '' // Reset to empty if unchecked
+                }));
+            } else {
+                // For true/false checkboxes
+                setFilterOptions(prev => ({
+                    ...prev,
+                    verified: checked ? value : '' // Reset if unchecked
+                }));
+            }
         } else if (type === 'range') {
             setFilterOptions(prev => ({
                 ...prev,
@@ -141,6 +150,7 @@ const Browsetutors = () => {
             }));
         }
     };
+
 
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
@@ -183,36 +193,49 @@ const Browsetutors = () => {
                     </label>
                 </div>
 
-                {/* Verified Filter */}
                 <h5 className="mt-4">Verified Teacher</h5>
-                <div className="form-check">
-                    <input
-                        type="checkbox"
-                        className="form-check-input"
-                        id="verifiedTrue"
-                        name="verified"
-                        value={true}
-                        checked={FilterOptions.verified === true}
-                        onChange={handleFilterChange}
-                    />
-                    <label className="form-check-label" htmlFor="verifiedTrue">
-                        True
-                    </label>
-                </div>
-                <div className="form-check">
-                    <input
-                        type="checkbox"
-                        className="form-check-input"
-                        id="verifiedFalse"
-                        name="verified"
-                        value={false}
-                        checked={FilterOptions.verified === false}
-                        onChange={handleFilterChange}
-                    />
-                    <label className="form-check-label" htmlFor="verifiedFalse">
-                        False
-                    </label>
-                </div>
+<div className="form-check">
+    <input
+        type="checkbox"
+        className="form-check-input"
+        id="verifiedTrue"
+        name="verified"
+        value="true" // Set as string
+        checked={FilterOptions.verified === 'true'}
+        onChange={handleFilterChange}
+    />
+    <label className="form-check-label" htmlFor="verifiedTrue">
+        Verified Teacher
+    </label>
+</div>
+<div className="form-check">
+    <input
+        type="checkbox"
+        className="form-check-input"
+        id="verifiedFalse"
+        name="verified"
+        value="false" // Set as string
+        checked={FilterOptions.verified === 'false'}
+        onChange={handleFilterChange}
+    />
+    <label className="form-check-label" htmlFor="verifiedFalse">
+        Un-Verified Teacher
+    </label>
+</div>
+<div className="form-check">
+    <input
+        type="checkbox"
+        className="form-check-input"
+        id="Both"
+        name="verified"
+        value="Both" // Value for the 'Both' option
+        checked={FilterOptions.verified === 'Both'}
+        onChange={handleFilterChange}
+    />
+    <label className="form-check-label" htmlFor="Both">
+        Both
+    </label>
+</div>
 
                 {/* Subjects Filter */}
                 <h5 className="mt-4">Subjects</h5>

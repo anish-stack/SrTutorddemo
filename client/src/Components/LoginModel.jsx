@@ -97,11 +97,14 @@ const LoginModal = ({ isOpen, modalType, onClose }) => {
     student: {
       title: "Find Perfect Home Tutors",
       url: "/Student-register?source=home",
+      acountOpen:'Register As a Student',
+
       forgetPassword: "/Forget-Password?source=home&type-student",
       DashboardUrl: `/Student-dashboard`,
     },
     teacher: {
-      title: "Go Check Students Are Coming",
+      title: "Become Part of our Team",
+      acountOpen:'Create A Tutor Account',
       url: "/teacher-register?source=home",
       forgetPassword: "/Forget-Password?source=home&type-teacher",
       DashboardUrl: `/Teacher-dashboard`,
@@ -184,7 +187,7 @@ const LoginModal = ({ isOpen, modalType, onClose }) => {
                 href={`${modalContent[modalType]?.url}`}
                 className="link-danger text-decoration-none"
               >
-                Create A Free Account!!
+                {`${modalContent[modalType]?.acountOpen}`}
               </a>
             </div>
           </form>
