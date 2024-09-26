@@ -435,15 +435,29 @@ exports.AnalyticalData = CatchAsync(async (req, res) => {
 
 exports.CreateContact = CatchAsync(async (req, res) => {
     try {
-        const { Name, Email, Phone, Subject, Message } = req.body;
+        const { Name, Email, Phone, Subject, Message, StudentId, TeacherId } = req.body;
+
+        // Default QueryType if both StudentId and TeacherId are absent
+        const queryType = StudentId ? "Registered Student" : TeacherId ? "Registered Teacher" : "General Inquiry";
 
         // Create a new contact entry
-        const newContact = await Contact.create({ Name, Email, Phone, Subject, Message });
+        const newContact = await Contact.create({
+            Name,
+            Email,
+            Phone,
+            Subject,
+            Message,
+            StudentId,
+            TeacherId,
+            QueryType: queryType
+        });
 
+        // Return the created contact
         return res.status(201).json({
             success: true,
             data: newContact
         });
+
     } catch (error) {
         console.error(error);
         return res.status(500).json({
@@ -452,6 +466,7 @@ exports.CreateContact = CatchAsync(async (req, res) => {
         });
     }
 });
+
 
 // Get all contacts sorted by timestamps
 exports.GetAllContact = CatchAsync(async (req, res) => {
