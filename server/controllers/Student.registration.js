@@ -430,12 +430,12 @@ exports.CheckNumber = CatchAsync(async (req, res) => {
         if (checkUser) {
             const otp = crypto.randomInt(100000, 999999);
             const otpExpiresTime = Date.now() + 10 * 60 * 1000;
-            // const sendOtpOnMobileNumber = await axios.get(`https://2factor.in/API/V1/${process.env.TWOFACTOR_API_KEY}/SMS/${userNumber}/${otp}/OTP1`);
+            const sendOtpOnMobileNumber = await axios.get(`https://2factor.in/API/V1/${process.env.TWOFACTOR_API_KEY}/SMS/${userNumber}/${otp}/OTP1`);
 
-            // // Handle OTP sending failure
-            // if (sendOtpOnMobileNumber.data.Status !== 'Success') {
-            //     return res.status(400).json({ message: 'Failed to send OTP' });
-            // }
+            // Handle OTP sending failure
+            if (sendOtpOnMobileNumber.data.Status !== 'Success') {
+                return res.status(400).json({ message: 'Failed to send OTP' });
+            }
             checkUser.SignInOtp = otp
             checkUser.OtpExpiresTime = otpExpiresTime
 
@@ -480,12 +480,12 @@ exports.CheckNumber = CatchAsync(async (req, res) => {
         // await sendEmail(Options);
 
         // Send OTP via mobile number
-        // const sendOtpOnMobileNumber = await axios.get(`https://2factor.in/API/V1/${process.env.TWOFACTOR_API_KEY}/SMS/${PhoneNumber}/${otp}/OTP1`);
+        const sendOtpOnMobileNumber = await axios.get(`https://2factor.in/API/V1/${process.env.TWOFACTOR_API_KEY}/SMS/${PhoneNumber}/${otp}/OTP1`);
 
         // // Handle OTP sending failure
-        // if (sendOtpOnMobileNumber.data.Status !== 'Success') {
-        //     return res.status(400).json({ message: 'Failed to send OTP' });
-        // }
+        if (sendOtpOnMobileNumber.data.Status !== 'Success') {
+            return res.status(400).json({ message: 'Failed to send OTP' });
+        }
 
         // Send success response
         res.status(201).json({
