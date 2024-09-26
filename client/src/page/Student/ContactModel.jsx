@@ -369,7 +369,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
     console.log(loginNumber)
     try {
 
-      const response = await axios.post('http://localhost:7000/api/v1/student/resent-otp', { PhoneNumber: loginNumber });
+      const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/resent-otp', { PhoneNumber: loginNumber });
       console.log(response.data)
       toast.success(response.data.message);
 
