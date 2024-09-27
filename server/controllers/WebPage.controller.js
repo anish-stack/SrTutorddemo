@@ -11,7 +11,8 @@ const Newsletter = require('../models/NewsLetterModal');
 const streamifier = require('streamifier');
 const CatchAsync = require('../utils/CatchAsync');
 const Cloudinary = require('cloudinary').v2;
-const Contact = require('../models/ContactUsModel')
+const Contact = require('../models/ContactUsModel');
+const Request = require('../models/UniversalSchema');
 require('dotenv').config();
 
 // Configure Cloudinary
@@ -311,11 +312,9 @@ exports.AnalyticalData = CatchAsync(async (req, res) => {
         ]);
 
         // Calculate counts for particularTeacher, student, subjectTeacherRequest, and testimonial
-        const [particularTeacherCountToday, totalCountParticularTeacher, particularTeacherCountWeekAgo] = await Promise.all([
-            ParticularTeacher.countDocuments({ createdAt: { $gte: todayStart } }),
-            getDataFromCacheOrDb('totalCountParticularTeacher', () => ParticularTeacher.countDocuments()),
-            ParticularTeacher.countDocuments({ createdAt: { $gte: weekStart, $lt: todayStart } })
-        ]);
+        const ToadyRequest = await Request.countDocuments({ createdAt: { $gte: todayStart } })
+
+        const AllRequest = await Request.countDocuments()
 
         const [studentCountToday, totalCountStudent, studentCountWeekAgo] = await Promise.all([
             Student.countDocuments({ createdAt: { $gte: todayStart } }),
@@ -323,11 +322,7 @@ exports.AnalyticalData = CatchAsync(async (req, res) => {
             Student.countDocuments({ createdAt: { $gte: weekStart, $lt: todayStart } })
         ]);
 
-        const [subjectTeacherRequestCountToday, totalCountSubjectTeacherRequest, subjectTeacherRequestCountWeekAgo] = await Promise.all([
-            SubjectTeacherRequest.countDocuments({ createdAt: { $gte: todayStart } }),
-            getDataFromCacheOrDb('totalCountSubjectTeacherRequest', () => SubjectTeacherRequest.countDocuments()),
-            SubjectTeacherRequest.countDocuments({ createdAt: { $gte: weekStart, $lt: todayStart } })
-        ]);
+
 
         const [testimonialCountToday, totalCountTestimonial, testimonialCountWeekAgo] = await Promise.all([
             Testimonial.countDocuments({ createdAt: { $gte: todayStart } }),
@@ -385,21 +380,14 @@ exports.AnalyticalData = CatchAsync(async (req, res) => {
                 currentMonthCount: await Blogs.countDocuments({ createdAt: { $gte: currentMonthStart } }),
                 previousMonthCount: await Blogs.countDocuments({ createdAt: { $gte: previousMonthStart, $lte: previousMonthEnd } })
             },
-            particularTeacherRequest: {
-                today: particularTeacherCountToday,
-                weekAgo: particularTeacherCountWeekAgo,
-                total: totalCountParticularTeacher
-            },
+
             student: {
                 today: studentCountToday,
                 total: totalCountStudent,
                 weekAgo: studentCountWeekAgo
             },
-            subjectTeacherRequest: {
-                today: subjectTeacherRequestCountToday,
-                weekAgo: subjectTeacherRequestCountWeekAgo,
-                total: totalCountSubjectTeacherRequest
-            },
+            TodayTeacherRequest: ToadyRequest,
+            AllTimeRequest:AllRequest,
             testimonial: {
                 today: testimonialCountToday,
                 weekAgo: testimonialCountWeekAgo,
@@ -435,15 +423,29 @@ exports.AnalyticalData = CatchAsync(async (req, res) => {
 
 exports.CreateContact = CatchAsync(async (req, res) => {
     try {
-        const { Name, Email, Phone, Subject, Message } = req.body;
-
+        const { Name, Email, Phone, Subject, Message, StudentId, TeacherId } = req.body;
+        console.log(req.body)
+        // Default QueryType if both StudentId and TeacherId are absent
+        const queryType = StudentId ? "Registered Student" : TeacherId ? "Registered Teacher" : "General Inquiry";
+        console.log(queryType)
         // Create a new contact entry
-        const newContact = await Contact.create({ Name, Email, Phone, Subject, Message });
+        const newContact = await Contact.create({
+            Name,
+            Email,
+            Phone,
+            Subject,
+            Message,
+            StudentId,
+            TeacherId,
+            QueryType: queryType
+        });
 
+        // Return the created contact
         return res.status(201).json({
             success: true,
             data: newContact
         });
+
     } catch (error) {
         console.error(error);
         return res.status(500).json({
@@ -453,10 +455,11 @@ exports.CreateContact = CatchAsync(async (req, res) => {
     }
 });
 
+
 // Get all contacts sorted by timestamps
 exports.GetAllContact = CatchAsync(async (req, res) => {
     try {
-        const contacts = await Contact.find().sort({ createdAt: -1 }); // Retrieve all contacts sorted by createdAt in descending order
+        const contacts = await Contact.find().sort({ createdAt: -1 }).populate(['StudentId', 'TeacherId']); // Retrieve all contacts sorted by createdAt in descending order
 
         return res.status(200).json({
             success: true,

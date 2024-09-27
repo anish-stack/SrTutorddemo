@@ -104,16 +104,16 @@ const Dashboard = () => {
     };
     const barChartDatatwo = {
         labels: [
-            'Particular Subject Request',
-            'Subject Teacher Requests'
+            'All Time Request',
+            'Today Request',
         ],
         datasets: [{
             label: 'Counts',
             data: [
 
-                data.particularTeacherRequest?.total || 0,
+                data.AllTimeRequest || 0,
 
-                data.subjectTeacherRequest?.total || 0
+                data.TodayTeacherRequest || 0
             ],
             backgroundColor: 'rgba(75, 192, 192, 0.2)',
             borderColor: 'rgba(75, 192, 192, 1)',
@@ -184,11 +184,11 @@ const Dashboard = () => {
             <main className="p-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <Card
-                        href={"/Manage-Teacher-Requests"}
+                        href={"/Manage-All-Requests"}
                         icon={faPersonChalkboard}
-                        title="Teacher Requests (Total)"
-                        value={data.particularTeacherRequest?.total || 0}
-                        difference={calculateDifference(data.particularTeacherRequest?.total || 0, data.particularTeacherRequest?.weekAgo || 0)}
+                        title="Today Teacher Requests "
+                        value={data.TodayTeacherRequest || 0}
+                        difference={calculateDifference(data.TodayTeacherRequest || 0, data.AllTimeRequest || 0)}
                         iconColor="text-blue-500"
                     />
                     <Card
@@ -199,14 +199,14 @@ const Dashboard = () => {
                         difference={calculateDifference(data.student?.total || 0, data.student?.weekAgo || 0)}
                         iconColor="text-green-500"
                     />
-                    <Card
+                    {/* <Card
                         href={"/Subject-Teacher-Requests"}
                         icon={faPersonChalkboard}
                         title="Subject Teacher Requests"
                         value={data.subjectTeacherRequest?.total || 0}
                         difference={calculateDifference(data.subjectTeacherRequest?.total || 0, data.subjectTeacherRequest?.weekAgo || 0)}
                         iconColor="text-red-500"
-                    />
+                    /> */}
                     <Card
                         href={"/Manage-Reviews"}
                         icon={faHeart}
@@ -242,13 +242,13 @@ const Dashboard = () => {
                         value={data.subscribers?.subscriberCount || 0}
                         iconColor="text-pink-500"
                     />
-                    <Card
+                    {/* <Card
                         href={"/Manage-Blogs"}
                         icon={faBlog}
                         title="Total Blogs"
                         value={data.blogCount?.currentMonthCount || 0}
                         iconColor="text-pink-500"
-                    />
+                    /> */}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
@@ -288,7 +288,7 @@ const Dashboard = () => {
                             }
                         }} />
                     </div>
-                    <div className="bg-white p-6 rounded-lg shadow-md">
+                    {/* <div className="bg-white p-6 rounded-lg shadow-md">
                         <h2 className="text-xl font-semibold mb-4">Distribution (Pie Chart 1)</h2>
                         <Pie data={pieChart1Data} options={{
                             responsive: true,
@@ -305,7 +305,7 @@ const Dashboard = () => {
                                 }
                             }
                         }} />
-                    </div>
+                    </div> */}
 
                     <div className="bg-white p-6 rounded-lg shadow-md">
                         <h2 className="text-xl font-semibold mb-4">Distribution (Pie Chart 2)</h2>

@@ -9,6 +9,7 @@ const crypto = require('crypto')
 const sendEmail = require('../utils/SendEmails')
 const { check } = require('express-validator')
 const RequestSchema = require('../models/UniversalSchema')
+const Request = require('../models/UniversalSchema')
 
 exports.MakeARequestForTeacher = CatchAsync(async (req, res) => {
     try {
@@ -168,7 +169,7 @@ exports.MakeARequestForTeacher = CatchAsync(async (req, res) => {
 
         res.status(201).json({
             success: true,
-            message: "Teacher request created successfully. An OTP has been sent to your email.",
+            message: "Teacher request created successfully. An OTP has been Sent to Your Contact Number.",
             data: newRequest
         });
 
@@ -362,7 +363,8 @@ exports.GetPostByStudentId = CatchAsync(async (req, res) => {
 exports.getSubscribed = CatchAsync(async (req, res) => {
     try {
         const studentId = req.user.id;
-
+        console.log(studentId)
+        // Check if studentId is provided
         if (!studentId) {
             return res.status(400).json({
                 success: false,
@@ -370,46 +372,20 @@ exports.getSubscribed = CatchAsync(async (req, res) => {
             });
         }
 
-        // Fetch posts from SubjectTeacherModel where studentId matches and isDealDone is true
-        const subjectTeacherPosts = await SubjectTeacherModel.find({
-            studentId: studentId,
-            isDealDone: true
-        });
+        // Query to check if the student is subscribed (dealDone is true)
+        const CheckSubscribed = await Request.find({
+            studentId: studentId,  // Match studentId
+            dealDone: true          // Only include where dealDone is true
+        }).populate('teacherId');
 
-        // Fetch posts from ParticularTeacher where studentId matches and isDealDone is true
-        const particularTeacherPosts = await ParticularTeacher.find({
-            studentId: studentId,
-            isDealDone: true
-        });
-
-        // Combine posts from both models
-        const combinedPostsWithTeacher = [...subjectTeacherPosts, ...particularTeacherPosts];
-
-        // Extract teacher IDs from the combined posts
-        const teacherIds = combinedPostsWithTeacher.map(post => post.teacherId).filter(id => id);
-
-        // Fetch teacher details based on the teacher IDs
-        const teacherDetails = await teacherPro.find({
-            _id: { $in: teacherIds }
-        }).select('-Password -TeacherProfile');
-
-
-        // Map teacher details to the posts
-        const postsWithTeacherInfo = combinedPostsWithTeacher.map(post => {
-            const teacherInfo = teacherDetails.find(teacher => teacher._id.toString() === post.teacherId.toString());
-            return {
-                ...post.toObject(), // Convert Mongoose document to plain object
-                teacherInfo: teacherInfo || null
-            };
-        });
-
-        // Send response with posts including teacher information
+        // Send response with subscribed requests
         res.status(200).json({
             success: true,
-            data: postsWithTeacherInfo
+            data: CheckSubscribed
         });
 
     } catch (error) {
+        console.log(error)
         // Handle errors and send response
         res.status(500).json({
             success: false,
@@ -418,6 +394,7 @@ exports.getSubscribed = CatchAsync(async (req, res) => {
         });
     }
 });
+
 
 exports.ShowAllPost = CatchAsync(async (req, res) => {
     try {

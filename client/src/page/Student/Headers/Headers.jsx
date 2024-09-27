@@ -5,6 +5,8 @@ import Cookies from "js-cookie";
 import axios from "axios";
 import { Pagination } from 'react-bootstrap';
 import { useLocation } from "react-router-dom";
+import HomeLoader from "../../../Components/HomeLoader";
+import toast from 'react-hot-toast'
 const Headers = () => {
     const [isOpen, setIsOpen] = useState(false);
     const location = useLocation()
@@ -25,6 +27,50 @@ const Headers = () => {
         setIsOpen(!isOpen);
     };
 
+    const [formData, setFormData] = useState({
+        Name: '',
+        Email: '',
+        Phone: '',
+        Subject: '',
+        Message: '',
+        StudentId: studentDetails?._id || '', // Initialize StudentId if available
+    });
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+    };
+    useEffect(() => {
+        if (studentDetails) {
+            setFormData({
+                ...formData,
+                Name: studentDetails.StudentName || '', // Pre-fill Name
+                Email: studentDetails.Email || '',       // Pre-fill Email
+                Phone: studentDetails.PhoneNumber || '',  // Pre-fill Phone
+                StudentId: studentDetails?._id
+            });
+        }
+    }, [studentDetails]);
+    const handleSubmit = async (e) => {
+        e.preventDefault(); // Prevent the default form submission
+        console.log(formData)
+        try {
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/uni/create-contact', formData);
+            if (response.data.success) {
+                toast.success("Your message has been sent successfully! We will get back to you shortly.");
+                // setFormData({ Name: '', Email: '', Phone: '', Subject: '', Message: '' }); // Reset form fields
+            } else {
+                toast.error("Failed to send the message.");
+            }
+        } catch (error) {
+            console.error("Error sending message:", error);
+            toast.error("An error occurred. Please try again later.");
+        }
+    };
+
+
+
+    const [loading, setLoding] = useState(false)
     useEffect(() => {
         const student = Cookies.get("studentToken");
         setStudentToken(student || null);
@@ -59,6 +105,7 @@ const Headers = () => {
 
 
     const MyPost = async () => {
+        setLoding(true)
         try {
             const { data } = await axios.get('https://api.srtutorsbureau.com/api/v1/student/Get-My-Post', {
                 headers: {
@@ -69,28 +116,38 @@ const Headers = () => {
                     limit: postsPerPage
                 }
             });
+            const postSort = data.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            setPost(postSort);
 
-            setPost(data.data);
-            console.log(data.data)
+            // console.log(data.data)
             setTotalPosts(data.data.length);
+            setLoding(false)
+
         } catch (error) {
             console.log(error);
             setPost([]);
+            setLoding(false)
+
         }
     };
 
     const MySubscribed = async () => {
         try {
+            setLoding(true)
+
             const { data } = await axios.get('https://api.srtutorsbureau.com/api/v1/student/Get-My-Subscribed-Teacher', {
                 headers: {
                     Authorization: `Bearer ${studentToken}`
                 }
             });
-            console.log(data.data)
+            console.log("i am write", data.data)
             setSubscribed(data.data)
+            setLoding(false)
 
         } catch (error) {
             console.log(error);
+            setLoding(false)
+
 
         }
     };
@@ -113,7 +170,7 @@ const Headers = () => {
     };
 
 
-    const subscribedTeachers = 15;
+    const subscribedTeachers = subscribed?.length || 0;
     const friendsCount = 30;
     const specialOffers = 5;
     const reviewsCount = 75;
@@ -152,6 +209,9 @@ const Headers = () => {
         setCurrentPage(newPage);
         MyPost();
     };
+    if (loading) {
+        return <HomeLoader />
+    }
     return (
         <>
             {studentToken && studentDetails ? (
@@ -162,7 +222,7 @@ const Headers = () => {
                             <h4 className="text-black  navbar-brand  px-12 m-0"><img src="https://srtutors.hoverbusinessservices.com/assets/img/logo/srtutor.webp" width="95" height="52" className="img-fluid  navbar-brand" alt="" /></h4>
                             <div className=" d-md-block mt-2 border-none text-center px-12     d-none">
                                 <a href="#" className="align-items-center text-black text-decoration-none " aria-expanded="false">
-                                    <img src={studentDetails?.profilePic} alt="" width="32" height="32" className="rounded-circle me-2" />
+                                    <img src={studentDetails?.profilePic || "https://i.ibb.co/znBZ37L/s.jpg"} alt="" width="32" height="32" className="rounded-circle me-2" />
 
                                 </a><br />
                                 <strong>
@@ -380,11 +440,11 @@ const Headers = () => {
                                                                 <ul className="list-group w-100 mb-3 list-group-flush">
                                                                     <li className="list-group-item px-2 bg-transparent rounded d-flex justify-content-between">
                                                                         <span className="mb-0">📅 Date:</span>
-                                                                        <strong>{new Date(item.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</strong>
+                                                                        <strong>{new Date(item?.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) || 'N/A'}</strong>
                                                                     </li>
                                                                     <li className="list-group-item px-2 bg-transparent rounded d-flex justify-content-between">
                                                                         <span className="mb-0">🏫 Class:</span>
-                                                                        <strong>{item.className}</strong>
+                                                                        <strong>{item?.className || 'N/A'}</strong>
                                                                     </li>
                                                                     <li className="list-group-item px-2 bg-transparent rounded d-flex justify-content-between">
                                                                         <span className="mb-0">📘 Subject:</span>
@@ -392,24 +452,24 @@ const Headers = () => {
                                                                     </li>
                                                                     <li className="list-group-item px-2 bg-transparent rounded d-flex justify-content-between">
                                                                         <span className="mb-0">❤️ Interested:</span>
-                                                                        <strong>{item.interestedInTypeOfClass}</strong>
+                                                                        <strong>{item?.interestedInTypeOfClass || 'N/A'}</strong>
                                                                     </li>
                                                                     <li className="list-group-item px-2 bg-transparent rounded d-flex justify-content-between">
                                                                         <span className="mb-0">📚 Classes Requested:</span>
-                                                                        <strong>{item.numberOfSessions}</strong>
+                                                                        <strong>{item?.numberOfSessions || 'N/A'}</strong>
                                                                     </li>
                                                                     <li className="list-group-item px-2 bg-transparent rounded d-flex justify-content-between">
                                                                         <span className="mb-0">💵 Budget:</span>
-                                                                        <strong>₹{item.minBudget} - ₹{item.maxBudget}</strong>
+                                                                        <strong>₹{item?.minBudget || '0'} - ₹{item?.maxBudget || '0'}</strong>
                                                                     </li>
                                                                     <li className="list-group-item px-2 bg-transparent rounded d-flex justify-content-between">
                                                                         <span>👨‍🏫 Teacher Gender:</span>
-                                                                        <strong>{item.teacherGenderPreference}</strong>
+                                                                        <strong>{item?.teacherGenderPreference || 'N/A'}</strong>
                                                                     </li>
                                                                     <li className="list-group-item text-white mt-2 px-2 d-flex justify-content-between"
                                                                         style={{ backgroundColor: index % 2 === 0 ? '#4CAF50' : '#FF5722', borderRadius: '8px' }}>
                                                                         <span><i className="me-2"></i>🔔 Status</span>
-                                                                        <strong>{item.statusOfRequest}</strong>
+                                                                        <strong>{item?.statusOfRequest || 'N/A'}</strong>
                                                                     </li>
                                                                 </ul>
                                                             </div>
@@ -464,15 +524,15 @@ const Headers = () => {
                                                                     <ul className="list-group w-100 mb-3 list-group-flush">
                                                                         <li className="list-group-item px-2 bg-transparent rounded d-flex justify-content-between">
                                                                             <span className="mb-0">👨‍🏫 Teacher Name:</span>
-                                                                            <strong>{teacher.teacherInfo.TeacherName}</strong>
+                                                                            <strong>{teacher?.teacherId?.FullName}</strong>
                                                                         </li>
                                                                         <li className="list-group-item px-2 bg-transparent rounded d-flex justify-content-between">
-                                                                            <span className="mb-0">📧 Email</span>
-                                                                            <strong>{teacher.teacherInfo.Email}</strong>
+                                                                            <span className="mb-0">📧 Gender</span>
+                                                                            <strong>{teacher?.teacherId?.Gender}</strong>
                                                                         </li>
                                                                         <li className="list-group-item px-2 bg-transparent rounded d-flex justify-content-between">
                                                                             <span className="mb-0">☎️ Contact Number:</span>
-                                                                            <strong>{teacher.teacherInfo.PhoneNumber}</strong>
+                                                                            <strong>{teacher?.teacherId?.ContactNumber}</strong>
                                                                         </li>
                                                                         <li className="list-group-item px-2 bg-transparent rounded d-flex justify-content-between">
                                                                             <span className="mb-0">🏫 Class</span>
@@ -480,7 +540,7 @@ const Headers = () => {
                                                                         </li>
                                                                         <li className="list-group-item px-2 bg-transparent rounded d-flex justify-content-between">
                                                                             <span className="mb-0">📘 Subject:</span>
-                                                                            <strong>{Array.isArray(teacher.Subject) ? teacher.Subject.map(sub => <span key={sub} className="badge bg-primary me-1">{sub}</span>) : 'No subjects available'}</strong>
+                                                                            <strong>{Array.isArray(teacher.subjects) ? teacher?.subjects.map(sub => <span key={sub} className="badge bg-primary me-1">{sub}</span>) : 'No subjects available'}</strong>
                                                                         </li>
                                                                         <li className="list-group-item px-2 bg-transparent rounded d-flex justify-content-between">
                                                                             <span className="mb-0">📅 Experience:</span>
@@ -488,16 +548,16 @@ const Headers = () => {
                                                                         </li>
                                                                         <li className="list-group-item px-2 bg-transparent rounded d-flex justify-content-between">
                                                                             <span className="mb-0">🌍 Location:</span>
-                                                                            <strong>{teacher.Location}</strong>
+                                                                            <strong>{teacher.locality}</strong>
                                                                         </li>
                                                                         <li className="list-group-item px-2 bg-transparent rounded d-flex justify-content-between">
                                                                             <span className="mb-0">💵 Budget:</span>
-                                                                            <strong>₹{teacher.MinRange} - ₹{teacher.MaxRange}</strong>
+                                                                            <strong>₹{teacher?.minBudget} - ₹{teacher?.maxBudget}</strong>
                                                                         </li>
                                                                         <li className="list-group-item text-white mt-2 px-2 d-flex justify-content-between"
                                                                             style={{ backgroundColor: index % 2 === 0 ? '#4CAF50' : '#FF5722', borderRadius: '8px' }}>
                                                                             <span><i className="me-2"></i>Status:</span>
-                                                                            <strong>{teacher.statusOfRequest}</strong>
+                                                                            <strong>{teacher.dealDone ? 'Teacher Subscribed' : 'Pending'}</strong>
                                                                         </li>
                                                                     </ul>
                                                                 </div>
@@ -523,6 +583,8 @@ const Headers = () => {
                                                     </div>
                                                 </div>
                                             </>
+                                        ) : loading ? (
+                                            <HomeLoader />
                                         ) : (
                                             <div className="row">
                                                 <div className="col-lg-12">
@@ -537,8 +599,8 @@ const Headers = () => {
                                                     </div>
                                                 </div>
                                             </div>
-
                                         )}
+
                                     </div>
                                 )}
 
@@ -673,35 +735,86 @@ const Headers = () => {
                                             }}>
                                                 <h4 className="mb-4 text-center text-dark">Contact Us</h4>
                                                 <ul className="list-unstyled d-flex justify-content-around text-center text-md-start">
-                                                    <li><i className="fas fa-phone me-2 text-primary"></i> +123-456-7890</li>
-                                                    <li><i className="fas fa-envelope me-2 text-primary"></i> help@yourdomain.com</li>
-                                                    <li className="d-flex">
+                                                    <li><i className="fas fa-phone me-2 text-primary"></i> +91 9811382915</li>
+                                                    <li><i className="fas fa-envelope me-2 text-primary"></i> srtutorsbureau.com</li>
+                                                    {/* <li className="d-flex">
                                                         <a href="https://facebook.com" className="btn btn-outline-primary me-2"><i className="fab fa-facebook-f"></i></a>
                                                         <a href="https://twitter.com" className="btn btn-outline-info me-2"><i className="fab fa-twitter"></i></a>
                                                         <a href="https://instagram.com" className="btn btn-outline-danger"><i className="fab fa-instagram"></i></a>
-                                                    </li>
+                                                    </li> */}
                                                 </ul>
                                             </div>
                                         </div>
-
                                         <div className="row align-items-center">
-
-
                                             <div className="col-lg-10 mx-auto">
-                                                <form className="p-4 rounded ">
+                                                <form className="p-4 rounded" onSubmit={handleSubmit}>
                                                     <h5 className="mb-4 text-center">Send Us a Message</h5>
+
                                                     <div className="mb-3">
                                                         <label className="form-label" htmlFor="name">Your Name</label>
-                                                        <input type="text" className="form-control" id="name" placeholder="Enter your name" />
+                                                        <input
+                                                            type="text"
+                                                            className="form-control"
+                                                            id="name"
+                                                            name="Name"
+                                                            value={formData.Name}
+                                                            placeholder="Enter your name"
+                                                            onChange={handleChange}
+                                                        />
                                                     </div>
+
+                                                    <div className="mb-3">
+                                                        <label className="form-label" htmlFor="phone">Contact Number</label>
+                                                        <input
+                                                            type="text"
+                                                            className="form-control"
+                                                            id="phone"
+                                                            name="Phone"
+                                                            value={formData.Phone}
+                                                            placeholder="Enter your contact number"
+                                                            onChange={handleChange}
+                                                        />
+                                                    </div>
+
                                                     <div className="mb-3">
                                                         <label className="form-label" htmlFor="email">Your Email</label>
-                                                        <input type="email" className="form-control" id="email" placeholder="Enter your email" />
+                                                        <input
+                                                            type="email"
+                                                            className="form-control"
+                                                            id="email"
+                                                            name="Email"
+                                                            value={formData.Email}
+                                                            placeholder="Enter your email"
+                                                            onChange={handleChange}
+                                                        />
                                                     </div>
+
+                                                    <div className="mb-3">
+                                                        <label className="form-label" htmlFor="subject">Subject</label>
+                                                        <input
+                                                            type="text"
+                                                            className="form-control"
+                                                            id="subject"
+                                                            name="Subject"
+                                                            value={formData.Subject}
+                                                            placeholder="Enter Subject"
+                                                            onChange={handleChange}
+                                                        />
+                                                    </div>
+
                                                     <div className="mb-3">
                                                         <label className="form-label" htmlFor="message">Message</label>
-                                                        <textarea className="form-control" id="message" rows="4" placeholder="Enter your message"></textarea>
+                                                        <textarea
+                                                            className="form-control"
+                                                            id="message"
+                                                            name="Message"
+                                                            rows="4"
+                                                            value={formData.Message}
+                                                            placeholder="Enter your message"
+                                                            onChange={handleChange}
+                                                        ></textarea>
                                                     </div>
+
                                                     <div className="text-center">
                                                         <button type="submit" className="btn btn-primary">Send Message</button>
                                                     </div>
@@ -720,7 +833,7 @@ const Headers = () => {
                                                         <div className="card-body text-center">
                                                             <div className="profile-avatar mb-4">
                                                                 <img
-                                                                    src={studentDetails?.profilePic}
+                                                                    src={studentDetails?.profilePic || 'https://i.ibb.co/znBZ37L/s.jpg'}
                                                                     alt="Profile"
                                                                     className="rounded-circle shadow"
                                                                     style={{ width: '100px', height: '100px', objectFit: 'cover', border: '3px solid #6A73FA' }}
@@ -744,7 +857,7 @@ const Headers = () => {
                                                                     style={{ backgroundColor: '#6A73FA', borderColor: '#6A73FA', padding: '10px 20px', borderRadius: '30px' }}
                                                                     onClick={handleEditProfile}
                                                                 >
-                                                                    Edit Profile
+                                                                    Change Password
                                                                 </button>
                                                                 <button
                                                                     className="btn btn-danger"
