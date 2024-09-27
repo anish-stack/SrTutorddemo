@@ -158,21 +158,26 @@ const Slider = () => {
     }
   }, [coords]);
   const handlePassQuery = () => {
-    // Function to clean and encode the location input
     const cleanAndEncode = (str) => {
       return encodeURIComponent(
-        str.replace(/,\s*/g, "-").replace(/\s+/g, "-")
+        str.replace(/,\s*/g, "-").replace(/\s+/g, "-") // Replace commas and spaces with dashes
       );
     };
 
+    // Encode parameters for the URL
     const locationParam = cleanAndEncode(locationInput);
     const classParam = encodeURIComponent(selectedClass.classid);
     const classNameParam = encodeURIComponent(selectedClass.classNameValue);
-
     const subjectParam = encodeURIComponent(selectedSubject);
 
-    window.location.href = `/Search-result?role=${selectedRole}&SearchPlaceLat=${ClickLatitude || locationData.lat}&SearchPlaceLng=${ClickLongitude || locationData.lng}&via-home-page&Location=${locationParam}&ClassId=${classParam}&ClassNameValue=${classNameParam}&Subject=${subjectParam}&lat=${locationData.lat}&lng=${locationData.lng}`;
+    // Default coordinates for emergency if not available
+    const latEmergency = 28.6909129;
+    const lngEmergency = 77.1518306;
+
+    // Construct the URL with parameters
+    window.location.href = `/Search-result?role=${selectedRole}&SearchPlaceLat=${ClickLatitude || locationData.lat}&SearchPlaceLng=${ClickLongitude || locationData.lng}&via-home-page&Location=${locationParam}&ClassId=${classParam}&ClassNameValue=${classNameParam}&Subject=${subjectParam}&lat=${locationData.lat || latEmergency}&lng=${locationData.lng || lngEmergency}`;
   };
+
 
   return (
     <section className="banner-area-two banner-bg-two" data-background={bannerImg01}>

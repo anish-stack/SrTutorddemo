@@ -144,10 +144,14 @@ exports.StudentResendOtp = CatchAsync(async (req, res) => {
         student.OtpExpiresTime = Date.now() + 10 * 60 * 1000;
         // OTP expires in 10 minutes
         const Message = `Your OTP for mobile number verification is: ${newOtp}\n \nPlease use this code to complete your verification process.\nThis OTP is valid for 10 minutes.\nIf you did not request this, please ignore this message.\nBest regards,\nS R Tutors`;
+
+        const mes = await SendWhatsAppMessage(Message, student.PhoneNumber);
+        if (!mes || !mes.success) {
+            return res.status(500).json({ message: "Failed to send message. Please try again later." });
+        }
+
+
         await student.save();
-        await SendWhatsAppMessage(Message, student.PhoneNumber)
-
-
         res.status(200).json({ message: 'OTP resent successfully' });
     } catch (error) {
         console.error("Error in StudentResendOtp:", error);
@@ -230,23 +234,19 @@ exports.CheckNumber = CatchAsync(async (req, res) => {
         const otpExpiresTime = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
 
         if (checkUser) {
-            const Message = `Your OTP for mobile number verification is: ${otp}.
+            const Message = `Your OTP for mobile number verification is: ${otp}.\nPlease use this code to complete your verification process.\nThis OTP is valid for 10 minutes. If you did not request this, please ignore this message.\nBest regards,\nS R Tutors`;
 
-                            Please use this code to complete your verification process.
 
-                            This OTP is valid for 10 minutes. If you did not request this, please ignore this message.
-
-                            Best regards,
-                            S R Tutors
-            `
 
 
             // Update user with new OTP
             checkUser.SignInOtp = otp;
             checkUser.OtpExpiresTime = otpExpiresTime;
             const SendWhatsappMeg = await SendWhatsAppMessage(Message, userNumber)
-            console.log(SendWhatsappMeg)
-            //    c await SendWhatsAppMessage(Message, userNumber)
+
+            if (!SendWhatsappMeg || !SendWhatsappMeg.success) {
+                return res.status(500).json({ message: "Failed to send message. Please try again later." });
+            }
             await checkUser.save();
             return res.status(200).json({
                 success: true,
@@ -267,18 +267,8 @@ exports.CheckNumber = CatchAsync(async (req, res) => {
                 OtpExpiresTime: otpExpiresTime
             });
 
-            const Message = `
-          
+            const Message = `Your OTP for mobile number verification is: ${otp}. Please use this code to complete your verification process. This OTP is valid for 10 minutes. If you did not request this, please ignore this message. Best regards, S R Tutors`;
 
-            Your OTP for mobile number verification is: ${otp}.
-
-            Please use this code to complete your verification process.
-
-            This OTP is valid for 10 minutes. If you did not request this, please ignore this message.
-
-            Best regards,
-            S R Tutors
-            `
             await SendWhatsAppMessage(Message, userNumber)
             // Send success response
             res.status(201).json({
@@ -347,34 +337,29 @@ exports.AdminLogin = CatchAsync(async (req, res) => {
 
 //Student Password Change Request
 exports.StudentPasswordChangeRequest = CatchAsync(async (req, res) => {
-    const { Email } = req.body;
+    try {
+        const { Email } = req.body;
+        console.log(Email)
+        const student = await Student.findOne({ Email });
+        if (!student) {
+            return res.status(404).json({ message: 'Student not found' });
+        }
 
-    const student = await Student.findOne({ Email });
-    if (!student) {
-        return res.status(404).json({ message: 'Student not found' });
+        student.ForgetPasswordOtp = crypto.randomInt(100000, 999999);
+        student.OtpExpiresTime = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
+        await student.save();
+
+        const Message = `Password Change Request OTP Verification\n\nDear ${student.StudentName},\n\nYour OTP for verifying your password change is: ${student.ForgetPasswordOtp}.\n\nPlease use this OTP to complete your password change process. It is valid for a limited time, so kindly proceed without delay.\n\nIf you did not request this OTP, please disregard this message.\n\nBest regards,\nS R Tutors`;
+        const sent = await SendWhatsAppMessage(Message, student.PhoneNumber)
+        console.log(sent)
+        if (!sent) {
+            return res.status(500).json({ message: 'Failed to send OTP' });
+        }
+
+        res.status(200).json({ message: 'Password reset OTP sent' });
+    } catch (error) {
+        console.log(error)
     }
-
-    student.ForgetPasswordOtp = crypto.randomInt(100000, 999999);
-    student.OtpExpiresTime = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
-    await student.save();
-
-    const Message = `
- Password Change Request OTP Verification
-
-Dear ${Student.name},
-
-Your OTP for verifying your password change is: ${ForgetPasswordOtp}.
-
-Please use this OTP to complete your password change process. It is valid for a limited time, so kindly proceed without delay.
-
-If you did not request this OTP, please disregard this message.
-
-Best regards,  
-S R Tutors
- `
-
-    await SendWhatsAppMessage(Message, student.PhoneNumber)
-    res.status(200).json({ message: 'Password reset OTP sent' });
 });
 
 //Student Verify Password Otp
@@ -410,20 +395,8 @@ exports.StudentPasswordOtpResent = CatchAsync(async (req, res) => {
     student.ForgetPasswordOtp = crypto.randomInt(100000, 999999);
     student.OtpExpiresTime = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
     await student.save();
-    const Message = `
-    Password Change Request OTP Verification
-   
-   Dear ${Student.name},
-   
-   Your OTP for verifying your password change is: ${ForgetPasswordOtp}.
-   
-   Please use this OTP to complete your password change process. It is valid for a limited time, so kindly proceed without delay.
-   
-   If you did not request this OTP, please disregard this message.
-   
-   Best regards,  
-   S R Tutors
-    `
+    const Message = `Password Change Request OTP Verification. Dear ${Student.name}, Your OTP for verifying your password change is: ${ForgetPasswordOtp}. Please use this OTP to complete your password change process. It is valid for a limited time, so kindly proceed without delay. If you did not request this OTP, please disregard this message. Best regards, S R Tutors`;
+
 
     await SendWhatsAppMessage(Message, student.PhoneNumber)
     res.status(200).json({ message: 'OTP resent Successful' });

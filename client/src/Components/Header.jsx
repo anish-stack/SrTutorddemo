@@ -140,13 +140,13 @@ function Header() {
     student: {
       title: "Find Perfect Home Tutors",
       url: "/Student-register?source=home",
-      forgetPassword: "/Forget-Password?source=home&type-student",
+      forgetPassword: "/Forget-Password?source=home&type=student",
       DashboardUrl: `/Student-dashboard?login=${studentToken ? true : false}`,
     },
     teacher: {
       title: "Become Part of our Team",
       url: "/teacher-register?source=home",
-      forgetPassword: "/Forget-Password?source=home&type-teacher",
+      forgetPassword: "/Forget-Password?source=home&type=teacher",
       DashboardUrl: `/Teacher-dashboard?login=${teacherToken ? true : false}`,
     },
   };
