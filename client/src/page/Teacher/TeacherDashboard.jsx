@@ -31,6 +31,42 @@ const TeacherDashboard = () => {
     const [showUploader, setShowUploader] = useState(false);
     const teacherDetails = Cookies.get('teacherUser');
     // Toggle image uploader on double-click
+      // UseEffect to handle token and user details
+      useEffect(() => {
+        console.log("i am hit at 1st")
+        const token = Cookies.get('teacherToken');
+        const teacherDetails = Cookies.get('teacherUser');
+        if (token && teacherDetails) {
+            setTeacherToken(token);
+            setTeacherUser(JSON.parse(teacherDetails));
+        } else {
+            setTeacherToken(false);
+        }
+        setLoading(false);
+    }, []);
+
+    useEffect(() => {
+        console.log("i am hit at 1it")
+
+        if (teacherToken && teacherUser) {
+            const handleFetch = async () => {
+                try {
+                    const { data } = await axios.get(`https://api.srtutorsbureau.com/api/v1/teacher/Get-Teacher/${teacherUser._id}`, {
+                        headers: {
+                            Authorization: `Bearer ${teacherToken}`,
+                        },
+                    });
+                    console.log(data.data)
+                    setProfileInfo(data.data);
+                    // console.log(data.data.RangeWhichWantToDoClasses);
+                    setTeachingLocations(data?.data?.RangeWhichWantToDoClasses || [])
+                } catch (error) {
+                    console.error("Error fetching teacher data", error);
+                }
+            };
+            handleFetch();
+        }
+    }, [teacherToken, teacherUser])
     const handleDoubleClick = () => {
         setShowUploader(true);
     };
@@ -38,11 +74,11 @@ const TeacherDashboard = () => {
         const fileViaUpload = profileFile.file;
         const formData = new FormData();
         formData.append('image', fileViaUpload);
-
+        console.log(profileInfo)
         setLoading(true)
         try {
             const response = await axios.post(
-                `https://api.srtutorsbureau.com/api/v1/teacher/teacher-profile-pic/${profileInfo.TeacherUserId}`,
+                `https://api.srtutorsbureau.com/api/v1/teacher/teacher-profile-pic/${profileInfo.TeacherUserId?._id}`,
                 formData, // Send formData directly here
                 {
                     headers: {
@@ -92,39 +128,7 @@ const TeacherDashboard = () => {
         }
     }, [locations])
 
-    // UseEffect to handle token and user details
-    useEffect(() => {
-        const token = Cookies.get('teacherToken');
-        const teacherDetails = Cookies.get('teacherUser');
-        if (token && teacherDetails) {
-            setTeacherToken(token);
-            setTeacherUser(JSON.parse(teacherDetails));
-        } else {
-            setTeacherToken(false);
-        }
-        setLoading(false);
-    }, []);
-
-    useEffect(() => {
-        if (teacherToken && teacherUser) {
-            const handleFetch = async () => {
-                try {
-                    const { data } = await axios.get(`https://api.srtutorsbureau.com/api/v1/teacher/Get-Teacher/${teacherUser._id}`, {
-                        headers: {
-                            Authorization: `Bearer ${teacherToken}`,
-                        },
-                    });
-                    // console.log(data.data)
-                    setProfileInfo(data.data);
-                    // console.log(data.data.RangeWhichWantToDoClasses);
-                    setTeachingLocations(data?.data?.RangeWhichWantToDoClasses || [])
-                } catch (error) {
-                    console.error("Error fetching teacher data", error);
-                }
-            };
-            handleFetch();
-        }
-    }, [teacherToken, teacherUser])
+  
 
     useEffect(() => {
         if (teacherToken && teacherUser) {
