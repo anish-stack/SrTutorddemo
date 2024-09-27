@@ -544,7 +544,7 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
     const Email = req.user.id.Email;
     console.log(Email);
     const Message = `OTP Verification\nDear ${FullName},\nWe are excited to proceed with your verification process. Please use the One-Time Password (OTP) provided below to continue:\n${SubmitOtp}\nThis OTP is valid for the next 10 minutes. Please complete your verification within this time frame.\nIf you did not request this OTP, please disregard this message. For assistance, feel free to reach out to our support team.\nBest regards,\nS R Tutors\nEmail: support@srtutors.com`;
-
+    await SendWhatsAppMessage(Message, ContactNumber);
     if (!CheckTeacher.DOB) {
       CheckTeacher.DOB = teacherProfile.DOB
     }
@@ -560,7 +560,7 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
     }
     console.log(teacherProfile)
     await redisClient.del('Teacher')
-    await SendWhatsAppMessage(Message, ContactNumber);
+    // await SendWhatsAppMessage(Message, ContactNumber);
 
     // Respond with success message
     res.status(200).json({
