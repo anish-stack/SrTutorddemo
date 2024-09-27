@@ -4797,8 +4797,8 @@ textarea {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 98px;
-  height: 98px;
+  width: 65px;
+  height: 65px;
   flex: 0 0 auto;
   background: var(--tg-common-color-white);
   -webkit-border-radius: 10px;
@@ -4806,7 +4806,7 @@ textarea {
   -o-border-radius: 10px;
   -ms-border-radius: 10px;
   border-radius: 10px;
-  font-size: 50px;
+  font-size: 30px;
   position: relative;
   box-shadow: 0px 0px 14px #edd4d4;
   -webkit-transition: all 0.3s ease-out 0s;

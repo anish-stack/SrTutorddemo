@@ -303,47 +303,69 @@ exports.TeacherLogin = CatchAsync(async (req, res) => {
 
 //Teacher Password Change Request
 exports.TeacherPasswordChangeRequest = CatchAsync(async (req, res) => {
-  const { Email } = req.body;
+  try {
+    const { Email } = req.body;
 
-  const Teachers = await Teacher.findOne({ Email });
-  if (!Teachers) {
-    return res.status(404).json({ message: "Teacher not found" });
+    // Find the teacher by email
+    const teacher = await Teacher.findOne({ Email });
+    if (!teacher) {
+      return res.status(404).json({ message: "Teacher not found. Please check the email address and try again." });
+    }
+
+    // Generate OTP and set expiration time
+    teacher.ForgetPasswordOtp = crypto.randomInt(100000, 999999);
+    teacher.OtpExpiresTime = Date.now() + 10 * 60 * 1000; // 10 minutes
+    await teacher.save();
+
+    // Create WhatsApp message
+    const NewMessage = `Password Change Request OTP Verification\nDear ${teacher.TeacherName},\nWe have generated an OTP for your password change request: ${teacher.ForgetPasswordOtp}.\nPlease use this OTP to complete your password change process. This OTP is valid for a limited time.\nIf you did not request this, please ignore this message.\nBest regards,\nS R Tutors`;
+
+    // Send OTP via WhatsApp
+    const sent = await SendWhatsAppMessage(NewMessage, teacher.PhoneNumber);
+    if (sent.success === false) {
+      return res.status(500).json({ message: "Failed to send OTP. Please try again later." });
+    }
+
+    // Success response
+    res.status(200).json({ message: "Password reset OTP has been successfully sent to your registered phone number." });
+  } catch (err) {
+    console.error("Error in TeacherPasswordChangeRequest:", err.message);
+    res.status(500).json({ message: "An error occurred while processing your request. Please try again later." });
   }
-
-  Teachers.ForgetPasswordOtp = crypto.randomInt(100000, 999999);
-  Teachers.OtpExpiresTime = Date.now() + 10 * 60 * 1000;
-  await Teachers.save();
-
-  const NewMessage = `Password Change Request OTP Verification\nDear ${Teachers.TeacherName},\nWe have generated an OTP for your password change request: ${Teachers.ForgetPasswordOtp}.\nPlease use this OTP to complete your password change process. This OTP is valid for a limited time.\nIf you did not request this, please ignore this message.\nBest regards,\nS R Tutors`;
-
-
-  await SendWhatsAppMessage(NewMessage, Teachers.PhoneNumber);
-
-  res.status(200).json({ message: "Password reset OTP sent" });
 });
+;
 
-//Teacher Verify Password Otp
+// Teacher Verify Password OTP
 exports.TeacherVerifyPasswordOtp = CatchAsync(async (req, res) => {
-  const { Email, otp, newPassword } = req.body;
+  try {
+    const { Email, otp, newPassword } = req.body;
 
-  const Teachers = await Teacher.findOne({ Email });
-  if (!Teachers) {
-    return res.status(404).json({ message: "Teacher not found" });
+    // Find the teacher by email
+    const teacher = await Teacher.findOne({ Email });
+    if (!teacher) {
+      return res.status(404).json({ message: "Teacher not found. Please check the email address and try again." });
+    }
+
+    // Check if the OTP is valid and not expired
+    if (
+      teacher.ForgetPasswordOtp !== otp ||
+      teacher.OtpExpiresTime < Date.now()
+    ) {
+      return res.status(400).json({ message: "Invalid or expired OTP. Please request a new OTP and try again." });
+    }
+
+    // Update the password and clear the OTP fields
+    teacher.Password = newPassword;
+    teacher.ForgetPasswordOtp = undefined;
+    teacher.OtpExpiresTime = undefined;
+    await teacher.save();
+
+    // Success response
+    res.status(200).json({ message: "Password changed successfully. You can now log in with your new password." });
+  } catch (err) {
+    console.error("Error in TeacherVerifyPasswordOtp:", err.message);
+    res.status(500).json({ message: "An error occurred while processing your request. Please try again later." });
   }
-
-  if (
-    Teachers.ForgetPasswordOtp !== otp ||
-    Teachers.OtpExpiresTime < Date.now()
-  ) {
-    return res.status(400).json({ message: "Invalid or expired OTP" });
-  }
-
-  Teachers.Password = newPassword;
-  Teachers.ForgetPasswordOtp = undefined;
-  Teachers.OtpExpiresTime = undefined;
-  await Teachers.save();
-
-  res.status(200).json({ message: "Password changed successfully" });
 });
 
 //Teacher Resent Password Otp

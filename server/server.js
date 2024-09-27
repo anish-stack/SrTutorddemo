@@ -174,7 +174,7 @@ app.use((err, req, res, next) => {
         });
     }
     // Log general errors
-    error(`Unhandled Error: ${err.message}`, 'ErrorHandler', 'GlobalErrorHandler');
+    // error(`Unhandled Error: ${err.message}`, 'ErrorHandler', 'GlobalErrorHandler');
     if (!res.headersSent) {
         res.status(500).send("Something went wrong!");
     }

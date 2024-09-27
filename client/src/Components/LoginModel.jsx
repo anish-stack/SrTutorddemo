@@ -99,14 +99,14 @@ const LoginModal = ({ isOpen, modalType, onClose }) => {
       url: "/Student-register?source=home",
       acountOpen:'Register As a Student',
 
-      forgetPassword: "/Forget-Password?source=home&type-student",
+      forgetPassword: "/Forget-Password?source=home&type=student",
       DashboardUrl: `/Student-dashboard`,
     },
     teacher: {
       title: "Become Part of our Team",
       acountOpen:'Create A Tutor Account',
       url: "/teacher-register?source=home",
-      forgetPassword: "/Forget-Password?source=home&type-teacher",
+      forgetPassword: "/Forget-Password?source=home&type=teacher",
       DashboardUrl: `/Teacher-dashboard`,
     },
   };

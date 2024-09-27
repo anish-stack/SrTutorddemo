@@ -243,6 +243,13 @@ function Course() {
                 >
                   <div onClick={() => handleSubjectSelect(subject.SubjectName)} className="categories__item-two tg-svg">
                     <a >
+                    <div className="icon">
+                        <i
+                          className={
+                            subject.course_img || "flaticon-graphic-design"
+                          }
+                        ></i>
+                      </div>
                       <div className="info">
                         <span className="name">{subject.SubjectName}</span>
                       </div>
