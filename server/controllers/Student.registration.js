@@ -17,137 +17,8 @@ Cloudinary.config({
 });
 
 const crypto = require('crypto')
+const SendWhatsAppMessage = require('../utils/SendWhatsappMeg')
 
-async function regsiter(req, res) {
-    try {
-        const { StudentName, AltPhoneNumber, PhoneNumber, Email, Password, latitude, longitude } = req.body;
-
-        // Check for missing fields
-        const missingFields = [];
-        if (!StudentName) missingFields.push('Student Name');
-        if (!PhoneNumber) missingFields.push('Phone Number');
-        if (!Email) missingFields.push('Email');
-
-
-        if (missingFields.length > 0) {
-            return res.status(400).json({
-                message: 'The following fields are missing: ' + missingFields.join(', ')
-            });
-        }
-
-        // Check if the student already exists
-        const existingStudent = await Student.findOne({ Email });
-        if (existingStudent) {
-            // Check if the student is verified
-            if (existingStudent.isStudentVerified) {
-                return res.status(400).json({ message: 'Student with this email already exists' });
-            } else {
-                // If not verified, resend the OTP
-                const newOtp = crypto.randomInt(100000, 999999)
-                existingStudent.Password = !Password || PhoneNumber;
-                existingStudent.SignInOtp = newOtp// Generate a 6-digit OTP
-                existingStudent.OtpExpiresTime = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
-                await existingStudent.save();
-
-                const sendOtpOnMobileNumber = await axios.get(`https://2factor.in/API/V1/${process.env.TWOFACTOR_API_KEY}/SMS/${PhoneNumber}/${newOtp}/OTP1`)
-                if (!sendOtpOnMobileNumber) {
-                    return res.status(400).json({ message: 'Failed to send OTP' });
-                }
-
-                const Options = {
-                    email: Email,
-                    subject: 'OTP Verification',
-                    message: `<div style="font-family: Arial, sans-serif; padding: 20px; color: #000000; border: 1px solid #E21C1C;">
-                                <h2 style="color: #E21C1C; text-align: center;">OTP Verification</h2>
-                                <p>Dear ${existingStudent.StudentName}</p>
-                                <p>We are pleased to inform you that your OTP for verification is:</p>
-                                <p style="font-size: 24px; font-weight: bold; color: #E21C1C; text-align: center; margin: 20px 0;">
-                                    ${existingStudent.SignInOtp}
-                                </p>
-                                 ${!Password ? `
-                            <p style="font-size: 24px; font-weight: bold; color: #E21C1C; text-align: center; margin: 20px 0;">
-                                Your Default Password is ${newStudent.PhoneNumber}
-                            </p>
-                        ` : ''}
-                                <p>Please use this OTP to complete your verification process. This OTP is valid for a limited time, so kindly proceed without delay.</p>
-                                <p>If you did not request this OTP, please disregard this message.</p>
-                                <p>Best regards,</p>
-                                <p><strong>S R Tutors</strong></p>
-                                <hr style="border: 0; height: 1px; background-color: #E21C1C;">
-                                <p style="font-size: 12px; color: #000000; text-align: center;">This is an automated message. Please do not reply.</p>
-                            </div>`
-                };
-
-                await sendEmail(Options)
-
-                return res.status(200).json({ message: 'OTP resent. Please verify your email.' });
-            }
-        }
-
-
-
-        // Generate OTP
-        const otp = crypto.randomInt(100000, 999999);
-        const otpExpiresTime = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
-
-        // Create a new student
-        const newStudent = await Student.create({
-            StudentName,
-            PhoneNumber,
-            Email,
-            Password,
-            latitude,
-            AltPhoneNumber,
-            longitude,
-            isStudentVerified: false,
-            SignInOtp: otp,
-            OtpExpiresTime: otpExpiresTime
-        });
-
-        const Options = {
-            email: Email,
-            subject: 'OTP Verification',
-            message: `
-                <div style="font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f5f5f5; padding: 20px;">
-                    <div style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #E21C1C;">
-                        <h2 style="color: #E21C1C; text-align: center; margin-top: 0;">OTP Verification</h2>
-                        <p>Dear ${newStudent.StudentName},</p>
-                        <p>We are pleased to inform you that your OTP for verification is:</p>
-                        <p style="font-size: 24px; font-weight: bold; color: #E21C1C; text-align: center; margin: 20px 0;">
-                            ${newStudent.SignInOtp}
-                        </p>
-                        ${!Password ? `
-                            <p style="font-size: 24px; font-weight: bold; color: #E21C1C; text-align: center; margin: 20px 0;">
-                                Your Default Password is ${newStudent.PhoneNumber}
-                            </p>
-                        ` : ''}
-                        <p>Please use this OTP to complete your verification process. This OTP is valid for a limited time, so kindly proceed without delay.</p>
-                        <p>If you did not request this OTP, please disregard this message.</p>
-                        <p>Best regards,</p>
-                        <p><strong>S R Tutors</strong></p>
-                        <hr style="border: 0; height: 1px; background-color: #E21C1C; margin: 20px 0;">
-                        <p style="font-size: 12px; color: #000000; text-align: center;">This is an automated message. Please do not reply.</p>
-                    </div>
-                </div>
-            `
-        };
-
-        await sendEmail(Options)
-        const sendOtpOnMobileNumber = await axios.get(`https://2factor.in/API/V1/${process.env.TWOFACTOR_API_KEY}/SMS/${PhoneNumber}/${otp}/OTP1`)
-        if (!sendOtpOnMobileNumber) {
-            return res.status(400).json({ message: 'Failed to send OTP' });
-        }
-
-        res.status(201).json({
-            success: true,
-            message: 'Please verify Otp For Complete Registration Otp sends On Email and Phone Number Both',
-            data: newStudent
-        })
-    } catch (error) {
-        console.log(error)
-        return res.status(500).json({ message: 'Internal server error', error: error.message });
-    }
-}
 
 //Student New Register
 exports.StudentRegister = CatchAsync(async (req, res) => {
@@ -181,38 +52,12 @@ exports.StudentRegister = CatchAsync(async (req, res) => {
                 existingStudent.OtpExpiresTime = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
                 await existingStudent.save();
 
-                const sendOtpOnMobileNumber = await axios.get(`https://2factor.in/API/V1/${process.env.TWOFACTOR_API_KEY}/SMS/${PhoneNumber}/${newOtp}/OTP1`)
-                if (!sendOtpOnMobileNumber) {
-                    return res.status(400).json({ message: 'Failed to send OTP' });
-                }
+                const message = `Dear ${existingStudent.StudentName},\nWe are pleased to inform you that your OTP for verification is: ${existingStudent.SignInOtp}\n${!Password ? `Your Default Password is ${newStudent.PhoneNumber}\n` : ''}Please use this OTP to complete your verification process. This OTP is valid for a limited time, so kindly proceed without delay.\nIf you did not request this OTP, please disregard this message.\nBest regards,\nS R Tutors`;
 
-                const Options = {
-                    email: Email,
-                    subject: 'OTP Verification',
-                    message: `<div style="font-family: Arial, sans-serif; padding: 20px; color: #000000; border: 1px solid #E21C1C;">
-                                <h2 style="color: #E21C1C; text-align: center;">OTP Verification</h2>
-                                <p>Dear ${existingStudent.StudentName}</p>
-                                <p>We are pleased to inform you that your OTP for verification is:</p>
-                                <p style="font-size: 24px; font-weight: bold; color: #E21C1C; text-align: center; margin: 20px 0;">
-                                    ${existingStudent.SignInOtp}
-                                </p>
-                                 ${!Password ? `
-                            <p style="font-size: 24px; font-weight: bold; color: #E21C1C; text-align: center; margin: 20px 0;">
-                                Your Default Password is ${newStudent.PhoneNumber}
-                            </p>
-                        ` : ''}
-                                <p>Please use this OTP to complete your verification process. This OTP is valid for a limited time, so kindly proceed without delay.</p>
-                                <p>If you did not request this OTP, please disregard this message.</p>
-                                <p>Best regards,</p>
-                                <p><strong>S R Tutors</strong></p>
-                                <hr style="border: 0; height: 1px; background-color: #E21C1C;">
-                                <p style="font-size: 12px; color: #000000; text-align: center;">This is an automated message. Please do not reply.</p>
-                            </div>`
-                };
 
-                await sendEmail(Options)
+                await SendWhatsAppMessage(message, PhoneNumber)
 
-                return res.status(200).json({ message: 'OTP resent. Please verify your email.' });
+                return res.status(200).json({ message: 'OTP resent. Please verify your Contact Number.' });
             }
         }
 
@@ -237,43 +82,15 @@ exports.StudentRegister = CatchAsync(async (req, res) => {
             OtpExpiresTime: otpExpiresTime
         });
 
-        const Options = {
-            email: Email,
-            subject: 'OTP Verification',
-            message: `
-                <div style="font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f5f5f5; padding: 20px;">
-                    <div style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #E21C1C;">
-                        <h2 style="color: #E21C1C; text-align: center; margin-top: 0;">OTP Verification</h2>
-                        <p>Dear ${newStudent.StudentName},</p>
-                        <p>We are pleased to inform you that your OTP for verification is:</p>
-                        <p style="font-size: 24px; font-weight: bold; color: #E21C1C; text-align: center; margin: 20px 0;">
-                            ${newStudent.SignInOtp}
-                        </p>
-                        ${!Password ? `
-                            <p style="font-size: 24px; font-weight: bold; color: #E21C1C; text-align: center; margin: 20px 0;">
-                                Your Default Password is ${newStudent.PhoneNumber}
-                            </p>
-                        ` : ''}
-                        <p>Please use this OTP to complete your verification process. This OTP is valid for a limited time, so kindly proceed without delay.</p>
-                        <p>If you did not request this OTP, please disregard this message.</p>
-                        <p>Best regards,</p>
-                        <p><strong>S R Tutors</strong></p>
-                        <hr style="border: 0; height: 1px; background-color: #E21C1C; margin: 20px 0;">
-                        <p style="font-size: 12px; color: #000000; text-align: center;">This is an automated message. Please do not reply.</p>
-                    </div>
-                </div>
-            `
-        };
+        const message = `Dear ${newStudent.StudentName},\nWe are pleased to inform you that your OTP for verification is: ${newStudent.SignInOtp}\n${!Password ? `Your Default Password is ${newStudent.PhoneNumber}\n` : ''}Please use this OTP to complete your verification process. This OTP is valid for a limited time, so kindly proceed without delay.\nIf you did not request this OTP, please disregard this message.\nBest regards,\nS R Tutors`;
 
-        await sendEmail(Options)
-        const sendOtpOnMobileNumber = await axios.get(`https://2factor.in/API/V1/${process.env.TWOFACTOR_API_KEY}/SMS/${PhoneNumber}/${otp}/OTP1`)
-        if (!sendOtpOnMobileNumber) {
-            return res.status(400).json({ message: 'Failed to send OTP' });
-        }
+
+        await SendWhatsAppMessage(message, PhoneNumber)
+
 
         res.status(201).json({
             success: true,
-            message: 'Please verify Otp For Complete Registration Otp sends On Email and Phone Number Both',
+            message: 'Please verify Otp For Complete Registration Otp sends On Phone Number',
             data: newStudent
         })
     } catch (error) {
@@ -312,53 +129,24 @@ exports.StudentVerifyOtp = CatchAsync(async (req, res) => {
 //Student Resent Otp
 exports.StudentResendOtp = CatchAsync(async (req, res) => {
     try {
-        console.log("I am hit");
+
         const { PhoneNumber, Email } = req.body;
-        console.log(req.body);
+
 
         const student = await Student.findOne({ Email }) || await Student.findOne({ PhoneNumber });
         if (!student) {
             return res.status(404).json({ message: 'Student not found' });
         }
 
-        console.log(student);
+
         const newOtp = crypto.randomInt(100000, 999999);
         student.SignInOtp = newOtp;
-        student.OtpExpiresTime = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
+        student.OtpExpiresTime = Date.now() + 10 * 60 * 1000;
+        // OTP expires in 10 minutes
+        const Message = `Your OTP for mobile number verification is: ${newOtp}\n \nPlease use this code to complete your verification process.\nThis OTP is valid for 10 minutes.\nIf you did not request this, please ignore this message.\nBest regards,\nS R Tutors`;
         await student.save();
+        await SendWhatsAppMessage(Message, student.PhoneNumber)
 
-        const Options = {
-            email: Email,
-            subject: 'Resent OTP For Verification',
-            message: `<div style="font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f5f5f5; padding: 20px;">
-                        <div style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #E21C1C;">
-                        <h2 style="color: #E21C1C; text-align: center; margin-top: 0;">OTP Verification</h2>
-                        <p>Dear ${student.StudentName},</p>
-                        <p>We are pleased to inform you that your OTP for verification is:</p>
-                        <p style="font-size: 24px; font-weight: bold; color: #E21C1C; text-align: center; margin: 20px 0;">
-                            ${student.SignInOtp}
-                        </p>
-                        <p>Please use this OTP to complete your verification process. This OTP is valid for a limited time, so kindly proceed without delay.</p>
-                        <p>If you did not request this OTP, please disregard this message.</p>
-                        <p>Best regards,</p>
-                        <p><strong>S R Tutors</strong></p>
-                        <hr style="border: 0; height: 1px; background-color: #E21C1C; margin: 20px 0;">
-                        <p style="font-size: 12px; color: #000000; text-align: center;">This is an automated message. Please do not reply.</p>
-                        </div>
-                        </div>`
-        };
-
-        console.log(process.env.TWO_FACTOR_API_KEY);
-
-        const sendOtpOnMobileNumber = await axios.get(`https://2factor.in/API/V1/${process.env.TWO_FACTOR_API_KEY}/SMS/${PhoneNumber}/${newOtp}/OTP1`);
-        if (sendOtpOnMobileNumber.data.Status !== 'Success') {
-            return res.status(400).json({ message: 'Failed to send OTP' });
-        }
-
-        // Send OTP email if Email is provided
-        if (Email) {
-            await sendEmail(Options);
-        }
 
         res.status(200).json({ message: 'OTP resent successfully' });
     } catch (error) {
@@ -442,17 +230,23 @@ exports.CheckNumber = CatchAsync(async (req, res) => {
         const otpExpiresTime = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
 
         if (checkUser) {
-            const sendOtpOnMobileNumber = await axios.get(`https://2factor.in/API/V1/${process.env.TWOFACTOR_API_KEY}/SMS/${userNumber}/${otp}/OTP1`);
+            const Message = `Your OTP for mobile number verification is: ${otp}.
 
-            // Handle OTP sending failure
-            if (sendOtpOnMobileNumber.data.Status !== 'Success') {
-                return res.status(400).json({ message: 'Failed to send OTP' });
-            }
+                            Please use this code to complete your verification process.
+
+                            This OTP is valid for 10 minutes. If you did not request this, please ignore this message.
+
+                            Best regards,
+                            S R Tutors
+            `
+
 
             // Update user with new OTP
             checkUser.SignInOtp = otp;
             checkUser.OtpExpiresTime = otpExpiresTime;
-
+            const SendWhatsappMeg = await SendWhatsAppMessage(Message, userNumber)
+            console.log(SendWhatsappMeg)
+            //    c await SendWhatsAppMessage(Message, userNumber)
             await checkUser.save();
             return res.status(200).json({
                 success: true,
@@ -473,14 +267,19 @@ exports.CheckNumber = CatchAsync(async (req, res) => {
                 OtpExpiresTime: otpExpiresTime
             });
 
-            // Send OTP via mobile number
-            const sendOtpOnMobileNumber = await axios.get(`https://2factor.in/API/V1/${process.env.TWOFACTOR_API_KEY}/SMS/${userNumber}/${otp}/OTP1`);
+            const Message = `
+          
 
-            // Handle OTP sending failure
-            if (sendOtpOnMobileNumber.data.Status !== 'Success') {
-                return res.status(400).json({ message: 'Failed to send OTP' });
-            }
+            Your OTP for mobile number verification is: ${otp}.
 
+            Please use this code to complete your verification process.
+
+            This OTP is valid for 10 minutes. If you did not request this, please ignore this message.
+
+            Best regards,
+            S R Tutors
+            `
+            await SendWhatsAppMessage(Message, userNumber)
             // Send success response
             res.status(201).json({
                 success: true,
@@ -559,29 +358,22 @@ exports.StudentPasswordChangeRequest = CatchAsync(async (req, res) => {
     student.OtpExpiresTime = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
     await student.save();
 
-    const Options = {
-        email: Email,
-        subject: 'Password Change Request Otp Verification',
-        message: `<div style="font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f5f5f5; padding: 20px;">
-                    <div style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #E21C1C;">
-                    <h2 style="color: #E21C1C; text-align: center; margin-top: 0;">OTP Verification For Password Change</h2>
-                    <p>Dear ${student.StudentName},</p>
-                    <p>We are pleased to inform you that your OTP for verification is:</p>
-                    <p style="font-size: 24px; font-weight: bold; color: #E21C1C; text-align: center; margin: 20px 0;">
-                        ${student.ForgetPasswordOtp}
-                    </p>
-                    <p>Please use this OTP to complete your Password change process. This OTP is valid for a limited time, so kindly proceed without delay.</p>
-                    <p>If you did not request this OTP, please disregard this message.</p>
-                    <p>Best regards,</p>
-                    <p><strong>S R Tutors</strong></p>
-                    <hr style="border: 0; height: 1px; background-color: #E21C1C; margin: 20px 0;">
-                    <p style="font-size: 12px; color: #000000; text-align: center;">This is an automated message. Please do not reply.</p>
-                    </div>
-                    </div>
-                            `
-    };
+    const Message = `
+ Password Change Request OTP Verification
 
-    await sendEmail(Options)
+Dear ${Student.name},
+
+Your OTP for verifying your password change is: ${ForgetPasswordOtp}.
+
+Please use this OTP to complete your password change process. It is valid for a limited time, so kindly proceed without delay.
+
+If you did not request this OTP, please disregard this message.
+
+Best regards,  
+S R Tutors
+ `
+
+    await SendWhatsAppMessage(Message, student.PhoneNumber)
     res.status(200).json({ message: 'Password reset OTP sent' });
 });
 
@@ -618,28 +410,22 @@ exports.StudentPasswordOtpResent = CatchAsync(async (req, res) => {
     student.ForgetPasswordOtp = crypto.randomInt(100000, 999999);
     student.OtpExpiresTime = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
     await student.save();
-    const Options = {
-        email: Email,
-        subject: 'Password Change Request Resend Otp Verification',
-        message: `<div style="font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f5f5f5; padding: 20px;">
-                    <div style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #E21C1C;">
-                    <h2 style="color: #E21C1C; text-align: center; margin-top: 0;">OTP Verification For Password Change</h2>
-                    <p>Dear ${student.StudentName},</p>
-                    <p>We are pleased to inform you that your OTP for verification is:</p>
-                    <p style="font-size: 24px; font-weight: bold; color: #E21C1C; text-align: center; margin: 20px 0;">
-                        ${student.ForgetPasswordOtp}
-                    </p>
-                    <p>Please use this OTP to complete your Password change process. This OTP is valid for a limited time, so kindly proceed without delay.</p>
-                    <p>If you did not request this OTP, please disregard this message.</p>
-                    <p>Best regards,</p>
-                    <p><strong>S R Tutors</strong></p>
-                    <hr style="border: 0; height: 1px; background-color: #E21C1C; margin: 20px 0;">
-                    <p style="font-size: 12px; color: #000000; text-align: center;">This is an automated message. Please do not reply.</p>
-                    </div>
-                    </div>
-                            `
-    };
-    await sendEmail(Options);
+    const Message = `
+    Password Change Request OTP Verification
+   
+   Dear ${Student.name},
+   
+   Your OTP for verifying your password change is: ${ForgetPasswordOtp}.
+   
+   Please use this OTP to complete your password change process. It is valid for a limited time, so kindly proceed without delay.
+   
+   If you did not request this OTP, please disregard this message.
+   
+   Best regards,  
+   S R Tutors
+    `
+
+    await SendWhatsAppMessage(Message, student.PhoneNumber)
     res.status(200).json({ message: 'OTP resent Successful' });
 });
 
@@ -907,7 +693,7 @@ exports.UpdateTestimonial = CatchAsync(async (req, res) => {
 exports.studentDeleteById = CatchAsync(async (req, res) => {
     const { id } = req.params;
 
-  
+
     if (!id) {
         return res.status(400).json({
             status: 'fail',

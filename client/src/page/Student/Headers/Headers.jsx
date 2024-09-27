@@ -47,13 +47,13 @@ const Headers = () => {
                 Name: studentDetails.StudentName || '', // Pre-fill Name
                 Email: studentDetails.Email || '',       // Pre-fill Email
                 Phone: studentDetails.PhoneNumber || '',  // Pre-fill Phone
-                StudentId:studentDetails?._id
+                StudentId: studentDetails?._id
             });
         }
     }, [studentDetails]);
     const handleSubmit = async (e) => {
         e.preventDefault(); // Prevent the default form submission
-      console.log(formData)
+        console.log(formData)
         try {
             const response = await axios.post('https://api.srtutorsbureau.com/api/v1/uni/create-contact', formData);
             if (response.data.success) {

@@ -14,7 +14,8 @@ const connectDb = require('./config/db');
 const { info, error } = require('./utils/Logger');
 const redis = require("redis");
 const universal = require("./routes/universal.routes");
-const axios = require('axios')
+const axios = require('axios');
+const SendWhatsAppMessage = require("./utils/SendWhatsappMeg");
 const redisClient = redis.createClient({
     url: `redis://${process.env.REDIS_HOST || 'localhost'}:${process.env.REDIS_PORT || 6379}`
 });
@@ -96,6 +97,8 @@ app.get("/Flush-all-Redis-Cached", async (req, res) => {
         });
     }
 });
+
+
 app.use('/api/jd', leadRoutes);
 
 app.use("/api/v1/student", StudentRouter);

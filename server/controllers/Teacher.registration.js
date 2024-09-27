@@ -15,6 +15,7 @@ const TeacherRequest = require('../models/TeacherRequest.model')
 const ClassRequest = require('../models/ClassRequest')
 const axios = require('axios');
 const Request = require("../models/UniversalSchema");
+const SendWhatsAppMessage = require("../utils/SendWhatsappMeg");
 
 // Configure Cloudinary
 Cloudinary.config({
@@ -70,29 +71,13 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
         existingTeacher.OtpExpiresTime = Date.now() + 10 * 60 * 1000;
         await existingTeacher.save();
 
-        const Options = {
-          email: Email,
-          subject: "OTP Verification",
-          message: `<div style="font-family: Arial, sans-serif; padding: 20px; color: #000000; border: 1px solid #E21C1C;">
-                                <h2 style="color: #E21C1C; text-align: center;">OTP Verification</h2>
-                                <p>Dear ${existingTeacher.TeacherName},</p>
-                                <p>Your OTP for verification is:</p>
-                                <p style="font-size: 24px; font-weight: bold; color: #E21C1C; text-align: center; margin: 20px 0;">
-                                    ${existingTeacher.SignInOtp}
-                                </p>
-                                <p>This OTP is valid for a limited time.</p>
-                                <p>If you did not request this OTP, please disregard this message.</p>
-                                <p>Best regards,</p>
-                                <p><strong>S R Tutors</strong></p>
-                                <hr style="border: 0; height: 1px; background-color: #E21C1C;">
-                                <p style="font-size: 12px; color: #000000; text-align: center;">This is an automated message. Please do not reply.</p>
-                            </div>`,
-        };
+        const Message = `Dear ${existingTeacher.TeacherName},\nYour OTP for verification is: ${existingTeacher.SignInOtp}.\nThis OTP is valid for a limited time.\nIf you did not request this OTP, please ignore this message.\nBest regards,\nS R Tutors`;
 
-        await sendEmail(Options);
+
+        await SendWhatsAppMessage(Message, PhoneNumber);
 
         return res.status(200).json({
-          message: "OTP resent. Please verify your email.",
+          message: "OTP resent. Please verify your Contact Number.",
         });
       }
     }
@@ -174,32 +159,14 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
       OtpExpiresTime: otpExpiresTime,
     });
 
-    const Options = {
-      email: Email,
-      subject: "OTP Verification",
-      message: `<div style="font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f5f5f5; padding: 20px;">
-                        <div style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #E21C1C;">
-                        <h2 style="color: #E21C1C; text-align: center; margin-top: 0;">OTP Verification</h2>
-                        <p>Dear ${newTeacher.TeacherName},</p>
-                        <p>Your OTP for verification is:</p>
-                        <p style="font-size: 24px; font-weight: bold; color: #E21C1C; text-align: center; margin: 20px 0;">
-                            ${newTeacher.SignInOtp}
-                        </p>
-                        <p>This OTP is valid for a limited time.</p>
-                        <p>If you did not request this OTP, please disregard this message.</p>
-                        <p>Best regards,</p>
-                        <p><strong>S R Tutors</strong></p>
-                        <hr style="border: 0; height: 1px; background-color: #E21C1C; margin: 20px 0;">
-                        <p style="font-size: 12px; color: #000000; text-align: center;">This is an automated message. Please do not reply.</p>
-                        </div>
-                    </div>`,
-    };
+    const NewMessage = `Dear ${newTeacher.TeacherName},\nYour OTP for verification is: ${newTeacher.SignInOtp}.\nThis OTP is valid for a limited time.\nIf you did not request this OTP, please ignore this message.\nBest regards,\nS R Tutors`;
 
-    await sendEmail(Options);
-    console.log("newTeacher", newTeacher)
+
+    await SendWhatsAppMessage(NewMessage, PhoneNumber);
+    // console.log("newTeacher", newTeacher)
 
     res.status(201).json({
-      message: "Teacher registered successfully. Please verify your email.",
+      message: "Teacher registered successfully. Please verify your Contact Number.",
     });
   } catch (error) {
     console.error("Registration error: ", error);
@@ -264,45 +231,26 @@ exports.TeacherResendOtp = CatchAsync(async (req, res) => {
   // Check if the OTP resend request is within the 2-minute window
   const now = Date.now();
   const otpExpiresTime = Teachers.OtpExpiresTime || 0;
-  const resendDelay = 2 * 60 * 60; // 2 minutes in milliseconds
-  console.log(resendDelay)
-  if (now - otpExpiresTime < resendDelay) {
-    const remainingTime = Math.ceil(
-      (resendDelay - (now - otpExpiresTime)) / 1000
-    );
-    return res.status(429).json({
-      message: `Please wait 2 Minutes before requesting a new OTP.`,
-    });
-  }
+  // const resendDelay = 2 * 60 * 60; // 2 minutes in milliseconds
+  // console.log(resendDelay)
+  // if (now - otpExpiresTime < resendDelay) {
+  //   const remainingTime = Math.ceil(
+  //     (resendDelay - (now - otpExpiresTime)) / 1000
+  //   );
+  //   return res.status(429).json({
+  //     message: `Please wait 2 Minutes before requesting a new OTP.`,
+  //   });
+  // }
 
   // Generate a new OTP and set expiration time
   Teachers.SignInOtp = crypto.randomInt(100000, 999999);
-  Teachers.OtpExpiresTime = now + 10 * 60 * 1000; // OTP expires in 10 minutes
+  Teachers.OtpExpiresTime = now + 10 * 60 * 1000;
   await Teachers.save();
 
-  const Options = {
-    email: Email,
-    subject: "Resent OTP For Verification",
-    message: `<div style="font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f5f5f5; padding: 20px;">
-                    <div style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #E21C1C;">
-                    <h2 style="color: #E21C1C; text-align: center; margin-top: 0;">OTP Verification</h2>
-                    <p>Dear ${Teachers.TeacherName},</p>
-                    <p>We are pleased to inform you that your OTP for verification is:</p>
-                    <p style="font-size: 24px; font-weight: bold; color: #E21C1C; text-align: center; margin: 20px 0;">
-                        ${Teachers.SignInOtp}
-                    </p>
-                    <p>Please use this OTP to complete your verification process. This OTP is valid for a limited time, so kindly proceed without delay.</p>
-                    <p>If you did not request this OTP, please disregard this message.</p>
-                    <p>Best regards,</p>
-                    <p><strong>S R Tutors</strong></p>
-                    <hr style="border: 0; height: 1px; background-color: #E21C1C; margin: 20px 0;">
-                    <p style="font-size: 12px; color: #000000; text-align: center;">This is an automated message. Please do not reply.</p>
-                    </div>
-                    </div>
-                            `,
-  };
+  const NewMessage = `Dear ${Teachers.TeacherName},\nYour OTP for verification is: ${Teachers.SignInOtp}.\nThis OTP is valid for a limited time.\nIf you did not request this OTP, please ignore this message.\nBest regards,\nS R Tutors`;
 
-  await sendEmail(Options);
+
+  await SendWhatsAppMessage(NewMessage, Teachers.PhoneNumber);
   res.status(200).json({ message: "OTP resent successfully" });
 });
 
@@ -310,7 +258,7 @@ exports.TeacherResendOtp = CatchAsync(async (req, res) => {
 exports.TeacherLogin = CatchAsync(async (req, res) => {
   try {
     const { anyPhoneAndEmail, Password } = req.body;
-    console.log(req.body)
+    // console.log(req.body)
     if (!anyPhoneAndEmail || !Password) {
       return res.status(403).json({
         Success: false,
@@ -363,32 +311,14 @@ exports.TeacherPasswordChangeRequest = CatchAsync(async (req, res) => {
   }
 
   Teachers.ForgetPasswordOtp = crypto.randomInt(100000, 999999);
-  Teachers.OtpExpiresTime = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
+  Teachers.OtpExpiresTime = Date.now() + 10 * 60 * 1000;
   await Teachers.save();
 
-  const Options = {
-    email: Email,
-    subject: "Password Change Request Otp Verification",
-    message: `<div style="font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f5f5f5; padding: 20px;">
-                    <div style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #E21C1C;">
-                    <h2 style="color: #E21C1C; text-align: center; margin-top: 0;">OTP Verification For Password Change</h2>
-                    <p>Dear ${Teachers.TeacherName},</p>
-                    <p>We are pleased to inform you that your OTP for verification is:</p>
-                    <p style="font-size: 24px; font-weight: bold; color: #E21C1C; text-align: center; margin: 20px 0;">
-                        ${Teachers.ForgetPasswordOtp}
-                    </p>
-                    <p>Please use this OTP to complete your Password change process. This OTP is valid for a limited time, so kindly proceed without delay.</p>
-                    <p>If you did not request this OTP, please disregard this message.</p>
-                    <p>Best regards,</p>
-                    <p><strong>S R Tutors</strong></p>
-                    <hr style="border: 0; height: 1px; background-color: #E21C1C; margin: 20px 0;">
-                    <p style="font-size: 12px; color: #000000; text-align: center;">This is an automated message. Please do not reply.</p>
-                    </div>
-                    </div>
-                            `,
-  };
+  const NewMessage = `Password Change Request OTP Verification\nDear ${Teachers.TeacherName},\nWe have generated an OTP for your password change request: ${Teachers.ForgetPasswordOtp}.\nPlease use this OTP to complete your password change process. This OTP is valid for a limited time.\nIf you did not request this, please ignore this message.\nBest regards,\nS R Tutors`;
 
-  await sendEmail(Options);
+
+  await SendWhatsAppMessage(NewMessage, Teachers.PhoneNumber);
+
   res.status(200).json({ message: "Password reset OTP sent" });
 });
 
@@ -428,28 +358,10 @@ exports.TeacherPasswordOtpResent = CatchAsync(async (req, res) => {
   Teachers.ForgetPasswordOtp = crypto.randomInt(100000, 999999);
   Teachers.OtpExpiresTime = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
   await Teachers.save();
-  const Options = {
-    email: Email,
-    subject: "Password Change Request Resend Otp Verification",
-    message: `<div style="font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f5f5f5; padding: 20px;">
-                    <div style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #E21C1C;">
-                    <h2 style="color: #E21C1C; text-align: center; margin-top: 0;">OTP Verification For Password Change</h2>
-                    <p>Dear ${Teachers.TeacherName},</p>
-                    <p>We are pleased to inform you that your OTP for verification is:</p>
-                    <p style="font-size: 24px; font-weight: bold; color: #E21C1C; text-align: center; margin: 20px 0;">
-                        ${Teachers.ForgetPasswordOtp}
-                    </p>
-                    <p>Please use this OTP to complete your Password change process. This OTP is valid for a limited time, so kindly proceed without delay.</p>
-                    <p>If you did not request this OTP, please disregard this message.</p>
-                    <p>Best regards,</p>
-                    <p><strong>S R Tutors</strong></p>
-                    <hr style="border: 0; height: 1px; background-color: #E21C1C; margin: 20px 0;">
-                    <p style="font-size: 12px; color: #000000; text-align: center;">This is an automated message. Please do not reply.</p>
-                    </div>
-                    </div>
-                            `,
-  };
-  await sendEmail(Options);
+  const Message = `Password Change Request Resend OTP Verification\nDear ${Teachers.TeacherName},\nYour OTP for password change verification is: ${Teachers.ForgetPasswordOtp}.\nPlease use this OTP to complete your password change process. This OTP is valid for a limited time, so please proceed without delay.\nIf you did not request this, please ignore this message.\nBest regards,\nS R Tutors`;
+
+  await SendWhatsAppMessage(Message, Teachers.PhoneNumber);
+
   res.status(200).json({ message: "OTP resent Successful" });
 });
 
@@ -609,55 +521,7 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
     // Send OTP via email
     const Email = req.user.id.Email;
     console.log(Email);
-    const emailOptions = {
-      email: Email,
-      subject: "OTP Verification",
-      message: `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teacher Verification OTP</title>
-</head>
-<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; color: #333;">
-    <div style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; border: 1px solid #ddd; padding: 20px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-        <header style="text-align: center; padding-bottom: 20px;">
-            <h1 style="color: #4CAF50; margin: 0;">S R Tutors</h1>
-            <p style="color: #555; margin: 5px 0;">Teacher Verification</p>
-        </header>
-        <main>
-            <p style="font-size: 16px; line-height: 1.5; color: #333;">
-                Dear ${FullName},
-            </p>
-            <p style="font-size: 16px; line-height: 1.5; color: #333;">
-                We are excited to proceed with your verification process. To continue, please use the One-Time Password (OTP) provided below:
-            </p>
-            <div style="text-align: center; margin: 20px 0;">
-                <span style="font-size: 30px; font-weight: bold; color: #4CAF50; border: 2px solid #4CAF50; padding: 15px 25px; border-radius: 5px; display: inline-block;">
-                    ${SubmitOtp}
-                </span>
-            </div>
-            <p style="font-size: 16px; line-height: 1.5; color: #333;">
-                This OTP is valid for the next 10 minutes. Please make sure to complete your verification within this time frame.
-            </p>
-            <p style="font-size: 16px; line-height: 1.5; color: #333;">
-                If you did not request this OTP, please disregard this email. For any assistance, feel free to reach out to our support team.
-            </p>
-            <p style="font-size: 16px; line-height: 1.5; color: #333;">
-                Best regards,<br>
-                <strong>S R Tutors</strong>
-            </p>
-        </main>
-        <footer style="text-align: center; padding-top: 20px; border-top: 1px solid #ddd;">
-            <p style="font-size: 12px; color: #777;">
-                This is an automated message. Please do not reply directly to this email. For any queries, contact our support team at support@srtutors.com.
-            </p>
-        </footer>
-    </div>
-</body>
-</html>
-`,
-    };
+    const Message = `OTP Verification\nDear ${FullName},\nWe are excited to proceed with your verification process. Please use the One-Time Password (OTP) provided below to continue:\n${SubmitOtp}\nThis OTP is valid for the next 10 minutes. Please complete your verification within this time frame.\nIf you did not request this OTP, please disregard this message. For assistance, feel free to reach out to our support team.\nBest regards,\nS R Tutors\nEmail: support@srtutors.com`;
 
     if (!CheckTeacher.DOB) {
       CheckTeacher.DOB = teacherProfile.DOB
@@ -674,14 +538,14 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
     }
     console.log(teacherProfile)
     await redisClient.del('Teacher')
-    await sendEmail(emailOptions);
+    await SendWhatsAppMessage(Message, ContactNumber);
 
     // Respond with success message
     res.status(200).json({
       success: true,
       data: teacherProfile,
       message:
-        "Profile details Saved successfully. OTP has been sent to your email.",
+        "Profile details Saved successfully. OTP has been Sent to Your Contact Number.",
     });
   } catch (error) {
     console.log(error)
@@ -707,8 +571,6 @@ exports.AddProfilePic = async (req, res) => {
       });
     }
 
-    console.log(teacherId);
-
     // Adjust query to find by TeacherUserId, not by _id
     const TeacherFind = await TeacherProfile.findOne({ TeacherUserId: teacherId });  // Use findOne and pass the correct field
     if (!TeacherFind) {
@@ -717,10 +579,8 @@ exports.AddProfilePic = async (req, res) => {
       });
     }
 
-    console.log(TeacherFind);
 
     const ProfilePic = req.file;
-    console.log(req.file);
 
     if (!ProfilePic) {
       return res.status(403).json({
@@ -728,7 +588,6 @@ exports.AddProfilePic = async (req, res) => {
       });
     }
 
-    console.log(ProfilePic);
 
     const uploadFromBuffer = (buffer) => {
       return new Promise((resolve, reject) => {
@@ -915,71 +774,10 @@ exports.TeacherVerifyProfileOtp = CatchAsync(async (req, res) => {
       })
     );
 
-    const emailOptions = {
-      email: userEmail,
-      subject: "Successful Onboarding at SR Tutors as a Teacher",
-      message: `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Successful Onboarding as a Teacher</title>
-</head>
-<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; color: #333;">
-<div style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; border: 1px solid #ddd; padding: 20px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-    <header style="text-align: center; padding-bottom: 20px;">
-        <h1 style="color: #4CAF50; margin: 0;">Welcome to SR Tutors!</h1>
-        <p style="color: #555; margin: 5px 0;">We are thrilled to have you join us as a new teacher.</p>
-    </header>
-    <main style="padding: 20px;">
-        <p style="font-size: 16px; line-height: 1.5; color: #333;">
-            Dear ${Teachers.FullName},
-        </p>
-        <p style="font-size: 16px; line-height: 1.5; color: #333;">
-            Congratulations on successfully completing your onboarding process at SR Tutors! We are excited to have you join our team. Here is a summary of the details we have recorded for you:
-        </p>
-        <p style="font-size: 16px; line-height: 1.5; color: #333;">
-            You are a highly qualified teacher with a <strong>${Teachers.TeachingExperience
-        }</strong> teaching experience and an expected fee of ₹${Teachers.ExpectedFees
-        }. You will be providing <strong>${Teachers.TeachingMode
-        }</strong> and are available for classes within a <strong>${Teachers.RangeWhichWantToDoClasses
-        } km</strong> radius. 
-        </p>
-        <p style="font-size: 16px; line-height: 1.5; color: #333;">
-            Your academic qualifications include:
-            <ul>
-                ${Teachers.AcademicInformation.map(
-          (info, index) =>
-            `<li><strong>${classNames[index]
-            }</strong>: ${info.SubjectNames.join(", ")}</li>`
-        ).join("")}
-            </ul>
-        </p>
-        <p style="font-size: 16px; line-height: 1.5; color: #333;">
-            Additionally, your current address is:
-            <br>
-            <strong>House No:</strong> ${Teachers.CurrentAddress.HouseNo}
-            <br>
-            <strong>Landmark:</strong> ${Teachers.CurrentAddress.LandMark}
-            <br>
-            <strong>District:</strong> ${Teachers.CurrentAddress.District}
-            <br>
-            <strong>Pincode:</strong> ${Teachers.CurrentAddress.Pincode}
-        </p>
-        <p style="font-size: 16px; line-height: 1.5; color: #333;">
-            We are committed to supporting you every step of the way. Your journey with us is just beginning, and we believe you'll make a significant impact on our students. If you have any questions or need any help, our support team is here for you.
-        </p>
-    </main>
-    <footer style="text-align: center; padding-top: 20px; border-top: 1px solid #ddd;">
-        <p style="font-size: 12px; color: #777;">
-            This is an automated message. Please do not reply directly to this email. For any queries, contact our support team at support@srtutors.com.
-        </p>
-    </footer>
-</div>
-</body>
-</html>
-`,
-    };
+    const Message = `Successful Onboarding at SR Tutors as a Teacher\n\nDear ${Teachers.FullName},\n\nCongratulations on successfully completing your onboarding process at SR Tutors! We are thrilled to have you join our team.\n\nSummary of Your Details:\n\nTeaching Experience: ${Teachers.TeachingExperience}\nExpected Fee: ₹${Teachers.ExpectedFees}\nTeaching Mode: ${Teachers.TeachingMode}\nAvailable Radius for Classes: ${Teachers.RangeWhichWantToDoClasses} km\n\nAcademic Qualifications:\n${Teachers.AcademicInformation.map((info, index) => `${classNames[index]}: ${info.SubjectNames.join(", ")}`).join("\n- ")}\n\nCurrent Address:\nHouse No: ${Teachers.CurrentAddress.HouseNo}\nLandmark: ${Teachers.CurrentAddress.LandMark}\nDistrict: ${Teachers.CurrentAddress.District}\nPincode: ${Teachers.CurrentAddress.Pincode}\n\nWe are committed to supporting you every step of the way. If you have any questions or need help, our support team is here for you.\n\nBest regards,\nS R Tutors\nEmail: support@srtutors.com`;
+
+
+
     const redisClient = req.app.locals.redis;
 
     if (!redisClient) {
@@ -991,8 +789,8 @@ exports.TeacherVerifyProfileOtp = CatchAsync(async (req, res) => {
     await redisClient.del("Teacher");
     await redisClient.del("Top-Teacher");
 
-    await sendEmail(emailOptions);
     await Teachers.save();
+    await SendWhatsAppMessage(Message, Teachers.ContactNumber);
     res.status(200).json({ message: "Profile details saved successfully" });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
@@ -1011,31 +809,10 @@ exports.TeacherProfileResendOtp = CatchAsync(async (req, res) => {
   Teachers.SubmitOtp = crypto.randomInt(100000, 999999);
   Teachers.OtpExpired = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
   await Teachers.save();
-  const Options = {
-    email: userEmail,
-    subject: "Profile Details Verification OTP Resent Successfully",
-    message: `
-            <div style="font-family: Arial, sans-serif; background-color: #f5f5f5; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh;">
-                <div style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #4CAF50;">
-                    <h2 style="color: #4CAF50; text-align: center; margin-top: 0;">Profile Details Verification OTP Resent Successfully</h2>
-                    <p>Dear ${Teachers.TeacherName},</p>
-                    <p>We have successfully resent your OTP for profile verification. Please use the OTP provided below to complete your profile verification process:</p>
-                    <div style="text-align: center; margin: 20px 0;">
-                        <span style="font-size: 28px; font-weight: bold; color: #4CAF50; border: 2px solid #4CAF50; padding: 15px 25px; border-radius: 5px; display: inline-block;">
-                            ${Teachers.SubmitOtp}
-                        </span>
-                    </div>
-                    <p>This OTP is valid for the next 10 minutes. Please make sure to enter it within this timeframe to avoid expiration.</p>
-                    <p>If you did not request this OTP, please disregard this email. For any assistance, feel free to contact our support team.</p>
-                    <p>Best regards,<br><strong>S R Tutors</strong></p>
-                    <hr style="border: 0; height: 1px; background-color: #4CAF50; margin: 20px 0;">
-                    <p style="font-size: 12px; color: #777; text-align: center;">This is an automated message. Please do not reply directly to this email. For assistance, contact support@srtutors.com.</p>
-                </div>
-            </div>
-        `,
-  };
+  const Message = `Profile Details Verification OTP Resent Successfully\n\nDear ${Teachers.TeacherName},\n\nWe have successfully resent your OTP for profile verification. Please use the OTP provided below to complete your profile verification process:\n\nOTP: ${Teachers.SubmitOtp}\n\nThis OTP is valid for the next 10 minutes. Please make sure to enter it within this timeframe to avoid expiration.\n\nIf you did not request this OTP, please disregard this message. For any assistance, feel free to contact our support team.\n\nBest regards,\nS R Tutors\nEmail: support@srtutors.com`;
 
-  await sendEmail(Options);
+
+  await SendWhatsAppMessage(Message, Teachers.ContactNumber);
   res.status(200).json({ message: "OTP resent Successful" });
 });
 
@@ -1044,17 +821,13 @@ exports.updateTeacherProfile = CatchAsync(async (req, res) => {
     const userId = req.user.id;
     const updates = req.body;
 
-    // console.log("Incoming data:", updates);
 
-    // Fetch the current profile details
     const teacher = await TeacherProfile.findOne({ TeacherUserId: userId });
-    // console.log("Match:", teacher);
 
     if (!teacher) {
       return res.status(404).json({ message: "Teacher not found" });
     }
 
-    // Update only the fields that are present in the request body
     Object.keys(updates).forEach((key) => {
       if (updates[key] !== undefined) {
         if (typeof updates[key] === 'object' && !Array.isArray(updates[key])) {

@@ -169,7 +169,7 @@ exports.MakeARequestForTeacher = CatchAsync(async (req, res) => {
 
         res.status(201).json({
             success: true,
-            message: "Teacher request created successfully. An OTP has been sent to your email.",
+            message: "Teacher request created successfully. An OTP has been Sent to Your Contact Number.",
             data: newRequest
         });
 
