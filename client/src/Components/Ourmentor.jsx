@@ -130,12 +130,14 @@ function Ourmentor() {
                                                     <li className="rating"><i className={"flaticon-star"} /><span className="rating-count">⭐⭐⭐⭐⭐</span></li>
                                                 </ul>
                                             </div>
-                                            <div className='teacher-tag'>
-                                        <span style={{fontSize:10}}>Sr Tutors Verified</span>
-                                    </div>
+                                            {item?.TeacherProfile?.srVerifiedTag && (
+                                                <div className='teacher-tag'>
+                                                    <span style={{ fontSize: 10 }}>Sr Tutors Verified</span>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
-                                   
+
                                 </div>
 
                             ))
