@@ -542,9 +542,9 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
     CheckTeacher.TeacherProfile = teacherProfile._id;
     // Send OTP via email
     const Email = req.user.id.Email;
-    console.log(Email);
+    // console.log(Email);
     const Message = `OTP Verification\nDear ${FullName},\nWe are excited to proceed with your verification process. Please use the One-Time Password (OTP) provided below to continue:\n${SubmitOtp}\nThis OTP is valid for the next 10 minutes. Please complete your verification within this time frame.\nIf you did not request this OTP, please disregard this message. For assistance, feel free to reach out to our support team.\nBest regards,\nS R Tutors\nEmail: support@srtutors.com`;
-    await SendWhatsAppMessage(Message, ContactNumber);
+    await SendWhatsAppMessage(Message, CheckTeacher.PhoneNumber);
     if (!CheckTeacher.DOB) {
       CheckTeacher.DOB = teacherProfile.DOB
     }
@@ -773,7 +773,7 @@ exports.TeacherVerifyProfileOtp = CatchAsync(async (req, res) => {
     const { otp } = req.body;
     const userEmail = req.user.id.Email;
     const Teachers = await TeacherProfile.findOne({
-      TeacherUserId: req.user.id,
+      TeacherUserId: req.user.id._id,
     });
 
     if (!Teachers) {
@@ -796,8 +796,40 @@ exports.TeacherVerifyProfileOtp = CatchAsync(async (req, res) => {
       })
     );
 
-    const Message = `Successful Onboarding at SR Tutors as a Teacher\n\nDear ${Teachers.FullName},\n\nCongratulations on successfully completing your onboarding process at SR Tutors! We are thrilled to have you join our team.\n\nSummary of Your Details:\n\nTeaching Experience: ${Teachers.TeachingExperience}\nExpected Fee: ₹${Teachers.ExpectedFees}\nTeaching Mode: ${Teachers.TeachingMode}\nAvailable Radius for Classes: ${Teachers.RangeWhichWantToDoClasses} km\n\nAcademic Qualifications:\n${Teachers.AcademicInformation.map((info, index) => `${classNames[index]}: ${info.SubjectNames.join(", ")}`).join("\n- ")}\n\nCurrent Address:\nHouse No: ${Teachers.CurrentAddress.HouseNo}\nLandmark: ${Teachers.CurrentAddress.LandMark}\nDistrict: ${Teachers.CurrentAddress.District}\nPincode: ${Teachers.CurrentAddress.Pincode}\n\nWe are committed to supporting you every step of the way. If you have any questions or need help, our support team is here for you.\n\nBest regards,\nS R Tutors\nEmail: support@srtutors.com`;
+    const Message = `Successful Onboarding at SR Tutors as a Teacher
 
+Dear ${Teachers?.FullName},
+
+Congratulations on successfully completing your onboarding process at SR Tutors! We are thrilled to have you join our team.
+
+Summary of Your Details:
+
+Teaching Experience: ${Teachers?.TeachingExperience}
+Expected Fee: ₹${Teachers?.ExpectedFees}
+Teaching Mode: ${Teachers?.TeachingMode}
+
+
+
+Current Address:
+House No: ${Teachers?.CurrentAddress.HouseNo}
+Landmark: ${Teachers?.CurrentAddress.LandMark}
+District: ${Teachers?.CurrentAddress.District}
+Pincode: ${Teachers?.CurrentAddress.Pincode}
+
+We are committed to supporting you every step of the way. If you have any questions or need help, our support team is here for you.
+
+Best regards,
+S R Tutors
+Email: support@srtutors.com`;
+
+    console.log(Teachers?.ContactNumber);
+
+    try {
+      const messageSent = await SendWhatsAppMessage(Message, Teachers?.ContactNumber);
+      console.log('WhatsApp message sent:', messageSent);
+    } catch (error) {
+      console.error('Error sending WhatsApp message:', error);
+    }
 
 
     const redisClient = req.app.locals.redis;
@@ -812,7 +844,7 @@ exports.TeacherVerifyProfileOtp = CatchAsync(async (req, res) => {
     await redisClient.del("Top-Teacher");
 
     await Teachers.save();
-    await SendWhatsAppMessage(Message, Teachers.ContactNumber);
+
     res.status(200).json({ message: "Profile details saved successfully" });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
@@ -821,17 +853,17 @@ exports.TeacherVerifyProfileOtp = CatchAsync(async (req, res) => {
 
 //Resend Verify Otp Given By Teacher
 exports.TeacherProfileResendOtp = CatchAsync(async (req, res) => {
-  const userEmail = req.user.id.Email;
-
-  const Teachers = await TeacherProfile.findOne({ TeacherUserId: req.user.id });
+  const userId = req.user.id._id;
+  console.log(userId)
+  const Teachers = await TeacherProfile.findOne({ TeacherUserId: userId });
   if (!Teachers) {
     return res.status(404).json({ message: "Teacher not found" });
   }
-
+  console.log(Teachers)
   Teachers.SubmitOtp = crypto.randomInt(100000, 999999);
   Teachers.OtpExpired = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
   await Teachers.save();
-  const Message = `Profile Details Verification OTP Resent Successfully\n\nDear ${Teachers.TeacherName},\n\nWe have successfully resent your OTP for profile verification. Please use the OTP provided below to complete your profile verification process:\n\nOTP: ${Teachers.SubmitOtp}\n\nThis OTP is valid for the next 10 minutes. Please make sure to enter it within this timeframe to avoid expiration.\n\nIf you did not request this OTP, please disregard this message. For any assistance, feel free to contact our support team.\n\nBest regards,\nS R Tutors\nEmail: support@srtutors.com`;
+  const Message = `Profile Details Verification OTP Resent Successfully\n\nDear ${Teachers?.FullName},\n\nWe have successfully resent your OTP for profile verification. Please use the OTP provided below to complete your profile verification process:\n\nOTP: ${Teachers.SubmitOtp}\n\nThis OTP is valid for the next 10 minutes. Please make sure to enter it within this timeframe to avoid expiration.\n\nIf you did not request this OTP, please disregard this message. For any assistance, feel free to contact our support team.\n\nBest regards,\nS R Tutors\nEmail: support@srtutors.com`;
 
 
   await SendWhatsAppMessage(Message, Teachers.ContactNumber);
