@@ -11,7 +11,7 @@ const TeacherProfileOtp = () => {
     const [loading, setLoading] = useState(false);
     const [otploading, setOtpLoading] = useState(false);
 
-    const [timer, setTimer] = useState(10);
+    const [timer, setTimer] = useState(0);
 
     // Timer countdown for OTP resend
     useEffect(() => {
@@ -66,11 +66,12 @@ const TeacherProfileOtp = () => {
             console.log(res.data);
             toast.success("🔄 OTP resent successfully!");
             setOtpLoading(false)
-            setTimer(10); // Reset timer
+            setTimer(120); // Reset timer
         } catch (error) {
+            console.log(error)
             setOtpLoading(false)
-            setError('Failed to resend OTP. Please try again.');
-            toast.error("❌ Failed to resend OTP.");
+            setError(error.response.data.message);
+            toast.error(error.response.data.message);
         } finally {
             setOtpLoading(false);
         }

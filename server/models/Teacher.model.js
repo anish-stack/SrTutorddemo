@@ -66,26 +66,33 @@ const TeacherSchema = new mongoose.Schema({
         },
         DocumentImageUrl: {
             type: String,
-            
+
         },
         DocumentPublicId: {
             type: String,
-            
+
         }
+    },
+    isBlockForOtp: {
+        type: Boolean,
+        default: false
+    },
+    OtpBlockTime: {
+        type: Date
     },
     QualificationDocument: {
         QualificationImageUrl: {
             type: String,
-            
+
         },
         QualificationPublicId: {
             type: String,
-            
+
         }
     },
-    DocumentStatus:{
-        type:Boolean,
-        default:false
+    DocumentStatus: {
+        type: Boolean,
+        default: false
     },
     Role: {
         type: String,
