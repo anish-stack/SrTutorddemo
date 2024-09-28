@@ -5,7 +5,7 @@ const ParticularTeacher = require('../models/Particular.model')
 const Student = require('../models/Student.model')
 const cityModel = require("../models/City.model"); // Assuming the model is named 'City.model'
 const Classes = require('../models/ClassModel');
-const SubjectTeacherRequest = require("../models/SubjectRequest");
+const AllTeacher = require("../models/Teacher.model");
 const Testimonial = require('../models/Testinomial.mode')
 const Newsletter = require('../models/NewsLetterModal');
 const streamifier = require('streamifier');
@@ -13,6 +13,7 @@ const CatchAsync = require('../utils/CatchAsync');
 const Cloudinary = require('cloudinary').v2;
 const Contact = require('../models/ContactUsModel');
 const Request = require('../models/UniversalSchema');
+const TeacherProfile = require('../models/TeacherProfile.model');
 require('dotenv').config();
 
 // Configure Cloudinary
@@ -322,6 +323,10 @@ exports.AnalyticalData = CatchAsync(async (req, res) => {
             Student.countDocuments({ createdAt: { $gte: weekStart, $lt: todayStart } })
         ]);
 
+        const TeacherHaveDoneProfile = await TeacherProfile.countDocuments()
+        const TeacherHaveDoneNotDoneProfile = await AllTeacher.countDocuments()
+        
+
 
 
         const [testimonialCountToday, totalCountTestimonial, testimonialCountWeekAgo] = await Promise.all([
@@ -380,14 +385,15 @@ exports.AnalyticalData = CatchAsync(async (req, res) => {
                 currentMonthCount: await Blogs.countDocuments({ createdAt: { $gte: currentMonthStart } }),
                 previousMonthCount: await Blogs.countDocuments({ createdAt: { $gte: previousMonthStart, $lte: previousMonthEnd } })
             },
-
+            TeacherHaveDoneProfile,
+            TeacherHaveDoneNotDoneProfile,
             student: {
                 today: studentCountToday,
                 total: totalCountStudent,
                 weekAgo: studentCountWeekAgo
             },
             TodayTeacherRequest: ToadyRequest,
-            AllTimeRequest:AllRequest,
+            AllTimeRequest: AllRequest,
             testimonial: {
                 today: testimonialCountToday,
                 weekAgo: testimonialCountWeekAgo,

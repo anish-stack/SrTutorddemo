@@ -61,10 +61,12 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
       });
     }
 
-    const existingTeacher = await Teacher.findOne({ Email });
+    const existingTeacher = await Teacher.findOne({ 
+      $or: [{ Email }, { PhoneNumber }] 
+    });
     if (existingTeacher) {
       if (existingTeacher.isTeacherVerified) {
-        return res.status(400).json({ message: "Teacher with this email already exists" });
+        return res.status(400).json({ message: "Teacher with this email and Phone Number already exists" });
       } else {
         existingTeacher.Password = Password;
         existingTeacher.SignInOtp = crypto.randomInt(100000, 999999);
@@ -266,9 +268,10 @@ exports.TeacherLogin = CatchAsync(async (req, res) => {
       });
     }
 
-    // Check if user exists (either Teacher or Teacher)
-    const CheckUser = await Teacher.findOne({ Email: anyPhoneAndEmail });
-    if (!CheckUser) {
+    const CheckUser = await Teacher.findOne({ 
+      $or: [{ Email: anyPhoneAndEmail }, { PhoneNumber: anyPhoneAndEmail }] 
+    });
+        if (!CheckUser) {
       return res.status(403).json({
         Success: false,
         message: "User not found",

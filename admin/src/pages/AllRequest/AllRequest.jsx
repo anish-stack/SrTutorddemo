@@ -33,7 +33,7 @@ const AllRequest = () => {
                         Authorization: `Bearer ${Token}`
                     }
                 });
-                // console.log(response.data.data)
+                console.log(response.data.data)
                 setAllData(response.data.data);
                 const sortedData = response.data.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
                 console.log(sortedData)
