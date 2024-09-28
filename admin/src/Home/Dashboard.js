@@ -30,17 +30,30 @@ const Card = ({ icon, title, value, difference, iconColor, href }) => (
 const Dashboard = () => {
     const [data, setData] = useState({});
     const token = localStorage.getItem('Sr-token');
-
     useEffect(() => {
-        axios.get('https://api.srtutorsbureau.com/api/v1/admin/Get-Dashboard')
-            .then(response => {
+        const fetchDashboardData = async () => {
+            try {
+                const response = await axios.get('https://api.srtutorsbureau.com/api/v1/admin/Get-Dashboard');
+
+                // Check if the response is successful
+                console.log(response.data.data)
                 if (response.data.success) {
-                    setData(response.data.data);
+                    setData(response.data.data); // Set the fetched data
                 }
-            })
-            .catch(error => {
-                console.error("There was an error fetching the dashboard data!", error);
-            });
+            } catch (error) {
+                // Handle specific error codes
+                if (error?.response?.status === 401) {
+                    toast.error("Your Session Has Expired. Please Login.");
+                    setTimeout(() => {
+                        window.location.href = "/login"; // Redirect to login after 700ms
+                    }, 700);
+                } else {
+                    console.error("There was an error fetching the dashboard data!", error);
+                }
+            }
+        };
+
+        fetchDashboardData(); // Call the function to fetch data
     }, []);
 
     // Calculate differences
@@ -199,14 +212,21 @@ const Dashboard = () => {
                         difference={calculateDifference(data.student?.total || 0, data.student?.weekAgo || 0)}
                         iconColor="text-green-500"
                     />
-                    {/* <Card
-                        href={"/Subject-Teacher-Requests"}
+                    <Card
+                        // href={"/Subject-Teacher-Requests"}
                         icon={faPersonChalkboard}
-                        title="Subject Teacher Requests"
-                        value={data.subjectTeacherRequest?.total || 0}
-                        difference={calculateDifference(data.subjectTeacherRequest?.total || 0, data.subjectTeacherRequest?.weekAgo || 0)}
+                        title="All Teachers"
+                        value={data.TeacherHaveDoneNotDoneProfile || 0}
+                        // difference={calculateDifference(data.TeacherHaveDoneNotDoneProfile || 0, data.TeacherHaveDoneNotDoneProfile || 0)}
                         iconColor="text-red-500"
-                    /> */}
+                    />
+                    <Card
+                        // href={"/Subject-Teacher-Requests"}
+                        icon={faPersonChalkboard}
+                        title="Teachers Have Profile Complete"
+                        value={data.TeacherHaveDoneProfile || 0}
+                        iconColor="text-red-500"
+                    />
                     <Card
                         href={"/Manage-Reviews"}
                         icon={faHeart}

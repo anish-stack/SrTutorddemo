@@ -27,15 +27,37 @@ const TeacherRegistration = () => {
     const handleClose = () => setModelOpen(false);
     const handleIdentityFileChange = (e) => {
         const file = e.target.files[0];
+
         if (file) {
+            const validFileTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+
+            if (!validFileTypes.includes(file.type)) {
+                toast.error('Invalid file type. Please upload a .jpg, .jpeg, .png, or .pdf file.');
+                setFormData({ ...formData, DocumentImage: null });
+                return; 
+            }
             setFormData({ ...formData, DocumentImage: file });
+            toast.success('File Selected successfully!');
         }
     };
 
     const handleQualificationFileChange = (e) => {
         const file = e.target.files[0];
+
         if (file) {
+        
+            const validFileTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+
+      
+            if (!validFileTypes.includes(file.type)) {
+                toast.error('Invalid file type. Please upload a .jpg, .jpeg, .png, or .pdf file.');
+                setFormData({ ...formData, QualificationDocument: null });
+                return; 
+            }
+
+          
             setFormData({ ...formData, QualificationDocument: file });
+            toast.success('File Selected successfully!');
         }
     };
     const [Loading, setLoading] = useState(false)
@@ -85,7 +107,10 @@ const TeacherRegistration = () => {
     const handleRegister = async (e) => {
         e.preventDefault()
         const isFormValid = Object.values(formData).every(value => value !== '' && value !== undefined && value !== null);
-
+        if (formData.PhoneNumber.length > 10) {
+            toast.error('Phone number cannot exceed 10 digits.');
+            return; 
+        }
         if (!isFormValid) {
             toast.error("Please fill all required fields.");
             return;
@@ -97,7 +122,7 @@ const TeacherRegistration = () => {
         data.append('Password', formData.Password);
         data.append('DOB', formData.DOB);
         data.append('gender', formData.gender);
-      
+
 
         data.append('Document', formData.DocumentImage);
         data.append('Qualification', formData.QualificationDocument);
@@ -146,281 +171,287 @@ const TeacherRegistration = () => {
 
     return (
         <>
-        <div className="container py-5">
-            <div className="row justify-content-center align-items-center">
-                <div className="col-lg-8 col-xl-10">
-                    <div className="card shadow-sm">
-                        <div className="row g-0">
-                            <div className="col-md-6 d-none d-md-block">
-                                <img
-                                    src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-registration/img4.webp"
-                                    alt="Sample photo"
-                                    className="img-fluid rounded-start"
-                                />
-                            </div>
-                            <div className="col-md-6">
-                                <div className="card-body p-4">
-                                    <h3 className="mb-4">
-                                        <span className="text-danger">Tutor</span> Registration Form
-                                    </h3>
-    
-                                    <form onSubmit={handleRegister}>
-                                        <div className="mb-3">
-                                            <div className="form-floating">
-                                                <input
-                                                    type="text"
-                                                    className="form-control"
-                                                    id="teacherName"
-                                                    name="TeacherName"
-                                                    value={formData.TeacherName}
-                                                    onChange={handleChange}
-                                                    required
-                                                    placeholder="Full Name"
-                                                />
-                                                <label htmlFor="teacherName">Full Name</label>
-                                            </div>
-                                        </div>
-                                        <div className="row">
-                                            <div className="mb-3 col-md-6">
+            <div className="container-fluid py-5">
+                <div className="row justify-content-center align-items-center">
+                    <div className="col-md-12 col-xl-10">
+                        <div className="card shadow-sm">
+                            <div className="row g-0">
+                                <div className="col-md-6 d-none d-md-block">
+                                    <img
+                                        src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-registration/img4.webp"
+                                        alt="Sample photo"
+                                        className="img-fluid  w-100 rounded-start"
+                                    />
+                                </div>
+                                <div className="col-md-6">
+                                    <div className="card-body p-4">
+                                        <h3 className="mb-4">
+                                            <span className="text-danger">Tutor</span> Registration Form
+                                        </h3>
+
+                                        <form onSubmit={handleRegister}>
+                                            <div className="mb-3">
                                                 <div className="form-floating">
                                                     <input
                                                         type="text"
                                                         className="form-control"
-                                                        id="phoneNumber"
-                                                        name="PhoneNumber"
-                                                        value={formData.PhoneNumber}
+                                                        id="teacherName"
+                                                        name="TeacherName"
+                                                        value={formData.TeacherName}
                                                         onChange={handleChange}
                                                         required
-                                                        placeholder="Phone Number"
+                                                        placeholder="Full Name"
                                                     />
-                                                    <label htmlFor="phoneNumber">Phone Number</label>
+                                                    <label htmlFor="teacherName">Full Name</label>
                                                 </div>
                                             </div>
-                                            <div className="mb-3  col-md-6">
-                                            <div className="form-floating">
-                                                <input
-                                                    type="email"
-                                                    className="form-control"
-                                                    id="email"
-                                                    name="Email"
-                                                    value={formData.Email}
-                                                    onChange={handleChange}
-                                                    required
-                                                    placeholder="Email"
-                                                />
-                                                <label htmlFor="email">Email</label>
-                                            </div>
-                                        </div>
-                                        </div>
-    
-                                      
-    
-                                        <div className="mb-3">
-                                            <div className="form-floating">
-                                                <input
-                                                    type="password"
-                                                    className="form-control"
-                                                    id="password"
-                                                    name="Password"
-                                                    value={formData.Password}
-                                                    onChange={handleChange}
-                                                    required
-                                                    placeholder="Password"
-                                                />
-                                                <label htmlFor="password">Password</label>
-                                            </div>
-                                        </div>
-                                        <div className="row">
-                                            <div className="mb-3 col-md-6">
-                                                <div className="form-floating">
-                                                    <input
-                                                        type="date"
-                                                        className="form-control"
-                                                        id="dob"
-                                                        name="DOB"
-                                                        value={formData.DOB}
-                                                        onChange={handleDOBChange}
-                                                        placeholder="Date of Birth"
-                                                    />
-                                                    <label htmlFor="dob">Date of Birth</label>
-                                                </div>
-                                            </div>
-                                            <div className="mb-3 col-md-6">
-                                                <div className="form-floating">
-                                                    <input
-                                                        type="text"
-                                                        className="form-control"
-                                                        id="age"
-                                                        name="Age"
-                                                        value={formData.Age}
-                                                        readOnly
-                                                        placeholder="Age"
-                                                    />
-                                                    <label htmlFor="age">Age</label>
-                                                </div>
-                                            </div>
-                                        </div>
-    
-                                        {formData.Age && (
-                                            <div className="alert alert-info mt-3" role="alert">
-                                                Your calculated age is: {formData.Age} years old.
-                                            </div>
-                                        )}
-    
-                                        <div className="mb-1">
-                                            <label className="form-label">Gender</label>
                                             <div className="row">
-                                                <div className="col-md-4">
-                                                    <div className="form-check">
+                                                <div className="mb-3 col-md-6">
+                                                    <div className="form-floating">
                                                         <input
-                                                            className="form-check-input"
-                                                            type="radio"
-                                                            name="gender"
-                                                            id="femaleGender"
-                                                            value="Female"
-                                                            checked={formData.gender === 'Female'}
+                                                            type="text"
+                                                            className="form-control"
+                                                            id="phoneNumber"
+                                                            name="PhoneNumber"
+                                                            value={formData.PhoneNumber}
                                                             onChange={handleChange}
                                                             required
+                                                            placeholder="Phone Number"
                                                         />
-                                                        <label className="form-check-label" htmlFor="femaleGender">
-                                                            Female
-                                                        </label>
+                                                        <label htmlFor="phoneNumber">Phone Number</label>
                                                     </div>
                                                 </div>
-                                                <div className="col-md-4">
-                                                    <div className="form-check">
+                                                <div className="mb-3  col-md-6">
+                                                    <div className="form-floating">
                                                         <input
-                                                            className="form-check-input"
-                                                            type="radio"
-                                                            name="gender"
-                                                            id="maleGender"
-                                                            value="Male"
-                                                            checked={formData.gender === 'Male'}
+                                                            type="email"
+                                                            className="form-control"
+                                                            id="email"
+                                                            name="Email"
+                                                            value={formData.Email}
                                                             onChange={handleChange}
                                                             required
+                                                            placeholder="Email"
                                                         />
-                                                        <label className="form-check-label" htmlFor="maleGender">
-                                                            Male
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                                <div className="col-md-4">
-                                                    <div className="form-check">
-                                                        <input
-                                                            className="form-check-input"
-                                                            type="radio"
-                                                            name="gender"
-                                                            id="otherGender"
-                                                            value="Other"
-                                                            checked={formData.gender === 'Other'}
-                                                            onChange={handleChange}
-                                                            required
-                                                        />
-                                                        <label className="form-check-label" htmlFor="otherGender">
-                                                            Other
-                                                        </label>
+                                                        <label htmlFor="email">Email</label>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-    
-                                        <div className="mb-4">
-                                            <Card className="p-3">
-                                                <h5>For Identical Verification</h5>
-                                                <Row className="mb-1">
-                                                    <Col>
-                                                        <Form.Check
-                                                            type="radio"
-                                                            label="Aadhaar"
-                                                            name="documentType"
-                                                            value="Aadhaar"
-                                                            checked={formData.DocumentType === 'Aadhaar'}
-                                                            onChange={(e) => setFormData({ ...formData, DocumentType: e.target.value })}
-                                                        />
-                                                    </Col>
-                                                    <Col>
-                                                        <Form.Check
-                                                            type="radio"
-                                                            label="Pan"
-                                                            name="documentType"
-                                                            value="Pan"
-                                                            checked={formData.DocumentType === 'Pan'}
-                                                            onChange={(e) => setFormData({ ...formData, DocumentType: e.target.value })}
-                                                        />
-                                                    </Col>
-                                                   
-                                                   
-                                                </Row>
-    
-                                                <Form.Group className="">
-                                                    <Form.Label>Upload Identity Document</Form.Label>
-                                                    <Form.Control
-                                                        type="file"
-                                                        onChange={handleIdentityFileChange}
+
+
+
+                                            <div className="mb-3">
+                                                <div className="form-floating">
+                                                    <input
+                                                        type="password"
+                                                        className="form-control"
+                                                        id="password"
+                                                        name="Password"
+                                                        value={formData.Password}
+                                                        onChange={handleChange}
+                                                        required
+                                                        placeholder="Password"
                                                     />
-                                                </Form.Group>
-                                            </Card>
-    
-                                            <Card className="p-3">
-                                                <h5>For Qualification Verification</h5>
-                                                <Form.Group className="mb-3">
-                                                    <Form.Label>Upload a Higher Education Qualification Document</Form.Label>
-                                                    <Form.Control
-                                                        type="file"
-                                                        onChange={handleQualificationFileChange}
-                                                    />
-                                                </Form.Group>
-                                            </Card>
-                                        </div>
-    
-                                        <div className="d-flex justify-content-end">
-                                            <button type="submit" className="btn btn-primary">Submit</button>
-                                        </div>
-                                    </form>
+                                                    <label htmlFor="password">Password</label>
+                                                </div>
+                                            </div>
+                                            <div className="row">
+                                                <div className="mb-3 col-md-6">
+                                                    <div className="form-floating">
+                                                        <input
+                                                            type="date"
+                                                            className="form-control"
+                                                            id="dob"
+                                                            name="DOB"
+                                                            value={formData.DOB}
+                                                            onChange={handleDOBChange}
+                                                            placeholder="Date of Birth"
+                                                        />
+                                                        <label htmlFor="dob">Date of Birth</label>
+                                                    </div>
+                                                </div>
+                                                <div className="mb-3 col-md-6">
+                                                    <div className="form-floating">
+                                                        <input
+                                                            type="text"
+                                                            className="form-control"
+                                                            id="age"
+                                                            name="Age"
+                                                            value={formData.Age}
+                                                            readOnly
+                                                            placeholder="Age"
+                                                        />
+                                                        <label htmlFor="age">Age</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {formData.Age && (
+                                                <div className="alert alert-info mt-3" role="alert">
+                                                    Your calculated age is: {formData.Age} years old.
+                                                </div>
+                                            )}
+
+                                            <div className="mb-1">
+                                                <label className="form-label">Gender</label>
+                                                <div className="row">
+                                                    <div className="col-md-4">
+                                                        <div className="form-check">
+                                                            <input
+                                                                className="form-check-input"
+                                                                type="radio"
+                                                                name="gender"
+                                                                id="femaleGender"
+                                                                value="Female"
+                                                                checked={formData.gender === 'Female'}
+                                                                onChange={handleChange}
+                                                                required
+                                                            />
+                                                            <label className="form-check-label" htmlFor="femaleGender">
+                                                                Female
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <div className="col-md-4">
+                                                        <div className="form-check">
+                                                            <input
+                                                                className="form-check-input"
+                                                                type="radio"
+                                                                name="gender"
+                                                                id="maleGender"
+                                                                value="Male"
+                                                                checked={formData.gender === 'Male'}
+                                                                onChange={handleChange}
+                                                                required
+                                                            />
+                                                            <label className="form-check-label" htmlFor="maleGender">
+                                                                Male
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <div className="col-md-4">
+                                                        <div className="form-check">
+                                                            <input
+                                                                className="form-check-input"
+                                                                type="radio"
+                                                                name="gender"
+                                                                id="otherGender"
+                                                                value="Other"
+                                                                checked={formData.gender === 'Other'}
+                                                                onChange={handleChange}
+                                                                required
+                                                            />
+                                                            <label className="form-check-label" htmlFor="otherGender">
+                                                                Other
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="mb-4">
+                                                <Card className="p-3">
+                                                    <h5>For Identical Verification</h5>
+                                                    <Row className="mb-1">
+                                                        <Col>
+                                                            <Form.Check
+                                                                type="radio"
+                                                                label="Aadhaar"
+                                                                name="documentType"
+                                                                value="Aadhaar"
+                                                                checked={formData.DocumentType === 'Aadhaar'}
+                                                                onChange={(e) => setFormData({ ...formData, DocumentType: e.target.value })}
+                                                            />
+                                                        </Col>
+                                                        <Col>
+                                                            <Form.Check
+                                                                type="radio"
+                                                                label="Pan"
+                                                                name="documentType"
+                                                                value="Pan"
+                                                                checked={formData.DocumentType === 'Pan'}
+                                                                onChange={(e) => setFormData({ ...formData, DocumentType: e.target.value })}
+                                                            />
+                                                        </Col>
+
+
+                                                    </Row>
+
+                                                    <Form.Group className="">
+                                                        <Form.Label>Upload Identity Document </Form.Label>
+                                                        <p>[Only .jpg, .jpeg, .png, .pdf files are accepted]</p>
+                                                        <Form.Control
+                                                            type="file"
+                                                            accept=".jpg, .jpeg, .png, .pdf"
+                                                            onChange={handleIdentityFileChange}
+                                                        />
+                                                    </Form.Group>
+                                                </Card>
+
+                                                <Card className="p-3">
+                                                    <h5>Qualification Verification</h5>
+                                                    <p>[Only .jpg, .jpeg, .png, .pdf files are accepted]</p>
+
+                                                    <Form.Group className="mb-3">
+                                                        <Form.Label>Upload Your Higher Education Qualification Document</Form.Label>
+                                                        <Form.Control
+                                                            type="file"
+                                                            accept=".jpg, .jpeg, .png, .pdf"
+                                                            onChange={handleQualificationFileChange}
+                                                        />
+                                                    </Form.Group>
+                                                </Card>
+
+                                            </div>
+
+                                            <div className="d-flex justify-content-end">
+                                                <button type="submit" className="btn btn-primary">Submit</button>
+                                            </div>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    
-        {modelOpen && (
-            <Modal show={modelOpen} onHide={handleClose} animation={false}>
-                <Modal.Header closeButton>
-                    <Modal.Title><span className='text-danger'>Verification</span> With OTP</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <div className="mb-3">
-                        <div className="form-floating">
-                            <input
-                                type="text"
-                                className="form-control"
-                                id="Email"
-                                name="Email"
-                                value={verifyData.Email}
-                                onChange={handleVerifyChange}
-                                required
-                                placeholder="Email"
-                            />
+
+            {modelOpen && (
+                <Modal show={modelOpen} onHide={handleClose} animation={false}>
+                    <Modal.Header closeButton>
+                        <Modal.Title><span className='text-danger'>Verification</span> With OTP</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <div className="mb-3">
+                            <div className="form-floating">
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    id="Email"
+                                    name="Email"
+                                    value={verifyData.Email}
+                                    onChange={handleVerifyChange}
+                                    required
+                                    placeholder="Email"
+                                />
+                            </div>
                         </div>
-                    </div>
-                    <div className="mb-3">
-                        <div className="form-floating">
-                            <input
-                                type="text"
-                                className="form-control"
-                                id="otp"
-                                name="otp"
-                                value={verifyData.otp}
-                                onChange={handleVerifyChange}
-                                required
-                                placeholder="OTP"
-                            />
-                            <label htmlFor="otp">Enter OTP</label>
+                        <div className="mb-3">
+                            <div className="form-floating">
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    id="otp"
+                                    name="otp"
+                                    value={verifyData.otp}
+                                    onChange={handleVerifyChange}
+                                    required
+                                    placeholder="OTP"
+                                />
+                                <label htmlFor="otp">Enter OTP</label>
+                            </div>
                         </div>
-                    </div>
-                    <Modal.Footer>
+                        <Modal.Footer>
                             <Button style={{ background: "#111827" }} onClick={ResendOtp}>
                                 Re-Send Otp
                             </Button>
@@ -428,11 +459,11 @@ const TeacherRegistration = () => {
                                 Verify Otp
                             </Button>
                         </Modal.Footer>
-                </Modal.Body>
-            </Modal>
-        )}
-    </>
-    
+                    </Modal.Body>
+                </Modal>
+            )}
+        </>
+
     );
 };
 
