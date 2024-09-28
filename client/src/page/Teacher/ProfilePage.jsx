@@ -129,7 +129,7 @@ const ProfilePage = () => {
     const dispatch = useDispatch();
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false)
-
+    const [errorModel, setErrorModel] = useState(false)
     const [subjects, setSubjects] = useState([]);
 
 
@@ -387,49 +387,52 @@ const ProfilePage = () => {
         return Object.keys(newErrors).length === 0;
     };
 
-
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e, retry = false) => {
         e.preventDefault(); // Prevent default form submission behavior
+
         if (validateForm()) {
-
-
-
             if (typeof allPoints !== 'undefined') {
                 setFormData((prevData) => ({
                     ...prevData,
                     RangeWhichWantToDoClasses: [allPoints]
                 }));
-               
-
             } else {
-
-                alert('Are You Sure')
+                alert('Are You Sure');
                 console.error("allPoints is not defined or is undefined");
-                
+                return; // Exit the function if allPoints is undefined
             }
         } else {
             console.log("Form validation failed. Errors:", errors);
+            return;
         }
+
         try {
-            setLoading(true)
+            setLoading(true);
+
             const response = await axios.post('https://api.srtutorsbureau.com/api/v1/teacher/teacher-profile', formData, {
                 headers: {
                     Authorization: `Bearer ${tokenQuery}`
                 }
-            })
-            console.log(response.data)
-            toast.success("🎉 Profile submitted successfully! Please verify it with the OTP sent to your registered email. 📧");
-            setLoading(false)
-            setTimeout(() => {
+            });
 
-                window.location.href = `/Teacher-Profile-Verify?token=${tokenQuery}&id=${IdQuery}`
+            console.log(response.data);
+            toast.success("🎉 Profile submitted successfully! Please verify it with the OTP sent to your registered email. 📧");
+            setLoading(false);
+
+            setTimeout(() => {
+                window.location.href = `/Teacher-Profile-Verify?token=${tokenQuery}&id=${IdQuery}`;
             }, 500);
         } catch (error) {
-            console.log(error)
-            setLoading(false)
-        }
+            console.log(error);
+            setLoading(false);
 
+            if (!loading) {
+                setErrorModel(true)
+            }
+
+        }
     };
+
 
 
     const handleNext = (e) => {
@@ -697,7 +700,7 @@ const ProfilePage = () => {
 
 
 
-                    <div className="map-container" style={{position:'relative',zIndex:1}}>
+                    <div className="map-container" style={{ position: 'relative', zIndex: 1 }}>
                         <MapContainer
                             center={currentLocation}
                             zoom={12}
@@ -803,6 +806,34 @@ const ProfilePage = () => {
                     )}
                 </div>
             </div>
+
+            {errorModel && (
+                <div className="modal show d-block" tabIndex="-1" role="dialog">
+                    <div className="modal-dialog" role="document">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title">Submission Review</h5>
+                                <button type="button" className="close" onClick={() => setErrorModel(false)} aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div className="modal-body">
+                                <p>Are you sure you want to submit this information?</p>
+                            </div>
+
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-secondary">
+                                    Cancel
+                                </button>
+                                <button type="button" className="btn btn-primary" onClick={handleSubmit}>
+                                    Submit
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 };

@@ -324,7 +324,7 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
             {!login ? (
               <div className="container-fluid">
                 <Form.Group>
-                  <label htmlFor="">Enter Your Contact Number </label>
+                  <label htmlFor="">Enter Your Whatsapp Number </label>
                   <Form.Control
                     type="text"
                     name="loginNumber"
