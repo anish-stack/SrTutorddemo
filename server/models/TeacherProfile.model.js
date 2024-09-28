@@ -83,6 +83,13 @@ const TeacherProfileSchema = new mongoose.Schema({
             required: true
         }
     },
+    isBlockForOtp: {
+        type: Boolean,
+        default: false
+    },
+    OtpBlockTime: {
+        type: Date
+    },
     isAddressSame: {
         type: Boolean,
         default: false
@@ -99,9 +106,9 @@ const TeacherProfileSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    PostForHim:{
+    PostForHim: {
         type: mongoose.Schema.Types.ObjectId,
-        ref:'Request'
+        ref: 'Request'
     },
     VehicleOwned: {
         type: Boolean,
@@ -110,7 +117,7 @@ const TeacherProfileSchema = new mongoose.Schema({
 
     TeachingMode: {
         type: String,
-       
+
         required: true
     },
     AcademicInformation: [{

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Cookies from "js-cookie";
 import toast from 'react-hot-toast'
 import { Form, Button, Row, Col, Card } from 'react-bootstrap';
@@ -7,6 +7,9 @@ import Modal from 'react-bootstrap/Modal';
 import { useNavigate } from 'react-router-dom';
 const TeacherRegistration = () => {
     const navigate = useNavigate()
+    const [resendButtonClick, setResendButtonClick] = useState(0);
+    const [resendError, setResendError] = useState('');
+    const maxResendAttempts = 3;
     const [formData, setFormData] = useState({
         TeacherName: '',
         PhoneNumber: '',
@@ -19,12 +22,18 @@ const TeacherRegistration = () => {
         DocumentImage: null, // file for identity document
         QualificationDocument: null // file for qualification document
     });
+
+
     const [verifyData, setVerifyData] = useState({
         Email: '',
         otp: ''
     })
+
+
     const [modelOpen, setModelOpen] = useState(false)
     const handleClose = () => setModelOpen(false);
+
+
     const handleIdentityFileChange = (e) => {
         const file = e.target.files[0];
 
@@ -34,7 +43,7 @@ const TeacherRegistration = () => {
             if (!validFileTypes.includes(file.type)) {
                 toast.error('Invalid file type. Please upload a .jpg, .jpeg, .png, or .pdf file.');
                 setFormData({ ...formData, DocumentImage: null });
-                return; 
+                return;
             }
             setFormData({ ...formData, DocumentImage: file });
             toast.success('File Selected successfully!');
@@ -45,22 +54,25 @@ const TeacherRegistration = () => {
         const file = e.target.files[0];
 
         if (file) {
-        
+
             const validFileTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
 
-      
+
             if (!validFileTypes.includes(file.type)) {
                 toast.error('Invalid file type. Please upload a .jpg, .jpeg, .png, or .pdf file.');
                 setFormData({ ...formData, QualificationDocument: null });
-                return; 
+                return;
             }
 
-          
+
             setFormData({ ...formData, QualificationDocument: file });
             toast.success('File Selected successfully!');
         }
     };
+
+
     const [Loading, setLoading] = useState(false)
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prevData) => ({
@@ -74,6 +86,51 @@ const TeacherRegistration = () => {
             }));
         }
     };
+    useEffect(() => {
+        const storedResendCount = localStorage.getItem('resendButtonClick');
+        if (storedResendCount) {
+            setResendButtonClick(Number(storedResendCount));
+        }
+    }, []);
+
+    useEffect(() => {
+        localStorage.setItem('resendButtonClick', resendButtonClick);
+    }, [resendButtonClick]);
+
+    const ResendOtp = async () => {
+        if (resendButtonClick >= maxResendAttempts) {
+            setResendError('Maximum resend attempts reached. You are blocked for 24 hours.');
+            await handleBlockTeacher();
+            return;
+        }
+        try {
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/teacher/resent-otp', verifyData);
+            toast.success(response.data.message);
+            setResendButtonClick(resendButtonClick + 1);
+            setResendError('');
+        } catch (error) {
+            setResendError('You have been temporarily blocked from requesting OTP. Please try again later.')
+            toast.error(error.response.data.message);
+        }
+    };
+
+
+    const handleBlockTeacher = async () => {
+
+        try {
+            const res = await axios.post('https://api.srtutorsbureau.com/api/v1/teacher/block-teacher', {
+                Email: verifyData.Email,
+                HowManyRequest: resendButtonClick
+            });
+            console.log(res.data);
+            setResendError('You have been blocked for 24 hours due to too many OTP requests.')
+            toast.error('You have been blocked for 24 hours due to too many OTP requests.');
+        } catch (error) {
+            console.log(error);
+        }
+
+    };
+
     const handleVerifyChange = (e) => {
         const { name, value } = e.target;
         setVerifyData((prevData) => ({
@@ -109,7 +166,7 @@ const TeacherRegistration = () => {
         const isFormValid = Object.values(formData).every(value => value !== '' && value !== undefined && value !== null);
         if (formData.PhoneNumber.length > 10) {
             toast.error('Phone number cannot exceed 10 digits.');
-            return; 
+            return;
         }
         if (!isFormValid) {
             toast.error("Please fill all required fields.");
@@ -142,19 +199,21 @@ const TeacherRegistration = () => {
         }
     }
 
-    const ResendOtp = async () => {
-        try {
-            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/teacher/resent-otp', verifyData)
-            console.log(response.data)
-            toast.success(response.data.message)
-        } catch (error) {
-            toast.error(error.response.data.message)
-        }
-    }
+    // const ResendOtp = async () => {
+    //     try {
+    //         const response = await axios.post('https://api.srtutorsbureau.com/api/v1/teacher/resent-otp', verifyData)
+    //         console.log(response.data)
+    //         toast.success(response.data.message)
+    //     } catch (error) {
+    //         toast.error(error.response.data.message)
+    //     }
+    // }
+
+
     const VerifyOtp = async () => {
         try {
             const response = await axios.post('https://api.srtutorsbureau.com/api/v1/teacher/Verify-teacher', verifyData)
-            // console.log(response.data)
+
             toast.success("Tutor Verified Successful")
             const { token, user } = response.data;
             Cookies.set(`teacherToken`, token, { expires: 1 });
@@ -408,6 +467,7 @@ const TeacherRegistration = () => {
                                                 <button type="submit" className="btn btn-primary">Submit</button>
                                             </div>
                                         </form>
+
                                     </div>
                                 </div>
                             </div>
@@ -419,7 +479,9 @@ const TeacherRegistration = () => {
             {modelOpen && (
                 <Modal show={modelOpen} onHide={handleClose} animation={false}>
                     <Modal.Header closeButton>
-                        <Modal.Title><span className='text-danger'>Verification</span> With OTP</Modal.Title>
+                        <Modal.Title>
+                            <span className='text-danger'>Verification</span> With OTP
+                        </Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <div className="mb-3">
@@ -451,15 +513,42 @@ const TeacherRegistration = () => {
                                 <label htmlFor="otp">Enter OTP</label>
                             </div>
                         </div>
-                        <Modal.Footer>
-                            <Button style={{ background: "#111827" }} onClick={ResendOtp}>
-                                Re-Send Otp
-                            </Button>
-                            <Button variant="primary" onClick={VerifyOtp}>
-                                Verify Otp
-                            </Button>
-                        </Modal.Footer>
+                        <p className="text-success d-flex align-items-center">
+                            <img src="https://i.ibb.co/C920JnT/whatsapp.png" width={20} alt="WhatsApp Icon" className="me-2" />
+                            OTP is sent to your WhatsApp number
+                        </p>
+
+                        {resendButtonClick < maxResendAttempts ? (
+                            <p className="text-danger">
+                                You have {maxResendAttempts - resendButtonClick} OTP resend attempts left.
+                            </p>
+                        ) : (
+                            <p className="text-danger">
+                                {resendError}
+                            </p>
+                        )}
                     </Modal.Body>
+                    <div className="mb-3">
+                        {resendError && (
+                            <div className="alert alert-danger d-flex align-items-center" role="alert">
+                                <img src="https://i.ibb.co/C920JnT/error-icon.png" width={20} alt="Error Icon" className="me-2" />
+                                <span>{resendError}</span>
+                            </div>
+                        )}
+                    </div>
+
+                    <Modal.Footer>
+                        <Button
+                            style={{ background: resendButtonClick >= maxResendAttempts ? "#d9534f" : "#111827" }}
+                            onClick={ResendOtp}
+                        // disabled={resendButtonClick >= maxResendAttempts}
+                        >
+                            Re-Send Otp
+                        </Button>
+                        <Button variant="primary" onClick={VerifyOtp}>
+                            Verify Otp
+                        </Button>
+                    </Modal.Footer>
                 </Modal>
             )}
         </>
