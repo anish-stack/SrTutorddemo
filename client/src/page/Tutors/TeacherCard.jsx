@@ -70,7 +70,7 @@ const TeacherCard = ({ classes, item, tokenStudent, showBio }) => {
                             </div>
 
                         </div>
-                        {item.isAllDetailVerified ? (
+                        {item.srVerifiedTag ? (
                             <div className='teacher-tag'>
                                 <span>Sr Tutors Verified</span>
                             </div>
