@@ -145,10 +145,10 @@ const Upload = ({ teacherId }) => {
                             <Col>
                                 <Form.Check
                                     type="radio"
-                                    label="Pan"
+                                    label="Passport"
                                     name="documentType"
-                                    value="Pan"
-                                    checked={formData.DocumentType === "Pan"}
+                                    value="Passport"
+                                    checked={formData.DocumentType === "Passport"}
                                     onChange={(e) =>
                                         setFormData({ ...formData, DocumentType: e.target.value })
                                     }
