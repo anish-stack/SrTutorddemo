@@ -697,7 +697,7 @@ exports.AddDocument = async (req, res) => {
 
 
     // Predefined valid document types
-    const preDefineTypes = ["Aadhaar", "Pan"];
+    const preDefineTypes = ["Aadhaar", "Pan","Passport"];
 
     // Check if the document type is valid
     if (!preDefineTypes.includes(DocumentType)) {
