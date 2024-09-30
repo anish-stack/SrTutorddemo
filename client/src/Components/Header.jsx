@@ -12,6 +12,7 @@ Modal.setAppElement("#root");
 function Header() {
   const [teacherToken, setTeacherToken] = useState(null);
   const [studentToken, setStudentToken] = useState(null);
+  const [subMenuOpen,setSubMenuOpen] = useState(false)
   const { coords, isGeolocationAvailable, isGeolocationEnabled } = useGeolocated({
     positionOptions: {
       enableHighAccuracy: true,
@@ -31,6 +32,11 @@ function Header() {
       });
     }
   }, [coords]);
+
+    const handleSubMenuOpen = ()=>{
+      setSubMenuOpen(!subMenuOpen)
+    }
+
   useEffect(() => {
     const token = Cookies.get("teacherToken");
     setTeacherToken(token || null);
@@ -44,6 +50,7 @@ function Header() {
     anyPhoneAndEmail: "",
     Password: "",
   });
+
   const [loading, setLoading] = useState(false);
   const [modalType, setModalType] = useState(null);
 
@@ -105,7 +112,7 @@ function Header() {
         // Check if the teacher needs to complete their profile
         if (userPrefix === 'teacher') {
           const checkProfileId = user.TeacherProfile;
-         
+
           if (!checkProfileId) {
             window.location.href = `/Complete-profile?token=${token}&encoded=${user._id}`;
             return; // Exit early if redirecting
@@ -201,9 +208,7 @@ function Header() {
                             </li>
                           </ul>
                         </li>
-                        {/* <li className="">
-                          <Link to="#">Membership</Link>
-                        </li> */}
+                       
                         <li className="">
                           <Link to="contact-us">Contact us</Link>
                         </li>
@@ -264,7 +269,7 @@ function Header() {
                         Student Dashboard
                       </a>
                     ) : (
-                      <div className="tgmenu__categories d-none d-md-block">
+                      <div className="tgmenu__categories  d-md-block">
                         <DropdownButton
                           id="dropdownMenuButton1"
                           title={
@@ -323,14 +328,14 @@ function Header() {
                       </div>
                     </div>
 
-                    <div className="tgmobile__search">
+                    {/* <div className="tgmobile__search">
                       <form action="#">
                         <input type="text" placeholder="Search..." />
                         <button type="submit">
                           <i className="fa fa-search" />
                         </button>
                       </form>
-                    </div>
+                    </div> */}
                     <div className="tgmobile__menu-outer">
                       <ul className="navigation">
                         <li className="active">
@@ -343,44 +348,47 @@ function Header() {
                           <Link to="/services">Services</Link>
                         </li>
                         <li>
-                          <Link to="#">One-to-One Class</Link>
-                          <ul className="sub-menu">
+                          <a href="#" onClick={handleSubMenuOpen} data-toggle="collapse" data-target="#submenu1" aria-expanded="false" aria-controls="submenu1">
+                            One-to-One Class
+                          </a>
+                          <ul  style={{ display: subMenuOpen ? 'block' : 'none' }} class="collapse sub-menu" id="submenu1">
                             <li>
-                              <Link to="#">Home Tuition</Link>
+                              <a href="#">Home Tuition</a>
                             </li>
                             <li>
-                              <Link to="#">Hire a Tutor</Link>
+                              <a href="#">Hire a Tutor</a>
                             </li>
                             <li>
-                              <Link to="#">Tutor Section</Link>
+                              <Link to="/Browse-Tutors?lat=28.691029628579727&lng=77.1517630851126">Tutor Section</Link>
                             </li>
                             <li>
-                              <Link to="#">Apply as Tutor</Link>
+                              <Link to="/teacher-register?source=home">Apply as Tutor</Link>
                             </li>
                           </ul>
                         </li>
-                        <li>
-                          <Link to="#">Membership</Link>
-                        </li>
+                       
                         <li>
                           <Link to="/contact-us">Contact Us</Link>
+                        </li>
+                        <li>
+                          <Link to={`/Browse-Tutors?lat=${locationData.lat}&lng=${locationData.lng}`}>Browse Tutors</Link>
                         </li>
                       </ul>
                     </div>
                     <div className="tg-social">
                       <ul className="list-wrap">
                         <li>
-                          <Link to="#">
+                          <Link to="https://www.facebook.com/SRTutorsbureau">
                             <i className="fab fa-facebook-f"></i>
                           </Link>
                         </li>
                         <li>
-                          <Link to="#">
+                          <Link to="https://x.com/i/flow/login?redirect_after_login=%2FSR_TUTORS">
                             <i className="fab fa-twitter"></i>
                           </Link>
                         </li>
                         <li>
-                          <Link to="#">
+                          <Link to="https://www.linkedin.com/authwall?trkInfo=AQE695vU3YOo6QAAAZJCQLGICgEiF7E77yk7MFUfHbtUzk7_slE6eDu77_SW7JJycGD-bGsFWN_MZBVvlflrace7yDZTyyOWNR0D_Y84TfU6-1dsR06UqiehgatBFw30bl8ep50=&original_referer=&sessionRedirect=https%3A%2F%2Fin.linkedin.com%2Fin%2Fsr-tutors-bureau-b92384116">
                             <i className="fab fa-linkedin-in"></i>
                           </Link>
                         </li>
