@@ -31,8 +31,8 @@ const TeacherDashboard = () => {
     const [showUploader, setShowUploader] = useState(false);
     const teacherDetails = Cookies.get('teacherUser');
     // Toggle image uploader on double-click
-      // UseEffect to handle token and user details
-      useEffect(() => {
+    // UseEffect to handle token and user details
+    useEffect(() => {
         console.log("i am hit at 1st")
         const token = Cookies.get('teacherToken');
         const teacherDetails = Cookies.get('teacherUser');
@@ -128,7 +128,7 @@ const TeacherDashboard = () => {
         }
     }, [locations])
 
-  
+
 
     useEffect(() => {
         if (teacherToken && teacherUser) {
@@ -336,10 +336,10 @@ const TeacherDashboard = () => {
                                         <h1>{profileInfo?.FullName || 'N/A'}</h1>
                                         <p><strong>Email:</strong> {teacherUser?.Email || 'N/A'}</p>
                                         <p><strong>Phone Number:</strong> {profileInfo?.ContactNumber || 'N/A'}</p>
-                                        <p><strong>Age:</strong> {teacherUser?.Age || 'N/A'}</p>
+                                        {/* <p><strong>Age:</strong> {teacherUser?.Age || 'N/A'}</p> */}
                                         <p><strong>Date of Birth:</strong> {profileInfo?.DOB || 'N/A'}</p>
                                         <p><strong>Gender:</strong> {profileInfo?.Gender || 'N/A'}</p>
-                                        <p><strong>Alternate Number:</strong> {profileInfo?.AlternateContact || 'N/A'}</p>
+                                        {/* <p><strong>Alternate Number:</strong> {profileInfo?.AlternateContact || 'N/A'}</p> */}
                                         <span onClick={handleLogout} className="logout">
                                             <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
                                         </span>

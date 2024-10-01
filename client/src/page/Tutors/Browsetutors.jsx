@@ -58,7 +58,7 @@ const Browsetutors = () => {
 
             setCount(response.data.count);
             const tutorsData = response.data.results;
-
+            console.log(tutorsData)
             setData(tutorsData);
 
             // Extract class IDs for fetching class names
