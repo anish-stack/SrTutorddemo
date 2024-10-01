@@ -472,6 +472,7 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
 
     } = req.body;
     const ranges = RangeWhichWantToDoClasses.flatMap((range) => range)
+    console.log(ranges)
     const emptyFields = [];
 
     // Validate that all required fields are present and not empty
@@ -1447,7 +1448,7 @@ exports.SearchByMinimumCondition = CatchAsync(async (req, res) => {
 exports.BrowseTutorsNearMe = CatchAsync(async (req, res) => {
   try {
     const {
-      lat, lng, ResultLimit = 10, Page = 1, verified, maxRange, minRange,
+      lat, lng, Page = 1, verified, maxRange, minRange,
       Subject, Experience, ModeOfTuition, Gender
     } = req.query;
     // console.log(req.query)
@@ -1456,12 +1457,10 @@ exports.BrowseTutorsNearMe = CatchAsync(async (req, res) => {
     }
 
     // Parse and validate ResultLimit and Page
-    const limit = parseInt(ResultLimit, 10);
+
     const page = parseInt(Page, 10);
 
-    if (isNaN(limit) || limit <= 0) {
-      return res.status(400).json({ message: 'Invalid ResultLimit value.' });
-    }
+   
 
     if (isNaN(page) || page <= 0) {
       return res.status(400).json({ message: 'Invalid Page value.' });
@@ -1483,8 +1482,7 @@ exports.BrowseTutorsNearMe = CatchAsync(async (req, res) => {
       }
     })
 
-      .skip((page - 1) * limit) // Pagination - skip results
-      .limit(limit) // Pagination - limit results
+
       .exec(); // Execute the query
     // Apply additional filters
     if (Gender) {
@@ -1502,7 +1500,7 @@ exports.BrowseTutorsNearMe = CatchAsync(async (req, res) => {
         // No filtering needed for "Both"
       } else {
         const isVerified = verified === 'true';
-        locationResults = locationResults.filter(teacher => teacher.isAllDetailVerified === isVerified);
+        locationResults = locationResults.filter(teacher => teacher.srVerifiedTag === isVerified);
       }
     }
 

@@ -10,6 +10,7 @@ import Privacypolicy from "./page/Policy/Privacypolicy";
 import PlansAndTerms from "./page/Policy/PlansAndTerms";
 import RefundPolicy from "./page/Policy/RefundPolicy";
 import ForgetPassword from "./Components/ForgetPassword";
+import Google from "./Google";
 // Lazy load components
 const Home = lazy(() => import("./page/Home"));
 const Aboutus = lazy(() => import("./page/Aboutus"));
@@ -106,6 +107,8 @@ function App() {
           <Route path="/Refund-and-Cancellation-Policy" element={<RefundPolicy />} />
 
           <Route path="/Forget-Password" element={<ForgetPassword />} />
+          <Route path="/Google" element={<Google />} />
+
 
 
           <Route path="/*" element={<PageNotFound />} />

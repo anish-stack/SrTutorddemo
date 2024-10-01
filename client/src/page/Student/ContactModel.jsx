@@ -232,8 +232,8 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
     }
   };
   useEffect(() => {
-    console.log("Updated ClickLatitude:", ClickLatitude);
-    console.log("Updated ClickLongitude:", ClickLongitude);
+    // console.log("Updated ClickLatitude:", ClickLatitude);
+    // console.log("Updated ClickLongitude:", ClickLongitude);
   }, [ClickLatitude, ClickLongitude]);
 
   const handleLocationFetch = async (input) => {

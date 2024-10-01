@@ -3,43 +3,16 @@ import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { ClassSearch } from "../../Slices/Class.slice";
 import Cookies from "js-cookie";
-import MapWithCircle from './MapWithCircle';
 import Select from 'react-select';
-import { MapContainer, TileLayer, Marker, Popup, Tooltip, useMap } from 'react-leaflet';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
+import { GoogleMap, LoadScript, Marker, Circle, InfoWindow } from "@react-google-maps/api";
+
 import { Alert, Table } from 'react-bootstrap';
 import { useGeolocated } from 'react-geolocated';
 import toast from "react-hot-toast";
 
 const ProfilePage = () => {
     const [step, setStep] = useState(1);
-    const handleLocationClick = (lat, lng, setAllPoints, allPoints) => {
-        setAllPoints((prevPoints) => {
-            const existingIndex = prevPoints.findIndex(point => point.lat === lat && point.lng === lng);
 
-            if (existingIndex > -1) {
-                return prevPoints.filter((_, index) => index !== existingIndex);
-            } else {
-                return [...prevPoints, { lng, lat }];
-            }
-        });
-    };
-
-    // Hook to add map click event listener
-    const MapClickHandler = ({ handleMapClick }) => {
-        const map = useMap();
-
-        useEffect(() => {
-            map.on('click', handleMapClick);
-
-            return () => {
-                map.off('click', handleMapClick);
-            };
-        }, [map, handleMapClick]);
-
-        return null;
-    };
     const [formData, setFormData] = useState({
         FullName: '',
         DOB: '',
@@ -89,36 +62,6 @@ const ProfilePage = () => {
         }
     }, [coords]);
 
-    const handleMapClick = (event) => {
-        const { lat, lng } = event.latlng;
-
-        if (allPoints.length < 10) {
-            handleLocationClick(lat, lng, setAllPoints, allPoints);
-        } else {
-            setErrorMessage('You can only select up to 10 locations.');
-        }
-    };
-
-    const handleDoubleClick = (lat, lng) => {
-        handleLocationClick(lat, lng, setAllPoints, allPoints);
-    };
-
-    useEffect(() => {
-        if (allPoints.length < 2) {
-            setErrorMessage('You must select at least 2 locations.');
-        } else {
-            setErrorMessage(null);
-        }
-    }, [allPoints]);
-
-    const customIcon = L.divIcon({
-        className: 'custom-div-icon',
-        html: `<div style="color: red; font-size: 24px;">
-            <i class="fas fa-map-marker-alt"></i>
-          </div>`,
-        iconSize: [30, 42],
-        iconAnchor: [15, 42],
-    });
 
     const location = new URLSearchParams(window.location.search)
     const tokenQuery = location.get('token')
@@ -131,7 +74,11 @@ const ProfilePage = () => {
     const [loading, setLoading] = useState(false)
     const [errorModel, setErrorModel] = useState(false)
     const [subjects, setSubjects] = useState([]);
-
+    const [latitude, setLatitude] = useState(null);
+    const [longitude, setLongitude] = useState(null);
+    const [radius, setRadius] = useState(5); // Radius in kilometers
+    const [places, setPlaces] = useState([]);
+    const [selectedPlace, setSelectedPlace] = useState(null);
 
     const [user, setUser] = useState({
         TeacherName: '',
@@ -186,11 +133,22 @@ const ProfilePage = () => {
         }
     }, [data]);
 
-
+    useEffect(() => {
+        // Get user's current location
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                setLatitude(position.coords.latitude);
+                setLongitude(position.coords.longitude);
+            },
+            (error) => {
+                console.error("Error getting location:", error);
+            }
+        );
+    }, []);
 
     const handleAddressSame = (e) => {
-        const { checked } = e.target; // Get the checked status of the checkbox
-        setIsAddressSame(checked); // Update the state for whether the address is the same
+        const { checked } = e.target;
+        setIsAddressSame(checked);
 
         if (checked) {
 
@@ -214,6 +172,29 @@ const ProfilePage = () => {
         }
     };
 
+    const fetchNearbyPlaces = async () => {
+        if (latitude && longitude) {
+            const url = `https://api.srtutorsbureau.com/nearby-places?lat=${latitude}&lng=${longitude}&radius=${radius * 1000}`;// Convert km to meters
+
+            try {
+                const response = await axios.get(url);
+                // console.log(response.data)
+                const data = response.data.FilterData;
+                console.log(data)
+                const nextPageToken = response.data.next_page_token;
+                setPlaces(
+                    data.map((place) => ({
+                        // name: place.name,
+                        lat: place.lat,
+                        lng: place.lng,
+                    }))
+                );
+
+            } catch (error) {
+                console.error("Error fetching nearby places:", error);
+            }
+        }
+    };
 
     const fetchUser = async () => {
         try {
@@ -388,18 +369,18 @@ const ProfilePage = () => {
     };
 
     const handleSubmit = async (e, retry = false) => {
-        e.preventDefault(); // Prevent default form submission behavior
-
+        e.preventDefault();
+        console.log(places)
         if (validateForm()) {
-            if (typeof allPoints !== 'undefined') {
+            if (typeof places !== 'undefined') {
                 setFormData((prevData) => ({
                     ...prevData,
-                    RangeWhichWantToDoClasses: [allPoints]
+                    RangeWhichWantToDoClasses: [places]
                 }));
             } else {
                 alert('Are You Sure');
-                console.error("allPoints is not defined or is undefined");
-                return; // Exit the function if allPoints is undefined
+                console.error("places is not defined or is undefined");
+                return;
             }
         } else {
             console.log("Form validation failed. Errors:", errors);
@@ -685,7 +666,7 @@ const ProfilePage = () => {
                     <div className="col-md-6 mb-3">
                         <label className="form-label" htmlFor="TeachingMode">Teaching Mode</label>
                         <select className={`form-select p-half ${errors.TeachingMode ? 'is-invalid' : ''}`} name={`TeachingMode`} value={formData.TeachingMode} onChange={handleChange}>
-                            <option value="">Select True Or False</option>
+                            <option value="">Select Your's Teaching Mode</option>
                             <option value="Home Tuition at Student\'s Home">Home Tuition at Student's Home</option>
                             <option value="Home Tuition at Your Home">Home Tuition at Your Home</option>
                             <option value="Institute or Group Tuition">Institute or Group Tuition</option>
@@ -698,81 +679,61 @@ const ProfilePage = () => {
                         {errors.TeachingMode && <div className="text-danger">{errors.TeachingMode}</div>}
                     </div>
 
+                    <div className=" mb-2 mt-4">
 
-
-                    <div className="map-container" style={{ position: 'relative', zIndex: 1 }}>
-                        <MapContainer
-                            center={currentLocation}
-                            zoom={12}
-                            scrollWheelZoom={true}
-                            style={{ height: '500px', width: '1000px', borderRadius: '15px' }}
-                        >
-                            <TileLayer
-                                attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                            />
-                            <MapClickHandler handleMapClick={handleMapClick} />
-                            {currentLocation && (
-                                <Marker
-                                    position={currentLocation}
-                                    icon={customIcon}
-                                >
-                                    <Popup>Your current location</Popup>
-                                </Marker>
-                            )}
-                            {allPoints.map((point, index) =>
-                                point.lat && point.lng ? (
-                                    <Marker
-                                        key={index}
-                                        icon={customIcon}
-                                        position={[point.lat, point.lng]}
-                                        eventHandlers={{
-                                            dblclick: () => handleDoubleClick(point.lat, point.lng),
-                                        }}
-                                    >
-                                        <Tooltip direction="top" offset={[0, -20]} opacity={1} permanent>
-                                            <span style={{ fontSize: '10px' }}>{`Point ${index + 1}`}</span>
-                                        </Tooltip>
-                                        <Popup>
-                                            {`Point ${index + 1}: ${point.lat.toFixed(6)}, ${point.lng.toFixed(6)}`}
-                                        </Popup>
-                                    </Marker>
-                                ) : null
-                            )}
-                        </MapContainer>
-
-                        {errorMessage && (
-                            <Alert variant="danger" className="mt-3">
-                                {errorMessage}
-                            </Alert>
-                        )}
-
-                        <div className="mt-3">
-                            <h5>Selected Locations ({allPoints.length})</h5>
-                            <Table striped bordered hover size="sm">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Latitude</th>
-                                        <th>Longitude</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {allPoints.map((point, index) => (
-                                        <tr key={index}>
-                                            <td>{index + 1}</td>
-                                            <td>{point.lat.toFixed(6)}</td>
-                                            <td>{point.lng.toFixed(6)}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </Table>
+                        <div className="form-group">
+                            <label htmlFor="radiusSelect">Select Radius (in km): </label>
+                            <select
+                                id="radiusSelect"
+                                className="form-control"
+                                value={radius}
+                                onChange={(e) => {
+                                    setRadius(e.target.value);
+                                    fetchNearbyPlaces(); // Call on change
+                                }}
+                            >
+                                {/* Options from 5 to 80 km in increments of 5 km */}
+                                {[...Array(16)].map((_, index) => {
+                                    const value = (index + 1) * 5; // 5, 10, ..., 80
+                                    return (
+                                        <option key={value} value={value}>
+                                            {value} km
+                                        </option>
+                                    );
+                                })}
+                            </select>
                         </div>
                     </div>
+
+                    {latitude && longitude && (
+                        <LoadScript googleMapsApiKey={"AIzaSyBQ-6XL1bXfYt7_7inMBOFXLg5Zmram81o"}>
+                            <GoogleMap
+                                center={{ lat: latitude, lng: longitude }}
+                                zoom={12}
+                                mapContainerStyle={{ width: "100%", height: "500px" }}
+                            >
+
+                                <Marker position={{ lat: latitude, lng: longitude }} />
+
+
+                                <Circle
+                                    center={{ lat: latitude, lng: longitude }}
+                                    radius={radius * 1000}
+                                    options={{
+                                        fillColor: "rgba(0, 123, 255, 0.2)",
+                                        strokeColor: "#007bff",
+                                        strokeWeight: 2,
+                                    }}
+                                />
+
+
+                            </GoogleMap>
+                        </LoadScript>
+                    )}
                 </div>
             )}
 
-            <div className="row w-100">
+            <div className="row mt-4 w-100">
                 <div className="col d-flex justify-content-between">
                     {step > 1 && (
                         <button
