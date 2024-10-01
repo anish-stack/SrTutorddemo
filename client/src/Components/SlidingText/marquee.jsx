@@ -32,7 +32,7 @@ const Marquee = ({ data }) => {
                 </div>
 
                 <div className="container-fluid">
-                    <div className="row mx-auto gap-4 d-flex justify-content-center position-relative pb-2">
+                    <div className="row  gap-4 d-flex align-item-center justify-content-center position-relative pb-2">
                         {comingData.reverse().slice(0,4).map((item, index) => (
                             <a href={`/Student-Info?id=${item._id}`} className="col-lg-6 col-md-3 marquee__card gap-2">
                                 <h5>{item.studentName}</h5>

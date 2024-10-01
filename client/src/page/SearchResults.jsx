@@ -60,7 +60,8 @@ const SearchResults = () => {
           setCount(response.data.count);
         } catch (error) {
           console.error("Error fetching results:", error);
-          setError("An error occurred while fetching results.");
+          setError("Thank you! We will do our best for you.");
+
         } finally {
           setLoading(false);
         }
@@ -191,7 +192,7 @@ const SearchResults = () => {
     return (
       <div className="d-flex justify-content-center align-items-center vh-100">
         <div className="text-white text-center p-4 rounded border border-light">
-          <h2 className="mb-3">Oops! Something went wrong</h2>
+          <h2 className="mb-3">No Request Found For This Location</h2>
           <p className="lead">{error}</p>
           <button className="btn btn-light mt-3" onClick={() => setError(null)}>
             Close

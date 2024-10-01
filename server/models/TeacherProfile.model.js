@@ -48,36 +48,44 @@ const TeacherProfileSchema = new mongoose.Schema({
         type: String
     },
     PermanentAddress: {
-        HouseNo: {
+        streetAddress:{
             type: String,
-            required: true
+        },
+        City: {
+            type: String,
+           
+        },
+        Area: {
+            type: String,
+            
         },
         LandMark: {
             type: String,
             required: true
         },
-        District: {
-            type: String,
-            required: true
-        },
+    
         Pincode: {
             type: String,
             required: true
         }
     },
     CurrentAddress: {
-        HouseNo: {
+        streetAddress:{
             type: String,
-            required: true
+        },
+        City: {
+            type: String,
+           
+        },
+        Area: {
+            type: String,
+          
         },
         LandMark: {
             type: String,
             required: true
         },
-        District: {
-            type: String,
-            required: true
-        },
+      
         Pincode: {
             type: String,
             required: true

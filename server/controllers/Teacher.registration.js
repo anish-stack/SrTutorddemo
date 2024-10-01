@@ -268,10 +268,10 @@ exports.teacherBlockForOtp = CatchAsync(async (req, res) => {
     const { Email, id, HowManyRequest } = req.body;
     const Teachers = await Teacher.findOne({
       $or: [
-          { _id: id },      // Assuming 'id' is defined
-          { Email: Email }  // Assuming 'email' is defined
+        { _id: id },      // Assuming 'id' is defined
+        { Email: Email }  // Assuming 'email' is defined
       ]
-  });
+    });
     console.log(Teachers)
 
     if (!Teachers) {
@@ -497,18 +497,31 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
     }
     // Validate that PermanentAddress and CurrentAddress contain required sub-fields
     const requiredAddressFields = [
-      "HouseNo",
+      "streetAddress",
+      "City",
       "LandMark",
-      "District",
+      "Area",
       "Pincode",
     ];
+
+    let missingFields = [];
+
     for (const field of requiredAddressFields) {
-      if (!PermanentAddress[field] || !CurrentAddress[field]) {
-        return res
-          .status(400)
-          .json({ message: "Address fields are missing or incomplete" });
+      if (!PermanentAddress[field]) {
+        missingFields.push(`Permanent Address: ${field}`);
+      }
+      if (!CurrentAddress[field]) {
+        missingFields.push(`Current Address: ${field}`);
       }
     }
+
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        message: "The following address fields are missing or incomplete",
+        missingFields: missingFields
+      });
+    }
+
 
 
 
@@ -698,7 +711,7 @@ exports.AddDocument = async (req, res) => {
 
 
     // Predefined valid document types
-    const preDefineTypes = ["Aadhaar", "Pan","Passport"];
+    const preDefineTypes = ["Aadhaar", "Pan", "Passport"];
 
     // Check if the document type is valid
     if (!preDefineTypes.includes(DocumentType)) {
@@ -852,9 +865,9 @@ Teaching Mode: ${Teachers?.TeachingMode}
 
 
 Current Address:
-House No: ${Teachers?.CurrentAddress.HouseNo}
+Street Address: ${Teachers?.CurrentAddress.streetAddress}
 Landmark: ${Teachers?.CurrentAddress.LandMark}
-District: ${Teachers?.CurrentAddress.District}
+Area: ${Teachers?.CurrentAddress.Area}
 Pincode: ${Teachers?.CurrentAddress.Pincode}
 
 We are committed to supporting you every step of the way. If you have any questions or need help, our support team is here for you.
@@ -1416,16 +1429,24 @@ exports.SearchByMinimumCondition = CatchAsync(async (req, res) => {
       });
     } else if (role === 'tutor') {
 
-      const { data } = await axios.get('https://api.srtutorsbureau.com/api/v1/uni/get-all-universal-Request')
-      const CombinedData = data?.data
-      const findTeacherRequest = CombinedData.filter(item => item.className === ClassNameValue && item.subjects.includes(Subject))
+      try {
+        const { data } = await axios.get('https://api.srtutorsbureau.com/api/v1/uni/get-all-universal-Request')
+        const CombinedData = data?.data
+        const findTeacherRequest = CombinedData.filter(item => item.className === ClassNameValue && item.subjects.includes(Subject))
 
 
-      if (findTeacherRequest.length === 0) {
-        return res.status(404).json({ message: 'No teachers found.' });
+        if (findTeacherRequest.length === 0) {
+          return res.status(404).json({ message: 'No teachers found.' });
+        }
+        // console.log("findTeacherRequest", findTeacherRequest)
+        finalResults = findTeacherRequest;
+      } catch (error) {
+        return res.status(403).json({
+          success: false,
+          message: "No Request Found For This LocationOops! Something went wrong"
+        })
       }
-      // console.log("findTeacherRequest", findTeacherRequest)
-      finalResults = findTeacherRequest;
+
     } else {
       return res.status(400).json({ message: 'Invalid role.' });
     }
@@ -1460,7 +1481,7 @@ exports.BrowseTutorsNearMe = CatchAsync(async (req, res) => {
 
     const page = parseInt(Page, 10);
 
-   
+
 
     if (isNaN(page) || page <= 0) {
       return res.status(400).json({ message: 'Invalid Page value.' });
@@ -1485,6 +1506,7 @@ exports.BrowseTutorsNearMe = CatchAsync(async (req, res) => {
 
       .exec(); // Execute the query
     // Apply additional filters
+    console.log(Experience)
     if (Gender) {
       locationResults = locationResults.filter(teacher => teacher.Gender === Gender);
     }
@@ -1511,6 +1533,15 @@ exports.BrowseTutorsNearMe = CatchAsync(async (req, res) => {
         )
       );
       locationResults = subjectFilter
+    }
+
+    if (Experience !== undefined && Experience !== null) {
+      // If Experience is greater than 0, apply the filter
+      if (Experience > 0) {
+        locationResults = locationResults.filter(teacher => teacher.TeachingExperience >= Experience);
+      }
+      // // If Experience is 0, show all teachers (no need to filter)
+      // console.log(locationResults);
     }
 
     // if (maxRange && minRange) {

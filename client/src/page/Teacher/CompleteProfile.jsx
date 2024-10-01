@@ -35,7 +35,7 @@ const CompleteProfile = ({ profileInfo, readable, title }) => {
         }
     });
     const [checkIsCurrentLocationWantChange, setCheckIsCurrentLocationWantChange] = useState(false);
-
+    console.log(profileInfo)
     useEffect(() => {
         if (profileInfo) {
             setFormData({
@@ -200,7 +200,7 @@ const CompleteProfile = ({ profileInfo, readable, title }) => {
                             className="form-control"
                             id="AlternateContact"
                             name="AlternateContact"
-                            value={formData.AlternateContact}
+                            value={formData.AlternateContact || "Not available"}
                             onChange={handleChange}
                             readOnly={readable}
                         />
@@ -250,13 +250,13 @@ const CompleteProfile = ({ profileInfo, readable, title }) => {
                     <h5>Permanent Address</h5>
                     <div className="row">
                         <div className="col-md-6 mb-3">
-                            <label htmlFor="PermanentHouseNo" className="form-label">House No</label>
+                            <label htmlFor="PermanentHouseNo" className="form-label">Street Address</label>
                             <input
                                 type="text"
                                 className="form-control"
                                 id="PermanentHouseNo"
                                 name="PermanentAddress.HouseNo"
-                                value={formData.PermanentAddress.HouseNo}
+                                value={formData.PermanentAddress.streetAddress ||formData.PermanentAddress.HouseNo }
                                 onChange={handleNestedChange}
                                 readOnly={readable}
                             />
@@ -274,13 +274,26 @@ const CompleteProfile = ({ profileInfo, readable, title }) => {
                             />
                         </div>
                         <div className="col-md-6 mb-3">
-                            <label htmlFor="PermanentDistrict" className="form-label">District</label>
+                            <label htmlFor="PermanentLandMark" className="form-label">City</label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                id="PermanentLandMark"
+                                name="PermanentAddress.LandMark"
+                                value={formData.PermanentAddress?.City || "Not Available"}
+                                onChange={handleNestedChange}
+                                readOnly={readable}
+                            />
+                        </div>
+                        <div className="col-md-6 mb-3">
+                            <label htmlFor="PermanentDistrict" className="form-label">Area</label>
                             <input
                                 type="text"
                                 className="form-control"
                                 id="PermanentDistrict"
                                 name="PermanentAddress.District"
-                                value={formData.PermanentAddress.District}
+                                // value={formData.PermanentAddress.District}
+                                value={formData.PermanentAddress.Area ||formData.PermanentAddress.District }
                                 onChange={handleNestedChange}
                                 readOnly={readable}
                             />
