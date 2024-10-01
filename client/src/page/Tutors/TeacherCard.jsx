@@ -17,6 +17,7 @@ const TeacherCard = ({ classes, item, tokenStudent, showBio }) => {
     useEffect(() => {
         if (item) {
             setTeacher(item)
+            console.log(item)
         } else {
             setTeacher(null)
         }
@@ -161,6 +162,21 @@ const TeacherCard = ({ classes, item, tokenStudent, showBio }) => {
                                 </div>
                             </div>
                         </div>
+
+                        <div className="col-sm-12 mb-sm-0 mb-20">
+                            <div className="contact-box justify-content-start gap-2  d-flex align-items-center">
+                                <div
+                                    className="contact-icon d-flex justify-content-center align-items-center"
+                                >
+                                    🏙️
+                                </div>
+                                <div className="contact-desc">
+                                    <p className="mb-0 text-black fw-5"> {item.PermanentAddress.City || "Not Disclosed"}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
                         <div className="col-sm-12">
                             <div className="contact-box justify-content-start gap-2  d-flex align-items-center">
                                 <div
@@ -194,7 +210,7 @@ const TeacherCard = ({ classes, item, tokenStudent, showBio }) => {
             </div>
 
             <TeacherProfileModal isOpen={isOpen} teacherClasses={classes} isClose={handleClose} item={selectedTeacher} />
-            <ContactTeacherModal isClose={handleContactOpen} isOpen={ContactIsOpen} teachersData={item}   />
+            <ContactTeacherModal isClose={handleContactOpen} isOpen={ContactIsOpen} teachersData={item} />
         </>
     )
 }

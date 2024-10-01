@@ -158,9 +158,22 @@ const Browsetutors = () => {
     const paginatedSubjects = Subjects.slice(startIndex, endIndex);
     const FilterSidebarContent = () => (
         <>
-            <button className="btn btn-outline-secondary mb-3 w-100">
+            <button
+                onClick={() => setFilterOptions({
+                    verified: '',
+                    maxRange: '',
+                    minRange: '',
+                    Subject: '',
+                    Class: '',
+                    Gender: '',
+                    Experience: '',
+                    ModeOfTuition: ''
+                })}
+                className="btn btn-outline-secondary mb-3 w-100"
+            >
                 <i className="fa-solid fa-power-off"></i> Reset Filter
             </button>
+
             <form>
                 {/* Gender Filter */}
                 <h5>Filter By Gender</h5>
@@ -194,48 +207,48 @@ const Browsetutors = () => {
                 </div>
 
                 <h5 className="mt-4">Verified Teacher</h5>
-<div className="form-check">
-    <input
-        type="checkbox"
-        className="form-check-input"
-        id="verifiedTrue"
-        name="verified"
-        value="true" // Set as string
-        checked={FilterOptions.verified === 'true'}
-        onChange={handleFilterChange}
-    />
-    <label className="form-check-label" htmlFor="verifiedTrue">
-        Verified Teacher
-    </label>
-</div>
-<div className="form-check">
-    <input
-        type="checkbox"
-        className="form-check-input"
-        id="verifiedFalse"
-        name="verified"
-        value="false" // Set as string
-        checked={FilterOptions.verified === 'false'}
-        onChange={handleFilterChange}
-    />
-    <label className="form-check-label" htmlFor="verifiedFalse">
-        Un-Verified Teacher
-    </label>
-</div>
-<div className="form-check">
-    <input
-        type="checkbox"
-        className="form-check-input"
-        id="Both"
-        name="verified"
-        value="Both" // Value for the 'Both' option
-        checked={FilterOptions.verified === 'Both'}
-        onChange={handleFilterChange}
-    />
-    <label className="form-check-label" htmlFor="Both">
-        Both
-    </label>
-</div>
+                <div className="form-check">
+                    <input
+                        type="checkbox"
+                        className="form-check-input"
+                        id="verifiedTrue"
+                        name="verified"
+                        value="true" // Set as string
+                        checked={FilterOptions.verified === 'true'}
+                        onChange={handleFilterChange}
+                    />
+                    <label className="form-check-label" htmlFor="verifiedTrue">
+                        Verified Teacher
+                    </label>
+                </div>
+                <div className="form-check">
+                    <input
+                        type="checkbox"
+                        className="form-check-input"
+                        id="verifiedFalse"
+                        name="verified"
+                        value="false" // Set as string
+                        checked={FilterOptions.verified === 'false'}
+                        onChange={handleFilterChange}
+                    />
+                    <label className="form-check-label" htmlFor="verifiedFalse">
+                        Un-Verified Teacher
+                    </label>
+                </div>
+                <div className="form-check">
+                    <input
+                        type="checkbox"
+                        className="form-check-input"
+                        id="Both"
+                        name="verified"
+                        value="Both" // Value for the 'Both' option
+                        checked={FilterOptions.verified === 'Both'}
+                        onChange={handleFilterChange}
+                    />
+                    <label className="form-check-label" htmlFor="Both">
+                        Both
+                    </label>
+                </div>
 
                 {/* Subjects Filter */}
                 <h5 className="mt-4">Subjects</h5>
@@ -295,27 +308,16 @@ const Browsetutors = () => {
                     name="Experience"
                     min="0"
                     max="30"
-                    value={FilterOptions.Experience}
+                    value={FilterOptions.Experience || 0} // Default to 0 if undefined
                     onChange={handleFilterChange}
                 />
                 <div className="d-flex justify-content-between">
-                    <span>Min: {FilterOptions.minRange || 0}</span>
-                    <span>Max: {FilterOptions.maxRange || 30}</span>
+                    <span>Min: {FilterOptions.Experience || 0}</span> {/* Use Experience for Min */}
+                    <span>Max: {30}</span> {/* Max is always 30 */}
                 </div>
 
                 {/* Mode of Tuition */}
-                <h5 className="mt-4">Mode of Tuition</h5>
-                <select
-                    className="form-select"
-                    name="ModeOfTuition"
-                    value={FilterOptions.ModeOfTuition}
-                    onChange={handleFilterChange}
-                >
-                    <option value="">Select Mode</option>
-                    <option value="Online">Online</option>
-                    <option value="Offline">Offline</option>
-                    <option value="Home Tuition">Home Tuition</option>
-                </select>
+
             </form>
         </>
     );
@@ -387,8 +389,11 @@ const Browsetutors = () => {
                             })
                         ) : (
                             <div className="col-12">
-                                <Loader />
+                                <div className="alert alert-danger" role="alert">
+                                    No Teacher Found For This Filter
+                                </div>
                             </div>
+
                         )}
                     </div>
                 </div>

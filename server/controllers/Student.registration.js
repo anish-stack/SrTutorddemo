@@ -217,7 +217,7 @@ exports.StudentLogin = CatchAsync(async (req, res) => {
 exports.CheckNumber = CatchAsync(async (req, res) => {
     try {
         const { userNumber, latitude, longitude } = req.body;
-
+        console.log(req.body)
         // Check for missing fields
         const missingFields = [];
         if (!userNumber) missingFields.push('Phone Number');
@@ -269,7 +269,8 @@ exports.CheckNumber = CatchAsync(async (req, res) => {
 
             const Message = `Your OTP for mobile number verification is: ${otp}. Please use this code to complete your verification process. This OTP is valid for 10 minutes. If you did not request this, please ignore this message. Best regards, S R Tutors`;
 
-            await SendWhatsAppMessage(Message, userNumber)
+            const mes  = await SendWhatsAppMessage(Message, userNumber)
+            console.log(mes)
             // Send success response
             res.status(201).json({
                 success: true,

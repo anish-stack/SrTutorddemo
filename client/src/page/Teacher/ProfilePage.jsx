@@ -20,14 +20,16 @@ const ProfilePage = () => {
         ContactNumber: '',
         AlternateContact: '',
         PermanentAddress: {
-            HouseNo: '',
-            District: '',
+            streetAddress: '',
+            Area: '',
+            City:'',
             LandMark: '',
             Pincode: '',
         },
         CurrentAddress: {
-            HouseNo: '',
-            District: '',
+            streetAddress: '',
+            Area: '',
+            City:'',
             LandMark: '',
             Pincode: '',
         },
@@ -87,14 +89,16 @@ const ProfilePage = () => {
         ContactNumber: '',
         AlternateContact: '',
         PermanentAddress: {
-            HouseNo: '',
-            District: '',
+            streetAddress: '',
+            Area: '',
             LandMark: '',
+            City:'',
             Pincode: '',
         },
         CurrentAddress: {
-            HouseNo: '',
-            District: '',
+            streetAddress: '',
+            Area: '',
+            City:'',
             LandMark: '',
             Pincode: '',
         },
@@ -146,31 +150,20 @@ const ProfilePage = () => {
         );
     }, []);
 
-    const handleAddressSame = (e) => {
-        const { checked } = e.target;
-        setIsAddressSame(checked);
-
-        if (checked) {
-
-            setFormData((prevData) => ({
-                ...prevData,
-                CurrentAddress: { ...prevData.PermanentAddress },
-                isAddressSame: true
-            }));
-        } else {
-
-            setFormData((prevData) => ({
-                ...prevData,
-                CurrentAddress: {
-                    HouseNo: '',
-                    District: '',
-                    LandMark: '',
-                    Pincode: ''
-                },
-                isAddressSame: false
-            }));
-        }
+    const handleAddressSame = () => {
+        setFormData(prevState => ({
+            ...prevState,
+            isAddressSame: !prevState.isAddressSame,
+            CurrentAddress: !prevState.isAddressSame ? prevState.PermanentAddress : {
+                streetAddress: '',
+                City: '',
+                Area: '',
+                LandMark: '',
+                Pincode: ''
+            }
+        }));
     };
+    
 
     const fetchNearbyPlaces = async () => {
         if (latitude && longitude) {
@@ -287,14 +280,14 @@ const ProfilePage = () => {
                 ContactNumber: user.PhoneNumber || '',
                 AlternateContact: user.AltNumber || '',
                 PermanentAddress: {
-                    HouseNo: user.PermanentAddress?.HouseNo || '',
-                    District: user.PermanentAddress?.District || '',
+                    streetAddress: user.PermanentAddress?.streetAddress || '',
+                    Area: user.PermanentAddress?.Area || '',
                     LandMark: user.PermanentAddress?.LandMark || '',
                     Pincode: user?.PermanentAddress?.Pincode || '',
                 },
                 CurrentAddress: {
-                    HouseNo: user.CurrentAddress?.HouseNo || '',
-                    District: user.CurrentAddress?.District || '',
+                    streetAddress: user.CurrentAddress?.streetAddress || '',
+                    Area: user.CurrentAddress?.Area || '',
                     LandMark: user.CurrentAddress?.LandMark || '',
                     Pincode: user?.PermanentAddress?.Pincode || '',
                 },
@@ -336,12 +329,12 @@ const ProfilePage = () => {
         const newErrors = {};
 
         if (step === 1) {
-            if (!formData.PermanentAddress.HouseNo) newErrors.PermanentAddressHouseNo = 'House No. is required';
-            if (!formData.PermanentAddress.District) newErrors.PermanentAddressDistrict = 'District is required';
+            if (!formData.PermanentAddress.streetAddress) newErrors.PermanentAddressstreetAddress = 'Street Address. is required';
+            if (!formData.PermanentAddress.Area) newErrors.PermanentAddressArea = 'Area is required';
             if (!formData.PermanentAddress.LandMark) newErrors.PermanentAddressLandMark = 'Landmark is required';
             if (!formData.PermanentAddress.Pincode) newErrors.PermanentAddressPincode = 'Pincode is required';
-            if (!formData.CurrentAddress.HouseNo) newErrors.CurrentAddressHouseNo = 'House No. is required';
-            if (!formData.CurrentAddress.District) newErrors.CurrentAddressDistrict = 'District is required';
+            if (!formData.CurrentAddress.streetAddress) newErrors.CurrentAddressstreetAddress = 'Street Address. is required';
+            if (!formData.CurrentAddress.Area) newErrors.CurrentAddressArea = 'Area is required';
             if (!formData.CurrentAddress.LandMark) newErrors.CurrentAddressLandMark = 'Landmark is required';
             if (!formData.CurrentAddress.Pincode) newErrors.CurrentAddressPincode = 'Pincode is required';
             if (!formData.Qualification) newErrors.Qualification = 'Qualification is required';
@@ -483,36 +476,48 @@ const ProfilePage = () => {
                     {/* Permanent Address */}
                     <h6 className=" fw-bold">Permanent Address (*) </h6>
                     <div className="row">
-                        {/* House No. Input Field */}
-                        <div className="col-md-6 mb-3">
-                            <label className="form-label" htmlFor="HouseNo">House No.</label>
+                        {/* Street Address. Input Field */}
+                        <div className="col-md-4 mb-3">
+                            <label className="form-label" htmlFor="streetAddress">Street Address.</label>
                             <input
                                 type="text"
-                                className={`form-control ${errors.PermanentAddressHouseNo ? 'is-invalid' : ''}`}
-                                name="HouseNo"
-                                id="HouseNo"
-                                placeholder="Enter House No"
-                                value={formData.PermanentAddress.HouseNo}
+                                className={`form-control ${errors.PermanentAddressstreetAddress ? 'is-invalid' : ''}`}
+                                name="streetAddress"
+                                id="streetAddress"
+                                placeholder="Enter Street Address"
+                                value={formData.PermanentAddress.streetAddress}
                                 onChange={(e) => handleNestedChange(e, 'PermanentAddress')}
                             />
-                            {errors.PermanentAddressHouseNo && <div className="invalid-feedback">{errors.PermanentAddressHouseNo}</div>}
+                            {errors.PermanentAddressstreetAddress && <div className="invalid-feedback">{errors.PermanentAddressstreetAddress}</div>}
                         </div>
 
-                        {/* District Input Field */}
-                        <div className="col-md-6 mb-3">
-                            <label className="form-label" htmlFor="District">District</label>
+                        {/* Area Input Field */}
+                        <div className="col-md-4 mb-3">
+                            <label className="form-label" htmlFor="Area">Area</label>
                             <input
                                 type="text"
-                                className={`form-control ${errors.PermanentAddressDistrict ? 'is-invalid' : ''}`}
-                                name="District"
-                                id="District"
-                                placeholder="Enter District"
-                                value={formData.PermanentAddress.District}
+                                className={`form-control ${errors.PermanentAddressArea ? 'is-invalid' : ''}`}
+                                name="Area"
+                                id="Area"
+                                placeholder="Enter Area"
+                                value={formData.PermanentAddress.Area}
                                 onChange={(e) => handleNestedChange(e, 'PermanentAddress')}
                             />
-                            {errors.PermanentAddressDistrict && <div className="invalid-feedback">{errors.PermanentAddressDistrict}</div>}
+                            {errors.PermanentAddressArea && <div className="invalid-feedback">{errors.PermanentAddressArea}</div>}
                         </div>
-
+                        <div className="col-md-4 mb-3">
+                            <label className="form-label" htmlFor="City">City</label>
+                            <input
+                                type="text"
+                                className={`form-control }`}
+                                name="City"
+                                id="City"
+                                placeholder="Enter City"
+                                value={formData.PermanentAddress.City}
+                                onChange={(e) => handleNestedChange(e, 'PermanentAddress')}
+                            />
+                            {/* {errors.PermanentAddressArea && <div className="invalid-feedback">{errors.PermanentAddressArea}</div>} */}
+                        </div>
                         {/* Landmark Input Field */}
                         <div className="col-md-6 mb-3">
                             <label className="form-label" htmlFor="LandMark">LandMark</label>
@@ -559,15 +564,21 @@ const ProfilePage = () => {
 
                     <div className="row">
                         <div className="col-md-6 mb-3">
-                            <label className="form-label" htmlFor="HouseNo">House No.</label>
-                            <input type="text" className={`form-control ${errors.CurrentAddressHouseNo ? 'is-invalid' : ''}`} name="HouseNo" id="HouseNo" placeholder="Enter House No" value={formData.CurrentAddress.HouseNo} onChange={(e) => handleNestedChange(e, 'CurrentAddress')} />
-                            {errors.CurrentAddressHouseNo && <div className="invalid-feedback">{errors.CurrentAddressHouseNo}</div>}
+                            <label className="form-label" htmlFor="streetAddress">Street Address.</label>
+                            <input type="text" className={`form-control ${errors.CurrentAddressstreetAddress ? 'is-invalid' : ''}`} name="streetAddress" id="streetAddress" placeholder="Enter Street Address" value={formData.CurrentAddress.streetAddress} onChange={(e) => handleNestedChange(e, 'CurrentAddress')} />
+                            {errors.CurrentAddressstreetAddress && <div className="invalid-feedback">{errors.CurrentAddressstreetAddress}</div>}
 
                         </div>
                         <div className="col-md-6 mb-3">
-                            <label className="form-label" htmlFor="District">District</label>
-                            <input type="text" className={`form-control ${errors.CurrentAddressDistrict ? 'is-invalid' : ''}`} name="District" id="District" placeholder="Enter District" value={formData.CurrentAddress.District} onChange={(e) => handleNestedChange(e, 'CurrentAddress')} />
-                            {errors.CurrentAddressDistrict && <div className="invalid-feedback">{errors.CurrentAddressDistrict}</div>}
+                            <label className="form-label" htmlFor="Area">Area</label>
+                            <input type="text" className={`form-control ${errors.CurrentAddressArea ? 'is-invalid' : ''}`} name="Area" id="Area" placeholder="Enter Area" value={formData.CurrentAddress.Area} onChange={(e) => handleNestedChange(e, 'CurrentAddress')} />
+                            {errors.CurrentAddressArea && <div className="invalid-feedback">{errors.CurrentAddressArea}</div>}
+
+                        </div>
+                        <div className="col-md-6 mb-3">
+                            <label className="form-label" htmlFor="City">City</label>
+                            <input type="text" className={`form-control`} name="City" id="City" placeholder="Enter City" value={formData.CurrentAddress.City} onChange={(e) => handleNestedChange(e, 'CurrentAddress')} />
+                            {/* {errors.CurrentAddressArea && <div className="invalid-feedback">{errors.CurrentAddressArea}</div>} */}
 
                         </div>
                         <div className="col-md-6 mb-3">
@@ -605,9 +616,9 @@ const ProfilePage = () => {
                         <div className="col-md-6 mb-3">
                             <label className="form-label" htmlFor="VehicleOwned">Do You have Vehicle ?</label>
                             <select className={`form-select p-half ${errors.VehicleOwned ? 'is-invalid' : ''}`} name={`VehicleOwned`} value={formData.VehicleOwned} onChange={handleChange}>
-                                <option value="">Select True Or False</option>
-                                <option value="true">True</option>
-                                <option value="false">False</option>
+                                <option value="">Select Yes Or No</option>
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
 
 
                             </select>
