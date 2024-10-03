@@ -80,7 +80,7 @@ const Google = () => {
 
       {/* Google Map with Circle and Markers */}
       {latitude && longitude && (
-        <LoadScript googleMapsApiKey={"AIzaSyBQ-6XL1bXfYt7_7inMBOFXLg5Zmram81o"}>
+        <LoadScript googleMapsApiKey={"AIzaSyCBATa-tKn2Ebm1VbQ5BU8VOqda2nzkoTU"}>
           <GoogleMap
             center={{ lat: latitude, lng: longitude }}
             zoom={12}

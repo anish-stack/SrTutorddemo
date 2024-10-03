@@ -81,7 +81,7 @@ const TeacherProfileOtp = () => {
         <div className="container d-flex justify-content-center align-items-center vh-100">
             <div className="card shadow p-4" style={{ maxWidth: '400px', width: '100%' }}>
                 <h3 className="text-center mb-3">Verify Your Profile</h3>
-                <p className="text-muted text-center">Enter the OTP sent to your registered email</p>
+                <p className="text-muted text-center">Enter the OTP sent to your Whataspp Number </p>
                 {error && <div className="alert alert-danger">{error}</div>}
                 <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
                     <div className="form-group mb-3">
