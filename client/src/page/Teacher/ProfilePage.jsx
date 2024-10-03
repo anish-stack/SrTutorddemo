@@ -390,7 +390,7 @@ const ProfilePage = () => {
             });
 
             console.log(response.data);
-            toast.success("🎉 Profile submitted successfully! Please verify it with the OTP sent to your registered email. 📧");
+            toast.success("🎉 Profile submitted successfully! Please verify it with the OTP sent to your Whatsapp Number. 📧");
             setLoading(false);
 
             setTimeout(() => {
@@ -717,7 +717,7 @@ const ProfilePage = () => {
                     </div>
 
                     {latitude && longitude && (
-                        <LoadScript googleMapsApiKey={"AIzaSyBQ-6XL1bXfYt7_7inMBOFXLg5Zmram81o"}>
+                        <LoadScript googleMapsApiKey={"AIzaSyCBATa-tKn2Ebm1VbQ5BU8VOqda2nzkoTU"}>
                             <GoogleMap
                                 center={{ lat: latitude, lng: longitude }}
                                 zoom={12}

@@ -114,7 +114,7 @@ app.get('/autocomplete', async (req, res) => {
                 params: {
                     input,
                     radius: 500,
-                    key: "AIzaSyBQ-6XL1bXfYt7_7inMBOFXLg5Zmram81o"
+                    key: process.env.GOOGLE_MAP_KEY
                 }
             }
         );
@@ -128,12 +128,12 @@ app.get('/autocomplete', async (req, res) => {
 app.get('/nearby-places', async (req, res) => {
     const { lat, lng, radius, pagetoken } = req.query;
     console.log(req.query);
-    const apiKey = 'AIzaSyBQ-6XL1bXfYt7_7inMBOFXLg5Zmram81o'; 
+    const apiKey = process.env.GOOGLE_MAP_KEY;
     if (!lat || !lng || !radius) {
         return res.status(400).json({ error: 'Missing required query parameters.' });
     }
-    
-    const metersRadius = radius;  
+
+    const metersRadius = radius;
     console.log(metersRadius);
 
     // Include pagetoken if provided
@@ -141,20 +141,20 @@ app.get('/nearby-places', async (req, res) => {
 
     try {
         const response = await axios.get(apiUrl);
-        
+
         // Extract places    
         const places = response.data.results.map(place => ({
 
             name: place.name,
             lat: place.geometry.location.lat,
             lng: place.geometry.location.lng,
-            address: place.vicinity 
+            address: place.vicinity
         }));
 
         return res.status(201).json({
-            success:true,
-          
-            FilterData:places
+            success: true,
+
+            FilterData: places
         })
     } catch (error) {
         console.error('Error fetching places from Google API:', error.response ? error.response.data : error.message);
@@ -175,7 +175,7 @@ app.get('/geocode', async (req, res) => {
         const response = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
             params: {
                 address: address,
-                key: "AIzaSyBQ-6XL1bXfYt7_7inMBOFXLg5Zmram81o"
+                key: process.env.GOOGLE_MAP_KEY
             },
         });
 
