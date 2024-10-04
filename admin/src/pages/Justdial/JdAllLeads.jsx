@@ -6,7 +6,7 @@ const JdAllLeads = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [leadsPerPage] = useState(5);
+  const [leadsPerPage] = useState(8);
   const [filter, setFilter] = useState('');
 
   // Fetch leads from API
@@ -68,60 +68,61 @@ const JdAllLeads = () => {
 
       {/* Table */}
       <table className="min-w-full border border-gray-300">
-        <thead>
-          <tr className="bg-gray-200">
-            {/* <th className="border border-gray-300 p-2">Lead ID</th> */}
-            <th className="border border-gray-300 p-2">Lead Type</th>
-            <th className="border border-gray-300 p-2">Prefix</th>
-            <th className="border border-gray-300 p-2">Name</th>
-            <th className="border border-gray-300 p-2">Mobile</th>
-            <th className="border border-gray-300 p-2">Phone</th>
-            <th className="border border-gray-300 p-2">Email</th>
-            <th className="border border-gray-300 p-2">Date</th>
-            <th className="border border-gray-300 p-2">Category</th>
-            <th className="border border-gray-300 p-2">City</th>
-            <th className="border border-gray-300 p-2">Area</th>
-            <th className="border border-gray-300 p-2">Branch Area</th>
-            {/* <th className="border border-gray-300 p-2">DNC Mobile</th> */}
-            {/* <th className="border border-gray-300 p-2">DNC Phone</th> */}
-            <th className="border border-gray-300 p-2">Company</th>
-            <th className="border border-gray-300 p-2">Pincode</th>
-            <th className="border border-gray-300 p-2">Time</th>
-            <th className="border border-gray-300 p-2">Branch Pin</th>
-            {/* <th className="border border-gray-300 p-2">Parent ID</th> */}
-          </tr>
-        </thead>
-        <tbody>
-          {currentLeads.length === 0 ? (
-            <tr>
-              <td colSpan="19" className="text-center p-2">No leads found.</td>
-            </tr>
-          ) : (
-            currentLeads.map((lead) => (
-              <tr key={lead._id}>
-                {/* <td className="border border-gray-300 p-2">{lead.leadid || "Not-available"}</td> */}
-                <td className="border border-gray-300 p-2">{lead.leadtype || "Not-available"}</td>
-                <td className="border border-gray-300 p-2">{lead.prefix || "Not-available"}</td>
-                <td className="border border-gray-300 p-2">{lead.name || "Not-available"}</td>
-                <td className="border border-gray-300 p-2">{lead.mobile || "Not-available"}</td>
-                <td className="border border-gray-300 p-2">{lead.phone || "Not-available"}</td>
-                <td className="border border-gray-300 p-2">{lead.email || "Not-available"}</td>
-                <td className="border border-gray-300 p-2">{new Date(lead.date).toLocaleDateString() || "Not-available"}</td>
-                <td className="border border-gray-300 p-2">{lead.category || "Not-available"}</td>
-                <td className="border border-gray-300 p-2">{lead.city || "Not-available"}</td>
-                <td className="border border-gray-300 p-2">{lead.area || "Not-available"}</td>
-                <td className="border border-gray-300 p-2">{lead.brancharea || "Not-available"}</td>
-                {/* <td className="border border-gray-300 p-2">{lead.dncmobile || "Not-available"}</td> */}
-                {/* <td className="border border-gray-300 p-2">{lead.dncphone || "Not-available"}</td> */}
-                <td className="border border-gray-300 p-2">{lead.company || "Not-available"}</td>
-                <td className="border border-gray-300 p-2">{lead.pincode || "Not-available"}</td>
-                <td className="border border-gray-300 p-2">{lead.time || "Not-available"}</td>
-                <td className="border border-gray-300 p-2">{lead.branchpin || "Not-available"}</td>
-                {/* <td className="border border-gray-300 p-2">{lead.parentid || "Not-available"}</td> */}
-              </tr>
-            ))
-          )}
-        </tbody>
+      <thead>
+  <tr className="bg-gray-200 text-sm">
+    {/* <th className="border border-gray-300 p-2">Lead ID</th> */}
+    <th className="border border-gray-300 p-1 text-left">Lead Type</th>
+    <th className="border border-gray-300 p-1 text-left">Prefix</th>
+    <th className="border border-gray-300 p-1 text-left">Name</th>
+    <th className="border border-gray-300 p-1 text-left">Mobile</th>
+    <th className="border border-gray-300 p-1 text-left">Phone</th>
+    <th className="border border-gray-300 p-1 text-left">Email</th>
+    <th className="border border-gray-300 p-1 text-left">Date</th>
+    <th className="border border-gray-300 p-1 text-left">Category</th>
+    <th className="border border-gray-300 p-1 text-left">City</th>
+    <th className="border border-gray-300 p-1 text-left">Area</th>
+    <th className="border border-gray-300 p-1 text-left">Branch Area</th>
+    {/* <th className="border border-gray-300 p-1 text-left">DNC Mobile</th> */}
+    {/* <th className="border border-gray-300 p-1 text-left">DNC Phone</th> */}
+    <th className="border border-gray-300 p-1 text-left">Company</th>
+    <th className="border border-gray-300 p-1 text-left">Pincode</th>
+    <th className="border border-gray-300 p-1 text-left">Time</th>
+    <th className="border border-gray-300 p-1 text-left">Branch Pin</th>
+    {/* <th className="border border-gray-300 p-1 text-left">Parent ID</th> */}
+  </tr>
+</thead>
+<tbody>
+  {currentLeads.length === 0 ? (
+    <tr>
+      <td colSpan="19" className="text-center p-2 text-sm text-gray-500">No leads found.</td>
+    </tr>
+  ) : (
+    currentLeads.map((lead) => (
+      <tr key={lead._id} className="hover:bg-gray-100">
+        {/* <td className="border border-gray-300 p-1">{lead.leadid || "Not-available"}</td> */}
+        <td className="border border-gray-300 p-1 text-sm">{lead.leadtype || "Not-available"}</td>
+        <td className="border border-gray-300 p-1 text-sm">{lead.prefix || "Not-available"}</td>
+        <td className="border border-gray-300 p-1 text-sm">{lead.name || "Not-available"}</td>
+        <td className="border border-gray-300 p-1 text-sm">{lead.mobile || "Not-available"}</td>
+        <td className="border border-gray-300 p-1 text-sm">{lead.phone || "Not-available"}</td>
+        <td className="border border-gray-300 p-1 text-sm">{lead.email || "Not-available"}</td>
+        <td className="border border-gray-300 p-1 text-sm">{new Date(lead.date).toLocaleDateString() || "Not-available"}</td>
+        <td className="border border-gray-300 p-1 text-sm">{lead.category || "Not-available"}</td>
+        <td className="border border-gray-300 p-1 text-sm">{lead.city || "Not-available"}</td>
+        <td className="border border-gray-300 p-1 text-sm">{lead.area || "Not-available"}</td>
+        <td className="border border-gray-300 p-1 text-sm">{lead.brancharea || "Not-available"}</td>
+        {/* <td className="border border-gray-300 p-1">{lead.dncmobile || "Not-available"}</td> */}
+        {/* <td className="border border-gray-300 p-1">{lead.dncphone || "Not-available"}</td> */}
+        <td className="border border-gray-300 p-1 text-sm">{lead.company || "Not-available"}</td>
+        <td className="border border-gray-300 p-1 text-sm">{lead.pincode || "Not-available"}</td>
+        <td className="border border-gray-300 p-1 text-sm">{lead.time || "Not-available"}</td>
+        <td className="border border-gray-300 p-1 text-sm">{lead.branchpin || "Not-available"}</td>
+        {/* <td className="border border-gray-300 p-1">{lead.parentid || "Not-available"}</td> */}
+      </tr>
+    ))
+  )}
+</tbody>
+
       </table>
 
       {/* Pagination Controls */}

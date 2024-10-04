@@ -109,7 +109,7 @@ const TeacherRegistration = () => {
             setResendButtonClick(resendButtonClick + 1);
             setResendError('');
         } catch (error) {
-            setResendError('You have been temporarily blocked from requesting OTP. Please try again later.')
+            setResendError(error.response.data.message)
             toast.error(error.response.data.message);
         }
     };
