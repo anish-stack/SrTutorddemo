@@ -120,7 +120,7 @@ const AddNewsClass = () => {
                                         onChange={(e) => handleChange(e, index, 'innerClass')}
                                         className="p-2 border border-gray-300 rounded-lg flex-1"
                                         placeholder="Inner Class"
-                                        required
+                          
                                     />
                                     <button
                                         type="button"

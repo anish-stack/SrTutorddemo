@@ -105,6 +105,7 @@ app.use("/api/v1/student", StudentRouter);
 app.use("/api/v1/teacher", TeacherRouter);
 app.use("/api/v1/admin", AdminRouter);
 app.use("/api/v1/uni", universal);
+
 app.get('/autocomplete', async (req, res) => {
     try {
         const { input } = req.query;
@@ -165,20 +166,21 @@ app.get('/nearby-places', async (req, res) => {
 
 app.get('/geocode', async (req, res) => {
     const { address } = req.query; // Get address from query parameters
-
+    console.log(address)
     if (!address) {
         return res.status(400).send({ error: 'Address is required' });
     }
 
     try {
+        // console.log(process.env.GOOGLE_MAP_KEY)
         // Make a request to Google Geocoding API
         const response = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
             params: {
                 address: address,
-                key: process.env.GOOGLE_MAP_KEY
+                key:"AIzaSyCiQk-jVBIRKkYgO5b2sKcoy1HTFm1FZ28"
             },
         });
-
+        console.log(response.data)
         if (response.data.status === 'OK') {
             const location = response.data.results[0].geometry.location;
             const lat = location.lat;

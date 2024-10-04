@@ -459,7 +459,8 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
 
       }
     }
-
+    const latEmergency = 28.6909129;
+    const lngEmergency = 77.1518306;
     const student = Cookies.get("studentToken");
     const submittedData = {
       requestType: "Particular Teacher Request",
@@ -478,7 +479,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
       specificRequirement: formData?.SpecificRequirement,
       location: {
         type: 'Point',
-        coordinates: [ClickLongitude, ClickLatitude]
+        coordinates: [ClickLongitude || lngEmergency, ClickLatitude ||latEmergency]
       },
       teacherId: formData?.teacherId,
       studentInfo: {

@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ClassSearch } from "../Slices/Class.slice";
@@ -175,7 +176,7 @@ const Slider = () => {
     const lngEmergency = 77.1518306;
 
     // Construct the URL with parameters
-    window.location.href = `/Search-result?role=${selectedRole}&SearchPlaceLat=${ClickLatitude || locationData.lat}&SearchPlaceLng=${ClickLongitude || locationData.lng}&via-home-page&Location=${locationParam}&ClassId=${classParam}&ClassNameValue=${classNameParam}&Subject=${subjectParam}&lat=${locationData.lat || latEmergency}&lng=${locationData.lng || lngEmergency}`;
+    window.location.href = `/Search-result?role=${selectedRole}&SearchPlaceLat=${ClickLatitude || locationData.lat || latEmergency}&SearchPlaceLng=${ClickLongitude || locationData.lng || lngEmergency}&via-home-page&Location=${locationParam}&ClassId=${classParam}&ClassNameValue=${classNameParam}&Subject=${subjectParam}&lat=${locationData.lat || latEmergency}&lng=${locationData.lng || lngEmergency}`;
   };
 
 

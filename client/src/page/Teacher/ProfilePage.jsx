@@ -22,14 +22,14 @@ const ProfilePage = () => {
         PermanentAddress: {
             streetAddress: '',
             Area: '',
-            City:'',
+            City: '',
             LandMark: '',
             Pincode: '',
         },
         CurrentAddress: {
             streetAddress: '',
             Area: '',
-            City:'',
+            City: '',
             LandMark: '',
             Pincode: '',
         },
@@ -51,10 +51,11 @@ const ProfilePage = () => {
     const [allPoints, setAllPoints] = useState([]);
     const [errorMessage, setErrorMessage] = useState(null);
 
-    const { coords } = useGeolocated({
+    const { coords, isGeolocationAvailable, isGeolocationEnabled } = useGeolocated({
         positionOptions: {
             enableHighAccuracy: true,
         },
+        watchPosition: false,
         userDecisionTimeout: 5000,
     });
 
@@ -81,7 +82,8 @@ const ProfilePage = () => {
     const [radius, setRadius] = useState(5); // Radius in kilometers
     const [places, setPlaces] = useState([]);
     const [selectedPlace, setSelectedPlace] = useState(null);
-
+    const [permissionDenied, setPermissionDenied] = useState(false);
+    const [initialConfirm, setInitialConfirm] = useState(false);
     const [user, setUser] = useState({
         TeacherName: '',
         DOB: '',
@@ -92,13 +94,13 @@ const ProfilePage = () => {
             streetAddress: '',
             Area: '',
             LandMark: '',
-            City:'',
+            City: '',
             Pincode: '',
         },
         CurrentAddress: {
             streetAddress: '',
             Area: '',
-            City:'',
+            City: '',
             LandMark: '',
             Pincode: '',
         },
@@ -136,20 +138,27 @@ const ProfilePage = () => {
             setConcatenatedData(combinedData);
         }
     }, [data]);
-
-    useEffect(() => {
-        // Get user's current location
+    const requestLocation = () => {
         navigator.geolocation.getCurrentPosition(
             (position) => {
                 setLatitude(position.coords.latitude);
                 setLongitude(position.coords.longitude);
             },
             (error) => {
+                if (error.code === error.PERMISSION_DENIED) {
+                    setPermissionDenied(true);
+                }
                 console.error("Error getting location:", error);
             }
         );
+    };
+    useEffect(() => {
+        const confirmAccess = window.confirm("We would like to access your location to provide a better experience. Do you allow?");
+        if (confirmAccess) {
+            setInitialConfirm(true); // Mark that user clicked OK
+            requestLocation();
+        }
     }, []);
-
     const handleAddressSame = () => {
         setFormData(prevState => ({
             ...prevState,
@@ -163,7 +172,7 @@ const ProfilePage = () => {
             }
         }));
     };
-    
+
 
     const fetchNearbyPlaces = async () => {
         if (latitude && longitude) {
@@ -360,6 +369,28 @@ const ProfilePage = () => {
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
+    if (permissionDenied) {
+        return (
+            <div className="d-flex justify-content-center align-items-center vh-100">
+                <div className="alert alert-danger text-center p-4" role="alert" style={{ maxWidth: '500px' }}>
+                    <h4 className="alert-heading">Location Access Denied</h4>
+                    <p>
+                        It looks like you have denied location access. Please enable it in your browser settings to continue.
+                    </p>
+                    <hr />
+                    <p className="mb-3">
+                        For the best experience, please allow location access or adjust your browser permissions.
+                    </p>
+                    {/* Button that opens a help page or provides guidance */}
+                    <a href="https://support.google.com/chrome/answer/142065?hl=en" target="_blank" rel="noopener noreferrer">
+                        <button className="btn btn-primary">Go to Location Settings</button>
+                    </a>
+                </div>
+            </div>
+        );
+    }
+
+
 
     const handleSubmit = async (e, retry = false) => {
         e.preventDefault();
@@ -724,7 +755,7 @@ const ProfilePage = () => {
                                 mapContainerStyle={{ width: "100%", height: "500px" }}
                             >
 
-                                <Marker position={{ lat: latitude, lng: longitude }} />
+                                {/* <Marker position={{ lat: latitude, lng: longitude }} /> */}
 
 
                                 <Circle

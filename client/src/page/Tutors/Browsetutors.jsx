@@ -49,10 +49,11 @@ const Browsetutors = () => {
             setSubjects([]);
         }
     };
-
+    const latEmergency = 28.6909129;
+    const lngEmergency = 77.1518306;
     const fetchTutors = async () => {
         try {
-            const response = await axios.get(`https://api.srtutorsbureau.com/api/v1/student/BrowseTutorsNearMe?lat=${searchQueryForlat}&lng=${searchQueryForlng}`, {
+            const response = await axios.get(`https://api.srtutorsbureau.com/api/v1/student/BrowseTutorsNearMe?lat=${searchQueryForlat || latEmergency}&lng=${searchQueryForlng || lngEmergency}`, {
                 params: { ...FilterOptions }
             });
 
