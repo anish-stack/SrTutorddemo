@@ -207,17 +207,18 @@ const Slider = () => {
               </h3>
               <div className="col-12 my-3">
                 <div className="row">
-                  <div class="form-check col-md-6 px-5 col-lg-6">
-                    <input onChange={() => handleRoleChange('tutor')} class="form-check-input" type="radio" value={'tutor'} name="flexRadioDefault" id="flexRadioDefault2" checked={selectedRole === 'tutor'} />
-                    <label class="form-check-label text-white" for="flexRadioDefault2">
-                      Student
-                    </label>
-                  </div>
+                 
 
                   <div class="form-check col-md-6 px-5 col-lg-6">
                     <input onChange={() => handleRoleChange('student')} class="form-check-input" type="radio" name="flexRadioDefault" value={'student'} id="flexRadioDefault1" checked={selectedRole === 'student'} />
                     <label class="form-check-label text-white" for="flexRadioDefault1">
                       Tutor
+                    </label>
+                  </div>
+                  <div class="form-check col-md-6 px-5 col-lg-6">
+                    <input onChange={() => handleRoleChange('tutor')} class="form-check-input" type="radio" value={'tutor'} name="flexRadioDefault" id="flexRadioDefault2" checked={selectedRole === 'tutor'} />
+                    <label class="form-check-label text-white" for="flexRadioDefault2">
+                      Student
                     </label>
                   </div>
                 </div>

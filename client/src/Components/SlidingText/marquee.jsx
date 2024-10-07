@@ -32,22 +32,25 @@ const Marquee = ({ data }) => {
                 </div>
 
                 <div className="container-fluid">
-                    <div className="row  gap-4 d-flex align-item-center justify-content-center position-relative pb-2">
-                        {comingData.reverse().slice(0,4).map((item, index) => (
-                            <a href={`/Student-Info?id=${item._id}`} className="col-lg-6 col-md-3 marquee__card gap-2">
-                                <h5>{item.studentName}</h5>
-                                <p><strong>Class:</strong> {item.className}</p>
+    <div className="row gap-4 d-flex align-items-center justify-content-center position-relative pb-2">
+        {comingData.reverse().slice(0, 4).map((item, index) => (
+            <a 
+                key={item._id} // Use the unique ID as key
+                href={`/Student-Info?id=${item._id}`} 
+                className={`col-lg-6 col-md-3 marquee__card gap-2 ${item.className || ''}`} // Add item.className conditionally
+            >
+                <h5>{item.studentName}</h5>
+                <p><strong>Class:</strong> {item.className || "Not Disclosed"}</p>
+                <p><strong>Subjects:</strong> {item.subjects.join(', ')}</p>
+                <p><strong>Sessions:</strong> {item.numberOfSessions}</p>
+                <p><strong>Location:</strong> {item.locality.substring(0, 5) + 'xxxxx'}</p>
+                <p><strong>Date:</strong> {formatDate(item.createdAt)}</p>
+                <button className='btn-contact'>Contact Now</button>
+            </a>
+        ))}
+    </div>
+</div>
 
-                                <p><strong>Subjects:</strong> {item.subjects.join(', ')}</p>
-                                <p><strong>Sessions:</strong> {item.numberOfSessions}</p>
-                                <p><strong>Location:</strong> {item.locality.substring(0,5) +'xxxxx'}</p>
-                                <p><strong>Date:</strong> {formatDate(item.createdAt)}</p>
-                                <button className='btn-contact'>Contact Now</button>
-                            </a>
-
-                        ))}
-                    </div>
-                </div>
                 <br />
               
             </div>
