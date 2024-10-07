@@ -17,13 +17,13 @@ const ForgetPassword = () => {
         confirmPassword: ''
     });
 
-    const [step, setStep] = useState(1); // Step 1: Enter Email, Step 2: Enter OTP & Reset Password
-    const [isEmailVerified, setIsEmailVerified] = useState(false); // Email verification state
-    const [isOtpResendDisabled, setOtpResendDisabled] = useState(false); // Resend OTP button state
-    const [loading, setLoading] = useState(false); // Loading state for buttons
-    const [showPassword, setShowPassword] = useState(false); // Toggle password visibility
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false); // Toggle confirm password visibility
-    const [timer, setTimer] = useState(120); // Timer for OTP resend in seconds
+    const [step, setStep] = useState(1); 
+    const [isEmailVerified, setIsEmailVerified] = useState(false); 
+    const [isOtpResendDisabled, setOtpResendDisabled] = useState(false); 
+    const [loading, setLoading] = useState(false); 
+    const [showPassword, setShowPassword] = useState(false); 
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false); 
+    const [timer, setTimer] = useState(120); 
 
     useEffect(() => {
         let interval;

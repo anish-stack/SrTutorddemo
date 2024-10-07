@@ -10,10 +10,16 @@ const TeacherProfileOtp = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [otploading, setOtpLoading] = useState(false);
-
+    const [otpCount, setotpCount] = useState(0);
     const [timer, setTimer] = useState(0);
 
-    // Timer countdown for OTP resend
+    useEffect(() => {
+        const savedOtpCount = localStorage.getItem('otpCount');
+        if (savedOtpCount) {
+            setotpCount(Number(savedOtpCount));
+        }
+    }, []);
+
     useEffect(() => {
         const interval = setInterval(() => {
             if (timer > 0) {
@@ -29,7 +35,7 @@ const TeacherProfileOtp = () => {
         try {
             const res = await axios.post(
                 'https://api.srtutorsbureau.com/api/v1/teacher/Verify-profile-otp',
-                { otp }, // OTP should be sent as an object
+                { otp },
                 {
                     headers: {
                         Authorization: `Bearer ${tokenQuery}`,
@@ -39,7 +45,7 @@ const TeacherProfileOtp = () => {
             console.log(res.data);
             toast.success("🎉 Profile verified successfully!");
             setTimeout(() => {
-                window.location.href="/Teacher-dashboard?login=true"
+                window.location.href = "/Teacher-dashboard?login=true";
             }, 1200);
         } catch (error) {
             setError('Invalid OTP or verification failed.');
@@ -50,13 +56,20 @@ const TeacherProfileOtp = () => {
     };
 
     const handleResend = async () => {
-        if (timer > 0) return; // Prevent resending if the timer is still active
+        if (timer > 0) return;
         setOtpLoading(true);
         setError('');
+        
+        if (otpCount >= 3) {
+            toast.error("You have reached the maximum number of OTP requests.");
+            setOtpLoading(false);
+          
+        }
+
         try {
             const res = await axios.post(
                 'https://api.srtutorsbureau.com/api/v1/teacher/profile-otp',
-                {},
+                { HowManyRequest: otpCount },
                 {
                     headers: {
                         Authorization: `Bearer ${tokenQuery}`,
@@ -65,18 +78,20 @@ const TeacherProfileOtp = () => {
             );
             console.log(res.data);
             toast.success("🔄 OTP resent successfully!");
-            setOtpLoading(false)
+            setOtpLoading(false);
+            const newOtpCount = otpCount + 1; // Increment the count
+            setotpCount(newOtpCount);
+            localStorage.setItem('otpCount', newOtpCount); // Save new count to localStorage
             setTimer(120); // Reset timer
         } catch (error) {
-            console.log(error)
-            setOtpLoading(false)
-            setError(error.response.data.message);
-            toast.error(error.response.data.message);
+            console.log(error);
+            setOtpLoading(false);
+            setError(error.response?.data?.message || "An error occurred.");
+            toast.error(error.response?.data?.message || "An error occurred.");
         } finally {
             setOtpLoading(false);
         }
     };
-
     return (
         <div className="container d-flex justify-content-center align-items-center vh-100">
             <div className="card shadow p-4" style={{ maxWidth: '400px', width: '100%' }}>
