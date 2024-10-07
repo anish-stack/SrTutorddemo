@@ -59,7 +59,7 @@ const StudentRegistration = () => {
 
         setLoading(true);
         try {
-            const response = await axios.post('http://localhost:7000/api/v1/student/Create-Student', formData);
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/Create-Student', formData);
             toast.success(response.data.message);
             setLoading(false);
             setModelOpen(true);
@@ -72,7 +72,7 @@ const StudentRegistration = () => {
     const resendOtp = async () => {
         setLoading(true);
         try {
-            const response = await axios.post('http://localhost:7000/api/v1/student/resent-otp', { Email: verifyData.Email });
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/resent-otp', { Email: verifyData.Email });
             toast.success(response.data.message);
             setLoading(false);
         } catch (error) {
@@ -84,7 +84,7 @@ const StudentRegistration = () => {
 
     const verifyOtp = async () => {
         try {
-            const response = await axios.post('http://localhost:7000/api/v1/student/Verify-Student', verifyData);
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/Verify-Student', verifyData);
             toast.success("Student Verified Successfully");
             const { token, user } = response.data;
             console.log(response.data)

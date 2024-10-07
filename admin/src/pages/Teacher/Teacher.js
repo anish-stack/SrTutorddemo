@@ -69,7 +69,7 @@ const Teacher = () => {
 
     const makeVerifed = async (teacherId, stauts) => {
         try {
-            const res = await axios.post(`http://localhost:7000/api/v1/uni/Make-teacher-Verified?teacherId=${teacherId}&status=${stauts}`)
+            const res = await axios.post(`https://api.srtutorsbureau.com/api/v1/uni/Make-teacher-Verified?teacherId=${teacherId}&status=${stauts}`)
             dispatch(AllTeacher());
         } catch (error) {
             console.log(error)

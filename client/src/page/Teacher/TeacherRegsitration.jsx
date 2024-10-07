@@ -104,7 +104,7 @@ const TeacherRegistration = () => {
             return;
         }
         try {
-            const response = await axios.post('http://localhost:7000/api/v1/teacher/resent-otp', verifyData);
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/teacher/resent-otp', verifyData);
             toast.success(response.data.message);
             setResendButtonClick(resendButtonClick + 1);
             setResendError('');
@@ -118,7 +118,7 @@ const TeacherRegistration = () => {
     const handleBlockTeacher = async () => {
 
         try {
-            const res = await axios.post('http://localhost:7000/api/v1/teacher/block-teacher', {
+            const res = await axios.post('https://api.srtutorsbureau.com/api/v1/teacher/block-teacher', {
                 Email: verifyData.Email,
                 HowManyRequest: resendButtonClick
             });
@@ -186,7 +186,7 @@ const TeacherRegistration = () => {
         data.append('DocumentType', formData.DocumentType);
         setLoading(true)
         try {
-            const response = await axios.post(`http://localhost:7000/api/v1/teacher/Create-teacher?DocumentType=${formData.DocumentType}`, data)
+            const response = await axios.post(`https://api.srtutorsbureau.com/api/v1/teacher/Create-teacher?DocumentType=${formData.DocumentType}`, data)
             console.log(response.data.message)
             toast.success(response.data.message)
             setLoading(false)
@@ -201,7 +201,7 @@ const TeacherRegistration = () => {
 
     // const ResendOtp = async () => {
     //     try {
-    //         const response = await axios.post('http://localhost:7000/api/v1/teacher/resent-otp', verifyData)
+    //         const response = await axios.post('https://api.srtutorsbureau.com/api/v1/teacher/resent-otp', verifyData)
     //         console.log(response.data)
     //         toast.success(response.data.message)
     //     } catch (error) {
@@ -212,7 +212,7 @@ const TeacherRegistration = () => {
 
     const VerifyOtp = async () => {
         try {
-            const response = await axios.post('http://localhost:7000/api/v1/teacher/Verify-teacher', verifyData)
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/teacher/Verify-teacher', verifyData)
 
             toast.success("Tutor Verified Successful")
             const { token, user } = response.data;

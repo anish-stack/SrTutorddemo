@@ -108,7 +108,7 @@ const PostRequirement = () => {
     console.log(classId);
     try {
       const response = await axios.get(
-        `http://localhost:7000/api/v1/admin/Get-Class-Subject/${classId}`
+        `https://api.srtutorsbureau.com/api/v1/admin/Get-Class-Subject/${classId}`
       );
       setSubjects(response.data.data.Subjects);
     } catch (error) {

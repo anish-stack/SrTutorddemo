@@ -9,7 +9,7 @@ const AllotTeacher = ({ isOpen, SelectedRequest, onClose }) => {
 
     const handleAllotTeacher = async () => {
         try {
-            const { data } = await axios.post('http://localhost:7000/api/v1/uni/Add-Teacher-in-Request', {
+            const { data } = await axios.post('https://api.srtutorsbureau.com/api/v1/uni/Add-Teacher-in-Request', {
                 requestId: SelectedRequest._id,
                 teacherId,
             });
@@ -23,7 +23,7 @@ const AllotTeacher = ({ isOpen, SelectedRequest, onClose }) => {
 
     const GetAllTeacher = async () => {
         try {
-            const { data } = await axios.get('http://localhost:7000/api/v1/teacher/Get-Teacher-By-Profile');
+            const { data } = await axios.get('https://api.srtutorsbureau.com/api/v1/teacher/Get-Teacher-By-Profile');
             const InitialData = data.data
 
 

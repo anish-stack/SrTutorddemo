@@ -18,7 +18,7 @@ function Footer() {
 
         // Using toast.promise to handle the promise
         toast.promise(
-            axios.post('http://localhost:7000/api/v1/admin/join-newsletter', { email }),
+            axios.post('https://api.srtutorsbureau.com/api/v1/admin/join-newsletter', { email }),
             {
                 pending: "📧 Subscribing, please wait...",
                 success: "🎉 Success! You've been subscribed to our newsletter.",
