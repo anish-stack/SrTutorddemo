@@ -99,7 +99,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
     const handleLocationFetch = async (input) => {
         try {
             const res = await axios.get(
-                `https://api.srtutorsbureau.com/autocomplete?input=${input}`);
+                `http://localhost:7000/autocomplete?input=${input}`);
 
             setLocationSuggestions(res.data || []);
         } catch (error) {
@@ -111,7 +111,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
     const handleLocationLatAndLngFetch = async (address) => {
         const options = {
             method: 'GET',
-            url: `https://api.srtutorsbureau.com/geocode?address=${address}`
+            url: `http://localhost:7000/geocode?address=${address}`
         };
 
         try {
@@ -231,7 +231,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
         setLoading(true);
 
         try {
-            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/universal-request', submittedData, {
+            const response = await axios.post('http://localhost:7000/api/v1/student/universal-request', submittedData, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             console.log(response.data)
@@ -249,7 +249,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
     // const resendOtp = async () => {
     //     try {
     //         if (sessionData.number || sessionData.otpSent) {
-    //             const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/resent-otp', { PhoneNumber: sessionData.number });
+    //             const response = await axios.post('http://localhost:7000/api/v1/student/resent-otp', { PhoneNumber: sessionData.number });
     //             toast.success(response.data.message);
     //         } else {
     //             toast.error("Unauthorized Action")
@@ -263,7 +263,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
     // const verifyOtp = async () => {
     //     try {
 
-    //         const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/Verify-Student', {
+    //         const response = await axios.post('http://localhost:7000/api/v1/student/Verify-Student', {
     //             PhoneNumber: loginNumber,
     //             otp
     //         });
@@ -291,7 +291,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
 
 
     //     try {
-    //         const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/checkNumber-request', {
+    //         const response = await axios.post('http://localhost:7000/api/v1/student/checkNumber-request', {
     //             userNumber: loginNumber
     //         })
     //         console.log(response.data)
@@ -335,7 +335,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
     const resendOtp = async () => {
         console.log(loginNumber);
         try {
-            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/resent-otp', {
+            const response = await axios.post('http://localhost:7000/api/v1/student/resent-otp', {
                 PhoneNumber: loginNumber,
                 HowManyHit: resendButtonClick
             });
@@ -353,7 +353,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
 
     const verifyOtp = async () => {
         try {
-            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/Verify-Student', {
+            const response = await axios.post('http://localhost:7000/api/v1/student/Verify-Student', {
                 PhoneNumber: loginNumber,
                 otp
             });
@@ -390,7 +390,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
         }
 
         try {
-            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/checkNumber-request', {
+            const response = await axios.post('http://localhost:7000/api/v1/student/checkNumber-request', {
                 userNumber: loginNumber,
                 HowManyHit: resendButtonClick
             });

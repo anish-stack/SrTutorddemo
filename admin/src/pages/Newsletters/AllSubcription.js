@@ -12,7 +12,7 @@ const AllSubscription = () => {
     // Fetch all subscribed emails
     const handleFetch = async () => {
         try {
-            const res = await axios.get('https://api.srtutorsbureau.com/api/v1/admin/get-all-subscribe-newsletter-email');
+            const res = await axios.get('http://localhost:7000/api/v1/admin/get-all-subscribe-newsletter-email');
             const data = res.data.data.sort((a, b) => new Date(b.subscribedAt) - new Date(a.subscribedAt))
 
             setEmails(data);
@@ -24,7 +24,7 @@ const AllSubscription = () => {
     // Handle delete email
     const handleDelete = async () => {
         try {
-            await axios.delete(`https://api.srtutorsbureau.com/api/v1/admin/delete-newsletter-email/${selectedEmailId}`);
+            await axios.delete(`http://localhost:7000/api/v1/admin/delete-newsletter-email/${selectedEmailId}`);
             handleFetch();
             setShowDeleteModal(false);
         } catch (error) {

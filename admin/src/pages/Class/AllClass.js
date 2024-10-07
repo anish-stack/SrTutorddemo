@@ -52,7 +52,7 @@ const AllClass = () => {
     const handleDelete = async (id) => {
         try {
             await toast.promise(
-                axios.delete(`https://api.srtutorsbureau.com/api/v1/admin/delete-Class/${id}`, {
+                axios.delete(`http://localhost:7000/api/v1/admin/delete-Class/${id}`, {
                     headers: {
                         Authorization: `Bearer ${Token}`
                     }

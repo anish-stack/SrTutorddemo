@@ -79,7 +79,7 @@ const ProfilePage = () => {
     const [subjects, setSubjects] = useState([]);
     const [latitude, setLatitude] = useState(null);
     const [longitude, setLongitude] = useState(null);
-    const [radius, setRadius] = useState(5); // Radius in kilometers
+    const [radius, setRadius] = useState(); // Radius in kilometers
     const [places, setPlaces] = useState([]);
     const [selectedPlace, setSelectedPlace] = useState(null);
     const [permissionDenied, setPermissionDenied] = useState(false);
@@ -176,7 +176,7 @@ const ProfilePage = () => {
 
     const fetchNearbyPlaces = async () => {
         if (latitude && longitude) {
-            const url = `https://api.srtutorsbureau.com/nearby-places?lat=${latitude}&lng=${longitude}&radius=${radius * 1000}`;// Convert km to meters
+            const url = `http://localhost:7000/nearby-places?lat=${latitude}&lng=${longitude}&radius=${radius * 1000}`;// Convert km to meters
 
             try {
                 const response = await axios.get(url);
@@ -201,7 +201,7 @@ const ProfilePage = () => {
     const fetchUser = async () => {
         try {
             const response = await axios.get(
-                `https://api.srtutorsbureau.com/api/v1/teacher/Teacher-details/${IdQuery}`
+                `http://localhost:7000/api/v1/teacher/Teacher-details/${IdQuery}`
             );
             console.log(response.data)
             setUser(response.data.data)
@@ -221,7 +221,7 @@ const ProfilePage = () => {
     const fetchSubjects = async (classId) => {
         try {
             const response = await axios.get(
-                `https://api.srtutorsbureau.com/api/v1/admin/Get-Class-Subject/${classId}`
+                `http://localhost:7000/api/v1/admin/Get-Class-Subject/${classId}`
             );
             console.log(response.data)
 
@@ -414,7 +414,7 @@ const ProfilePage = () => {
         try {
             setLoading(true);
 
-            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/teacher/teacher-profile', formData, {
+            const response = await axios.post('http://localhost:7000/api/v1/teacher/teacher-profile', formData, {
                 headers: {
                     Authorization: `Bearer ${tokenQuery}`
                 }
@@ -705,7 +705,7 @@ const ProfilePage = () => {
                 <div>
 
 
-                    <div className="col-md-6 mb-3">
+                    <div className="col-md-12 mb-3">
                         <label className="form-label" htmlFor="TeachingMode">Teaching Mode</label>
                         <select className={`form-select p-half ${errors.TeachingMode ? 'is-invalid' : ''}`} name={`TeachingMode`} value={formData.TeachingMode} onChange={handleChange}>
                             <option value="">Select Your's Teaching Mode</option>
@@ -720,9 +720,7 @@ const ProfilePage = () => {
                         </select>
                         {errors.TeachingMode && <div className="text-danger">{errors.TeachingMode}</div>}
                     </div>
-
-                    <div className=" mb-2 mt-4">
-
+                    <div className="mb-2 mt-4">
                         <div className="form-group">
                             <label htmlFor="radiusSelect">Select Radius (in km): </label>
                             <select
@@ -730,11 +728,16 @@ const ProfilePage = () => {
                                 className="form-control"
                                 value={radius}
                                 onChange={(e) => {
-                                    setRadius(e.target.value);
-                                    fetchNearbyPlaces(); // Call on change
+                                    const selectedValue = e.target.value;
+                                    setRadius(selectedValue);
+                                    if (selectedValue) {
+                                        fetchNearbyPlaces(); // Only call if a valid value is selected
+                                    }
                                 }}
                             >
-                                {/* Options from 5 to 80 km in increments of 5 km */}
+                                <option value="">
+                                    --- SELECT YOUR RANGE FOR TEACHING ---
+                                </option>
                                 {[...Array(16)].map((_, index) => {
                                     const value = (index + 1) * 5; // 5, 10, ..., 80
                                     return (

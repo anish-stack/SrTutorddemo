@@ -79,8 +79,9 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
         await SendWhatsAppMessage(Message, PhoneNumber);
 
         return res.status(200).json({
-          message: "OTP resent. Please verify your Contact Number.",
+          message: "You are already registered. OTP has been resent via WhatsApp. Please verify your contact number.",
         });
+
       }
     }
 
@@ -400,7 +401,6 @@ exports.TeacherVerifyPasswordOtp = CatchAsync(async (req, res) => {
     teacher.OtpExpiresTime = undefined;
     await teacher.save();
 
-    // Success response
     res.status(200).json({ message: "Password changed successfully. You can now log in with your new password." });
   } catch (err) {
     console.error("Error in TeacherVerifyPasswordOtp:", err.message);
@@ -598,6 +598,7 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
     // Generate OTP and its expiration time
     const SubmitOtp = crypto.randomInt(100000, 999999); // Generate a 6-digit OTP
     const OtpExpiresTime = Date.now() + 2 * 60 * 1000; // OTP valid for 10 minutes
+
     const formattedRanges = ranges.map(range => ({
       location: {
         type: 'Point',
@@ -852,9 +853,6 @@ exports.AddDocument = async (req, res) => {
     });
   }
 };
-
-
-
 
 //Verify Otp Given By Teacher
 exports.TeacherVerifyProfileOtp = CatchAsync(async (req, res) => {
@@ -1485,7 +1483,7 @@ exports.SearchByMinimumCondition = CatchAsync(async (req, res) => {
     } else if (role === 'tutor') {
 
       try {
-        const { data } = await axios.get('https://api.srtutorsbureau.com/api/v1/uni/get-all-universal-Request')
+        const { data } = await axios.get('http://localhost:7000/api/v1/uni/get-all-universal-Request')
         const CombinedData = data?.data
         const findTeacherRequest = CombinedData.filter(item => item.className === ClassNameValue && item.subjects.includes(Subject))
 
@@ -1627,7 +1625,49 @@ exports.BrowseTutorsNearMe = CatchAsync(async (req, res) => {
   }
 });
 
+exports.AddLocations = CatchAsync(async (req, res) => {
+  try {
+    // Get the teacher ID from the authenticated user (assuming JWT or session-based authentication)
+    const teacherId = req.user.id;
+    console.log(teacherId);
 
+    // Find the teacher's profile by their ID
+    const findProfile = await TeacherProfile.findById(teacherId);
+    if (!findProfile) {
+      return res.status(404).json({ message: "Teacher profile not found." });
+    }
+
+    // Get the range of locations the teacher wants to do classes
+    const { RangeWhichWantToDoClasses } = req.body;
+    if (!RangeWhichWantToDoClasses || !Array.isArray(RangeWhichWantToDoClasses)) {
+      return res.status(400).json({ message: "Invalid range data." });
+    }
+
+    // Flatten and format the range data to create geoJSON points
+    const formattedRanges = RangeWhichWantToDoClasses.flatMap((range) => ({
+      location: {
+        type: 'Point',
+        coordinates: [range.lng, range.lat]
+      }
+    }));
+
+    // Update the profile with the new range data
+    findProfile.RangeWhichWantToDoClasses = formattedRanges;
+
+    // Save the updated profile
+    await findProfile.save();
+
+    // Return a success response
+    return res.status(200).json({
+      message: "Locations added successfully.",
+      data: findProfile
+    });
+  } catch (error) {
+    // Handle any errors and return a server error response
+    console.error("Error adding locations:", error);
+    return res.status(500).json({ message: "An error occurred while adding locations." });
+  }
+});
 
 
 exports.SingleTeacher = CatchAsync(async (req, res) => {
