@@ -56,6 +56,14 @@ const StudentSchema = new mongoose.Schema({
     latitude: {
         type: String
     },
+    isBlockForOtp: {
+        type: Boolean,
+        default: false
+    },
+    OtpBlockTime: {
+        type: Date,
+        default: Date.now()
+    },
     longitude: {
         type: String
     }

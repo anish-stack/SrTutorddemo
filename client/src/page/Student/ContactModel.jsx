@@ -44,12 +44,15 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
     isBestFaculty: false,
   });
   const navigate = useNavigate();
-  const [loginNumber, setLoginNumber] = useState()
+  const [loginNumber, setLoginNumber] = useState(''); // Initialized as an empty string
+  const [resendButtonClick, setResendButtonClick] = useState(0);
+  const [resendError, setResendError] = useState('');
   const [classes, setClasses] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [selectedClass, setSelectedClass] = useState("");
   const [concatenatedData, setConcatenatedData] = useState([]);
 
+  const maxResendAttempts = 3;
   const dispatch = useDispatch();
   const { data } = useSelector((state) => state.Class);
   const { coords, isGeolocationAvailable, isGeolocationEnabled } = useGeolocated({
@@ -366,17 +369,29 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
     setStep(prevStep => prevStep - 1);
   };
 
+  useEffect(() => {
+    const storedResendCount = localStorage.getItem('resendButtonClickCheck');
+    if (storedResendCount) {
+      setResendButtonClick(Number(storedResendCount));
+    }
+  }, []);
+
+  useEffect(() => {
+    console.log('Resend Button Click Count:', resendButtonClick); // Log the count
+    localStorage.setItem('resendButtonClickCheck', resendButtonClick);
+  }, [resendButtonClick]);
 
   const resendOtp = async () => {
     console.log(loginNumber)
     try {
 
-      const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/resent-otp', { PhoneNumber: loginNumber });
+      const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/resent-otp', { PhoneNumber: loginNumber, HowManyHit: resendButtonClick });
       console.log(response.data)
       toast.success(response.data.message);
-
+      setResendButtonClick((prev) => prev + 1);
     } catch (error) {
       console.log(error)
+      // setResendError(error.response?.data.message);
       toast.error(error.response?.data?.message || "An error occurred");
     }
   };
@@ -408,38 +423,55 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
 
 
   const handleLoginNumberCheck = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
+    // Validate loginNumber
+    if (!loginNumber) {
+      setResendError('Please enter a valid phone number.');
+      return;
+    }
 
+    if (resendButtonClick >= maxResendAttempts) {
+      toast.error('Maximum resend attempts reached. You are blocked for 24 hours.');
+      return;
+    }
 
     try {
       const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/checkNumber-request', {
-        userNumber: loginNumber
-      })
-      console.log(response.data)
-      setShowOtp(true)
-      const newUrl = new URL(window.location.href);
-      newUrl.searchParams.set('otpSent', 'true');
-      newUrl.searchParams.set('number', loginNumber);
-      newUrl.searchParams.set('verified', 'false');
+        userNumber: loginNumber,
+        HowManyHit: resendButtonClick,
+      });
 
-      sessionStorage.setItem('OtpSent', true)
-      sessionStorage.setItem('number', loginNumber)
-      sessionStorage.setItem('verified', false)
+      if (response.data && response.data.success) {
+       // Incrementing safely
+        setResendError('');
+        setShowOtp(true);
 
+        const newUrl = new URL(window.location.href);
+        newUrl.searchParams.set('otpSent', 'true');
+        newUrl.searchParams.set('number', loginNumber);
+        newUrl.searchParams.set('verified', 'false');
 
-      navigate(`${window.location.pathname}?${newUrl.searchParams.toString()}`, { replace: true });
+        sessionStorage.setItem('OtpSent', true);
+        sessionStorage.setItem('number', loginNumber);
+        sessionStorage.setItem('verified', false);
+
+        navigate(`${window.location.pathname}?${newUrl.searchParams.toString()}`, { replace: true });
+      } else {
+        throw new Error('Unexpected response format');
+      }
     } catch (error) {
-      console.log(error.response)
+      console.error(error.response); // Log the error for debugging
 
       if (error.response?.data?.success === false &&
         error.response?.data?.message === "User with this phone number already exists.") {
-        setShowOtp(true)
+        setShowOtp(true);
         setStep(1); // Correctly set the state
+      } else {
+        toast.error(error.response?.data?.message || "An error occurred");
       }
     }
-  }
-
+  };
 
 
 
@@ -479,7 +511,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
       specificRequirement: formData?.SpecificRequirement,
       location: {
         type: 'Point',
-        coordinates: [ClickLongitude || lngEmergency, ClickLatitude ||latEmergency]
+        coordinates: [ClickLongitude || lngEmergency, ClickLatitude || latEmergency]
       },
       teacherId: formData?.teacherId,
       studentInfo: {
@@ -541,6 +573,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
       aria-labelledby="contactTeacherModalLabel"
       aria-hidden={!isOpen}
     >
+      {resendError && <div className="error-message">{resendError}</div>}
       <div className="modal-dialog">
         <div className="modal-content">
           <div className="modal-header">
@@ -1006,13 +1039,13 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
                       </li>
 
                       {
-                        formData.className? (
+                        formData.className ? (
                           <li className="list-group-item d-flex justify-content-between align-items-center">
-                          <strong>Class:</strong> <span>{formData.className}</span>
-                        </li>
-                        ):null
+                            <strong>Class:</strong> <span>{formData.className}</span>
+                          </li>
+                        ) : null
                       }
-                   
+
                       <li className="list-group-item d-flex justify-content-between align-items-center">
                         <strong>Subjects:</strong>
                         <span>

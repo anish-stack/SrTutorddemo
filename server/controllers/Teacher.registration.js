@@ -410,22 +410,57 @@ exports.TeacherVerifyPasswordOtp = CatchAsync(async (req, res) => {
 
 //Teacher Resent Password Otp
 exports.TeacherPasswordOtpResent = CatchAsync(async (req, res) => {
-  const { Email } = req.body;
+  const { Email, howManyHit } = req.body;
 
   const Teachers = await Teacher.findOne({ Email });
   if (!Teachers) {
     return res.status(404).json({ message: "Teacher not found" });
   }
+  if (Teachers.isBlockForOtp === true) {
+    return res.status(429).json({ message: "You have been temporarily blocked from requesting OTP. Please try again later." });
+  }
 
+  // Define the current time
+  const now = Date.now();
+
+  // Check if the previous OTP is still valid
+  if (Teachers.OtpExpiresTime && now < Teachers.OtpExpiresTime - 1 * 60 * 1000) {
+    const remainingTimeInMs = Teachers.OtpExpiresTime - 1 * 60 * 1000 - now;
+    const remainingSeconds = Math.ceil(remainingTimeInMs / 1000);
+
+    return res.status(429).json({
+      message: `OTP already sent recently. Please wait ${remainingSeconds} seconds before requesting a new OTP.`
+    });
+  }
+
+  // If the hit count exceeds the limit, block the teacher from requesting OTP
+  if (howManyHit >= 3) {
+    Teachers.isBlockForOtp = true;
+    Teachers.OtpBlockTime = new Date();
+    await Teachers.save();
+
+    return res.status(403).json({ message: "You are blocked from requesting OTP for the end of the day." });
+  }
+
+  // Generate a new OTP and set its expiration time
   Teachers.ForgetPasswordOtp = crypto.randomInt(100000, 999999);
-  Teachers.OtpExpiresTime = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
+  Teachers.OtpExpiresTime = Date.now() + 2 * 60 * 1000; // OTP expires in 10 minutes
   await Teachers.save();
+
+  // Prepare the message for WhatsApp
   const Message = `Password Change Request Resend OTP Verification\nDear ${Teachers.TeacherName},\nYour OTP for password change verification is: ${Teachers.ForgetPasswordOtp}.\nPlease use this OTP to complete your password change process. This OTP is valid for a limited time, so please proceed without delay.\nIf you did not request this, please ignore this message.\nBest regards,\nS R Tutors`;
 
-  await SendWhatsAppMessage(Message, Teachers.PhoneNumber);
-
-  res.status(200).json({ message: "OTP resent Successful" });
+  try {
+    // Send OTP via WhatsApp
+    await SendWhatsAppMessage(Message, Teachers.PhoneNumber);
+    res.status(200).json({ message: "OTP resent successfully" });
+  } catch (error) {
+    // Handle WhatsApp message sending error
+    console.error('Failed to send WhatsApp message:', error);
+    res.status(500).json({ message: "Failed to send OTP. Please try again later." });
+  }
 });
+
 
 //Add Profile Details Of Verified Teacher
 exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {

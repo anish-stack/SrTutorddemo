@@ -22,8 +22,11 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
         otpSent: false,
         number: ''
     })
+    const [resendButtonClick, setResendButtonClick] = useState(0);
+    const [resendError, setResendError] = useState('');
+    const maxResendAttempts = 3;
     const [isLoading, setLoading] = useState(false)
-    const { Class, Subjects = [], isClass, id } = subject || {}; // Default Subjects to an empty array if it's not an array
+    const { Class, Subjects = [], isClass, id } = subject || {};
     const [locationSuggestions, setLocationSuggestions] = useState([]);
     const [showOtp, setShowOtp] = useState(false)
     const [otp, setOtp] = useState()
@@ -36,7 +39,7 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
         HowManyClassYouWant: "",
         experienceRequired: "",
         MinumBudegt: "",
-        ClassLangUage:"",
+        ClassLangUage: "",
         Maxmimu: "",
         StartDate: "",
         TeaherGender: "",
@@ -197,77 +200,122 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
 
         return { valid, errors };
     };
+    useEffect(() => {
+        const storedResendCount = localStorage.getItem('resendButtonClickCheckSubjectr');
+        if (storedResendCount) {
+            setResendButtonClick(Number(storedResendCount));
+        }
+    }, []);
+
+    useEffect(() => {
+        console.log('Resend Button Click Count:', resendButtonClick); // Log the count
+        localStorage.setItem('resendButtonClickCheckSubjectr', resendButtonClick);
+    }, [resendButtonClick]);
+
+    const updateUrlParams = (params) => {
+        const newUrl = new URL(window.location.href);
+        Object.keys(params).forEach(key => {
+            newUrl.searchParams.set(key, params[key]);
+        });
+        navigate(`${window.location.pathname}?${newUrl.searchParams.toString()}`, { replace: true });
+    };
+    const clearSessionStorage = () => {
+        sessionStorage.removeItem('OtpSent');
+        sessionStorage.removeItem('number');
+        sessionStorage.removeItem('verified');
+    };
+
+
 
     const resendOtp = async () => {
+        console.log(loginNumber);
         try {
-
-            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/resent-otp', { PhoneNumber: loginNumber });
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/resent-otp', {
+                PhoneNumber: loginNumber,
+                HowManyHit: resendButtonClick
+            });
+            console.log(response.data);
+            setShowOtp(true);
             toast.success(response.data.message);
-
+            setResendButtonClick((prev) => prev + 1); // Increment resend counter
         } catch (error) {
-            console.log(error)
+            console.log(error);
+
+            clearSessionStorage()
+            updateUrlParams({ otpSent: 'false', number: '', verified: 'false' });
             toast.error(error.response?.data?.message || "An error occurred");
         }
     };
 
     const verifyOtp = async () => {
         try {
-
             const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/Verify-Student', {
                 PhoneNumber: loginNumber,
                 otp
             });
             toast.success("Student Verified Successfully");
             const { token, user } = response.data;
-            console.log(response.data)
+            console.log(response.data);
             Cookies.set('studentToken', token, { expires: 1 });
             Cookies.set('studentUser', JSON.stringify(user), { expires: 1 });
-            sessionStorage.removeItem('OtpSent')
-            sessionStorage.removeItem('number')
-            sessionStorage.removeItem('verified')
-
-            setLogin(true)
+            clearSessionStorage();
+            updateUrlParams({ otpSent: 'false', number: '', verified: 'false' });
+            setLogin(true);
             setStep(1);
-
         } catch (error) {
-            console.log(error)
+            console.log(error);
             toast.error(error.response?.data?.message || "An error occurred");
+            clearSessionStorage();
+            updateUrlParams({ otpSent: 'false', number: '', verified: 'false' });
         }
     };
 
-
     const handleLoginNumberCheck = async (e) => {
-        e.preventDefault()
+        e.preventDefault();
 
+        if (!loginNumber) {
+            setResendError('Please enter a valid phone number.');
+            return;
+        }
 
+        if (resendButtonClick >= maxResendAttempts) {
+            toast.error('Maximum resend attempts reached. You are blocked for 24 hours.');
+            clearSessionStorage();
+            setShowOtp(false);
+            updateUrlParams({ otpSent: 'false', number: '', verified: 'false' });
+            return;
+        }
 
         try {
             const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/checkNumber-request', {
-                userNumber: loginNumber
-            })
-            console.log(response.data)
-            setShowOtp(true)
-            const newUrl = new URL(window.location.href);
-            newUrl.searchParams.set('otpSent', 'true');
-            newUrl.searchParams.set('number', loginNumber);
-            newUrl.searchParams.set('verified', 'false');
+                userNumber: loginNumber,
+                HowManyHit: resendButtonClick
+            });
 
-            sessionStorage.setItem('OtpSent', true)
-            sessionStorage.setItem('number', loginNumber)
-            sessionStorage.setItem('verified', false)
-
-
-            navigate(`${window.location.pathname}?${newUrl.searchParams.toString()}`, { replace: true });
+            if (response.data && response.data.success) {
+                setResendError('');
+                setShowOtp(true);
+                updateUrlParams({ otpSent: 'true', number: loginNumber, verified: 'false' });
+                sessionStorage.setItem('OtpSent', true);
+                sessionStorage.setItem('number', loginNumber);
+                sessionStorage.setItem('verified', false);
+            } else {
+                throw new Error('Unexpected response format');
+            }
         } catch (error) {
-            console.log(error.response)
+            console.error(error.response);
+            clearSessionStorage()
 
             if (error.response?.data?.success === false &&
                 error.response?.data?.message === "User with this phone number already exists.") {
-                setShowOtp(true)
-                setStep(1); // Correctly set the state
+                setShowOtp(false);
+
+                setStep(1);
+            } else {
+                toast.error(error.response?.data?.message || "An error occurred");
             }
         }
-    }
+    };
 
 
 
@@ -280,7 +328,7 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
             requestType: "Subject Teacher",
             classId: null,
             className: formData.Class,
-            ClassLangUage:formData.ClassLangUage,
+            ClassLangUage: formData.ClassLangUage,
             subjects: isClass ? [formData.Subject] : [Subjects],
             interestedInTypeOfClass: formData.Interested,
             teacherGenderPreference: formData.TeaherGender,
