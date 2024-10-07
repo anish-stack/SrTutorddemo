@@ -33,7 +33,7 @@ const Dashboard = () => {
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                const response = await axios.get('http://localhost:7000/api/v1/admin/Get-Dashboard');
+                const response = await axios.get('https://api.srtutorsbureau.com/api/v1/admin/Get-Dashboard');
 
                 // Check if the response is successful
                 console.log(response.data.data)
@@ -168,7 +168,7 @@ const Dashboard = () => {
 
     const CleanCaches = async () => {
         try {
-            const response = await axios.get('http://localhost:7000/flush-all-Redis-Cached', {
+            const response = await axios.get('https://api.srtutorsbureau.com/flush-all-Redis-Cached', {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

@@ -19,7 +19,7 @@ function Contactus() {
     const handleSubmit = async (e) => {
         e.preventDefault(); // Prevent the default form submission
         try {
-            const response = await axios.post('http://localhost:7000/api/v1/uni/create-contact', formData);
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/uni/create-contact', formData);
             if (response.data.success) {
                 toast.success("Your message has been sent successfully! We will get back to you shortly.");
                 setFormData({ Name: '', Email: '', Phone: '', Subject: '', Message: '' }); // Reset form fields
