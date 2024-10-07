@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
 
+const MAX_RESEND_ATTEMPTS = 3; // Maximum resend attempts allowed
 
 const ForgetPassword = () => {
     const navigate = useNavigate();
@@ -17,15 +18,24 @@ const ForgetPassword = () => {
         confirmPassword: ''
     });
 
-    const [step, setStep] = useState(1); 
-    const [isEmailVerified, setIsEmailVerified] = useState(false); 
-    const [isOtpResendDisabled, setOtpResendDisabled] = useState(false); 
-    const [loading, setLoading] = useState(false); 
-    const [showPassword, setShowPassword] = useState(false); 
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false); 
-    const [timer, setTimer] = useState(120); 
+    const [step, setStep] = useState(1);
+    const [isEmailVerified, setIsEmailVerified] = useState(false);
+    const [isOtpResendDisabled, setOtpResendDisabled] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [timer, setTimer] = useState(300);
+    const [resendCount, setResendCount] = useState(0); // Track resend attempts
 
     useEffect(() => {
+        // Load the number of resend attempts from localStorage on component mount
+        const storedResendCount = localStorage.getItem('resendForgetPasswordClickCount');
+        setResendCount(Number(storedResendCount) || 0);
+
+        if (resendCount >= MAX_RESEND_ATTEMPTS) {
+            setOtpResendDisabled(true);
+        }
+
         let interval;
         if (isOtpResendDisabled) {
             interval = setInterval(() => {
@@ -40,7 +50,7 @@ const ForgetPassword = () => {
             }, 1000);
         }
         return () => clearInterval(interval);
-    }, [isOtpResendDisabled]);
+    }, [isOtpResendDisabled, resendCount]);
 
     // Handle input changes
     const handleChange = (e) => {
@@ -65,7 +75,7 @@ const ForgetPassword = () => {
             setStep(2);
             setIsEmailVerified(true); // Mark email as verified
             setOtpResendDisabled(true); // Disable resend OTP for a period
-            setTimer(120); // Reset timer to 2 minutes
+            setTimer(300); // Reset timer to 2 minutes
         } catch (error) {
             toast.error(error.response?.data?.message || 'Please enter a valid email');
         } finally {
@@ -118,6 +128,12 @@ const ForgetPassword = () => {
 
     // Handle OTP Resend
     const handleResendOtp = async () => {
+        // Check if resend attempts exceeded
+        if (resendCount >= MAX_RESEND_ATTEMPTS) {
+            toast.error(`You have reached the maximum resend attempts. Please try again later.`);
+            return;
+        }
+
         const apiUrl = SearchType === 'teacher'
             ? 'https://api.srtutorsbureau.com/api/v1/teacher/teacher-Password-resend-otp'
             : 'https://api.srtutorsbureau.com/api/v1/student/Student-Password-resend-Otp';
@@ -125,12 +141,18 @@ const ForgetPassword = () => {
         setLoading(true); // Start loading
 
         try {
-            await axios.post(apiUrl, { Email: formData.Email });
+            await axios.post(apiUrl, { Email: formData.Email, howManyHit: resendCount });
             toast.success('OTP resent successfully!');
-            setOtpResendDisabled(true); // Disable resend OTP button for 2 minutes
-            setTimer(120); // Reset timer to 2 minutes
+
+            // Increment resend attempts and update localStorage
+            const updatedResendCount = resendCount + 1;
+            setResendCount(updatedResendCount);
+            localStorage.setItem('resendForgetPasswordClickCount', updatedResendCount);
+
+            setOtpResendDisabled(true);
+            setTimer(300);
         } catch (error) {
-            toast.error('Failed to resend OTP. Please try again later.');
+            toast.error(error?.response?.data.message);
         } finally {
             setLoading(false); // Stop loading
         }
@@ -174,7 +196,7 @@ const ForgetPassword = () => {
                                 value={formData.otp}
                                 onChange={handleChange}
                                 placeholder="Enter the OTP sent to your contact number"
-                                required
+
                             />
                         </div>
                         <div className="mb-3">
@@ -182,28 +204,27 @@ const ForgetPassword = () => {
                             <div className="input-group">
                                 <input
                                     type={showPassword ? 'text' : 'password'}
-                                    className="form-control"
+                                    className="form-control py-2"
                                     id="password"
                                     name="password"
                                     value={formData.password}
                                     onChange={handleChange}
                                     placeholder="Enter your new password"
-                                    required
+
                                 />
                                 <button
                                     type="button"
-                                    className="btn btn-outline-secondary"
+                                    className="btn p-1 btn-outline-secondary"
                                     onClick={() => setShowPassword(!showPassword)}
                                 >
                                     <p style={{ cursor: 'pointer', fontSize: '20px', margin: 0 }}>
                                         {showPassword ? '👁️‍🗨️' : '👁️'}
                                     </p>
                                 </button>
-
                             </div>
                         </div>
                         <div className="mb-3">
-                            <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
+                            <label htmlFor="confirmPassword" className="form-label">Confirm New Password</label>
                             <div className="input-group">
                                 <input
                                     type={showConfirmPassword ? 'text' : 'password'}
@@ -213,33 +234,31 @@ const ForgetPassword = () => {
                                     value={formData.confirmPassword}
                                     onChange={handleChange}
                                     placeholder="Confirm your new password"
-                                    required
                                 />
                                 <button
                                     type="button"
-                                    className="btn btn-outline-secondary"
+                                    className="btn p-1 btn-outline-secondary"
                                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                                 >
                                     <p style={{ cursor: 'pointer', fontSize: '20px', margin: 0 }}>
                                         {showConfirmPassword ? '👁️‍🗨️' : '👁️'}
                                     </p>
                                 </button>
-
                             </div>
                         </div>
                         <button type="submit" className={`btn btn-primary w-100 ${loading ? 'loading' : ''}`} disabled={loading}>
-                            {loading ? 'Verifying...' : 'Verify OTP & Reset Password'}
+                            {loading ? 'Submitting...' : 'Submit OTP & Reset Password'}
                         </button>
 
-                        {/* Resend OTP Button */}
-                        <button
-                            type="button"
-                            className="btn btn-link mt-3"
-                            onClick={handleResendOtp}
-                            disabled={isOtpResendDisabled}
-                        >
-                            Resend OTP {isOtpResendDisabled && `(${Math.floor(timer / 60)}:${(timer % 60).toString().padStart(2, '0')})`}
-                        </button>
+                        <div className="mt-4 text-center">
+                            <button
+                                className="btn btn-link"
+                                onClick={handleResendOtp}
+                                disabled={isOtpResendDisabled || resendCount >= MAX_RESEND_ATTEMPTS}
+                            >
+                                {isOtpResendDisabled ? `Resend OTP in ${timer}s` : 'Resend OTP'}
+                            </button>
+                        </div>
                     </form>
                 )}
             </div>

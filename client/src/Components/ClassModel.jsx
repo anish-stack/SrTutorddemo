@@ -13,7 +13,8 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
   const { Class, Subjects = [], isClass } = subject;
   const navigate = useNavigate();
   const [loginNumber, setLoginNumber] = useState()
-
+  const [resendButtonClick, setResendButtonClick] = useState(0);
+  const [resendError, setResendError] = useState('');
   const [locationSuggestions, setLocationSuggestions] = useState([]);
   const token = Cookies.get('studentToken') || false;
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -42,7 +43,7 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
     specificRequirement: ""
   });
   const [login, setLogin] = useState(false)
-
+  const maxResendAttempts = 3;
   const url = new URLSearchParams(window.location.search)
   const otpValue = url.get('otpSent')
   const [sessionData, setSessionData] = useState({
@@ -50,6 +51,7 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
     number: ''
   })
   const [showOtp, setShowOtp] = useState(false)
+  const [disabledButton, setDisabledButton] = useState(false)
   const [otp, setOtp] = useState()
   const [ClickLatitude, setClickLatitude] = useState(null);
   const [ClickLongitude, setClickLongitude] = useState(null);
@@ -168,16 +170,28 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
     handleLocationLatAndLngFetch(location.description);
     setLocationSuggestions([]);
   };
+  useEffect(() => {
+    const storedResendCount = localStorage.getItem('resendButtonClickCheckClass');
+    if (storedResendCount) {
+      setResendButtonClick(Number(storedResendCount));
+    }
+  }, []);
 
+  useEffect(() => {
+    console.log('Resend Button Click Count:', resendButtonClick); // Log the count
+    localStorage.setItem('resendButtonClickCheckClass', resendButtonClick);
+  }, [resendButtonClick]);
 
   const resendOtp = async () => {
     try {
 
-      const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/resent-otp', { PhoneNumber: loginNumber });
+      const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/resent-otp', { PhoneNumber: loginNumber, HowManyHit: resendButtonClick });
+      console.log(response.data)
       toast.success(response.data.message);
-
+      setResendButtonClick((prev) => prev + 1);
     } catch (error) {
       console.log(error)
+      // setResendError(error.response?.data.message);
       toast.error(error.response?.data?.message || "An error occurred");
     }
   };
@@ -208,38 +222,57 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
   };
 
 
+
   const handleLoginNumberCheck = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
+    // Validate loginNumber
+    if (!loginNumber) {
+      setResendError('Please enter a valid phone number.');
+      return;
+    }
 
+    if (resendButtonClick >= maxResendAttempts) {
+      toast.error('Maximum resend attempts reached. You are blocked for 24 hours.');
+      return;
+    }
 
     try {
       const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/checkNumber-request', {
-        userNumber: loginNumber
-      })
-      console.log(response.data)
-      setShowOtp(true)
-      const newUrl = new URL(window.location.href);
-      newUrl.searchParams.set('otpSent', 'true');
-      newUrl.searchParams.set('number', loginNumber);
-      newUrl.searchParams.set('verified', 'false');
+        userNumber: loginNumber,
+        HowManyHit: resendButtonClick,
+      });
 
-      sessionStorage.setItem('OtpSent', true)
-      sessionStorage.setItem('number', loginNumber)
-      sessionStorage.setItem('verified', false)
+      if (response.data && response.data.success) {
+        // Incrementing safely
+        setResendError('');
+        setShowOtp(true);
 
+        const newUrl = new URL(window.location.href);
+        newUrl.searchParams.set('otpSent', 'true');
+        newUrl.searchParams.set('number', loginNumber);
+        newUrl.searchParams.set('verified', 'false');
 
-      navigate(`${window.location.pathname}?${newUrl.searchParams.toString()}`, { replace: true });
+        sessionStorage.setItem('OtpSent', true);
+        sessionStorage.setItem('number', loginNumber);
+        sessionStorage.setItem('verified', false);
+        // setDisabledButton(true)
+        navigate(`${window.location.pathname}?${newUrl.searchParams.toString()}`, { replace: true });
+      } else {
+        throw new Error('Unexpected response format');
+      }
     } catch (error) {
-      console.log(error.response)
+      console.error(error.response); // Log the error for debugging
 
       if (error.response?.data?.success === false &&
         error.response?.data?.message === "User with this phone number already exists.") {
-        setShowOtp(true)
+        setShowOtp(true);
         setStep(1); // Correctly set the state
+      } else {
+        toast.error(error.response?.data?.message || "An error occurred");
       }
     }
-  }
+  };
 
 
 

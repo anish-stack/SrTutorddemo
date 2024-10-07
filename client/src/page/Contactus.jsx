@@ -96,15 +96,7 @@ function Contactus() {
                                                 <a href="tel:9899247916">+91 9899247916</a>
                                             </div>
                                         </li>
-                                        <li>
-                                            <div className="icon">
-                                                <i className="flaticon-phone-call" />
-                                            </div>
-                                            <div className="content">
-                                                <a href="tel:01122442314">011 22442314</a>
-                                                <a href="tel:01122459766">011 22459766</a>
-                                            </div>
-                                        </li>
+                                      
                                         <li>
                                             <div className="icon">
                                                 <i className="flaticon-email" />

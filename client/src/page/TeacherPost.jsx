@@ -40,6 +40,9 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
     const navigate = useNavigate();
     const [loginNumber, setLoginNumber] = useState()
     const [login, setLogin] = useState(false)
+    const [resendButtonClick, setResendButtonClick] = useState(0);
+    const [resendError, setResendError] = useState('');
+    const maxResendAttempts = 3;
     const [locationSuggestions, setLocationSuggestions] = useState([]);
     const [ClickLatitude, setClickLatitude] = useState(null);
     const [ClickLongitude, setClickLongitude] = useState(null);
@@ -178,7 +181,17 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
         }
     };
 
+    useEffect(() => {
+        const storedResendCount = localStorage.getItem('resendButtonClickCheckTeacher');
+        if (storedResendCount) {
+            setResendButtonClick(Number(storedResendCount));
+        }
+    }, []);
 
+    useEffect(() => {
+        console.log('Resend Button Click Count:', resendButtonClick); // Log the count
+        localStorage.setItem('resendButtonClickCheckTeacher', resendButtonClick);
+    }, [resendButtonClick]);
 
     const handleSelectChange = (selectedOption, action) => {
         setFormData({ ...formData, [action.name]: selectedOption });
@@ -233,77 +246,182 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
     };
 
 
+    // const resendOtp = async () => {
+    //     try {
+    //         if (sessionData.number || sessionData.otpSent) {
+    //             const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/resent-otp', { PhoneNumber: sessionData.number });
+    //             toast.success(response.data.message);
+    //         } else {
+    //             toast.error("Unauthorized Action")
+    //         }
+    //     } catch (error) {
+    //         console.log(error)
+    //         toast.error(error.response?.data?.message || "An error occurred");
+    //     }
+    // };
+
+    // const verifyOtp = async () => {
+    //     try {
+
+    //         const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/Verify-Student', {
+    //             PhoneNumber: loginNumber,
+    //             otp
+    //         });
+    //         toast.success("Student Verified Successfully");
+    //         const { token, user } = response.data;
+    //         console.log(response.data)
+    //         Cookies.set('studentToken', token, { expires: 1 });
+    //         Cookies.set('studentUser', JSON.stringify(user), { expires: 1 });
+    //         sessionStorage.removeItem('OtpSent')
+    //         sessionStorage.removeItem('number')
+    //         sessionStorage.removeItem('verified')
+
+    //         setLogin(true)
+    //         setStep(1);
+
+    //     } catch (error) {
+    //         toast.error(error.response?.data?.message || "An error occurred");
+    //     }
+    // };
+
+
+    // const handleLoginNumberCheck = async (e) => {
+    //     e.preventDefault()
+
+
+
+    //     try {
+    //         const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/checkNumber-request', {
+    //             userNumber: loginNumber
+    //         })
+    //         console.log(response.data)
+    //         setShowOtp(true)
+    //         const newUrl = new URL(window.location.href);
+    //         newUrl.searchParams.set('otpSent', 'true');
+    //         newUrl.searchParams.set('number', loginNumber);
+    //         newUrl.searchParams.set('verified', 'false');
+
+    //         sessionStorage.setItem('OtpSent', true)
+    //         sessionStorage.setItem('number', loginNumber)
+    //         sessionStorage.setItem('verified', false)
+
+
+    //         navigate(`${window.location.pathname}?${newUrl.searchParams.toString()}`, { replace: true });
+    //     } catch (error) {
+    //         console.log(error.response)
+
+    //         if (error.response?.data?.success === false &&
+    //             error.response?.data?.message === "User with this phone number already exists.") {
+    //             setShowOtp(true)
+    //             setStep(1); // Correctly set the state
+    //         }
+    //     }
+    // }
+    const updateUrlParams = (params) => {
+        const newUrl = new URL(window.location.href);
+        Object.keys(params).forEach(key => {
+            newUrl.searchParams.set(key, params[key]);
+        });
+        navigate(`${window.location.pathname}?${newUrl.searchParams.toString()}`, { replace: true });
+    };
+    const clearSessionStorage = () => {
+        sessionStorage.removeItem('OtpSent');
+        sessionStorage.removeItem('number');
+        sessionStorage.removeItem('verified');
+    };
+
+
+
     const resendOtp = async () => {
+        console.log(loginNumber);
         try {
-            if (sessionData.number || sessionData.otpSent) {
-                const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/resent-otp', { PhoneNumber: sessionData.number });
-                toast.success(response.data.message);
-            } else {
-                toast.error("Unauthorized Action")
-            }
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/resent-otp', {
+                PhoneNumber: loginNumber,
+                HowManyHit: resendButtonClick
+            });
+            console.log(response.data);
+            toast.success(response.data.message);
+            setResendButtonClick((prev) => prev + 1); // Increment resend counter
         } catch (error) {
-            console.log(error)
+            console.log(error);
+            setShowOtp(false);
+            clearSessionStorage()
+            updateUrlParams({ otpSent: 'false', number: '', verified: 'false' });
             toast.error(error.response?.data?.message || "An error occurred");
         }
     };
 
     const verifyOtp = async () => {
         try {
-
             const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/Verify-Student', {
                 PhoneNumber: loginNumber,
                 otp
             });
             toast.success("Student Verified Successfully");
             const { token, user } = response.data;
-            console.log(response.data)
+            console.log(response.data);
             Cookies.set('studentToken', token, { expires: 1 });
             Cookies.set('studentUser', JSON.stringify(user), { expires: 1 });
-            sessionStorage.removeItem('OtpSent')
-            sessionStorage.removeItem('number')
-            sessionStorage.removeItem('verified')
-
-            setLogin(true)
+            clearSessionStorage();
+            updateUrlParams({ otpSent: 'false', number: '', verified: 'false' });
+            setLogin(true);
             setStep(1);
-
         } catch (error) {
+            console.log(error);
             toast.error(error.response?.data?.message || "An error occurred");
+            clearSessionStorage();
+            updateUrlParams({ otpSent: 'false', number: '', verified: 'false' });
+        }
+    };
+
+    const handleLoginNumberCheck = async (e) => {
+        e.preventDefault();
+
+        if (!loginNumber) {
+            setResendError('Please enter a valid phone number.');
+            return;
+        }
+
+        if (resendButtonClick >= maxResendAttempts) {
+            toast.error('Maximum resend attempts reached. You are blocked for 24 hours.');
+            clearSessionStorage();
+            updateUrlParams({ otpSent: 'false', number: '', verified: 'false' });
+            return;
+        }
+
+        try {
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/checkNumber-request', {
+                userNumber: loginNumber,
+                HowManyHit: resendButtonClick
+            });
+
+            if (response.data && response.data.success) {
+                setResendError('');
+                setShowOtp(true);
+                updateUrlParams({ otpSent: 'true', number: loginNumber, verified: 'false' });
+                sessionStorage.setItem('OtpSent', true);
+                sessionStorage.setItem('number', loginNumber);
+                sessionStorage.setItem('verified', false);
+            } else {
+                throw new Error('Unexpected response format');
+            }
+        } catch (error) {
+            console.error(error.response);
+            clearSessionStorage()
+            setShowOtp(false);
+            if (error.response?.data?.success === false &&
+                error.response?.data?.message === "User with this phone number already exists.") {
+                    setShowOtp(false);
+                   
+                setStep(1);
+            } else {
+                toast.error(error.response?.data?.message || "An error occurred");
+            }
         }
     };
 
 
-    const handleLoginNumberCheck = async (e) => {
-        e.preventDefault()
 
-
-
-        try {
-            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/checkNumber-request', {
-                userNumber: loginNumber
-            })
-            console.log(response.data)
-            setShowOtp(true)
-            const newUrl = new URL(window.location.href);
-            newUrl.searchParams.set('otpSent', 'true');
-            newUrl.searchParams.set('number', loginNumber);
-            newUrl.searchParams.set('verified', 'false');
-
-            sessionStorage.setItem('OtpSent', true)
-            sessionStorage.setItem('number', loginNumber)
-            sessionStorage.setItem('verified', false)
-
-
-            navigate(`${window.location.pathname}?${newUrl.searchParams.toString()}`, { replace: true });
-        } catch (error) {
-            console.log(error.response)
-
-            if (error.response?.data?.success === false &&
-                error.response?.data?.message === "User with this phone number already exists.") {
-                setShowOtp(true)
-                setStep(1); // Correctly set the state
-            }
-        }
-    }
     const numberOfSessionsOptions = [
         { value: 'Two Classes a Week', label: 'Two Classes a Week' },
         { value: 'Three Classes a Week', label: 'Three Classes a Week' },
