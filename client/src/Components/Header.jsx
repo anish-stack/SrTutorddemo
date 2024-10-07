@@ -90,14 +90,14 @@ function Header() {
       if (modalType === "student") {
         setLoading(true);
         response = await axios.post(
-          "https://api.srtutorsbureau.com/api/v1/student/login",
+          "http://localhost:7000/api/v1/student/login",
           formData
         );
         userPrefix = "student";
       } else if (modalType === "teacher") {
         setLoading(true);
         response = await axios.post(
-          "https://api.srtutorsbureau.com/api/v1/teacher/Teacher-Login",
+          "http://localhost:7000/api/v1/teacher/Teacher-Login",
           formData
         );
         userPrefix = "teacher";

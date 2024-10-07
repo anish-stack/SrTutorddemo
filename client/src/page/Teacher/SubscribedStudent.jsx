@@ -12,7 +12,7 @@ const SubscribedStudent = ({id}) => {
 
     const fetchData = async () => {
         try {
-            const response = await axios.get(`https://api.srtutorsbureau.com/api/v1/uni/get-Request-teacher?id=${id}&page=1&limit=8`);
+            const response = await axios.get(`http://localhost:7000/api/v1/uni/get-Request-teacher?id=${id}&page=1&limit=8`);
             const filteredData = response.data.data.filter(request => request.dealDone === true && request.teacherAcceptThis !== 'declined');
             setData(filteredData);
         } catch (error) {

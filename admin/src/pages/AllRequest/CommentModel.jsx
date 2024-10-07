@@ -18,7 +18,7 @@ const CommentModel = ({ selected, onClose, isOpen, type }) => {
     const handleAddComment = async () => {
         setLoading(true)
         try {
-            const res = await axios.post('https://api.srtutorsbureau.com/api/v1/uni/Add-Comment-Request', {
+            const res = await axios.post('http://localhost:7000/api/v1/uni/Add-Comment-Request', {
                 requestId: selected._id,
                 comment,
             });
@@ -38,7 +38,7 @@ const CommentModel = ({ selected, onClose, isOpen, type }) => {
 
     const handleViewComments = async () => {
         try {
-            const res = await axios.get(`https://api.srtutorsbureau.com/api/v1/uni/All-Comment-Request/${selected._id}`);
+            const res = await axios.get(`http://localhost:7000/api/v1/uni/All-Comment-Request/${selected._id}`);
             console.log(res.data.data)
             setComments(res.data.data || []); // Set the comments or an empty array
         } catch (error) {
@@ -51,7 +51,7 @@ const CommentModel = ({ selected, onClose, isOpen, type }) => {
         setLoading(true)
 
         try {
-            const res = await axios.post(`https://api.srtutorsbureau.com/api/v1/uni/delete-Comment-Request`, {
+            const res = await axios.post(`http://localhost:7000/api/v1/uni/delete-Comment-Request`, {
                 requestId: selected._id,
                 commentId
             });
@@ -73,7 +73,7 @@ const CommentModel = ({ selected, onClose, isOpen, type }) => {
         setLoading(true)
 
         try {
-            const res = await axios.post(`https://api.srtutorsbureau.com/api/v1/uni/update-Comment-Request`, {
+            const res = await axios.post(`http://localhost:7000/api/v1/uni/update-Comment-Request`, {
                 requestId: selected._id,
                 commentId,
                 updatedCommentText,

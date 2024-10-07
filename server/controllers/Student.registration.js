@@ -50,7 +50,7 @@ exports.StudentRegister = CatchAsync(async (req, res) => {
                 const newOtp = crypto.randomInt(100000, 999999)
                 existingStudent.Password = !Password || PhoneNumber;
                 existingStudent.SignInOtp = newOtp// Generate a 6-digit OTP
-                existingStudent.OtpExpiresTime = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
+                existingStudent.OtpExpiresTime = Date.now() + 4 * 60 * 1000; // OTP expires in 4 minutes
                 await existingStudent.save();
 
                 const message = `Dear ${existingStudent.StudentName},\nWe are pleased to inform you that your OTP for verification is: ${existingStudent.SignInOtp}\n${!Password ? `Your Default Password is ${newStudent.PhoneNumber}\n` : ''}Please use this OTP to complete your verification process. This OTP is valid for a limited time, so kindly proceed without delay.\nIf you did not request this OTP, please disregard this message.\nBest regards,\nS R Tutors`;
@@ -58,7 +58,7 @@ exports.StudentRegister = CatchAsync(async (req, res) => {
 
                 await SendWhatsAppMessage(message, PhoneNumber)
 
-                return res.status(200).json({ message: 'OTP resent. Please verify your Contact Number.' });
+                return res.status(200).json({ message: 'You are already registered. OTP has been resent. Please verify your contact number.' });
             }
         }
 
@@ -66,7 +66,7 @@ exports.StudentRegister = CatchAsync(async (req, res) => {
 
         // Generate OTP
         const otp = crypto.randomInt(100000, 999999);
-        const otpExpiresTime = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
+        const otpExpiresTime = Date.now() + 4 * 60 * 1000; // OTP expires in 10 minutes
         const Image = `https://avatar.iran.liara.run/username?username=${StudentName}`
         // Create a new student
         const newStudent = await Student.create({
@@ -243,7 +243,7 @@ exports.StudentLogin = CatchAsync(async (req, res) => {
 exports.CheckNumber = CatchAsync(async (req, res) => {
     try {
         const { userNumber, latitude, longitude, HowManyHit } = req.body;
-        
+
         // Check for missing fields
         const missingFields = [];
         if (!userNumber) missingFields.push('Phone Number');

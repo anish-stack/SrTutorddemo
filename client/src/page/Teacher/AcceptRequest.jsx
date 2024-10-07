@@ -14,7 +14,7 @@ const AcceptRequetsByYou = ({ id }) => {
 
     const fetchData = async (page) => {
         try {
-            const response = await axios.get(`https://api.srtutorsbureau.com/api/v1/uni/get-Request-teacher?id=${id}&page=${page}&limit=8`);
+            const response = await axios.get(`http://localhost:7000/api/v1/uni/get-Request-teacher?id=${id}&page=${page}&limit=8`);
             const filteredData = response.data.data.filter(request => request.teacherAcceptThis === 'accepted');
             setData(filteredData);
             setTotalPages(Math.ceil((response.data.total || 0) / 8)); // Ensure total is valid
