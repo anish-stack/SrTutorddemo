@@ -5,7 +5,7 @@ const Marquee = ({ data }) => {
 
     useEffect(() => {
         if (data) {
-            setComingData(data);
+            setComingData(data);//comme
         } else {
             setComingData([]);
         }
