@@ -896,7 +896,8 @@ Email: support@srtutors.com`;
     }
     await redisClient.del("Teacher");
     await redisClient.del("Top-Teacher");
-
+    Teachers.isBlockForOtp = false;
+    Teachers.OtpBlockTime = null;
     await Teachers.save();
 
     res.status(200).json({ message: "Profile details saved successfully" });
@@ -908,18 +909,31 @@ Email: support@srtutors.com`;
 //Resend Verify Otp Given By Teacher
 exports.TeacherProfileResendOtp = CatchAsync(async (req, res) => {
   const userId = req.user.id._id;
+  const { HowManyRequest } = req.body;
+
+  if (typeof HowManyRequest !== 'number') {
+    return res.status(400).json({ message: "HowManyRequest must be a number." });
+  }
+
 
   const Teachers = await TeacherProfile.findOne({ TeacherUserId: userId });
+
   if (!Teachers) {
     return res.status(404).json({ message: "Teacher not found" });
   }
 
-  // Check if the teacher is blocked from OTP requests
   if (Teachers.isBlockForOtp) {
     return res.status(403).json({ message: "Your account is blocked for OTP requests. Please contact support." });
   }
 
   const now = Date.now();
+
+  if (HowManyRequest >= 3) {
+    Teachers.isBlockForOtp = true;
+    Teachers.OtpBlockTime = new Date();
+    await Teachers.save();
+    return res.status(200).json({ message: "You are blocked from requesting OTP for the rest of the day." });
+  }
 
   // Check if the OTP has expired and the request is made within the cooldown period
   if (Teachers.OtpExpired && now < Teachers.OtpExpired - 1 * 60 * 1000) {
@@ -933,13 +947,19 @@ exports.TeacherProfileResendOtp = CatchAsync(async (req, res) => {
 
   // Generate a new OTP and set its expiration time
   Teachers.SubmitOtp = crypto.randomInt(100000, 999999);
-  Teachers.OtpExpired = Date.now() + 2 * 60 * 1000; // OTP expires in 10 minutes
-  await Teachers.save();
+  Teachers.OtpExpired = Date.now() + 2 * 60 * 1000; // OTP expires in 2 minutes
 
-  const Message = `Profile Details Verification OTP Resent Successfully\n\nDear ${Teachers?.FullName},\n\nWe have successfully resent your OTP for profile verification. Please use the OTP provided below to complete your profile verification process:\n\nOTP: ${Teachers.SubmitOtp}\n\nThis OTP is valid for the next 10 minutes. Please make sure to enter it within this timeframe to avoid expiration.\n\nIf you did not request this OTP, please disregard this message. For any assistance, feel free to contact our support team.\n\nBest regards,\nS R Tutors\nEmail: support@srtutors.com`;
+  try {
+    await Teachers.save();
 
-  await SendWhatsAppMessage(Message, Teachers.ContactNumber);
-  res.status(200).json({ message: "OTP resent successfully" });
+    const Message = `Profile Details Verification OTP Resent Successfully\n\nDear ${Teachers?.FullName},\n\nWe have successfully resent your OTP for profile verification. Please use the OTP provided below to complete your profile verification process:\n\nOTP: ${Teachers.SubmitOtp}\n\nThis OTP is valid for the next 10 minutes. Please make sure to enter it within this timeframe to avoid expiration.\n\nIf you did not request this OTP, please disregard this message. For any assistance, feel free to contact our support team.\n\nBest regards,\nS R Tutors\nEmail: support@srtutors.com`;
+
+    await SendWhatsAppMessage(Message, Teachers.ContactNumber);
+    res.status(200).json({ message: "OTP resent successfully" });
+  } catch (error) {
+    console.error("Error sending OTP:", error);
+    res.status(500).json({ message: "Failed to resend OTP. Please try again." });
+  }
 });
 
 exports.updateTeacherProfile = CatchAsync(async (req, res) => {
