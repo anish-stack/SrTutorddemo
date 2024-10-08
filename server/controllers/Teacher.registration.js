@@ -71,7 +71,7 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
         return res.status(400).json({ message: "You are blocked For 24 Hours ,Please retry After the 24 Hours" });
       } else if (existingTeacher.hit >= 3) {
         existingTeacher.isBlockForOtp = true
-        await  existingTeacher.save()
+        await existingTeacher.save()
         return res.status(400).json({
           message: "You are blocked For 24 Hours. Please retry after 24 hours."
         });
@@ -1655,7 +1655,7 @@ exports.BrowseTutorsNearMe = CatchAsync(async (req, res) => {
       locationResults = locationResults.filter(teacher => teacher.Gender === Gender);
     }
 
-
+    // console.log(Subject)
 
     if (ModeOfTuition) {
       locationResults = locationResults.filter(teacher => teacher.TeachingMode === ModeOfTuition);
@@ -1670,14 +1670,19 @@ exports.BrowseTutorsNearMe = CatchAsync(async (req, res) => {
       }
     }
 
-    if (Subject) {
+    if (Subject && Array.isArray(Subject) && Subject.length > 0) {
       const subjectFilter = locationResults.filter(teacher =>
-        teacher.AcademicInformation.some(item =>
-          item.SubjectNames.map(subjectName => subjectName.toLowerCase()).includes(Subject.toLowerCase())
-        )
+          teacher.AcademicInformation.some(item =>
+              // Check if teacher has all selected subjects
+              Subject.every(selectedSubject =>
+                  item.SubjectNames.map(subjectName => subjectName.toLowerCase()).includes(selectedSubject.toLowerCase())
+              )
+          )
       );
-      locationResults = subjectFilter
-    }
+      locationResults = subjectFilter;
+      // console.log(locationResults); // Debugging: Check filtered results
+  }
+  
 
     if (Experience !== undefined && Experience !== null) {
       // If Experience is greater than 0, apply the filter

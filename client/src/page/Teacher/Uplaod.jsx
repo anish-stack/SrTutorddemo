@@ -54,7 +54,8 @@ const Upload = ({ teacherId }) => {
                 }
             );
             console.log('Response:', response.data);
-            toast.success("Document Upload Successful Please Wait 24 Hours For Complete Verification")
+            toast.success("Document Upload Successful Please Wait 24 Hours For Complete Verification") 
+            window.location.reload()
         } catch (error) {
             console.error('Error uploading documents:', error);
             setError(true);
