@@ -11,7 +11,7 @@ import { useGeolocated } from 'react-geolocated';
 import toast from "react-hot-toast";
 
 const ProfilePage = () => {
-    const [step, setStep] = useState(2);
+    const [step, setStep] = useState(1);
 
     const [formData, setFormData] = useState({
         FullName: '',
