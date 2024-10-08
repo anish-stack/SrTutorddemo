@@ -42,7 +42,7 @@ const TeacherProfileSchema = new mongoose.Schema({
     },
     ContactNumber: {
         type: String,
-        unique: true
+        // unique: true
     },
     AlternateContact: {
         type: String
