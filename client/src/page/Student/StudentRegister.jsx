@@ -17,7 +17,7 @@ const StudentRegistration = () => {
         Password: ''
     });
     const [verifyData, setVerifyData] = useState({
-        Email: '',
+        PhoneNumber: '',
         otp: ''
     });
     const [showModel, setShowModal] = useState(false)
@@ -28,18 +28,18 @@ const StudentRegistration = () => {
     const loginModelClose = () => setShowModal(false)
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prevData => ({
+        setFormData((prevData) => ({
             ...prevData,
             [name]: value
         }));
-        if (name === 'Email') {
-            setVerifyData(prevData => ({
+    
+        if (name === 'PhoneNumber') {
+            setVerifyData((prevData) => ({
                 ...prevData,
-                Email: value
+                PhoneNumber: value
             }));
         }
     };
-
     const handleVerifyChange = (e) => {
         const { name, value } = e.target;
         setVerifyData(prevData => ({
@@ -63,6 +63,11 @@ const StudentRegistration = () => {
             toast.success(response.data.message);
             setLoading(false);
             setModelOpen(true);
+            setVerifyData(prevData => ({
+                ...prevData,
+                PhoneNumber: formData.PhoneNumber // Copy phone number to verifyData
+            }));
+            console.log('Verifying OTP with:', verifyData);
         } catch (error) {
             setLoading(false);
             toast.error(error.response?.data?.message || "An error occurred");
@@ -71,8 +76,9 @@ const StudentRegistration = () => {
 
     const resendOtp = async () => {
         setLoading(true);
+        console.log('Verifying OTP with:', verifyData);
         try {
-            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/resent-otp', { Email: verifyData.Email });
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/resent-otp', { PhoneNumber: verifyData.PhoneNumber });
             toast.success(response.data.message);
             setLoading(false);
         } catch (error) {
@@ -209,14 +215,14 @@ const StudentRegistration = () => {
                                 <input
                                     type="text"
                                     className="form-control"
-                                    id="Email"
-                                    name="Email"
-                                    value={verifyData.Email}
+                                    id="PhoneNumber"
+                                    name="PhoneNumber"
+                                    value={verifyData.PhoneNumber}
                                     onChange={handleVerifyChange}
                                     required
-                                    placeholder="Email"
+                                    placeholder="PhoneNumber"
                                 />
-                                <label htmlFor="Email">Email</label>
+                                <label htmlFor="PhoneNumber">Phone Number</label>
                             </div>
                         </div>
                         <div className="mb-3">

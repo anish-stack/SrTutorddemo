@@ -70,6 +70,8 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
       } else if (existingTeacher.isBlockForOtp === true) {
         return res.status(400).json({ message: "You are blocked For 24 Hours ,Please retry After the 24 Hours" });
       } else if (existingTeacher.hit >= 3) {
+        existingTeacher.isBlockForOtp = true
+        await  existingTeacher.save()
         return res.status(400).json({
           message: "You are blocked For 24 Hours. Please retry after 24 hours."
         });
@@ -194,48 +196,58 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
 //Teacher Verify Otp
 exports.TeacherVerifyOtp = CatchAsync(async (req, res) => {
   try {
-    const { Email, otp } = req.body;
+    const { PhoneNumber, Email, otp } = req.body;
 
-    const ExistTeacher = await Teacher.findOne({ Email });
-    if (!ExistTeacher) {
+    // Find teacher by phone number or email
+    const existingTeacher = await Teacher.findOne({
+      $or: [{ PhoneNumber }, { Email }],
+    });
+
+    if (!existingTeacher) {
       return res.status(404).json({ message: "Teacher not found" });
     }
 
-    if (
-      ExistTeacher.SignInOtp !== otp ||
-      ExistTeacher.OtpExpiresTime < Date.now()
-    ) {
+    // Validate OTP and check expiration
+    const isOtpValid = existingTeacher.SignInOtp === otp;
+    const isOtpExpired = existingTeacher.OtpExpiresTime < Date.now();
+
+    if (!isOtpValid || isOtpExpired) {
       return res.status(400).json({ message: "Invalid or expired OTP" });
     }
 
-    ExistTeacher.isTeacherVerified = true;
-    ExistTeacher.isBlockForOtp = false
-    ExistTeacher.OtpBlockTime = null
-    ExistTeacher.SignInOtp = undefined;
-    ExistTeacher.hit = 0
-    ExistTeacher.OtpExpiresTime = undefined;
-    await ExistTeacher.save();
+    // Update teacher verification status
+    existingTeacher.isTeacherVerified = true;
+    existingTeacher.isBlockForOtp = false;
+    existingTeacher.OtpBlockTime = null;
+    existingTeacher.SignInOtp = undefined;
+    existingTeacher.hit = 0;
+    existingTeacher.OtpExpiresTime = undefined;
+
+    await existingTeacher.save();
+
     const redisClient = req.app.locals.redis;
 
     if (!redisClient) {
-      throw new Error("Redis client is not available.");
+      return res.status(500).json({ message: "Redis client is not available." });
     }
 
-    // Check if Teacher is cached
+    // Invalidate cached teacher data
     await redisClient.del(`Teacher`);
-    await sendToken(ExistTeacher, res, 201);
+
+    // Send token upon successful verification
+    await sendToken(existingTeacher, res, 201);
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: "Internal server error", error: error.message });
+    console.error(error); // Log error for debugging
+    return res.status(500).json({ message: "Internal server error", error: error.message });
   }
 });
 
-//Teacher Resent Otp
 exports.TeacherResendOtp = CatchAsync(async (req, res) => {
   try {
-    const { Email } = req.body;
-    const Teachers = await Teacher.findOne({ Email });
+    const { Email, PhoneNumber } = req.body;
+    const Teachers = await Teacher.findOne({
+      $or: [{ PhoneNumber }, { Email }],
+    });
 
     if (!Teachers) {
       return res.status(404).json({ message: "Teacher not found" });
@@ -245,7 +257,8 @@ exports.TeacherResendOtp = CatchAsync(async (req, res) => {
       return res.status(400).json({ message: "Teacher already verified" });
     }
 
-    if (Teachers.isBlockForOtp === true) {
+    // Check if the teacher is blocked
+    if (Teachers.isBlockForOtp) {
       return res.status(429).json({
         message: "You have been temporarily blocked from requesting OTP. Please try again later.",
       });
@@ -253,8 +266,10 @@ exports.TeacherResendOtp = CatchAsync(async (req, res) => {
 
     const now = Date.now();
 
-    // Check if Teacher hit limit of OTP requests
-    if (Teachers.hit >= 3) {
+    // Check if the teacher hit the limit of OTP requests
+    if (Teachers.hit >= 3) { // Block if hit is 3 or more
+      Teachers.isBlockForOtp = true;
+      await Teachers.save();
       return res.status(400).json({
         message: "You are blocked for 24 hours. Please retry after 24 hours.",
       });
@@ -290,14 +305,13 @@ exports.TeacherResendOtp = CatchAsync(async (req, res) => {
     res.status(200).json({ message: "OTP resent successfully" });
 
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500).json({
       message: "Internal server error",
       error: error.message,
     });
   }
 });
-
 
 
 exports.teacherBlockForOtp = CatchAsync(async (req, res) => {
