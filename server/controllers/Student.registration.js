@@ -38,7 +38,13 @@ exports.StudentRegister = CatchAsync(async (req, res) => {
         }
 
         // Check if the student already exists
-        const existingStudent = await Student.findOne({ Email });
+        const existingStudent = await Student.findOne({
+            $or: [
+                { Email: Email },
+                { PhoneNumber: PhoneNumber }
+            ]
+        });
+        
         if (existingStudent) {
             // Check if the student is verified
             if (existingStudent.isStudentVerified) {

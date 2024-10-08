@@ -25,7 +25,7 @@ const TeacherRegistration = () => {
 
 
     const [verifyData, setVerifyData] = useState({
-        Email: '',
+        PhoneNumber: '',
         otp: ''
     })
 
@@ -79,10 +79,10 @@ const TeacherRegistration = () => {
             ...prevData,
             [name]: value
         }));
-        if (name === 'Email') {
+        if (name === 'PhoneNumber') {
             setVerifyData((prevData) => ({
                 ...prevData,
-                Email: value
+                PhoneNumber: value
             }));
         }
     };
@@ -103,8 +103,9 @@ const TeacherRegistration = () => {
             await handleBlockTeacher();
             return;
         }
+        console.log(verifyData)
         try {
-            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/teacher/resent-otp', verifyData);
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/teacher/resent-otp',{PhoneNumber:verifyData.PhoneNumber});
             toast.success(response.data.message);
             setResendButtonClick(resendButtonClick + 1);
             setResendError('');
@@ -192,7 +193,10 @@ const TeacherRegistration = () => {
             toast.success(response.data.message)
             setLoading(false)
             setModelOpen(true)
-
+            setVerifyData(prevData => ({
+                ...prevData,
+                PhoneNumber: formData.PhoneNumber 
+            }));
         } catch (error) {
             setLoading(false)
             console.log(error.response.data.message)
@@ -490,12 +494,12 @@ const TeacherRegistration = () => {
                                 <input
                                     type="text"
                                     className="form-control"
-                                    id="Email"
-                                    name="Email"
-                                    value={verifyData.Email}
+                                    id="PhoneNumber"
+                                    name="PhoneNumber"
+                                    value={verifyData.PhoneNumber}
                                     onChange={handleVerifyChange}
                                     required
-                                    placeholder="Email"
+                                    placeholder="Phone Number"
                                 />
                             </div>
                         </div>
