@@ -101,6 +101,10 @@ const TeacherSchema = new mongoose.Schema({
     isTopTeacher: {
         type: Boolean,
         default: false,
+    },
+    hit: {
+        type: Number,
+        default: 0
     }
 }, { timestamps: true });
 
