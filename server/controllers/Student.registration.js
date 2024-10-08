@@ -21,7 +21,6 @@ const crypto = require('crypto')
 const SendWhatsAppMessage = require('../utils/SendWhatsappMeg')
 
 
-//Student New Register
 exports.StudentRegister = CatchAsync(async (req, res) => {
     try {
         const { StudentName, AltPhoneNumber, PhoneNumber, Email, Password, latitude, longitude } = req.body;
@@ -31,7 +30,6 @@ exports.StudentRegister = CatchAsync(async (req, res) => {
         if (!StudentName) missingFields.push('Student Name');
         if (!PhoneNumber) missingFields.push('Phone Number');
         if (!Email) missingFields.push('Email');
-
 
         if (missingFields.length > 0) {
             return res.status(400).json({
@@ -44,30 +42,33 @@ exports.StudentRegister = CatchAsync(async (req, res) => {
         if (existingStudent) {
             // Check if the student is verified
             if (existingStudent.isStudentVerified) {
-                return res.status(400).json({ message: 'Student with this email already exists' });
+                return res.status(400).json({ message: 'Student with this email is already verified.' });
+            } else if (existingStudent.isBlockForOtp) {
+                return res.status(403).json({ message: 'Your account is blocked for OTP requests. Please contact support.' });
             } else {
                 // If not verified, resend the OTP
-                const newOtp = crypto.randomInt(100000, 999999)
-                existingStudent.Password = !Password || PhoneNumber;
-                existingStudent.SignInOtp = newOtp// Generate a 6-digit OTP
-                existingStudent.OtpExpiresTime = Date.now() + 4 * 60 * 1000; // OTP expires in 4 minutes
+                const newOtp = crypto.randomInt(100000, 999999);
+                if (!Password) {
+                    existingStudent.Password = PhoneNumber; // Assign default password
+                }
+                existingStudent.SignInOtp = newOtp;
+                existingStudent.OtpExpiresTime = Date.now() + 4 * 60 * 1000;
+                existingStudent.hit += 1;
                 await existingStudent.save();
 
-                const message = `Dear ${existingStudent.StudentName},\nWe are pleased to inform you that your OTP for verification is: ${existingStudent.SignInOtp}\n${!Password ? `Your Default Password is ${newStudent.PhoneNumber}\n` : ''}Please use this OTP to complete your verification process. This OTP is valid for a limited time, so kindly proceed without delay.\nIf you did not request this OTP, please disregard this message.\nBest regards,\nS R Tutors`;
+                const message = `Dear ${existingStudent.StudentName},\nWe are pleased to inform you that your OTP for verification is: ${existingStudent.SignInOtp}\n${!Password ? `Your Default Password is ${existingStudent.PhoneNumber}\n` : ''}Please use this OTP to complete your verification process. This OTP is valid for a limited time, so kindly proceed without delay.\nIf you did not request this OTP, please disregard this message.\nBest regards,\nS R Tutors`;
 
-
-                await SendWhatsAppMessage(message, PhoneNumber)
+                await SendWhatsAppMessage(message, PhoneNumber);
 
                 return res.status(200).json({ message: 'You are already registered. OTP has been resent. Please verify your contact number.' });
             }
         }
 
-
-
         // Generate OTP
         const otp = crypto.randomInt(100000, 999999);
-        const otpExpiresTime = Date.now() + 4 * 60 * 1000; // OTP expires in 10 minutes
-        const Image = `https://avatar.iran.liara.run/username?username=${StudentName}`
+        const otpExpiresTime = Date.now() + 4 * 60 * 1000;
+        const Image = `https://avatar.iran.liara.run/username?username=${StudentName}`;
+
         // Create a new student
         const newStudent = await Student.create({
             StudentName,
@@ -77,6 +78,7 @@ exports.StudentRegister = CatchAsync(async (req, res) => {
             Password,
             latitude,
             AltPhoneNumber,
+            hit: 1,
             longitude,
             isStudentVerified: false,
             SignInOtp: otp,
@@ -85,17 +87,15 @@ exports.StudentRegister = CatchAsync(async (req, res) => {
 
         const message = `Dear ${newStudent.StudentName},\nWe are pleased to inform you that your OTP for verification is: ${newStudent.SignInOtp}\n${!Password ? `Your Default Password is ${newStudent.PhoneNumber}\n` : ''}Please use this OTP to complete your verification process. This OTP is valid for a limited time, so kindly proceed without delay.\nIf you did not request this OTP, please disregard this message.\nBest regards,\nS R Tutors`;
 
-
-        await SendWhatsAppMessage(message, PhoneNumber)
-
+        await SendWhatsAppMessage(message, PhoneNumber);
 
         res.status(201).json({
             success: true,
-            message: 'Please verify Otp For Complete Registration Otp sends On Phone Number',
+            message: 'Please verify OTP to complete registration. OTP sent to phone number.',
             data: newStudent
-        })
+        });
     } catch (error) {
-        console.log(error)
+        console.error(error);
         return res.status(500).json({ message: 'Internal server error', error: error.message });
     }
 });
@@ -104,9 +104,9 @@ exports.StudentRegister = CatchAsync(async (req, res) => {
 exports.StudentVerifyOtp = CatchAsync(async (req, res) => {
     try {
         const { PhoneNumber, Email, otp } = req.body;
-        console.log(req.body)
+
         const student = await Student.findOne({ Email }) || await Student.findOne({ PhoneNumber });
-        console.log(student)
+
         if (!student) {
             return res.status(404).json({ message: 'Student not found' });
         }
@@ -117,7 +117,9 @@ exports.StudentVerifyOtp = CatchAsync(async (req, res) => {
 
         student.isStudentVerified = true;
         student.SignInOtp = undefined;
+        student.isBlockForOtp = false
         student.OtpExpiresTime = undefined;
+        student.hit = 0
         await student.save();
 
         await sendToken(student, res, 201);
@@ -157,7 +159,7 @@ exports.StudentResendOtp = CatchAsync(async (req, res) => {
         }
 
 
-        if (HowManyHit >= MAX_RESEND_ATTEMPTS) {
+        if (student.hit >= MAX_RESEND_ATTEMPTS || HowManyHit >= MAX_RESEND_ATTEMPTS) {
             student.isBlockForOtp = true;
             student.OtpBlockTime = new Date();
             await student.save();
@@ -169,7 +171,7 @@ exports.StudentResendOtp = CatchAsync(async (req, res) => {
         const newOtp = crypto.randomInt(100000, 999999);
         student.SignInOtp = newOtp;
         student.OtpExpiresTime = Date.now() + 1 * 60 * 1000;
-
+        student.hit += 1
 
         const Message = `Your OTP for mobile number verification is: ${newOtp}\n\nPlease use this code to complete your verification process.\nThis OTP is valid for 10 minutes.\nIf you did not request this, please ignore this message.\nBest regards,\nS R Tutors`;
 
@@ -258,7 +260,7 @@ exports.CheckNumber = CatchAsync(async (req, res) => {
         const now = Date.now(); // Define now before using it
         const checkUser = await Student.findOne({ PhoneNumber: userNumber });
         const otp = crypto.randomInt(100000, 999999);
-        const otpExpiresTime = Date.now() + 2 * 60 * 1000;
+        const otpExpiresTime = now + 2 * 60 * 1000; // 2 minutes from now
 
         if (checkUser) {
             // Check if the user is blocked
@@ -266,16 +268,9 @@ exports.CheckNumber = CatchAsync(async (req, res) => {
                 return res.status(429).json({ message: "Your account is blocked for OTP requests. Please contact support." });
             }
 
-            // Block user if they hit the request limit
-            if (HowManyHit >= 3) {
-                checkUser.isBlockForOtp = true;
-                checkUser.OtpBlockTime = new Date();
-                await checkUser.save();
-            }
-
             // Check if OTP has expired
-            if (checkUser.OtpExpiresTime && now < checkUser.OtpExpiresTime - 1 * 60 * 1000) {
-                const remainingTimeInMs = checkUser.OtpExpiresTime - 1 * 60 * 1000 - now;
+            if (checkUser.OtpExpiresTime && now < checkUser.OtpExpiresTime) {
+                const remainingTimeInMs = checkUser.OtpExpiresTime - now;
                 const remainingSeconds = Math.ceil(remainingTimeInMs / 1000);
 
                 return res.status(429).json({
@@ -283,10 +278,21 @@ exports.CheckNumber = CatchAsync(async (req, res) => {
                 });
             }
 
+            // Block user if they hit the request limit
+            if (checkUser.hit >= 3 || HowManyHit >= 3) {
+                checkUser.isBlockForOtp = true;
+                checkUser.OtpBlockTime = new Date();
+                await checkUser.save();
+                return res.status(403).json({ message: "You are blocked from requesting OTP until the end of the day." });
+            }
+
             // Prepare message and send OTP
             const Message = `Your OTP for mobile number verification is: ${otp}.\nPlease use this code to complete your verification process.\nThis OTP is valid for 10 minutes. If you did not request this, please ignore this message.\nBest regards,\nS R Tutors`;
             checkUser.SignInOtp = otp;
             checkUser.OtpExpiresTime = otpExpiresTime;
+            checkUser.hit += 1; // Increment hit count
+
+            await checkUser.save(); // Save user data before sending the message
 
             const sendWhatsappMsg = await SendWhatsAppMessage(Message, userNumber);
 
@@ -294,7 +300,6 @@ exports.CheckNumber = CatchAsync(async (req, res) => {
                 return res.status(500).json({ message: "Failed to send message. Please try again later." });
             }
 
-            await checkUser.save();
             return res.status(200).json({
                 success: true,
                 message: 'OTP sent successfully.'
@@ -307,6 +312,7 @@ exports.CheckNumber = CatchAsync(async (req, res) => {
                 Email: `Student${crypto.randomInt(100, 999)}@gmail.com`,
                 Password: `Student${crypto.randomInt(100, 999)}`,
                 latitude,
+                hit: 1,
                 AltPhoneNumber: userNumber,
                 longitude,
                 isStudentVerified: false,
@@ -334,6 +340,7 @@ exports.CheckNumber = CatchAsync(async (req, res) => {
         return res.status(500).json({ message: 'Internal server error', error: error.message });
     }
 });
+
 
 
 
@@ -460,7 +467,7 @@ exports.StudentPasswordOtpResent = CatchAsync(async (req, res) => {
             message: `OTP already sent recently. Please wait ${remainingSeconds} seconds before requesting a new OTP.`
         });
     }
-        console.log(howManyHit)
+    console.log(howManyHit)
 
     if (howManyHit >= 3) {
         student.isBlockForOtp = true;
@@ -793,6 +800,7 @@ cron.schedule('0 0 * * *', async () => {
 
             if (timeDifference >= 24 * 60 * 60 * 1000) {
                 teacher.isBlockForOtp = false;
+                teacher.hit = 0
                 teacher.OtpBlockTime = null;
                 await teacher.save();
                 console.log(`Unblocked Studnets: ${teacher.Email}`);

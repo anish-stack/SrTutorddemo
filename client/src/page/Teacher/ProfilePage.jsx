@@ -11,7 +11,7 @@ import { useGeolocated } from 'react-geolocated';
 import toast from "react-hot-toast";
 
 const ProfilePage = () => {
-    const [step, setStep] = useState(1);
+    const [step, setStep] = useState(2);
 
     const [formData, setFormData] = useState({
         FullName: '',
@@ -79,7 +79,7 @@ const ProfilePage = () => {
     const [subjects, setSubjects] = useState([]);
     const [latitude, setLatitude] = useState(null);
     const [longitude, setLongitude] = useState(null);
-    const [radius, setRadius] = useState(); // Radius in kilometers
+    const [radius, setRadius] = useState(''); 
     const [places, setPlaces] = useState([]);
     const [selectedPlace, setSelectedPlace] = useState(null);
     const [permissionDenied, setPermissionDenied] = useState(false);
@@ -175,6 +175,7 @@ const ProfilePage = () => {
 
 
     const fetchNearbyPlaces = async () => {
+    
         if (latitude && longitude) {
             const url = `https://api.srtutorsbureau.com/nearby-places?lat=${latitude}&lng=${longitude}&radius=${radius * 1000}`;// Convert km to meters
 
@@ -197,7 +198,11 @@ const ProfilePage = () => {
             }
         }
     };
-
+    useEffect(() => {
+        if (radius) {
+            fetchNearbyPlaces();
+        }
+    }, [radius]);
     const fetchUser = async () => {
         try {
             const response = await axios.get(
@@ -421,11 +426,14 @@ const ProfilePage = () => {
             });
 
             console.log(response.data);
-            toast.success("🎉 Profile submitted successfully! Please verify it with the OTP sent to your Whatsapp Number. 📧");
+            toast.success("🎉 Profile submitted successfully! 📧");
             setLoading(false);
 
             setTimeout(() => {
-                window.location.href = `/Teacher-Profile-Verify?token=${tokenQuery}&id=${IdQuery}`;
+                // window.location.href = `/Teacher-Profile-Verify?token=${tokenQuery}&id=${IdQuery}`;
+                window.location.href = `/Teacher-dashboard`;
+
+               
             }, 500);
         } catch (error) {
             console.log(error);
@@ -729,10 +737,7 @@ const ProfilePage = () => {
                                 value={radius}
                                 onChange={(e) => {
                                     const selectedValue = e.target.value;
-                                    setRadius(selectedValue);
-                                    if (selectedValue) {
-                                        fetchNearbyPlaces(); // Only call if a valid value is selected
-                                    }
+                                    setRadius(selectedValue); 
                                 }}
                             >
                                 <option value="">

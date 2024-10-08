@@ -66,6 +66,10 @@ const StudentSchema = new mongoose.Schema({
     },
     longitude: {
         type: String
+    },
+    hit:{
+        type:Number,
+        default:0
     }
 }, { timestamps: true });
 

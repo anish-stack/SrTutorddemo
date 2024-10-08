@@ -109,7 +109,8 @@ const TeacherRegistration = () => {
             setResendButtonClick(resendButtonClick + 1);
             setResendError('');
         } catch (error) {
-            setResendError(error.response.data.message)
+            console.log(error)
+            setResendError(error?.response?.data.message)
             toast.error(error.response.data.message);
         }
     };

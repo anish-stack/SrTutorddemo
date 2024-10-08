@@ -67,7 +67,16 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
     if (existingTeacher) {
       if (existingTeacher.isTeacherVerified) {
         return res.status(400).json({ message: "Teacher with this email and Phone Number already exists" });
-      } else {
+      } else if (existingTeacher.isBlockForOtp === true) {
+        return res.status(400).json({ message: "You are blocked For 24 Hours ,Please retry After the 24 Hours" });
+      } else if (existingTeacher.hit >= 3) {
+        return res.status(400).json({
+          message: "You are blocked For 24 Hours. Please retry after 24 hours."
+        });
+      }
+      else {
+        existingTeacher.hit = (existingTeacher.hit || 0) + 1;
+
         existingTeacher.Password = Password;
         existingTeacher.SignInOtp = crypto.randomInt(100000, 999999);
         existingTeacher.OtpExpiresTime = Date.now() + 2 * 60 * 1000;
@@ -148,6 +157,7 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
       gender,
       AltNumber,
       DOB,
+      hit: 1,
       identityDocument: {
         DocumentType,
         DocumentImageUrl: documentUploadResult.secure_url,
@@ -202,6 +212,7 @@ exports.TeacherVerifyOtp = CatchAsync(async (req, res) => {
     ExistTeacher.isBlockForOtp = false
     ExistTeacher.OtpBlockTime = null
     ExistTeacher.SignInOtp = undefined;
+    ExistTeacher.hit = 0
     ExistTeacher.OtpExpiresTime = undefined;
     await ExistTeacher.save();
     const redisClient = req.app.locals.redis;
@@ -222,46 +233,71 @@ exports.TeacherVerifyOtp = CatchAsync(async (req, res) => {
 
 //Teacher Resent Otp
 exports.TeacherResendOtp = CatchAsync(async (req, res) => {
-  const { Email } = req.body;
-  console.log(req.body)
-  const Teachers = await Teacher.findOne({ Email });
-  if (!Teachers) {
-    return res.status(404).json({ message: "Teacher not found" });
-  }
+  try {
+    const { Email } = req.body;
+    const Teachers = await Teacher.findOne({ Email });
 
-  if (Teachers.isTeacherVerified) {
-    return res.status(400).json({ message: "Teacher already verified" });
-  }
+    if (!Teachers) {
+      return res.status(404).json({ message: "Teacher not found" });
+    }
 
+    if (Teachers.isTeacherVerified) {
+      return res.status(400).json({ message: "Teacher already verified" });
+    }
 
+    if (Teachers.isBlockForOtp === true) {
+      return res.status(429).json({
+        message: "You have been temporarily blocked from requesting OTP. Please try again later.",
+      });
+    }
 
-  if (Teachers.isBlockForOtp === true) {
-    return res.status(429).json({ message: "You have been temporarily blocked from requesting OTP. Please try again later." });
-  }
+    const now = Date.now();
 
-  const now = Date.now();
+    // Check if Teacher hit limit of OTP requests
+    if (Teachers.hit >= 3) {
+      return res.status(400).json({
+        message: "You are blocked for 24 hours. Please retry after 24 hours.",
+      });
+    }
 
-  if (Teachers.OtpExpiresTime && now < Teachers.OtpExpiresTime - 1 * 60 * 1000) {
-    const remainingTimeInMs = Teachers.OtpExpiresTime - 1 * 60 * 1000 - now;
-    const remainingSeconds = Math.ceil(remainingTimeInMs / 1000);
+    // Ensure OTP is only sent if previous OTP has expired
+    if (Teachers.OtpExpiresTime && now < Teachers.OtpExpiresTime - 1 * 60 * 1000) {
+      const remainingTimeInMs = Teachers.OtpExpiresTime - 1 * 60 * 1000 - now;
+      const remainingSeconds = Math.ceil(remainingTimeInMs / 1000);
 
-    return res.status(429).json({
-      message: `OTP already sent recently. Please wait ${remainingSeconds} seconds before requesting a new OTP.`
+      return res.status(429).json({
+        message: `OTP already sent recently. Please wait ${remainingSeconds} seconds before requesting a new OTP.`,
+      });
+    }
+
+    // Generate and set new OTP
+    Teachers.SignInOtp = crypto.randomInt(100000, 999999);
+    Teachers.OtpExpiresTime = now + 2 * 60 * 1000;
+    Teachers.hit += 1; // Increment hit counter after each OTP sent
+    await Teachers.save();
+
+    const NewMessage = `Dear ${Teachers.TeacherName},\nYour OTP for verification is: ${Teachers.SignInOtp}.\nThis OTP is valid for a limited time.\nIf you did not request this OTP, please ignore this message.\nBest regards,\nS R Tutors`;
+
+    try {
+      await SendWhatsAppMessage(NewMessage, Teachers.PhoneNumber);
+    } catch (error) {
+      return res.status(500).json({
+        message: "Failed to send OTP. Please try again later.",
+        error: error.message,
+      });
+    }
+
+    res.status(200).json({ message: "OTP resent successfully" });
+
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({
+      message: "Internal server error",
+      error: error.message,
     });
   }
-
-  Teachers.SignInOtp = crypto.randomInt(100000, 999999);
-  Teachers.OtpExpiresTime = now + 2 * 60 * 1000;
-  await Teachers.save();
-
-  const NewMessage = `Dear ${Teachers.TeacherName},\nYour OTP for verification is: ${Teachers.SignInOtp}.\nThis OTP is valid for a limited time.\nIf you did not request this OTP, please ignore this message.\nBest regards,\nS R Tutors`;
-  try {
-    await SendWhatsAppMessage(NewMessage, Teachers.PhoneNumber);
-  } catch (error) {
-    return res.status(500).json({ message: "Failed to send OTP. Please try again later." });
-  }
-  res.status(200).json({ message: "OTP resent successfully" });
 });
+
 
 
 exports.teacherBlockForOtp = CatchAsync(async (req, res) => {
@@ -353,9 +389,21 @@ exports.TeacherPasswordChangeRequest = CatchAsync(async (req, res) => {
       return res.status(404).json({ message: "Teacher not found. Please check the email address and try again." });
     }
 
+    // Check if OTP requests are blocked
+    if (teacher.isBlockForOtp === true) {
+      return res.status(429).json({ message: "You are temporarily blocked from requesting OTP. Please try again later." });
+    }
+
+    // Check if the teacher has exceeded the allowed OTP requests (hit >= 3)
+    if (teacher.hit >= 3) {
+      return res.status(429).json({ message: "You have exceeded the maximum OTP requests. Please try again after 24 hours." });
+    }
+
     // Generate OTP and set expiration time
     teacher.ForgetPasswordOtp = crypto.randomInt(100000, 999999);
-    teacher.OtpExpiresTime = Date.now() + 10 * 60 * 1000; // 10 minutes
+    teacher.OtpExpiresTime = Date.now() + 2 * 60 * 1000; // 2 minutes OTP validity
+    teacher.hit += 1; // Increment the hit counter
+
     await teacher.save();
 
     // Create WhatsApp message
@@ -363,7 +411,7 @@ exports.TeacherPasswordChangeRequest = CatchAsync(async (req, res) => {
 
     // Send OTP via WhatsApp
     const sent = await SendWhatsAppMessage(NewMessage, teacher.PhoneNumber);
-    if (sent.success === false) {
+    if (!sent.success) {
       return res.status(500).json({ message: "Failed to send OTP. Please try again later." });
     }
 
@@ -374,7 +422,7 @@ exports.TeacherPasswordChangeRequest = CatchAsync(async (req, res) => {
     res.status(500).json({ message: "An error occurred while processing your request. Please try again later." });
   }
 });
-;
+
 
 // Teacher Verify Password OTP
 exports.TeacherVerifyPasswordOtp = CatchAsync(async (req, res) => {
@@ -399,6 +447,7 @@ exports.TeacherVerifyPasswordOtp = CatchAsync(async (req, res) => {
     teacher.Password = newPassword;
     teacher.ForgetPasswordOtp = undefined;
     teacher.OtpExpiresTime = undefined;
+    teacher.hit = 0
     await teacher.save();
 
     res.status(200).json({ message: "Password changed successfully. You can now log in with your new password." });
@@ -412,20 +461,23 @@ exports.TeacherVerifyPasswordOtp = CatchAsync(async (req, res) => {
 exports.TeacherPasswordOtpResent = CatchAsync(async (req, res) => {
   const { Email, howManyHit } = req.body;
 
-  const Teachers = await Teacher.findOne({ Email });
-  if (!Teachers) {
-    return res.status(404).json({ message: "Teacher not found" });
+  // Find teacher by email
+  const teacher = await Teacher.findOne({ Email });
+  if (!teacher) {
+    return res.status(404).json({ message: "Teacher not found." });
   }
-  if (Teachers.isBlockForOtp === true) {
+
+  // Check if teacher is blocked from requesting OTP
+  if (teacher.isBlockForOtp === true) {
     return res.status(429).json({ message: "You have been temporarily blocked from requesting OTP. Please try again later." });
   }
 
   // Define the current time
   const now = Date.now();
 
-  // Check if the previous OTP is still valid
-  if (Teachers.OtpExpiresTime && now < Teachers.OtpExpiresTime - 1 * 60 * 1000) {
-    const remainingTimeInMs = Teachers.OtpExpiresTime - 1 * 60 * 1000 - now;
+  // Check if OTP was sent recently (subtract 1 minute from expiration time)
+  if (teacher.OtpExpiresTime && now < teacher.OtpExpiresTime - 1 * 60 * 1000) {
+    const remainingTimeInMs = teacher.OtpExpiresTime - 1 * 60 * 1000 - now;
     const remainingSeconds = Math.ceil(remainingTimeInMs / 1000);
 
     return res.status(429).json({
@@ -433,27 +485,29 @@ exports.TeacherPasswordOtpResent = CatchAsync(async (req, res) => {
     });
   }
 
-  // If the hit count exceeds the limit, block the teacher from requesting OTP
-  if (howManyHit >= 3) {
-    Teachers.isBlockForOtp = true;
-    Teachers.OtpBlockTime = new Date();
-    await Teachers.save();
+  // Check if hit limit is exceeded (either from DB or request body)
+  if (teacher.hit >= 3 || (howManyHit && howManyHit >= 3)) {
+    teacher.isBlockForOtp = true;
+    teacher.OtpBlockTime = new Date();  // Track when the block was set
+    teacher.hit += 1;
+    await teacher.save();
 
-    return res.status(403).json({ message: "You are blocked from requesting OTP for the end of the day." });
+    return res.status(403).json({ message: "You are blocked from requesting OTP until the end of the day." });
   }
 
-  // Generate a new OTP and set its expiration time
-  Teachers.ForgetPasswordOtp = crypto.randomInt(100000, 999999);
-  Teachers.OtpExpiresTime = Date.now() + 2 * 60 * 1000; // OTP expires in 10 minutes
-  await Teachers.save();
+  // Increment hit count and generate new OTP
+  teacher.hit += 1;
+  teacher.ForgetPasswordOtp = crypto.randomInt(100000, 999999);  // Generate a 6-digit OTP
+  teacher.OtpExpiresTime = now + 2 * 60 * 1000;  // Set expiration time to 2 minutes from now
+  await teacher.save();
 
-  // Prepare the message for WhatsApp
-  const Message = `Password Change Request Resend OTP Verification\nDear ${Teachers.TeacherName},\nYour OTP for password change verification is: ${Teachers.ForgetPasswordOtp}.\nPlease use this OTP to complete your password change process. This OTP is valid for a limited time, so please proceed without delay.\nIf you did not request this, please ignore this message.\nBest regards,\nS R Tutors`;
+  // Prepare the WhatsApp message
+  const Message = `Password Change Request Resend OTP Verification\nDear ${teacher.TeacherName},\nYour OTP for password change verification is: ${teacher.ForgetPasswordOtp}.\nPlease use this OTP to complete your password change process. This OTP is valid for a limited time, so please proceed without delay.\nIf you did not request this, please ignore this message.\nBest regards,\nS R Tutors`;
 
   try {
     // Send OTP via WhatsApp
-    await SendWhatsAppMessage(Message, Teachers.PhoneNumber);
-    res.status(200).json({ message: "OTP resent successfully" });
+    await SendWhatsAppMessage(Message, teacher.PhoneNumber);
+    res.status(200).json({ message: "OTP resent successfully." });
   } catch (error) {
     // Handle WhatsApp message sending error
     console.error('Failed to send WhatsApp message:', error);
@@ -474,11 +528,9 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
         message: "Unauthorised ACtion Performed",
       });
     }
-    // console.log(userId)
     const FetchProfileExist = await TeacherProfile.findOne({
       TeacherUserId: userId,
     });
-    // console.log(FetchProfileExist)
     if (FetchProfileExist) {
       return res.status(403).json({
         success: false,
@@ -596,16 +648,16 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
     }
 
     // Generate OTP and its expiration time
-    const SubmitOtp = crypto.randomInt(100000, 999999); // Generate a 6-digit OTP
-    const OtpExpiresTime = Date.now() + 2 * 60 * 1000; // OTP valid for 10 minutes
+    const SubmitOtp = crypto.randomInt(100000, 999999);
+    const OtpExpiresTime = Date.now() + 2 * 60 * 1000;
 
     const formattedRanges = ranges.map(range => ({
       location: {
         type: 'Point',
-        coordinates: [range.lng, range.lat] // GeoJSON format requires [longitude, latitude]
+        coordinates: [range.lng, range.lat]
       }
     }));
-    // Save or update teacher profile details
+
     const teacherProfile = new TeacherProfile({
       TeacherUserId: userId,
       FullName,
@@ -617,6 +669,7 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
       CurrentAddress,
       isAddressSame,
       Qualification,
+
       TeachingExperience,
       ExpectedFees,
       VehicleOwned,
@@ -627,13 +680,37 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
       RangeWhichWantToDoClasses: formattedRanges,
       SubmitOtp,
       OtpExpired: OtpExpiresTime,
-      isAllDetailVerified: false, // Assuming profile is not verified yet
+      isAllDetailVerified: true, // Assuming profile is not verified yet
     });
     CheckTeacher.TeacherProfile = teacherProfile._id;
     // Send OTP via email
     const Email = req.user.id.Email;
     // console.log(Email);
-    const Message = `OTP Verification\nDear ${FullName},\nWe are excited to proceed with your verification process. Please use the One-Time Password (OTP) provided below to continue:\n${SubmitOtp}\nThis OTP is valid for the next 2 minutes. Please complete your verification within this time frame.\nIf you did not request this OTP, please disregard this message. For assistance, feel free to reach out to our support team.\nBest regards,\nS R Tutors\nEmail: support@srtutors.com`;
+    const Message = `Successful Onboarding at SR Tutors as a Teacher
+
+    Dear ${teacherProfile?.FullName},
+    
+    Congratulations on successfully completing your onboarding process at SR Tutors! We are thrilled to have you join our team.
+    
+    Summary of Your Details:
+    
+    Teaching Experience: ${teacherProfile?.TeachingExperience}
+    Expected Fee: ₹${teacherProfile?.ExpectedFees}
+    Teaching Mode: ${teacherProfile?.TeachingMode}
+    
+    
+    
+    Current Address:
+    Street Address: ${teacherProfile?.CurrentAddress.streetAddress}
+    Landmark: ${teacherProfile?.CurrentAddress.LandMark}
+    Area: ${teacherProfile?.CurrentAddress.Area}
+    Pincode: ${teacherProfile?.CurrentAddress.Pincode}
+    
+    We are committed to supporting you every step of the way. If you have any questions or need help, our support team is here for you.
+    
+    Best regards,
+    S R Tutors
+    Email: support@srtutors.com`;
     await SendWhatsAppMessage(Message, CheckTeacher.PhoneNumber);
     if (!CheckTeacher.DOB) {
       CheckTeacher.DOB = teacherProfile.DOB
@@ -1956,6 +2033,7 @@ cron.schedule('0 0 * * *', async () => {
       if (timeDifference >= 24 * 60 * 60 * 1000) {
         teacher.isBlockForOtp = false;
         teacher.OtpBlockTime = null;
+        teacher.hit = 0
         await teacher.save();
         console.log(`Unblocked teacher: ${teacher.Email}`);
       }
