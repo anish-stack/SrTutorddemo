@@ -118,7 +118,7 @@ const Browsetutors = () => {
     };
     const handleFilterChange = (e) => {
         const { name, value, type, checked } = e.target;
-
+    
         if (name === 'Gender' && type === 'checkbox') {
             setFilterOptions(prev => ({
                 ...prev,
@@ -139,6 +139,18 @@ const Browsetutors = () => {
                     verified: checked ? value : '' // Reset if unchecked
                 }));
             }
+        } else if (name === 'Subject' && type === 'checkbox') {
+            // Handle multiple subjects selection
+            setFilterOptions(prev => {
+                const newSubjects = checked
+                    ? [...(prev.Subject || []), value] // Add selected subject
+                    : prev.Subject.filter(subject => subject !== value); // Remove unselected subject
+    
+                return {
+                    ...prev,
+                    Subject: newSubjects // Update the Subject filter with the new array
+                };
+            });
         } else if (type === 'range') {
             setFilterOptions(prev => ({
                 ...prev,
@@ -151,7 +163,7 @@ const Browsetutors = () => {
             }));
         }
     };
-
+    
 
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
@@ -254,21 +266,22 @@ const Browsetutors = () => {
                 {/* Subjects Filter */}
                 <h5 className="mt-4">Subjects</h5>
                 {paginatedSubjects.map((item, index) => (
-                    <div key={index} className="form-check">
-                        <input
-                            type="checkbox"
-                            className="form-check-input"
-                            id={`subject-${index}`}
-                            name="Subject"
-                            value={item.SubjectName}
-                            checked={FilterOptions.Subject === item.SubjectName}
-                            onChange={handleFilterChange}
-                        />
-                        <label className="form-check-label" htmlFor={`subject-${index}`}>
-                            {item.SubjectName}
-                        </label>
-                    </div>
-                ))}
+    <div key={index} className="form-check">
+        <input
+            type="checkbox"
+            className="form-check-input"
+            id={`subject-${index}`}
+            name="Subject"
+            value={item.SubjectName}
+            checked={FilterOptions.Subject && FilterOptions.Subject.includes(item.SubjectName)} // Check if the subject is in the selected array
+            onChange={handleFilterChange}
+        />
+        <label className="form-check-label" htmlFor={`subject-${index}`}>
+            {item.SubjectName}
+        </label>
+    </div>
+))}
+
 
                 {/* Pagination */}
                 <div className="pagination mt-4">

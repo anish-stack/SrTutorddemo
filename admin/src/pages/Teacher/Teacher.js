@@ -188,9 +188,9 @@ const Teacher = () => {
 
                     <p className='ml-2'> Show Which have Profiled Teachers</p>
                 </label>
-                <div>
+                {/* <div>
                     <button onClick={handleAdvancedClick} className='bg-indigo-400 px-2 py-2 text-white text-sm rounded-3xl'>Advanced Search</button>
-                </div>
+                </div> */}
             </div>
 
             <div className="overflow-x-auto">

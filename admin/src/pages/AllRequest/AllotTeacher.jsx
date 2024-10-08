@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import toast from 'react-hot-toast'
+import toast from 'react-hot-toast';
+
 const AllotTeacher = ({ isOpen, SelectedRequest, onClose }) => {
-    console.log(SelectedRequest)
     const [teacherId, setTeacherId] = useState('');
     const [data, setData] = useState([]);
     const [showDropdown, setShowDropdown] = useState(false);
@@ -13,46 +13,34 @@ const AllotTeacher = ({ isOpen, SelectedRequest, onClose }) => {
                 requestId: SelectedRequest._id,
                 teacherId,
             });
-            toast.success("Teacher Alloted Successful")
-            onClose()
+            toast.success("Teacher Alloted Successful");
+            onClose();
         } catch (error) {
             console.log(error);
-            toast.error("Plaese try Again")
+            toast.error("Please try Again");
         }
     };
 
     const GetAllTeacher = async () => {
         try {
             const { data } = await axios.get('https://api.srtutorsbureau.com/api/v1/teacher/Get-Teacher-By-Profile');
-            const InitialData = data.data
-
-
+            const InitialData = data.data;
 
             const filterDataFromSelectedRequest = InitialData.filter((teacher) => {
-                // Ensure teacher.AcademicInformation exists and is an array
                 if (!teacher.AcademicInformation || !Array.isArray(teacher.AcademicInformation)) {
-
                     return false;
                 }
 
                 return teacher.AcademicInformation.some((acd) => {
-                    // Ensure acd.Subjects exists and is an array
                     if (!acd.SubjectNames) {
-
                         return false;
                     }
 
                     return acd.SubjectNames.some((subject) =>
-
-                        // Ensure subject.SubjectName exists
                         SelectedRequest.subjects.includes(subject)
-
                     );
                 });
             });
-
-
-            // console.log("Filter", filterDataFromSelectedRequest);
 
             if (filterDataFromSelectedRequest.length > 0) {
                 setData(filterDataFromSelectedRequest);
@@ -78,7 +66,7 @@ const AllotTeacher = ({ isOpen, SelectedRequest, onClose }) => {
 
                 <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
-                <div className="inline-block  text-left z-999 align-bottom min-h-60 transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div className="inline-block text-left z-999 align-bottom min-h-60 transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                     <div className="px-4 pt-5 pb-4 bg-white sm:p-6 sm:pb-4">
                         <div className="sm:flex sm:items-start">
                             <div className="flex items-center justify-center flex-shrink-0 w-12 h-12 mx-auto bg-blue-100 rounded-full sm:mx-0 sm:h-10 sm:w-10">
@@ -100,7 +88,7 @@ const AllotTeacher = ({ isOpen, SelectedRequest, onClose }) => {
                                         </button>
 
                                         {showDropdown && (
-                                            <ul className="absolute z-999 w-full mt-2 bg-white border border-gray-300 rounded-md shadow-lg  overflow-y-auto">
+                                            <ul className="absolute z-999 w-full mt-2 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
                                                 {data.map((teacher) => (
                                                     <li
                                                         key={teacher._id}
@@ -111,7 +99,7 @@ const AllotTeacher = ({ isOpen, SelectedRequest, onClose }) => {
                                                         }}
                                                     >
                                                         <img
-                                                            src={teacher?.ProfilePic?.url}
+                                                            src={teacher?.ProfilePic?.url || 'https://i.ibb.co/9pbTnt3/sds.webp'}
                                                             alt={teacher.FullName}
                                                             className="w-8 h-8 mr-2 rounded-full"
                                                         />
