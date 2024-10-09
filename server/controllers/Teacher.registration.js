@@ -725,12 +725,14 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
     Best regards,
     S R Tutors
     Email: support@srtutors.com`;
-    await SendWhatsAppMessage(Message, CheckTeacher.PhoneNumber);
     if (!CheckTeacher.DOB) {
       CheckTeacher.DOB = teacherProfile.DOB
     }
     await teacherProfile.save();
     const save = await CheckTeacher.save();
+    if (save) {
+      await SendWhatsAppMessage(Message, CheckTeacher.PhoneNumber);
+    }
 
     const redisClient = req.app.locals.redis;
     if (!redisClient) {
@@ -739,11 +741,9 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
         message: "Redis No Found"
       })
     }
-    // console.log(teacherProfile)
-    await redisClient.del('Teacher')
-    // await SendWhatsAppMessage(Message, ContactNumber);
 
-    // Respond with success message
+    await redisClient.del('Teacher')
+
     res.status(200).json({
       success: true,
       data: teacherProfile,
@@ -1672,17 +1672,17 @@ exports.BrowseTutorsNearMe = CatchAsync(async (req, res) => {
 
     if (Subject && Array.isArray(Subject) && Subject.length > 0) {
       const subjectFilter = locationResults.filter(teacher =>
-          teacher.AcademicInformation.some(item =>
-              // Check if teacher has all selected subjects
-              Subject.every(selectedSubject =>
-                  item.SubjectNames.map(subjectName => subjectName.toLowerCase()).includes(selectedSubject.toLowerCase())
-              )
+        teacher.AcademicInformation.some(item =>
+          // Check if teacher has all selected subjects
+          Subject.every(selectedSubject =>
+            item.SubjectNames.map(subjectName => subjectName.toLowerCase()).includes(selectedSubject.toLowerCase())
           )
+        )
       );
       locationResults = subjectFilter;
       // console.log(locationResults); // Debugging: Check filtered results
-  }
-  
+    }
+
 
     if (Experience !== undefined && Experience !== null) {
       // If Experience is greater than 0, apply the filter
