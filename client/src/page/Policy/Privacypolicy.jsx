@@ -40,7 +40,7 @@ const PrivacyPolicy = () => {
           </ul>
 
           <h3>Use of Data</h3>
-          <p>S.R Tutors Bureau uses the collected data for various purposes:</p>
+          <p>S.R. Tutors Bureau uses the collected data for various purposes:</p>
           <ul>
             <li>To provide and maintain the Service</li>
             <li>To notify you about changes to our Service</li>
@@ -52,10 +52,10 @@ const PrivacyPolicy = () => {
           </ul>
 
           <h3>Disclosure Of Data</h3>
-          <p>S.R Tutors Bureau may disclose your Personal Data in the good faith belief that such action is necessary to:</p>
+          <p>S.R. Tutors Bureau may disclose your Personal Data in the good faith belief that such action is necessary to:</p>
           <ul>
             <li>To comply with a legal obligation</li>
-            <li>To protect and defend the rights or property of S.R Tutors Bureau</li>
+            <li>To protect and defend the rights or property of S.R. Tutors Bureau</li>
             <li>To prevent or investigate possible wrongdoing in connection with the Service</li>
             <li>To protect the personal safety of users of the Service or the public</li>
             <li>To protect against legal liability</li>

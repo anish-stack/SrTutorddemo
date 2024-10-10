@@ -64,7 +64,7 @@ function About() {
                 <div className="section__title about-title">
                   <span className="sub-title sb-title">About S R Tutors</span>
                   <h2 className="title tg-svg main-title">
-                    SR Tutors Bureau - Let's{" "}
+                    S.R. Tutors Bureau - Let's{" "}
                     <span className="position-relative">
                       <span
                         className="svg-icon"
@@ -78,7 +78,7 @@ function About() {
                 </div>
                 <p className="desc">
                   For those who are looking for promising tutoring services for their
-                  children, doesn't matter whether school level or college level, SR
+                  children, doesn't matter whether school level or college level, S.R.
                   Tutors Bureau is the best option available to them. We introduce
                   ourselves as a network of qualified and experienced teachers who
                   know the best ways to shape the future of children.

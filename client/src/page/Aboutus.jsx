@@ -39,7 +39,7 @@ function Aboutus() {
                             <div className="col-xl-5 col-lg-6">
                                 <div className="about__title-wrap">
                                     <div className="section__title">
-                                        <span className="sub-title">SR Tutors Bureau</span>
+                                        <span className="sub-title">S.R. Tutors Bureau</span>
                                         <h2 className="title tg-svg">
                                             Let's Prepare{" "}
                                             <span className="position-relative">
@@ -56,7 +56,7 @@ function Aboutus() {
                                     <p className="text-para">
                                         For those who are looking for promising tutoring services for
                                         their children, doesn't matter whether school level or college
-                                        level, SR Tutors Bureau is the best option available to them. We
+                                        level, S.R. Tutors Bureau is the best option available to them. We
                                         introduce ourselves as a network of qualified and experienced
                                         teachers who know the best ways to shape the future of children.
                                     </p>
@@ -185,13 +185,13 @@ function Aboutus() {
                                     tutoring services online. Furthermore it is a cost efficient method
                                     which focuses on providing quality education to the facilitator.
                                     With advent of technology it is now possible to get the most
-                                    advantageous tutors at a decent cost. With SR Tutor you get the
+                                    advantageous tutors at a decent cost. With S.R. Tutor you get the
                                     following bunch of services within your comfort zone.
                                 </p>
                                 <strong>We know each and every area of Delhi ,</strong>
                                 <div className="section__title mt-4 mb-4">
                                     <h3 className="title" style={{ fontSize: 25 }}>
-                                        Why SR Tutor
+                                        Why S.R Tutors
                                     </h3>
                                 </div>
                                 <div className="event-details-list">

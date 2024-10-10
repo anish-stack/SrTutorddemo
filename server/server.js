@@ -100,7 +100,6 @@ app.get("/Flush-all-Redis-Cached", async (req, res) => {
 
 
 app.use('/api/jd', leadRoutes);
-
 app.use("/api/v1/student", StudentRouter);
 app.use("/api/v1/teacher", TeacherRouter);
 app.use("/api/v1/admin", AdminRouter);
@@ -162,7 +161,6 @@ app.get('/nearby-places', async (req, res) => {
         return res.status(500).json({ error: 'Error fetching data from Google Places API.' });
     }
 });
-
 
 app.get('/geocode', async (req, res) => {
     const { address } = req.query; // Get address from query parameters

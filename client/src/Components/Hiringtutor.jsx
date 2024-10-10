@@ -23,7 +23,7 @@ function Hiringtutor() {
                                         Easy
                                     </h2>
                                     <p className="mt-2">
-                                        SR Tutors expertise in providing Home Tutors &amp; Online tuitions
+                                        S.R. Tutors expertise in providing Home Tutors &amp; Online tuitions
                                         in India.
                                         <br />
                                         We offers a wide-range of tutoring programs citywise.

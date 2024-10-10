@@ -132,7 +132,7 @@ function Ourmentor() {
                                             </div>
                                             {item?.TeacherProfile?.srVerifiedTag && (
                                                 <div className='teacher-tag'>
-                                                    <span style={{ fontSize: 10 }}>Sr Tutors Verified</span>
+                                                    <span style={{ fontSize: 10 }}>S.R. Tutors Verified</span>
                                                 </div>
                                             )}
                                         </div>
