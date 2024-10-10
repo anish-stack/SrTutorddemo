@@ -58,7 +58,7 @@ function Footer() {
                                             </a>
                                         </div>
                                         <p>
-                                            SR Tutorial is India's leading education service provider
+                                            S.R. Tutors is India's leading education service provider
                                             portal.
                                         </p>
                                         <ul className="list-wrap m-0 p-0">
@@ -175,7 +175,7 @@ function Footer() {
                             <div className="col-lg-12">
                                 <div className="copyright__text text-center">
                                     <p className="text-white">
-                                        Copyright © 2024 S R Tutors. All rights reserved. | Manage by
+                                        Copyright © 2024 S.R. Tutors. All rights reserved. | Manage by
                                         Hover Business Servicess LLP
                                     </p>
                                 </div>

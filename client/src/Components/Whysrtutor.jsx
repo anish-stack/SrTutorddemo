@@ -79,13 +79,13 @@ function Whysrtutor() {
                                                 id="svg-8"
                                                 data-svg-icon="assets/img/icons/title_shape.svg"
                                             />{" "}
-                                            S R Tutors
+                                            S.R. Tutors
                                         </span>{" "}
                                         Bureau?
                                     </h2>
                                 </div>
                                 <p>
-                                    At S R Tutors Bureau, we understand that the journey to academic
+                                    At S.R. Tutors Bureau, we understand that the journey to academic
                                     excellence requires more than just hard work it requires the right
                                     guidance, support, and resources. Here’s why choosing us can make a
                                     significant difference in your or your child's educational journey:
