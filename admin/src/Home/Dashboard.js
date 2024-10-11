@@ -9,7 +9,7 @@ import { faChartBar, faBell, faBook, faHeart, faPersonChalkboard, faUser, faCity
 import { Bar, Pie } from 'react-chartjs-2';
 import 'chart.js/auto';
 import toast from 'react-hot-toast';
-
+// add thins
 // Reusable Card component
 const Card = ({ icon, title, value, difference, iconColor, href }) => (
     <Link to={href} className="bg-white p-6 rounded-lg shadow-md">
