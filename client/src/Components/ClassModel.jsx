@@ -156,24 +156,41 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
   };
 
   const fetchLocation = async () => {
-    try {
-      const { data } = await axios.post('https://api.srtutorsbureau.com/Fetch-Current-Location')
-      const address = data?.data?.address
-      console.log(address)
-      if (address) {
-        setFormData((prev) => ({
-          ...prev,
-          Location: address?.completeAddress,
-          location: {
-            type: 'Point',
-            coordinates: [address.lat, address.lng]
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          try {
+            const { data } = await axios.post('https://api.srtutorsbureau.com/Fetch-Current-Location', {
+              lat: latitude,
+              lng: longitude
+            });
+  
+            const address = data?.data?.address;
+            console.log(address);
+            if (address) {
+              setFormData((prev) => ({
+                ...prev,
+                Location: address?.completeAddress,
+                location: {
+                  type: 'Point',
+                  coordinates: [address.lat, address.lng]
+                }
+              }))
+            }
+          } catch (error) {
+            console.log(error);
           }
-        }))
-      }
-    } catch (error) {
-      console.log(error)
+        },
+        (error) => {
+          console.error('Error getting location:', error);
+        }
+      );
+    } else {
+      console.log('Geolocation is not supported by this browser.');
     }
-  }
+  };
+  
 
   useEffect(() => {
     fetchLocation()
