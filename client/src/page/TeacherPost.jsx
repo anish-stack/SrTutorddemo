@@ -305,7 +305,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
                 async (position) => {
                     const { latitude, longitude } = position.coords;
                     try {
-                        const { data } = await axios.post('http://api.srtutorsbureau.com/Fetch-Current-Location', {
+                        const { data } = await axios.post('https://api.srtutorsbureau.com/Fetch-Current-Location', {
                             lat: latitude,
                             lng: longitude
                         });
