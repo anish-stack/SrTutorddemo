@@ -124,6 +124,8 @@ app.post('/Fetch-Current-Location', async (req, res) => {
                         area: null,
                         postalCode: null,
                         landmark: null,
+                        lat: addressResponse.data.results[0].geometry.location.lat,
+                        lng: addressResponse.data.results[0].geometry.location.lng,
                     };
 
                     addressComponents.forEach(component => {
@@ -253,7 +255,7 @@ app.get('/geocode', async (req, res) => {
         const response = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
             params: {
                 address: address,
-                key: "AIzaSyCiQk-jVBIRKkYgO5b2sKcoy1HTFm1FZ28"
+                key: "AIzaSyCBATa-tKn2Ebm1VbQ5BU8VOqda2nzkoTU"
             },
         });
         console.log(response.data)

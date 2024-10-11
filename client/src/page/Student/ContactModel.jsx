@@ -117,7 +117,8 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
 
   useEffect(() => {
     if (data) {
-      const filterOutClasses = ['I-V', 'VI-X', 'X-XII'];
+      const filterOutClasses =["I-V", "VI-VIII", "IX-X", "XI-XII"];
+
       const filteredClasses = data
         .filter(item => !filterOutClasses.includes(item.Class))
         .map(item => ({ class: item.Class, id: item._id }));
@@ -156,7 +157,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
 
   const fetchSubjects = async (classId) => {
     try {
-      const response = await axios.get(`http://localhost:7000/api/v1/admin/Get-Class-Subject/${classId}`);
+      const response = await axios.get(`https://api.srtutorsbureau.com/api/v1/admin/Get-Class-Subject/${classId}`);
       const fetchedSubjects = response.data.data.Subjects;
 
       if (fetchedSubjects) {
@@ -193,9 +194,8 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
   ];
   const modeoptions = [
     { value: 'Online Class', label: 'Online Class' },
-    { value: 'Home Tuition at My Home', label: 'Home Tuition at My Home' },
-    { value: 'Willing to travel to Teacher Home', label: 'Willing to travel to Teacher Home' },
-    { value: 'Require Teacher to Travel to My Home', label: 'Require Teacher to Travel to My Home' },
+    { value: 'Offline Class', label: 'Offline Class' },
+
   ];
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -215,7 +215,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
   const handleLocationLatAndLngFetch = async (address) => {
     const options = {
       method: 'GET',
-      url: `http://localhost:7000/geocode?address=${address}`
+      url: `https://api.srtutorsbureau.com/geocode?address=${address}`
     };
 
     try {
@@ -242,7 +242,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
   const handleLocationFetch = async (input) => {
     try {
       const res = await axios.get(
-        `http://localhost:7000/autocomplete?input=${input}`);
+        `https://api.srtutorsbureau.com/autocomplete?input=${input}`);
 
       setLocationSuggestions(res.data || []);
     } catch (error) {
@@ -295,6 +295,30 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
     fetchSubjects(classId);
   };
 
+  const fetchLocation = async () => {
+    try {
+      const { data } = await axios.post('https://api.srtutorsbureau.com/Fetch-Current-Location')
+      const address = data?.data?.address
+      console.log(address)
+      if (address) {
+        setFormData((prev) => ({
+          ...prev,
+          locality: address?.completeAddress,
+
+          latitude: address.lat,
+          longitude: address.lng
+        }))
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  useEffect(() => {
+    fetchLocation()
+  }, [])
+
+
   const validateFields = () => {
     let isValid = true;
     if (step === 1) {
@@ -302,14 +326,8 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
         isValid = false;
         toast.error("Please fill out the Gender field.");
       }
-      if (!formData.StudentName) {
-        isValid = false;
-        toast.error("Please fill out the Name field.");
-      }
-      if (!formData.StudentEmail) {
-        isValid = false;
-        toast.error("Please fill out the Email field.");
-      }
+
+
       if (!formData.StudentContact) {
         isValid = false;
         toast.error("Please fill out the Contact Details field.");
@@ -330,10 +348,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
         isValid = false;
         toast.error("Please select a preferred start date.");
       }
-      if (!formData.Location) {
-        isValid = false;
-        toast.error("Please enter your preferred location.");
-      }
+
     }
     if (step === 4) {
       if (!formData.TeachingMode) {
@@ -344,10 +359,8 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
         isValid = false;
         toast.error("Please specify the teaching experience.");
       }
-      if (formData.MinRange <= 0) {
-        isValid = false;
-        toast.error("Please specify the minimum budget range.");
-      }
+
+
       if (formData.MaxRange <= 0) {
         isValid = false;
         toast.error("Please specify the maximum budget range.");
@@ -385,7 +398,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
     console.log(loginNumber)
     try {
 
-      const response = await axios.post('http://localhost:7000/api/v1/student/resent-otp', { PhoneNumber: loginNumber, HowManyHit: resendButtonClick });
+      const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/resent-otp', { PhoneNumber: loginNumber, HowManyHit: resendButtonClick });
       console.log(response.data)
       toast.success(response.data.message);
       setResendButtonClick((prev) => prev + 1);
@@ -399,7 +412,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
   const verifyOtp = async () => {
     try {
 
-      const response = await axios.post('http://localhost:7000/api/v1/student/Verify-Student', {
+      const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/Verify-Student', {
         PhoneNumber: loginNumber,
         otp
       });
@@ -437,13 +450,13 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
     }
 
     try {
-      const response = await axios.post('http://localhost:7000/api/v1/student/checkNumber-request', {
+      const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/checkNumber-request', {
         userNumber: loginNumber,
         HowManyHit: resendButtonClick,
       });
 
       if (response.data && response.data.success) {
-       // Incrementing safely
+        // Incrementing safely
         setResendError('');
         setShowOtp(true);
 
@@ -509,7 +522,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
       locality: formData?.locality,
       startDate: formData?.StartDate,
       specificRequirement: formData?.SpecificRequirement,
-      location: {
+      location: formData.Location || {
         type: 'Point',
         coordinates: [ClickLongitude || lngEmergency, ClickLatitude || latEmergency]
       },
@@ -523,7 +536,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
     console.log("submittedData", submittedData)
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:7000/api/v1/student/universal-request', submittedData, {
+      const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/universal-request', submittedData, {
         headers: { Authorization: `Bearer ${student || studentToken}` }
       });
       console.log(response.data)
@@ -663,7 +676,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
                   <Col md={12}>
                     <Form.Group className="mb-3"
                       required>
-                      <Form.Label>Student Name <b className="text-danger fs-5">*</b></Form.Label>
+                      <Form.Label>Student Name <b className="">(Optional)</b></Form.Label>
                       <div className="mb-3">
 
                         <input
@@ -682,26 +695,6 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
                     </Form.Group>
                   </Col>
                   <Col md={12}>
-                    <Form.Group className="mb-3"
-                      required>
-                      <Form.Label>Student Email <b className="text-danger fs-5">*</b></Form.Label>
-                      <div className="mb-3">
-
-                        <input
-                          type="Email"
-                          id="Email"
-                          required
-                          name="StudentEmail"
-                          value={formData.StudentEmail}
-                          onChange={handleInputChange}
-                          className="form-control"
-                          placeholder="Enter Your Email"
-                        />
-
-                      </div>
-
-                    </Form.Group>
-                  </Col>  <Col md={12}>
                     <Form.Group className="mb-3"
                       required>
                       <Form.Label>Contact Details <b className="text-danger fs-5">*</b></Form.Label>
@@ -776,7 +769,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
                       classNamePrefix="select"
                     />
                   </div>
-                  <Col md={12}>
+                  {/* <Col md={12}>
                     <Form.Group className="mb-3"
                       required>
                       <Form.Label>In Which Language You Want To Do Class <b className="text-danger fs-5">*</b></Form.Label>
@@ -792,7 +785,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
                       />
 
                     </Form.Group>
-                  </Col>
+                  </Col> */}
                   <Col md={12}>
                     <Form.Group className="mb-3"
                       required>
@@ -861,8 +854,8 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
                   </div>
                   <div className="mb-3">
                     <label htmlFor="Location" className="form-label">
-                      Search Your Near By Place{" "}
-                      <span className="text-danger">*</span>
+                      Search Your Near By Place (Optional)
+
                     </label>
                     <input
                       type="text"
@@ -888,20 +881,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
                       </ul>
                     )}
                   </div>
-                  <div className="mb-3">
-                    <label htmlFor="SpecificRequirement" className="form-label">
-                      Specific Requirement <span className="text-danger">(Optional)</span>
-                    </label>
-                    <textarea
 
-                      id="SpecificRequirement"
-
-                      name="SpecificRequirement"
-                      value={formData.SpecificRequirement}
-                      onChange={handleInputChange}
-                      className="form-control"
-                    />
-                  </div>
                   <button
                     type="button"
                     className="btn btn-secondary me-2"
@@ -970,21 +950,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
                       className="form-control"
                     />
                   </div>
-                  <div className="mb-3">
-                    <label htmlFor="MinRange" className="form-label">
-                      Specify the minimum budget range{" "}
-                      <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      id="MinRange"
-                      required
-                      name="MinRange"
-                      value={formData.MinRange}
-                      onChange={handleRangeChange}
-                      className="form-control"
-                    />
-                  </div>
+
                   <div className="mb-3">
                     <label htmlFor="MaxRange" className="form-label">
                       Specify the maximum budget range{" "}
@@ -1064,24 +1030,29 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
                       <li className="list-group-item d-flex justify-content-between align-items-center">
                         <strong>Classes You Want:</strong> <span>{formData.HowManyClassYouWant}</span>
                       </li>
-                      <li className="list-group-item d-flex justify-content-between align-items-center">
-                        <strong>Near By Location:</strong> <span>{formData.Location.substring(0, 12)}</span>
-                      </li>
+                      {
+                        formData.Location && (
+                          <li className="list-group-item d-flex justify-content-between align-items-center">
+                            <strong>Near By Location:</strong> <span>{formData.Location.substring(0, 12)}</span>
+                          </li>
+                        )
+                      }
                       <li className="list-group-item d-flex justify-content-between align-items-center">
                         <strong>Current Location:</strong> <span>{formData.locality.substring(0, 7) + ' ....'}</span>
                       </li>
                       <li className="list-group-item d-flex justify-content-between align-items-center">
                         <strong>Teaching Mode:</strong> <span>{formData.TeachingMode}</span>
                       </li>
-                      <li className="list-group-item d-flex justify-content-between align-items-center">
-                        <strong>Specific Requirement:</strong> <span>{formData.SpecificRequirement || "No Specific Requirement"}</span>
-                      </li>
+                      {formData.SpecificRequirement && (
+
+                        <li className="list-group-item d-flex justify-content-between align-items-center">
+                          <strong>Specific Requirement:</strong> <span>{formData.SpecificRequirement || "No Specific Requirement"}</span>
+                        </li>
+                      )}
                       <li className="list-group-item d-flex justify-content-between align-items-center">
                         <strong>Teaching Experience:</strong> <span>{formData.TeachingExperience} years</span>
                       </li>
-                      <li className="list-group-item d-flex justify-content-between align-items-center">
-                        <strong>Minimum Range:</strong> <span>{formData.MinRange}</span>
-                      </li>
+
                       <li className="list-group-item d-flex justify-content-between align-items-center">
                         <strong>Maximum Range:</strong> <span>{formData.MaxRange}</span>
                       </li>

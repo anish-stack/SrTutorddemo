@@ -100,14 +100,38 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
     }));
   };
 
-  const handleStepChange = (step) => {
-    setStep(step);
+  const handleStepChange = (location) => {
+    if (location > step) {
+      if (step) {
+        if (!formData.Class || !formData.Subject || !formData.Interested || !formData.Location || !formData.HowManyClassYouWant) {
+          toast.error('Please fill all required fields in Step 1');
+
+          return;
+        } else {
+          setStep(location)
+          return;
+        }
+      }
+
+      if (location === 2) {
+        if (!formData.MaximumBudget || !formData.teacherExperience || !formData.TeacherGender || !formData.StartDate) {
+          toast.error('Please fill all required fields in Step 2');
+          return;
+        } else {
+          setStep(location)
+          return;
+        }
+      }
+    }
+
+
+    setStep(location);
   };
 
   const handleLocationLatAndLngFetch = async (address) => {
     const options = {
       method: 'GET',
-      url: `http://localhost:7000/geocode?address=${address}`
+      url: `https://api.srtutorsbureau.com/geocode?address=${address}`
     };
 
     try {
@@ -130,20 +154,49 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
       console.error("Error fetching location coordinates:", error);
     }
   };
-  const handleChangeUserContactInfo = (field, value) => {
-    setFormData({
-      ...formData,
-      userContactInfo: {
-        ...formData.userContactInfo,
-        [field]: value
+
+  const fetchLocation = async () => {
+    try {
+      const { data } = await axios.post('https://api.srtutorsbureau.com/Fetch-Current-Location')
+      const address = data?.data?.address
+      console.log(address)
+      if (address) {
+        setFormData((prev) => ({
+          ...prev,
+          Location: address?.completeAddress,
+          location: {
+            type: 'Point',
+            coordinates: [address.lat, address.lng]
+          }
+        }))
       }
-    });
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  useEffect(() => {
+    fetchLocation()
+  }, [])
+
+  const handleChangeUserContactInfo = (field, value) => {
+    if (/^\d*$/.test(value) && value.length <= 10) {
+      setFormData({
+        ...formData,
+        userContactInfo: {
+          ...formData.userContactInfo,
+          [field]: value,
+        },
+      });
+    } else {
+      toast.error('Please enter a valid 10-digit phone number');
+    }
   };
 
   const handleLocationFetch = async (input) => {
     try {
       const res = await axios.get(
-        `http://localhost:7000/autocomplete?input=${input}`);
+        `https://api.srtutorsbureau.com/autocomplete?input=${input}`);
 
       setLocationSuggestions(res.data || []);
     } catch (error) {
@@ -170,6 +223,7 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
     handleLocationLatAndLngFetch(location.description);
     setLocationSuggestions([]);
   };
+
   useEffect(() => {
     const storedResendCount = localStorage.getItem('resendButtonClickCheckClass');
     if (storedResendCount) {
@@ -185,7 +239,7 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
   const resendOtp = async () => {
     try {
 
-      const response = await axios.post('http://localhost:7000/api/v1/student/resent-otp', { PhoneNumber: loginNumber, HowManyHit: resendButtonClick });
+      const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/resent-otp', { PhoneNumber: loginNumber, HowManyHit: resendButtonClick });
       console.log(response.data)
       toast.success(response.data.message);
       setResendButtonClick((prev) => prev + 1);
@@ -199,7 +253,7 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
   const verifyOtp = async () => {
     try {
 
-      const response = await axios.post('http://localhost:7000/api/v1/student/Verify-Student', {
+      const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/Verify-Student', {
         PhoneNumber: loginNumber,
         otp
       });
@@ -238,7 +292,7 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
     }
 
     try {
-      const response = await axios.post('http://localhost:7000/api/v1/student/checkNumber-request', {
+      const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/checkNumber-request', {
         userNumber: loginNumber,
         HowManyHit: resendButtonClick,
       });
@@ -285,30 +339,28 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
       requestType: "Class Teacher",
       classId: subject?._id || null,
       className: formData.Class,
-      ClassLangUage: formData.ClassLangUage,
-
-
+      ClassLangUage: 'Hindi',
       subjects: isClass ? formData.Subject : Subjects,
       interestedInTypeOfClass: formData.Interested,
       teacherGenderPreference: formData.TeacherGender,
       numberOfSessions: formData.HowManyClassYouWant,
       experienceRequired: formData.teacherExperience,
-      minBudget: formData.MinimumBudget,
+      minBudget: '520',
       maxBudget: formData.MaximumBudget,
       locality: formData.Location,
       startDate: formData.StartDate,
-      specificRequirement: formData.specificRequirement,
+      specificRequirement: 'No',
       location: formData.location,
       studentInfo: {
         studentName: formData.userContactInfo.Name,
         contactNumber: formData.userContactInfo.contactNumber,
-        emailAddress: formData.userContactInfo.email,
+        emailAddress: 'no email',
       },
     };
     console.log(submittedData)
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:7000/api/v1/student/universal-request', submittedData, {
+      const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/universal-request', submittedData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       console.log(response.data)
@@ -332,9 +384,8 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
   ];
   const modeoptions = [
     { value: 'Online Class', label: 'Online Class' },
-    { value: 'Home Tuition at My Home', label: 'Home Tuition at My Home' },
-    { value: 'Willing to travel to Teacher Home', label: 'Willing to travel to Teacher Home' },
-    { value: 'Require Teacher to Travel to My Home', label: 'Require Teacher to Travel to My Home' },
+    { value: 'Offline Class', label: 'Offline Class' }
+
   ];
 
   const closeLoginModal = () => setIsLoginModalOpen(false);
@@ -404,20 +455,20 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
                   <Row className="mb-md-3">
                     <Col xs={12} md={6}>
                       <Form.Group className="mb-md-3">
-                        <Form.Label>Class (Optional)</Form.Label>
+                        <Form.Label>Class <span className="text-danger fs-4" >*</span></Form.Label>
                         <Form.Control
                           type="text"
                           name="Class"
                           readOnly
                           value={formData.Class}
                           placeholder="Enter Class"
-                          className="form-control-sm"
+                          className="form-control"
                         />
                       </Form.Group>
                     </Col>
                     <Col xs={12} md={6}>
                       <Form.Group className="mb-md-3">
-                        <Form.Label>Subject Name</Form.Label>
+                        <Form.Label>Subject Name <span className="text-danger fs-4" >*</span></Form.Label>
                         <Select
                           options={subjectOptions}
                           isMulti
@@ -437,7 +488,7 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
                       </Form.Group>
                     </Col>
                   </Row>
-                  <Col md={12}>
+                  {/* <Col md={12}>
                     <Form.Group className="mb-3"
                       required>
                       <Form.Label>In Which Language You Want To Do Class <b className="text-danger fs-5">*</b></Form.Label>
@@ -453,12 +504,12 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
                       />
 
                     </Form.Group>
-                  </Col>
+                  </Col> */}
                   <Row className="mb-md-3">
                     <Col xs={12}>
                       <div className="mb-3">
                         <label htmlFor="Location" className="form-label">
-                          Enter your preferred location <span className="text-danger">*</span>
+                          Enter your preferred location  <span className="text-danger">*</span>
                         </label>
                         <input
                           type="text"
@@ -490,7 +541,7 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
                     <Col xs={12} md={6}>
 
                       <Form.Group>
-                        <Form.Label>Interested In Type Of Classes</Form.Label>
+                        <Form.Label>Interested In Type Of Classes <span className="text-danger fs-4" >*</span></Form.Label>
                         <Select
                           options={modeoptions}
                           onChange={handleSelectChange("Interested")}
@@ -504,7 +555,7 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
                     <Col xs={12} md={6}>
                       <Form.Group>
 
-                        <Form.Label>How Many Classes Do You Want?</Form.Label>
+                        <Form.Label>Number of Classes <span className="text-danger fs-4">*</span></Form.Label>
                         <Select
                           options={ClasessOptions}
                           onChange={handleSelectChange("HowManyClassYouWant")}
@@ -533,47 +584,44 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
               {step === 2 && (
                 <Container fluid>
                   <Row className="mb-md-3">
-                    <Col xs={12} md={6}>
+
+                    <Col xs={12} md={12}>
                       <Form.Group className="mb-md-3">
-                        <Form.Label>Minimum Budget (per session)</Form.Label>
+                        <Form.Label>Budget <span className="text-danger fs-4">*</span></Form.Label>
                         <Form.Control
-                          type="number"
-                          name="MinimumBudget"
-                          value={formData.MinimumBudget}
-                          onChange={handleChange}
-                          className="form-control-sm"
-                        />
-                      </Form.Group>
-                    </Col>
-                    <Col xs={12} md={6}>
-                      <Form.Group className="mb-md-3">
-                        <Form.Label>Maximum Budget (per session)</Form.Label>
-                        <Form.Control
-                          type="number"
+                          type="text"
                           name="MaximumBudget"
                           value={formData.MaximumBudget}
-                          onChange={handleChange}
+                          onChange={(e) => {
+                            const value = e.target.value;
+
+                            if (value === '' || /^[0-9]*$/.test(value)) {
+                              handleChange(e);
+                            }
+                          }}
                           className="form-control-sm"
                         />
                       </Form.Group>
                     </Col>
+
                   </Row>
                   <Row className="mb-md-3">
                     <Col xs={12} md={6}>
                       <Form.Group className="mb-md-3">
-                        <Form.Label>Teacher Experience (in years)</Form.Label>
+                        <Form.Label>Teacher Experience <span className="text-danger fs-4" >*</span></Form.Label>
                         <Form.Control
                           type="number"
                           name="teacherExperience"
                           value={formData.teacherExperience}
                           onChange={handleChange}
+                          min={'1'}
                           className="form-control-sm"
                         />
                       </Form.Group>
                     </Col>
                     <Col xs={12} md={6}>
                       <Form.Group className="mb-md-3">
-                        <Form.Label>Teacher Gender Preference</Form.Label>
+                        <Form.Label>Teacher Gender Preference <span className="text-danger fs-4" >*</span></Form.Label>
                         <Form.Control
                           as="select"
                           name="TeacherGender"
@@ -593,29 +641,19 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
                   <Row>
                     <Col xs={12} md={12}>
                       <Form.Group className="mb-md-3">
-                        <Form.Label>Preferred Start Date</Form.Label>
+                        <Form.Label>Preferred Start Date <span className="text-danger fs-4" >*</span> </Form.Label>
                         <Form.Control
                           type="date"
                           name="StartDate"
                           value={formData.StartDate}
                           onChange={handleChange}
                           className="form-control-sm"
+                          min={`${new Date().getFullYear()}-${new Date().getMonth() + 1 < 10 ? '0' : ''}${new Date().getMonth() + 1}-01`} // First day of current month
+                          max={`${new Date().getFullYear()}-12-31`}
                         />
                       </Form.Group>
                     </Col>
-                    <Col xs={12}>
-                      <Form.Group className="mb-md-3">
-                        <Form.Label>Specific Requirements</Form.Label>
-                        <Form.Control
-                          as="textarea"
-                          name="specificRequirement"
-                          rows={3}
-                          value={formData.specificRequirement}
-                          onChange={handleChange}
-                          className="form-control-sm"
-                        />
-                      </Form.Group>
-                    </Col>
+
                   </Row>
                   <Row>
                     <Col xs={6}>
@@ -647,7 +685,7 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
                   <Row className="mb-md-1">
                     <Col xs={12} md={12}>
                       <Form.Group className="mb-md-1">
-                        <Form.Label>Student Name</Form.Label>
+                        <Form.Label>Student Name (Optional)</Form.Label>
                         <Form.Control
                           type="text"
                           name="Name"
@@ -655,29 +693,15 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
                           onChange={(e) =>
                             handleChangeUserContactInfo('Name', e.target.value)
                           }
-                          required
+
                           className="form-control-sm"
                         />
                       </Form.Group>
                     </Col>
+
                     <Col xs={12} md={12}>
                       <Form.Group className="mb-md-1">
-                        <Form.Label>Student Email</Form.Label>
-                        <Form.Control
-                          type="email"
-                          name="email"
-                          value={formData.userContactInfo.email}
-                          onChange={(e) =>
-                            handleChangeUserContactInfo('email', e.target.value)
-                          }
-                          required
-                          className="form-control-sm"
-                        />
-                      </Form.Group>
-                    </Col>
-                    <Col xs={12} md={12}>
-                      <Form.Group className="mb-md-1">
-                        <Form.Label>Student Contact Number</Form.Label>
+                        <Form.Label>Student Contact Number <span className="text-danger fs-4" >*</span> </Form.Label>
                         <Form.Control
                           type="text"
                           name="contactNumber"
@@ -696,7 +720,7 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
                       <Button
                         variant="secondary"
                         className="btn-sm w-100 mt-3"
-                        onClick={() => handleStepChange(1)}
+                        onClick={() => handleStepChange(step - 1)}
                       >
                         Back
                       </Button>

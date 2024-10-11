@@ -44,7 +44,7 @@ exports.StudentRegister = CatchAsync(async (req, res) => {
                 { PhoneNumber: PhoneNumber }
             ]
         });
-        
+
         if (existingStudent) {
             // Check if the student is verified
             if (existingStudent.isStudentVerified) {
@@ -106,6 +106,44 @@ exports.StudentRegister = CatchAsync(async (req, res) => {
     }
 });
 
+exports.UpdateDetails = CatchAsync(async (req, res) => {
+    try {
+        console.log(req.body)
+        const userId = req.user.id._id;
+        const { StudentName, PhoneNumber, Email, Password } = req.body;
+        const existingStudent = await Student.findById(userId);
+
+        if (!existingStudent) {
+            return res.status(404).json({ message: 'Please login To Access this ' });
+        }
+
+        if (StudentName) {
+            existingStudent.StudentName = StudentName;
+            existingStudent.profilePic = `https://avatar.iran.liara.run/username?username=${StudentName}`;
+        }
+
+        if (Email) {
+            existingStudent.Email = Email;
+        }
+
+        if (PhoneNumber) {
+            existingStudent.PhoneNumber = PhoneNumber;
+        }
+
+        if (Password) {
+            existingStudent.Password = Password
+        }
+
+        await existingStudent.save();
+        res.status(200).json({
+            message: 'User details updated successfully',
+            data: existingStudent,
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
 //Student Verify Otp
 exports.StudentVerifyOtp = CatchAsync(async (req, res) => {
     try {
@@ -154,15 +192,7 @@ exports.StudentResendOtp = CatchAsync(async (req, res) => {
             return res.status(429).json({ message: "You have been temporarily blocked from requesting OTP. Please try again later." });
         }
 
-        // Check if the previous OTP is still valid
-        if (student.OtpExpiresTime && now < student.OtpExpiresTime - 1 * 60 * 1000) {
-            const remainingTimeInMs = student.OtpExpiresTime - 1 * 60 * 1000 - now;
-            const remainingSeconds = Math.ceil(remainingTimeInMs / 1000);
 
-            return res.status(429).json({
-                message: `OTP already sent recently. Please wait ${remainingSeconds} seconds before requesting a new OTP.`
-            });
-        }
 
 
         if (student.hit >= MAX_RESEND_ATTEMPTS || HowManyHit >= MAX_RESEND_ATTEMPTS) {
@@ -252,7 +282,7 @@ exports.CheckNumber = CatchAsync(async (req, res) => {
     try {
         const { userNumber, latitude, longitude, HowManyHit } = req.body;
 
-        // Check for missing fields
+
         const missingFields = [];
         if (!userNumber) missingFields.push('Phone Number');
         if (typeof HowManyHit === 'undefined') missingFields.push('How Many Hit');
@@ -274,15 +304,15 @@ exports.CheckNumber = CatchAsync(async (req, res) => {
                 return res.status(429).json({ message: "Your account is blocked for OTP requests. Please contact support." });
             }
 
-            // Check if OTP has expired
-            if (checkUser.OtpExpiresTime && now < checkUser.OtpExpiresTime) {
-                const remainingTimeInMs = checkUser.OtpExpiresTime - now;
-                const remainingSeconds = Math.ceil(remainingTimeInMs / 1000);
+            // // Check if OTP has expired
+            // if (checkUser.OtpExpiresTime && now < checkUser.OtpExpiresTime) {
+            //     const remainingTimeInMs = checkUser.OtpExpiresTime - now;
+            //     const remainingSeconds = Math.ceil(remainingTimeInMs / 1000);
 
-                return res.status(429).json({
-                    message: `OTP already sent recently. Please wait ${remainingSeconds} seconds before requesting a new OTP.`
-                });
-            }
+            //     return res.status(429).json({
+            //         message: `OTP already sent recently. Please wait ${remainingSeconds} seconds before requesting a new OTP.`
+            //     });
+            // }
 
             // Block user if they hit the request limit
             if (checkUser.hit >= 3 || HowManyHit >= 3) {

@@ -39,13 +39,16 @@ const Slider = () => {
   useEffect(() => {
     if (data) {
       // Step 1: Filter out specific classes
-      const filterOutClasses = ['I-V', 'VI-X', 'X-XII'];
+      // const classRanges = ["I-V", "VI-VIII", "IX-X", "XI-XII"];
+      const filterOutClasses =["I-V", "VI-VIII", "IX-X", "XI-XII"];
       const filteredClasses = data
+      
         .filter(item => !filterOutClasses.includes(item.Class))
         .map(item => ({ class: item.Class, id: item._id }));
 
       // Step 2: Map inner classes
       const rangeClasses = data
+      
         .filter(item => item.InnerClasses && item.InnerClasses.length > 0)
         .flatMap(item => item.InnerClasses.map(innerClass => ({
           class: innerClass.InnerClass,
@@ -63,7 +66,7 @@ const Slider = () => {
   const fetchSubjects = async (classId) => {
     try {
       const response = await axios.get(
-        `http://localhost:7000/api/v1/admin/Get-Class-Subject/${classId}`
+        `https://api.srtutorsbureau.com/api/v1/admin/Get-Class-Subject/${classId}`
       );
       setSubjects(response.data.data.Subjects || []);
     } catch (error) {
@@ -88,7 +91,7 @@ const Slider = () => {
 
 
         const res = await axios.get(
-          `http://localhost:7000/autocomplete?input=${input}`);
+          `https://api.srtutorsbureau.com/autocomplete?input=${input}`);
         console.log("Google", res.data)
         setLocationSuggestions(res.data || []);
       } catch (error) {
@@ -124,7 +127,7 @@ const Slider = () => {
   const handleLocationLatAndLngFetch = async (address) => {
     const options = {
       method: 'GET',
-      url: `http://localhost:7000/geocode?address=${address}`
+      url: `https://api.srtutorsbureau.com/geocode?address=${address}`
     };
 
     try {

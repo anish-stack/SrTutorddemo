@@ -156,7 +156,8 @@ const ProfilePage = () => {
 
     useEffect(() => {
         if (data) {
-            const filterOutClasses = ['I-V', 'VI-X', 'X-XII'];
+            const filterOutClasses =["I-V", "VI-VIII", "IX-X", "XI-XII"];
+
             const filteredClasses = data
                 .filter(item => !filterOutClasses.includes(item.Class))
                 .map(item => ({ class: item.Class, id: item._id }));
@@ -242,7 +243,7 @@ const ProfilePage = () => {
     const fetchNearbyPlaces = async () => {
 
         if (latitude && longitude) {
-            const url = `http://localhost:7000/nearby-places?lat=${latitude}&lng=${longitude}&radius=${radius * 1000}`;// Convert km to meters
+            const url = `https://api.srtutorsbureau.com/nearby-places?lat=${latitude}&lng=${longitude}&radius=${radius * 1000}`;// Convert km to meters
 
             try {
                 const response = await axios.get(url);
@@ -272,7 +273,7 @@ const ProfilePage = () => {
     const fetchUser = async () => {
         try {
             const response = await axios.get(
-                `http://localhost:7000/api/v1/teacher/Teacher-details/${IdQuery}`
+                `https://api.srtutorsbureau.com/api/v1/teacher/Teacher-details/${IdQuery}`
             );
             console.log(response.data)
             setUser(response.data.data)
@@ -290,7 +291,7 @@ const ProfilePage = () => {
     const fetchSubjects = async (classId) => {
         try {
             const response = await axios.get(
-                `http://localhost:7000/api/v1/admin/Get-Class-Subject/${classId}`
+                `https://api.srtutorsbureau.com/api/v1/admin/Get-Class-Subject/${classId}`
             );
             console.log(response.data)
             if (response.data.data) {
@@ -488,7 +489,7 @@ const ProfilePage = () => {
         try {
             setLoading(true);
 
-            const response = await axios.post('http://localhost:7000/api/v1/teacher/teacher-profile', formData, {
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/teacher/teacher-profile', formData, {
                 headers: {
                     Authorization: `Bearer ${tokenQuery}`
                 }

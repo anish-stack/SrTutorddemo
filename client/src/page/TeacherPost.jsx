@@ -99,7 +99,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
     const handleLocationFetch = async (input) => {
         try {
             const res = await axios.get(
-                `http://localhost:7000/autocomplete?input=${input}`);
+                `https://api.srtutorsbureau.com/autocomplete?input=${input}`);
 
             setLocationSuggestions(res.data || []);
         } catch (error) {
@@ -111,7 +111,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
     const handleLocationLatAndLngFetch = async (address) => {
         const options = {
             method: 'GET',
-            url: `http://localhost:7000/geocode?address=${address}`
+            url: `https://api.srtutorsbureau.com/geocode?address=${address}`
         };
 
         try {
@@ -145,29 +145,38 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
 
     // Step-wise validation function
     const validateStep = () => {
+        console.log(step);
         switch (step) {
             case 1:
-                return formData.studentInfo.studentName && formData.studentInfo.contactNumber.length === 10 && formData.studentInfo.emailAddress;
+                return formData.studentInfo.contactNumber.length === 10;
             case 2:
                 return formData.classId && formData.subjects.length > 0;
             case 3:
-                return formData.interestedInTypeOfClass && formData.teacherGenderPreference;
+                return (
+                    formData.interestedInTypeOfClass &&
+                    formData.teacherGenderPreference &&
+                    formData.experienceRequired &&
+                    formData.maxBudget
+                );
             case 4:
-                return formData.experienceRequired && formData.minBudget;
-            case 5:
-                return formData.locality && formData.currentAddress && formData.startDate;
+                return formData.currentAddress && formData.startDate;
             default:
                 return false;
         }
     };
 
     const handleStepChange = (stepChange) => {
-        if (stepChange === 1 && !validateStep()) {
-            toast.error("Please complete the current step before proceeding.");
-            return;
+        // Check if we're moving forward
+        if (stepChange === 1) {
+            if (!validateStep()) {
+                toast.error("Please complete the current step before proceeding.");
+                return;
+            }
         }
+
         setStep(step + stepChange);
     };
+
 
     const handleLoginChange = (e) => {
         setLoginNumber(e.target.value); // Directly set the value
@@ -201,7 +210,51 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
         e.preventDefault();
 
 
-        // Final submission data preparation
+        const errorMessages = [];
+
+
+        if (!formData.classId || !formData.classId.value) {
+            errorMessages.push("Class is required.");
+        }
+        if (!formData.subjects || formData.subjects.length === 0) {
+            errorMessages.push("At least one subject is required.");
+        }
+        if (!formData.interestedInTypeOfClass || !formData.interestedInTypeOfClass.value) {
+            errorMessages.push("Type of class is required.");
+        }
+        if (!formData.teacherGenderPreference) {
+            errorMessages.push("Teacher gender preference is required.");
+        }
+        if (!formData.numberOfSessions || !formData.numberOfSessions.value) {
+            errorMessages.push("Number of sessions is required.");
+        }
+        if (!formData.experienceRequired) {
+            errorMessages.push("Experience required is needed.");
+        }
+
+        if (!formData.maxBudget) {
+            errorMessages.push(" Budget is required.");
+        }
+
+        if (!formData.startDate) {
+            errorMessages.push("Start date is required.");
+        }
+        if (!formData.currentAddress) {
+            errorMessages.push("Current address is required.");
+        }
+
+        if (!formData.studentInfo.contactNumber) {
+            errorMessages.push("Contact number is required.");
+        }
+
+
+
+        if (errorMessages.length > 0) {
+            // Show all error messages using toast
+            toast.error(errorMessages.join(" "));
+            return; // Stop the form submission
+        }
+
         const submittedData = {
             requestType: "Teacher Request For School Classes",
             classId: formData.classId.value,
@@ -212,13 +265,13 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
             numberOfSessions: formData.numberOfSessions.value,
             ClassLangUage: formData.ClassLangUage,
             experienceRequired: formData.experienceRequired,
-            minBudget: formData.minBudget,
+            minBudget: "500",
             maxBudget: formData.maxBudget || '1000',
             locality: formData.locality,
             startDate: formData.startDate,
-            specificRequirement: formData.specificRequirement,
+            specificRequirement: "no",
             currentAddress: formData.currentAddress,
-            location: {
+            location: formData.location || {
                 type: 'Point',
                 coordinates: [ClickLongitude || 0, ClickLatitude || 0]
             },
@@ -228,15 +281,16 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
                 emailAddress: formData.studentInfo.emailAddress
             }
         };
+        console.log(submittedData)
         setLoading(true);
 
         try {
-            const response = await axios.post('http://localhost:7000/api/v1/student/universal-request', submittedData, {
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/universal-request', submittedData, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            console.log(response.data)
+            console.log(response.data);
             setLoading(false);
-            toast.success("Request Submited Successful")
+            toast.success("Request Submitted Successfully");
             window.location.href = "/thankYou";
         } catch (error) {
             console.log(error);
@@ -246,10 +300,35 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
     };
 
 
+
+    const fetchLocation = async () => {
+        try {
+            const { data } = await axios.post('https://api.srtutorsbureau.com/Fetch-Current-Location')
+            const address = data?.data?.address
+            console.log(address)
+            if (address) {
+                setFormData((prev) => ({
+                    ...prev,
+                    currentAddress: address?.completeAddress,
+                    location: {
+                        type: 'Point',
+                        coordinates: [address.lat, address.lng]
+                    }
+                }))
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    useEffect(() => {
+        fetchLocation()
+    }, [])
+
     // const resendOtp = async () => {
     //     try {
     //         if (sessionData.number || sessionData.otpSent) {
-    //             const response = await axios.post('http://localhost:7000/api/v1/student/resent-otp', { PhoneNumber: sessionData.number });
+    //             const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/resent-otp', { PhoneNumber: sessionData.number });
     //             toast.success(response.data.message);
     //         } else {
     //             toast.error("Unauthorized Action")
@@ -263,7 +342,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
     // const verifyOtp = async () => {
     //     try {
 
-    //         const response = await axios.post('http://localhost:7000/api/v1/student/Verify-Student', {
+    //         const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/Verify-Student', {
     //             PhoneNumber: loginNumber,
     //             otp
     //         });
@@ -291,7 +370,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
 
 
     //     try {
-    //         const response = await axios.post('http://localhost:7000/api/v1/student/checkNumber-request', {
+    //         const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/checkNumber-request', {
     //             userNumber: loginNumber
     //         })
     //         console.log(response.data)
@@ -335,7 +414,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
     const resendOtp = async () => {
         console.log(loginNumber);
         try {
-            const response = await axios.post('http://localhost:7000/api/v1/student/resent-otp', {
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/resent-otp', {
                 PhoneNumber: loginNumber,
                 HowManyHit: resendButtonClick
             });
@@ -353,7 +432,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
 
     const verifyOtp = async () => {
         try {
-            const response = await axios.post('http://localhost:7000/api/v1/student/Verify-Student', {
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/Verify-Student', {
                 PhoneNumber: loginNumber,
                 otp
             });
@@ -390,7 +469,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
         }
 
         try {
-            const response = await axios.post('http://localhost:7000/api/v1/student/checkNumber-request', {
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/checkNumber-request', {
                 userNumber: loginNumber,
                 HowManyHit: resendButtonClick
             });
@@ -411,8 +490,8 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
             setShowOtp(false);
             if (error.response?.data?.success === false &&
                 error.response?.data?.message === "User with this phone number already exists.") {
-                    setShowOtp(false);
-                   
+                setShowOtp(false);
+
                 setStep(1);
             } else {
                 toast.error(error.response?.data?.message || "An error occurred");
@@ -420,7 +499,21 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
         }
     };
 
-
+    const handleContactNumberChange = (value) => {
+        // Allow only digits and limit to 10
+        if (/^\d*$/.test(value) && value.length <= 10) {
+            setFormData({
+                ...formData,
+                studentInfo: {
+                    ...formData.studentInfo,
+                    contactNumber: value,
+                },
+            });
+        } else {
+            // Show an error if the value is not valid
+            toast.error('Please enter a valid 10-digit phone number');
+        }
+    };
 
     const numberOfSessionsOptions = [
         { value: 'Two Classes a Week', label: 'Two Classes a Week' },
@@ -432,9 +525,8 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
 
     const interestedInTypeOfClassOptions = [
         { value: 'Online Class', label: 'Online Class' },
-        { value: 'Home Tuition at My Home', label: 'Home Tuition at My Home' },
-        { value: 'Willing to travel to Teacher Home', label: 'Willing to travel to Teacher Home' },
-        { value: 'Require Teacher to Travel to My Home', label: 'Require Teacher to Travel to My Home' },
+        { value: 'Offline Class', label: 'Offline Class' },
+
     ];
 
     return (
@@ -492,13 +584,13 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
 
                                 </div>
                             ) :
-                                <>
+                                <form>
 
                                     {step === 1 && (
                                         <div>
                                             <h4>Step 1: Student Information</h4>
                                             <Form.Group>
-                                                <Form.Label>Student Name</Form.Label>
+                                                <Form.Label>Student Name (Optional)</Form.Label>
                                                 <Form.Control
                                                     type="text"
                                                     name="studentName"
@@ -509,39 +601,27 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
                                                             studentInfo: { ...formData.studentInfo, studentName: e.target.value }
                                                         })
                                                     }
-                                                    required
+
                                                 />
                                             </Form.Group>
                                             <Form.Group>
-                                                <Form.Label>Contact Number</Form.Label>
+                                                <Form.Label>Contact Number <span className="text-danger fs-5">*</span> </Form.Label>
                                                 <Form.Control
                                                     type="text"
                                                     name="contactNumber"
                                                     value={formData.studentInfo.contactNumber}
-                                                    onChange={(e) =>
-                                                        setFormData({
-                                                            ...formData,
-                                                            studentInfo: { ...formData.studentInfo, contactNumber: e.target.value }
-                                                        })
-                                                    }
+                                                    onChange={(e) => handleContactNumberChange(e.target.value)}
+                                                    onKeyPress={(e) => {
+
+                                                        if (!/[0-9]/.test(e.key)) {
+                                                            e.preventDefault();
+                                                        }
+                                                    }}
                                                     required
                                                 />
                                             </Form.Group>
-                                            <Form.Group>
-                                                <Form.Label>Email Address</Form.Label>
-                                                <Form.Control
-                                                    type="email"
-                                                    name="emailAddress"
-                                                    value={formData.studentInfo.emailAddress}
-                                                    onChange={(e) =>
-                                                        setFormData({
-                                                            ...formData,
-                                                            studentInfo: { ...formData.studentInfo, emailAddress: e.target.value }
-                                                        })
-                                                    }
-                                                    required
-                                                />
-                                            </Form.Group>
+
+
                                         </div>
                                     )}
 
@@ -549,7 +629,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
                                         <div>
                                             <h4>Step 2: Class & Subject Information</h4>
                                             <Form.Group>
-                                                <Form.Label>Class</Form.Label>
+                                                <Form.Label>Class <span className="text-danger fs-5">*</span></Form.Label>
                                                 <Select
                                                     name="classId"
                                                     options={item.InnerClasses.map((cls) => ({
@@ -562,7 +642,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
                                                 />
                                             </Form.Group>
                                             <Form.Group>
-                                                <Form.Label>Subjects</Form.Label>
+                                                <Form.Label>Subjects <span className="text-danger fs-5">*</span></Form.Label>
                                                 <Select
                                                     name="subjects"
                                                     options={item.Subjects.map((sub) => ({ value: sub._id, label: sub.SubjectName }))}
@@ -573,7 +653,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
                                                     required
                                                 />
                                             </Form.Group>
-                                            <Col md={12}>
+                                            {/* <Col md={12}>
                                                 <Form.Group className="mb-3"
                                                     required>
                                                     <Form.Label>In Which Language You Want To Do Class <b className="text-danger fs-5">*</b></Form.Label>
@@ -589,7 +669,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
                                                     />
 
                                                 </Form.Group>
-                                            </Col>
+                                            </Col> */}
                                         </div>
                                     )}
 
@@ -597,7 +677,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
                                         <div>
                                             <h4>Step 3: Preferences & Budget</h4>
                                             <Form.Group>
-                                                <Form.Label>Type of Class</Form.Label>
+                                                <Form.Label>Type of Class <span className="text-danger fs-5">*</span></Form.Label>
                                                 <Select
                                                     name="interestedInTypeOfClass"
                                                     options={interestedInTypeOfClassOptions}
@@ -608,7 +688,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
                                                 />
                                             </Form.Group>
                                             <Form.Group>
-                                                <Form.Label>Teacher Gender Preference</Form.Label>
+                                                <Form.Label>Teacher Gender Preference <span className="text-danger fs-5">*</span></Form.Label>
                                                 <Form.Control
                                                     as="select"
                                                     name="teacherGenderPreference"
@@ -622,7 +702,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
                                                 </Form.Control>
                                             </Form.Group>
                                             <Form.Group>
-                                                <Form.Label>Number of Sessions</Form.Label>
+                                                <Form.Label>Number of Sessions <span className="text-danger fs-5">*</span></Form.Label>
                                                 <Select
                                                     name="numberOfSessions"
                                                     options={numberOfSessionsOptions}
@@ -632,13 +712,18 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
                                                     required
                                                 />
                                             </Form.Group>
-
-                                        </div>
-                                    )}
-                                    {step === 4 && (
-                                        <div>
                                             <Form.Group>
-                                                <Form.Label>Experience Required (in years)</Form.Label>
+                                                <Form.Label> Budget <span className="text-danger fs-5">*</span></Form.Label>
+                                                <Form.Control
+                                                    type="number"
+                                                    name="maxBudget"
+                                                    min={'100'}
+                                                    value={formData.maxBudget}
+                                                    onChange={handleChange}
+                                                />
+                                            </Form.Group>
+                                            <Form.Group>
+                                                <Form.Label>Experience Required (Optional) </Form.Label>
                                                 <Form.Control
                                                     type="number"
                                                     name="experienceRequired"
@@ -647,42 +732,16 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
                                                     required
                                                 />
                                             </Form.Group>
-                                            <Form.Group>
-                                                <Form.Label>Min Budget</Form.Label>
-                                                <Form.Control
-                                                    type="number"
-                                                    name="minBudget"
-                                                    value={formData.minBudget}
-                                                    onChange={handleChange}
-                                                    required
-                                                />
-                                            </Form.Group>
-                                            <Form.Group>
-                                                <Form.Label>Max Budget</Form.Label>
-                                                <Form.Control
-                                                    type="number"
-                                                    name="maxBudget"
-                                                    value={formData.maxBudget}
-                                                    onChange={handleChange}
-                                                />
-                                            </Form.Group>
+
                                         </div>
                                     )}
-                                    {step === 5 && (
+
+                                    {step === 4 && (
                                         <div>
-                                            <h4>Step 5: Location & Requirements</h4>
+                                            <h4>Step 4: Location & Requirements</h4>
+
                                             <Form.Group>
-                                                <Form.Label>Specific Requirement</Form.Label>
-                                                <Form.Control
-                                                    as="textarea"
-                                                    rows={3}
-                                                    name="specificRequirement"
-                                                    value={formData.specificRequirement}
-                                                    onChange={handleChange}
-                                                />
-                                            </Form.Group>
-                                            <Form.Group>
-                                                <Form.Label>Current Address</Form.Label>
+                                                <Form.Label>Current Address <span className="text-danger fs-5">*</span> </Form.Label>
                                                 <Form.Control
                                                     type="text"
                                                     name="currentAddress"
@@ -691,8 +750,8 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
                                                     required
                                                 />
                                             </Form.Group>
-                                            <Form.Group>
-                                                <Form.Label>Nearby Place</Form.Label>
+                                            <Form.Group className="mt-2 mb-2">
+                                                <Form.Label>Nearby Place (Optional)</Form.Label>
                                                 <input
                                                     type="text"
                                                     id="locality"
@@ -726,6 +785,8 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
                                                     value={formData.startDate}
                                                     onChange={handleChange}
                                                     required
+                                                    min={`${new Date().getFullYear()}-${new Date().getMonth() + 1 < 10 ? '0' : ''}${new Date().getMonth() + 1}-01`} // First day of current month
+                                                    max={`${new Date().getFullYear()}-12-31`}
                                                 />
                                             </Form.Group>
                                         </div>
@@ -737,18 +798,18 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
                                                 Previous
                                             </Button>
                                         )}
-                                        {step < 5 && (
+                                        {step < 4 && (
                                             <Button variant="primary" onClick={() => handleStepChange(1)}>
                                                 Next
                                             </Button>
                                         )}
-                                        {step === 5 && (
+                                        {step === 4 && (
                                             <Button onClick={handleFormSubmit} variant="success" type="submit">
                                                 {loading ? 'Please Wait....' : 'Submit'}
                                             </Button>
                                         )}
                                     </div>
-                                </>
+                                </form>
 
                             }
 

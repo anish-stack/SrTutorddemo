@@ -41,6 +41,7 @@ const AllClass = () => {
     // Search functionality
     const filteredData = data.filter((item) =>
         item.Class.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item._id.toString().includes(searchTerm.toLowerCase()) ||
         item.Subjects.some(subject => subject.SubjectName.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
@@ -52,7 +53,7 @@ const AllClass = () => {
     const handleDelete = async (id) => {
         try {
             await toast.promise(
-                axios.delete(`http://localhost:7000/api/v1/admin/delete-Class/${id}`, {
+                axios.delete(`https://api.srtutorsbureau.com/api/v1/admin/delete-Class/${id}`, {
                     headers: {
                         Authorization: `Bearer ${Token}`
                     }
@@ -89,7 +90,7 @@ const AllClass = () => {
                 <div className="mb-4">
                     <input
                         type="text"
-                        placeholder="Search by class or subject name"
+                        placeholder="Search by class or subject name and by class id"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="p-2 border border-gray-300 rounded-lg w-full"
@@ -145,22 +146,22 @@ const AllClass = () => {
                                     onClick={() => openModal(item)}
                                     className="whitespace-nowrap  w-full gap-1  mt-2  text-sm flex items-center justify-center rounded border border-blue-400 bg-gradient-to-r from-blue-100 to-blue-200 px-4 py-1 font-semibold text-blue-600 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2 active:opacity-100 transition duration-150"
                                 >
-                                    <IoIosEye className=' text-xl'/>
-                                  
+                                    <IoIosEye className=' text-xl' />
+
                                 </button>
                                 <Link
                                     to={`/Edit-Class/${item._id}`}
                                     className="whitespace-nowrap  w-full gap-1  mt-2  text-sm flex items-center justify-center rounded border border-green-400 bg-gradient-to-r from-green-100 to-green-200 px-4 py-1 font-semibold text-green-600 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-green-300 focus:ring-offset-2 active:opacity-100 transition duration-150"
                                 >
                                     <CiEdit className=' text-xl' />
-                                 
+
                                 </Link>
                                 <button
                                     onClick={() => handleDelete(item._id)}
                                     className="whitespace-nowrap  w-full gap-1  mt-2  text-sm flex items-center justify-center rounded border border-red-400 bg-gradient-to-r from-red-100 to-red-200 px-4 py-1 font-semibold text-red-600 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-offset-2 active:opacity-100 transition duration-150"
                                 >
                                     <ImBin className='text-xl' />
-                                   
+
                                 </button>
                             </div>
                         </div>
@@ -184,7 +185,7 @@ const AllClass = () => {
                 nextLinkClassName="whitespace-nowrap  w-full gap-1    text-sm flex items-center justify-center rounded border border-indigo-400 bg-gradient-to-r from-indigo-100 to-indigo-200 px-4 py-1 font-semibold text-indigo-600 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:ring-offset-2 active:opacity-100 transition duration-150"
                 breakClassName="mx-1"
                 breakLinkClassName="px-3 py-1 border border-gray-300 rounded-lg hover:bg-gray-200"
-                // activeClassName="bg-red-500 text-white"
+            // activeClassName="bg-red-500 text-white"
             />
         </div>
     );

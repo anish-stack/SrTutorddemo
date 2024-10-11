@@ -118,13 +118,13 @@ const TeacherRegistration = () => {
 
     const ResendOtp = async () => {
         if (resendButtonClick >= maxResendAttempts) {
-            setResendError('Maximum resend attempts reached. You are blocked for 24 hours.');
+            // setResendError('Maximum resend attempts reached. You are blocked for 24 hours.');
             await handleBlockTeacher();
             return;
         }
         console.log(verifyData)
         try {
-            const response = await axios.post('http://localhost:7000/api/v1/teacher/resent-otp', { PhoneNumber: verifyData.PhoneNumber });
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/teacher/resent-otp', { PhoneNumber: verifyData.PhoneNumber });
             toast.success(response.data.message);
             setResendButtonClick(resendButtonClick + 1);
             setResendError('');
@@ -139,7 +139,7 @@ const TeacherRegistration = () => {
     const handleBlockTeacher = async () => {
 
         try {
-            const res = await axios.post('http://localhost:7000/api/v1/teacher/block-teacher', {
+            const res = await axios.post('https://api.srtutorsbureau.com/api/v1/teacher/block-teacher', {
                 Email: verifyData.Email,
                 HowManyRequest: resendButtonClick
             });
@@ -208,7 +208,7 @@ const TeacherRegistration = () => {
         data.append('DocumentType', formData.DocumentType);
         setLoading(true)
         try {
-            const response = await axios.post(`http://localhost:7000/api/v1/teacher/Create-teacher?DocumentType=${formData.DocumentType}`, data)
+            const response = await axios.post(`https://api.srtutorsbureau.com/api/v1/teacher/Create-teacher?DocumentType=${formData.DocumentType}`, data)
             console.log(response.data.message)
             toast.success(response.data.message)
             setLoading(false)
@@ -226,18 +226,18 @@ const TeacherRegistration = () => {
 
     const fetchLocation = async () => {
         try {
-            const { data } = await axios.post('http://localhost:7000/Fetch-Current-Location')
+            const { data } = await axios.post('https://api.srtutorsbureau.com/Fetch-Current-Location')
             const address = data?.data?.address
-            if(address){
-                setFormData((prev)=>({
-                        ...prev,
-                        PermanentAddress:{
-                            streetAddress:address?.completeAddress,
-                            Pincode:address?.postalCode,
-                            City:address?.city,
-                            Area:address?.area
+            if (address) {
+                setFormData((prev) => ({
+                    ...prev,
+                    PermanentAddress: {
+                        streetAddress: address?.completeAddress,
+                        Pincode: address?.postalCode,
+                        City: address?.city,
+                        Area: address?.area
 
-                        }
+                    }
                 }))
             }
         } catch (error) {
@@ -249,7 +249,7 @@ const TeacherRegistration = () => {
 
     const VerifyOtp = async () => {
         try {
-            const response = await axios.post('http://localhost:7000/api/v1/teacher/Verify-teacher', verifyData)
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/teacher/Verify-teacher', verifyData)
 
             toast.success("Tutor Verified Successful")
             const { token, user } = response.data;
@@ -491,7 +491,7 @@ const TeacherRegistration = () => {
                                                         onChange={(e) => handleNestedChange(e, 'PermanentAddress')}
                                                     />
                                                 </div>
-                                              
+
 
                                                 <div className="col-md-6 mb-3">
                                                     <label className="form-label" htmlFor="Pincode">Pincode</label>
