@@ -295,24 +295,42 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
     fetchSubjects(classId);
   };
 
-  const fetchLocation = async () => {
-    try {
-      const { data } = await axios.post('https://api.srtutorsbureau.com/Fetch-Current-Location')
-      const address = data?.data?.address
-      console.log(address)
-      if (address) {
-        setFormData((prev) => ({
-          ...prev,
-          locality: address?.completeAddress,
 
-          latitude: address.lat,
-          longitude: address.lng
-        }))
-      }
-    } catch (error) {
-      console.log(error)
+  const fetchLocation = async () => {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                const { latitude, longitude } = position.coords;
+                try {
+                    const { data } = await axios.post('http://api.srtutorsbureau.com/Fetch-Current-Location', {
+                        lat: latitude,
+                        lng: longitude
+                    });
+
+                    const address = data?.data?.address;
+                    console.log(address);
+                    if (address) {
+                      setFormData((prev) => ({
+                        ...prev,
+                        locality: address?.completeAddress,
+              
+                        latitude: address.lat,
+                        longitude: address.lng
+                      }))
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
+            },
+            (error) => {
+                console.error('Error getting location:', error);
+            }
+        );
+    } else {
+        console.log('Geolocation is not supported by this browser.');
     }
-  }
+};
+
 
   useEffect(() => {
     fetchLocation()

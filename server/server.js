@@ -99,6 +99,16 @@ app.get("/Flush-all-Redis-Cached", async (req, res) => {
 });
 
 app.post('/Fetch-Current-Location', async (req, res) => {
+    const { lat, lng } = req.body;
+
+   
+    if (!lat || !lng) {
+        return res.status(400).json({
+            success: false,
+            message: "Latitude and longitude are required",
+        });
+    }
+
     try {
         if (!process.env.GOOGLE_MAP_KEY) {
             return res.status(403).json({
@@ -107,75 +117,60 @@ app.post('/Fetch-Current-Location', async (req, res) => {
             });
         }
 
-        const { data } = await axios.post(`https://www.googleapis.com/geolocation/v1/geolocate?key=${process.env.GOOGLE_MAP_KEY}`);
+        // Use the provided lat/lng directly
+        const addressResponse = await axios.get(
+            `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${process.env.GOOGLE_MAP_KEY}`
+        );
 
-        if (data.location) {
-            try {
-                const addressResponse = await axios.get(
-                    `https://maps.googleapis.com/maps/api/geocode/json?latlng=${data.location.lat},${data.location.lng}&key=${process.env.GOOGLE_MAP_KEY}`
-                );
+        if (addressResponse.data.results.length > 0) {
+            const addressComponents = addressResponse.data.results[0].address_components;
 
-                if (addressResponse.data.results.length > 0) {
-                    const addressComponents = addressResponse.data.results[0].address_components;
+            const addressDetails = {
+                completeAddress: addressResponse.data.results[0].formatted_address,
+                city: null,
+                area: null,
+                postalCode: null,
+                landmark: null,
+                lat: addressResponse.data.results[0].geometry.location.lat,
+                lng: addressResponse.data.results[0].geometry.location.lng,
+            };
 
-                    const addressDetails = {
-                        completeAddress: addressResponse.data.results[0].formatted_address,
-                        city: null,
-                        area: null,
-                        postalCode: null,
-                        landmark: null,
-                        lat: addressResponse.data.results[0].geometry.location.lat,
-                        lng: addressResponse.data.results[0].geometry.location.lng,
-                    };
-
-                    addressComponents.forEach(component => {
-                        if (component.types.includes('locality')) {
-                            addressDetails.city = component.long_name;
-                        }
-                        if (component.types.includes('sublocality') || component.types.includes('neighborhood')) {
-                            addressDetails.area = component.long_name;
-                        }
-                        if (component.types.includes('postal_code')) {
-                            addressDetails.postalCode = component.long_name;
-                        }
-                        // You can add more types to extract landmarks if needed
-                    });
-
-                    return res.status(200).json({
-                        success: true,
-                        data: {
-                            location: data.location,
-                            address: addressDetails,
-                        },
-                        message: "Location fetch successful"
-                    });
-                } else {
-                    return res.status(404).json({
-                        success: false,
-                        message: "No address found for the given location",
-                    });
+            addressComponents.forEach(component => {
+                if (component.types.includes('locality')) {
+                    addressDetails.city = component.long_name;
                 }
-            } catch (error) {
-                console.error('Error fetching address:', error);
-                return res.status(500).json({
-                    success: false,
-                    message: "Failed to fetch address",
-                });
-            }
-        }
+                if (component.types.includes('sublocality') || component.types.includes('neighborhood')) {
+                    addressDetails.area = component.long_name;
+                }
+                if (component.types.includes('postal_code')) {
+                    addressDetails.postalCode = component.long_name;
+                }
+                // Additional types for landmarks can be added if needed
+            });
 
-        return res.status(404).json({
-            success: false,
-            message: "Location not found"
-        });
+            return res.status(200).json({
+                success: true,
+                data: {
+                    location: { lat, lng },
+                    address: addressDetails,
+                },
+                message: "Location fetch successful"
+            });
+        } else {
+            return res.status(404).json({
+                success: false,
+                message: "No address found for the given location",
+            });
+        }
     } catch (error) {
-        console.error('Error fetching location:', error);
+        console.error('Error fetching address:', error);
         return res.status(500).json({
             success: false,
-            message: "Location fetch failed",
+            message: "Failed to fetch address",
         });
     }
 });
+
 
 
 
