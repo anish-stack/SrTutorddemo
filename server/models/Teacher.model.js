@@ -102,6 +102,28 @@ const TeacherSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    PermanentAddress: {
+        streetAddress: {
+            type: String,
+        },
+        City: {
+            type: String,
+
+        },
+        Area: {
+            type: String,
+
+        },
+        LandMark: {
+            type: String,
+            required: true
+        },
+
+        Pincode: {
+            type: String,
+            required: true
+        }
+    },
     hit: {
         type: Number,
         default: 0

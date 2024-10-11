@@ -24,7 +24,7 @@ const Google = () => {
 
   const fetchNearbyPlaces = async () => {
     if (latitude && longitude) {
-      const url = `https://api.srtutorsbureau.com/nearby-places?lat=${latitude}&lng=${longitude}&radius=${radius * 1000}`; // Convert km to meters
+      const url = `http://localhost:7000/nearby-places?lat=${latitude}&lng=${longitude}&radius=${radius * 1000}`; // Convert km to meters
 
       try {
         const response = await axios.get(url);

@@ -20,7 +20,7 @@ const TeacherProfileSchema = new mongoose.Schema({
     ProfilePic: {
         url: {
             type: String,
-            // required: true,
+           
         },
         publicId: {
             type: String,
@@ -125,7 +125,6 @@ const TeacherProfileSchema = new mongoose.Schema({
 
     TeachingMode: {
         type: String,
-
         required: true
     },
     AcademicInformation: [{

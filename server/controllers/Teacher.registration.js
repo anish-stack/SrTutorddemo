@@ -35,8 +35,11 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
       Age,
       gender,
       AltNumber,
+      PermanentAddress,
     } = req.body;
 
+    const address = JSON.parse(PermanentAddress);
+    console.log(address)
     const { DocumentType } = req.query;
 
     const preDefineTypes = ["Aadhaar", "Pan", "Voter Card", "Passport"];
@@ -78,7 +81,6 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
       }
       else {
         existingTeacher.hit = (existingTeacher.hit || 0) + 1;
-
         existingTeacher.Password = Password;
         existingTeacher.SignInOtp = crypto.randomInt(100000, 999999);
         existingTeacher.OtpExpiresTime = Date.now() + 2 * 60 * 1000;
@@ -160,6 +162,7 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
       AltNumber,
       DOB,
       hit: 1,
+      PermanentAddress:address,
       identityDocument: {
         DocumentType,
         DocumentImageUrl: documentUploadResult.secure_url,
@@ -203,6 +206,7 @@ exports.TeacherVerifyOtp = CatchAsync(async (req, res) => {
       $or: [{ PhoneNumber }, { Email }],
     });
 
+    console.log("Found Teacher",existingTeacher)
     if (!existingTeacher) {
       return res.status(404).json({ message: "Teacher not found" });
     }
@@ -237,7 +241,7 @@ exports.TeacherVerifyOtp = CatchAsync(async (req, res) => {
     // Send token upon successful verification
     await sendToken(existingTeacher, res, 201);
   } catch (error) {
-    console.error(error); // Log error for debugging
+    console.error(error); 
     return res.status(500).json({ message: "Internal server error", error: error.message });
   }
 });
@@ -1574,7 +1578,7 @@ exports.SearchByMinimumCondition = CatchAsync(async (req, res) => {
     } else if (role === 'tutor') {
 
       try {
-        const { data } = await axios.get('https://api.srtutorsbureau.com/api/v1/uni/get-all-universal-Request')
+        const { data } = await axios.get('http://localhost:7000/api/v1/uni/get-all-universal-Request')
         const CombinedData = data?.data
         const findTeacherRequest = CombinedData.filter(item => item.className === ClassNameValue && item.subjects.includes(Subject))
 

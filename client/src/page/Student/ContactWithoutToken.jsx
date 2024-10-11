@@ -137,7 +137,7 @@ const ContactTeacherModalWithoutToken = ({ isOpen, isClose, teachersData }) => {
 
     const fetchSubjects = async (classId) => {
         try {
-            const response = await axios.get(`https://api.srtutorsbureau.com/api/v1/admin/Get-Class-Subject/${classId}`);
+            const response = await axios.get(`http://localhost:7000/api/v1/admin/Get-Class-Subject/${classId}`);
             const fetchedSubjects = response.data.data.Subjects;
 
             if (fetchedSubjects) {
@@ -193,7 +193,7 @@ const ContactTeacherModalWithoutToken = ({ isOpen, isClose, teachersData }) => {
     const handleLocationFetch = async (input) => {
         try {
             const res = await axios.get(
-                `https://api.srtutorsbureau.com/autocomplete?input=${input}`);
+                `http://localhost:7000/autocomplete?input=${input}`);
 
             setLocationSuggestions(res.data || []);
         } catch (error) {
@@ -333,7 +333,7 @@ const ContactTeacherModalWithoutToken = ({ isOpen, isClose, teachersData }) => {
         }
         setLoading(true)
         try {
-            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/Make-Particular-request', formData, {
+            const response = await axios.post('http://localhost:7000/api/v1/student/Make-Particular-request', formData, {
                 headers: {
                     Authorization: `Bearer ${studentToken}`
                 }

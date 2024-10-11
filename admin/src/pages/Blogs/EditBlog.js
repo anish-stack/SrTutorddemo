@@ -28,7 +28,7 @@ const EditBlog = () => {
     useEffect(() => {
         const fetchBlogData = async () => {
             try {
-                const { data } = await axios.get(`https://api.srtutorsbureau.com/api/v1/admin/get-Blog/${id}`);
+                const { data } = await axios.get(`http://localhost:7000/api/v1/admin/get-Blog/${id}`);
                 const blog = data.data;
                 console.log(data)
                 setFormData({
@@ -88,7 +88,7 @@ const EditBlog = () => {
         try {
             const token = localStorage.getItem('Sr-token');
             await toast.promise(
-                axios.put(`https://api.srtutorsbureau.com/api/v1/admin/update-Blog/${id}`, formDataToSubmit, {
+                axios.put(`http://localhost:7000/api/v1/admin/update-Blog/${id}`, formDataToSubmit, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                         'Authorization': `Bearer ${token}`

@@ -43,7 +43,7 @@ const ProfileOfTeacher = () => {
     };
     const handleVerify = async (teacherId, status) => {
         try {
-            const { data } = await axios.post(`https://api.srtutorsbureau.com/api/v1/teacher/Make-Document-verified`, {
+            const { data } = await axios.post(`http://localhost:7000/api/v1/teacher/Make-Document-verified`, {
                 teacherId: teacherId,
                 status: status
             })
