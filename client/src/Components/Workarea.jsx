@@ -34,7 +34,7 @@ function Workarea() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get('https://api.srtutorsbureau.com/api/v1/admin/get-City');
+                const response = await axios.get('http://localhost:7000/api/v1/admin/get-City');
                 if (response.data.success) {
                     const locations = response.data.data.map(city => ({
                         location_img: city.CityImage.url,

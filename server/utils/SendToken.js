@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken')
-
+const dotenv = require('dotenv')
+dotenv.config()
 const sendToken = async (user, res, status) => {
     try {
         console.log(user)
@@ -11,7 +12,6 @@ const sendToken = async (user, res, status) => {
        const options = {
 
            httpOnly: true,
-           secure: process.env.NODE_ENV === 'production', // true if in production
            sameSite: 'None' // or 'Lax' based on your needs
        }
 

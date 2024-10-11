@@ -42,7 +42,7 @@ const AllBlogs = () => {
     const handleDeleteBlog = async (id) => {
         try {
             await toast.promise(
-                axios.delete(`https://api.srtutorsbureau.com/api/v1/admin/Delete-Blog/${id}`, {
+                axios.delete(`http://localhost:7000/api/v1/admin/Delete-Blog/${id}`, {
                     headers: {
                         Authorization: `Bearer ${Token}`
                     }

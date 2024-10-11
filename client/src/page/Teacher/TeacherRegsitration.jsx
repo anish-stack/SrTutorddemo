@@ -18,9 +18,16 @@ const TeacherRegistration = () => {
         DOB: '',
         Age: '',
         gender: '',
+        PermanentAddress: {
+            streetAddress: '',
+            City: '',
+            Area: '',
+            LandMark: '',
+            Pincode: ''
+        },
         DocumentType: 'Aadhaar',
-        DocumentImage: null, // file for identity document
-        QualificationDocument: null // file for qualification document
+        DocumentImage: null,
+        QualificationDocument: null
     });
 
 
@@ -86,6 +93,18 @@ const TeacherRegistration = () => {
             }));
         }
     };
+
+    const handleNestedChange = (e, addressType) => {
+        const { name, value } = e.target;
+        setFormData(prevState => ({
+            ...prevState,
+            [addressType]: {
+                ...prevState[addressType],
+                [name]: value
+            }
+        }));
+    };
+
     useEffect(() => {
         const storedResendCount = localStorage.getItem('resendButtonClick');
         if (storedResendCount) {
@@ -105,7 +124,7 @@ const TeacherRegistration = () => {
         }
         console.log(verifyData)
         try {
-            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/teacher/resent-otp',{PhoneNumber:verifyData.PhoneNumber});
+            const response = await axios.post('http://localhost:7000/api/v1/teacher/resent-otp', { PhoneNumber: verifyData.PhoneNumber });
             toast.success(response.data.message);
             setResendButtonClick(resendButtonClick + 1);
             setResendError('');
@@ -120,7 +139,7 @@ const TeacherRegistration = () => {
     const handleBlockTeacher = async () => {
 
         try {
-            const res = await axios.post('https://api.srtutorsbureau.com/api/v1/teacher/block-teacher', {
+            const res = await axios.post('http://localhost:7000/api/v1/teacher/block-teacher', {
                 Email: verifyData.Email,
                 HowManyRequest: resendButtonClick
             });
@@ -181,6 +200,7 @@ const TeacherRegistration = () => {
         data.append('Password', formData.Password);
         data.append('DOB', formData.DOB);
         data.append('gender', formData.gender);
+        data.append('PermanentAddress', JSON.stringify(formData.PermanentAddress));
 
 
         data.append('Document', formData.DocumentImage);
@@ -188,14 +208,14 @@ const TeacherRegistration = () => {
         data.append('DocumentType', formData.DocumentType);
         setLoading(true)
         try {
-            const response = await axios.post(`https://api.srtutorsbureau.com/api/v1/teacher/Create-teacher?DocumentType=${formData.DocumentType}`, data)
+            const response = await axios.post(`http://localhost:7000/api/v1/teacher/Create-teacher?DocumentType=${formData.DocumentType}`, data)
             console.log(response.data.message)
             toast.success(response.data.message)
             setLoading(false)
             setModelOpen(true)
             setVerifyData(prevData => ({
                 ...prevData,
-                PhoneNumber: formData.PhoneNumber 
+                PhoneNumber: formData.PhoneNumber
             }));
         } catch (error) {
             setLoading(false)
@@ -204,20 +224,32 @@ const TeacherRegistration = () => {
         }
     }
 
-    // const ResendOtp = async () => {
-    //     try {
-    //         const response = await axios.post('https://api.srtutorsbureau.com/api/v1/teacher/resent-otp', verifyData)
-    //         console.log(response.data)
-    //         toast.success(response.data.message)
-    //     } catch (error) {
-    //         toast.error(error.response.data.message)
-    //     }
-    // }
+    const fetchLocation = async () => {
+        try {
+            const { data } = await axios.post('http://localhost:7000/Fetch-Current-Location')
+            const address = data?.data?.address
+            if(address){
+                setFormData((prev)=>({
+                        ...prev,
+                        PermanentAddress:{
+                            streetAddress:address?.completeAddress,
+                            Pincode:address?.postalCode,
+                            City:address?.city,
+                            Area:address?.area
+
+                        }
+                }))
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
 
 
     const VerifyOtp = async () => {
         try {
-            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/teacher/Verify-teacher', verifyData)
+            const response = await axios.post('http://localhost:7000/api/v1/teacher/Verify-teacher', verifyData)
 
             toast.success("Tutor Verified Successful")
             const { token, user } = response.data;
@@ -225,6 +257,7 @@ const TeacherRegistration = () => {
             Cookies.set(`teacherUser`, JSON.stringify(user), { expires: 1 });
             window.location.href = `/Complete-profile?token=${token}&encoded=${user._id}`;
         } catch (error) {
+            console.log(error)
             toast.error(error.response.data.message)
         }
     }
@@ -319,6 +352,7 @@ const TeacherRegistration = () => {
                                                     <label htmlFor="password">Password</label>
                                                 </div>
                                             </div>
+
                                             <div className="row">
                                                 <div className="mb-3 col-md-6">
                                                     <div className="form-floating">
@@ -412,6 +446,82 @@ const TeacherRegistration = () => {
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div className='col-md-12 mt-2 mb-3'>
+                                                <button type='button' onClick={fetchLocation} className='btn w-100 btn-danger btn-sm'>Get Your Current Location <span className='ml-2'>🌍</span> </button>
+                                            </div>
+                                            <h6 className=" fw-bold">Permanent Address (*) </h6>
+                                            <div className="row">
+                                                <div className="col-md-6 mb-3">
+                                                    <label className="form-label" htmlFor="streetAddress">Street Address.</label>
+                                                    <input
+                                                        type="text"
+                                                        className={`form-control`}
+                                                        name="streetAddress"
+                                                        id="streetAddress"
+                                                        placeholder="Enter Street Address"
+                                                        required
+                                                        value={formData.PermanentAddress.streetAddress}
+                                                        onChange={(e) => handleNestedChange(e, 'PermanentAddress')}
+                                                    />
+                                                </div>
+
+                                                <div className="col-md-6 mb-3">
+                                                    <label className="form-label" htmlFor="Area">Area</label>
+                                                    <input
+                                                        type="text"
+                                                        className={`form-control }`}
+                                                        name="Area"
+                                                        id="Area"
+                                                        placeholder="Enter Area"
+                                                        required
+                                                        value={formData.PermanentAddress.Area}
+                                                        onChange={(e) => handleNestedChange(e, 'PermanentAddress')}
+                                                    />
+                                                </div>
+                                                <div className="col-md-6 mb-3">
+                                                    <label className="form-label" htmlFor="City">City</label>
+                                                    <input
+                                                        type="text"
+                                                        className={`form-control }`}
+                                                        name="City"
+                                                        id="City"
+                                                        placeholder="Enter City"
+                                                        required
+                                                        value={formData.PermanentAddress.City}
+                                                        onChange={(e) => handleNestedChange(e, 'PermanentAddress')}
+                                                    />
+                                                </div>
+                                              
+
+                                                <div className="col-md-6 mb-3">
+                                                    <label className="form-label" htmlFor="Pincode">Pincode</label>
+                                                    <input
+                                                        type="text"
+                                                        className={`form-control `}
+                                                        name="Pincode"
+                                                        id="Pincode"
+                                                        placeholder="Enter Pincode"
+                                                        required
+                                                        value={formData.PermanentAddress.Pincode}
+                                                        onChange={(e) => handleNestedChange(e, 'PermanentAddress')}
+                                                    />
+
+                                                </div>
+                                                <div className="col-md-12 mb-3">
+                                                    <label className="form-label" htmlFor="LandMark">Landmark</label>
+                                                    <input
+                                                        type="text"
+                                                        className={`form-control }`}
+                                                        name="LandMark"
+                                                        id="LandMark"
+                                                        placeholder="Enter Landmark"
+                                                        required
+                                                        value={formData.PermanentAddress.LandMark}
+                                                        onChange={(e) => handleNestedChange(e, 'PermanentAddress')}
+                                                    />
+                                                </div>
+                                            </div>
+
 
                                             <div className="mb-4">
                                                 <Card className="p-3">

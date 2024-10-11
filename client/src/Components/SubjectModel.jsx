@@ -145,7 +145,7 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
         const address = formData.Location
         const options = {
             method: 'GET',
-            url: `https://api.srtutorsbureau.com/geocode?address=${address}`
+            url: `http://localhost:7000/geocode?address=${address}`
         };
 
         try {
@@ -165,7 +165,7 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
     const handleLocationFetch = async (input) => {
         try {
             const res = await axios.get(
-                `https://api.srtutorsbureau.com/autocomplete?input=${input}`);
+                `http://localhost:7000/autocomplete?input=${input}`);
 
             setLocationSuggestions(res.data || []);
         } catch (error) {
@@ -230,7 +230,7 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
     const resendOtp = async () => {
         console.log(loginNumber);
         try {
-            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/resent-otp', {
+            const response = await axios.post('http://localhost:7000/api/v1/student/resent-otp', {
                 PhoneNumber: loginNumber,
                 HowManyHit: resendButtonClick
             });
@@ -249,7 +249,7 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
 
     const verifyOtp = async () => {
         try {
-            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/Verify-Student', {
+            const response = await axios.post('http://localhost:7000/api/v1/student/Verify-Student', {
                 PhoneNumber: loginNumber,
                 otp
             });
@@ -287,7 +287,7 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
         }
 
         try {
-            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/checkNumber-request', {
+            const response = await axios.post('http://localhost:7000/api/v1/student/checkNumber-request', {
                 userNumber: loginNumber,
                 HowManyHit: resendButtonClick
             });
@@ -353,7 +353,7 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
 
         setLoading(true)
         try {
-            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/universal-request', submitedData, {
+            const response = await axios.post('http://localhost:7000/api/v1/student/universal-request', submitedData, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             console.log(response.data)

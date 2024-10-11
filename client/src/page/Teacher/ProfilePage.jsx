@@ -4,8 +4,9 @@ import axios from "axios";
 import { ClassSearch } from "../../Slices/Class.slice";
 import Cookies from "js-cookie";
 import Select from 'react-select';
-import { GoogleMap, LoadScript, Marker, Circle, InfoWindow } from "@react-google-maps/api";
-
+import { MapContainer, TileLayer, Marker, Popup, Tooltip, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { Alert, Table } from 'react-bootstrap';
 import { useGeolocated } from 'react-geolocated';
 import toast from "react-hot-toast";
@@ -47,8 +48,10 @@ const ProfilePage = () => {
         ranges: []
     });
     const [isAddressSame, setIsAddressSame] = useState(false);
-    const [currentLocation, setCurrentLocation] = useState([28.687446456774957, 77.14151483304185]);  //Default location
+    const [currentLocation, setCurrentLocation] = useState([28.687446456774957, 77.14151483304185]);
+
     const [allPoints, setAllPoints] = useState([]);
+
     const [errorMessage, setErrorMessage] = useState(null);
 
     const { coords, isGeolocationAvailable, isGeolocationEnabled } = useGeolocated({
@@ -58,6 +61,32 @@ const ProfilePage = () => {
         watchPosition: false,
         userDecisionTimeout: 5000,
     });
+
+    const handleLocationClick = (lat, lng, setAllPoints, allPoints) => {
+        setAllPoints((prevPoints) => {
+            const existingIndex = prevPoints.findIndex(point => point.lat === lat && point.lng === lng);
+
+            if (existingIndex > -1) {
+                return prevPoints.filter((_, index) => index !== existingIndex);
+            } else {
+                return [...prevPoints, { lng, lat }];
+            }
+        });
+    };
+
+    const MapClickHandler = ({ handleMapClick }) => {
+        const map = useMap();
+
+        useEffect(() => {
+            map.on('click', handleMapClick);
+
+            return () => {
+                map.off('click', handleMapClick);
+            };
+        }, [map, handleMapClick]);
+
+        return null;
+    };
 
     useEffect(() => {
         if (coords) {
@@ -75,15 +104,19 @@ const ProfilePage = () => {
     const dispatch = useDispatch();
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false)
+
     const [errorModel, setErrorModel] = useState(false)
-    const [subjects, setSubjects] = useState([]);
+    const [subjects, setSubjects] = useState();
     const [latitude, setLatitude] = useState(null);
+
     const [longitude, setLongitude] = useState(null);
-    const [radius, setRadius] = useState(''); 
+    const [radius, setRadius] = useState('');
     const [places, setPlaces] = useState([]);
+
     const [selectedPlace, setSelectedPlace] = useState(null);
     const [permissionDenied, setPermissionDenied] = useState(false);
     const [initialConfirm, setInitialConfirm] = useState(false);
+
     const [user, setUser] = useState({
         TeacherName: '',
         DOB: '',
@@ -120,6 +153,7 @@ const ProfilePage = () => {
         dispatch(ClassSearch());
     }, [dispatch]);
 
+
     useEffect(() => {
         if (data) {
             const filterOutClasses = ['I-V', 'VI-X', 'X-XII'];
@@ -138,6 +172,17 @@ const ProfilePage = () => {
             setConcatenatedData(combinedData);
         }
     }, [data]);
+
+    const handleMapClick = (event) => {
+        const { lat, lng } = event.latlng;
+        handleLocationClick(lat, lng, setAllPoints, allPoints);
+
+    };
+
+    const handleDoubleClick = (lat, lng) => {
+        handleLocationClick(lat, lng, setAllPoints, allPoints);
+    };
+
     const requestLocation = () => {
         navigator.geolocation.getCurrentPosition(
             (position) => {
@@ -152,6 +197,25 @@ const ProfilePage = () => {
             }
         );
     };
+
+    useEffect(() => {
+        if (allPoints.length < 2) {
+            setErrorMessage('You must select at least 2 locations.');
+        } else {
+            setErrorMessage(null);
+        }
+    }, [allPoints]);
+
+    const customIcon = L.divIcon({
+        className: 'custom-div-icon',
+        html: `<div style="color: red; font-size: 24px;">
+            <i class="fas fa-map-marker-alt"></i>
+          </div>`,
+        iconSize: [30, 42],
+        iconAnchor: [15, 42],
+    });
+
+
     useEffect(() => {
         const confirmAccess = window.confirm("We would like to access your location to provide a better experience. Do you allow?");
         if (confirmAccess) {
@@ -159,25 +223,26 @@ const ProfilePage = () => {
             requestLocation();
         }
     }, []);
-    const handleAddressSame = () => {
-        setFormData(prevState => ({
-            ...prevState,
-            isAddressSame: !prevState.isAddressSame,
-            CurrentAddress: !prevState.isAddressSame ? prevState.PermanentAddress : {
-                streetAddress: '',
-                City: '',
-                Area: '',
-                LandMark: '',
-                Pincode: ''
-            }
-        }));
-    };
+
+    // const handleAddressSame = () => {
+    //     setFormData(prevState => ({
+    //         ...prevState,
+    //         isAddressSame: !prevState.isAddressSame,
+    //         CurrentAddress: !prevState.isAddressSame ? prevState.PermanentAddress : {
+    //             streetAddress: '',
+    //             City: '',
+    //             Area: '',
+    //             LandMark: '',
+    //             Pincode: ''
+    //         }
+    //     }));
+    // };
 
 
     const fetchNearbyPlaces = async () => {
-    
+
         if (latitude && longitude) {
-            const url = `https://api.srtutorsbureau.com/nearby-places?lat=${latitude}&lng=${longitude}&radius=${radius * 1000}`;// Convert km to meters
+            const url = `http://localhost:7000/nearby-places?lat=${latitude}&lng=${longitude}&radius=${radius * 1000}`;// Convert km to meters
 
             try {
                 const response = await axios.get(url);
@@ -203,10 +268,11 @@ const ProfilePage = () => {
             fetchNearbyPlaces();
         }
     }, [radius]);
+
     const fetchUser = async () => {
         try {
             const response = await axios.get(
-                `https://api.srtutorsbureau.com/api/v1/teacher/Teacher-details/${IdQuery}`
+                `http://localhost:7000/api/v1/teacher/Teacher-details/${IdQuery}`
             );
             console.log(response.data)
             setUser(response.data.data)
@@ -214,8 +280,6 @@ const ProfilePage = () => {
             console.error("Error fetching subjects:", error);
         }
     };
-
-
 
     useEffect(() => {
         fetchUser()
@@ -226,11 +290,15 @@ const ProfilePage = () => {
     const fetchSubjects = async (classId) => {
         try {
             const response = await axios.get(
-                `https://api.srtutorsbureau.com/api/v1/admin/Get-Class-Subject/${classId}`
+                `http://localhost:7000/api/v1/admin/Get-Class-Subject/${classId}`
             );
             console.log(response.data)
+            if (response.data.data) {
 
-            setSubjects(response.data.data.Subjects || []);
+                setSubjects(response.data.data.Subjects);
+            } else {
+                setSubjects([]);
+            }
         } catch (error) {
             console.error("Error fetching subjects:", error);
         }
@@ -272,16 +340,16 @@ const ProfilePage = () => {
         }));
     };
 
-    const handleNestedChange = (e, addressType) => {
-        const { name, value } = e.target;
-        setFormData(prevState => ({
-            ...prevState,
-            [addressType]: {
-                ...prevState[addressType],
-                [name]: value
-            }
-        }));
-    };
+    // const handleNestedChange = (e, addressType) => {
+    //     const { name, value } = e.target;
+    //     setFormData(prevState => ({
+    //         ...prevState,
+    //         [addressType]: {
+    //             ...prevState[addressType],
+    //             [name]: value
+    //         }
+    //     }));
+    // };
 
 
     useEffect(() => {
@@ -295,14 +363,16 @@ const ProfilePage = () => {
                 AlternateContact: user.AltNumber || '',
                 PermanentAddress: {
                     streetAddress: user.PermanentAddress?.streetAddress || '',
+                    City: user.PermanentAddress.City,
                     Area: user.PermanentAddress?.Area || '',
                     LandMark: user.PermanentAddress?.LandMark || '',
                     Pincode: user?.PermanentAddress?.Pincode || '',
                 },
                 CurrentAddress: {
-                    streetAddress: user.CurrentAddress?.streetAddress || '',
-                    Area: user.CurrentAddress?.Area || '',
-                    LandMark: user.CurrentAddress?.LandMark || '',
+                    streetAddress: user.PermanentAddress?.streetAddress || '',
+                    Area: user.PermanentAddress?.Area || '',
+                    City: user.PermanentAddress.City,
+                    LandMark: user.PermanentAddress?.LandMark || '',
                     Pincode: user?.PermanentAddress?.Pincode || '',
                 },
                 isAddressSame: user.isAddressSame || false,
@@ -329,8 +399,6 @@ const ProfilePage = () => {
             ]
         }));
     };
-
-
 
     const handleRemoveClass = (index) => {
         setFormData(prevState => ({
@@ -374,6 +442,7 @@ const ProfilePage = () => {
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
+
     if (permissionDenied) {
         return (
             <div className="d-flex justify-content-center align-items-center vh-100">
@@ -399,17 +468,17 @@ const ProfilePage = () => {
 
     const handleSubmit = async (e, retry = false) => {
         e.preventDefault();
-        console.log(places)
+
         if (validateForm()) {
-            if (typeof places !== 'undefined') {
+            if (typeof allPoints !== 'undefined') {
                 setFormData((prevData) => ({
                     ...prevData,
-                    RangeWhichWantToDoClasses: [places]
+                    RangeWhichWantToDoClasses: [allPoints]
                 }));
             } else {
                 alert('Are You Sure');
-                console.error("places is not defined or is undefined");
-                return;
+                console.error("allPoints is not defined or is undefined");
+                return; // Exit the function if allPoints is undefined
             }
         } else {
             console.log("Form validation failed. Errors:", errors);
@@ -419,7 +488,7 @@ const ProfilePage = () => {
         try {
             setLoading(true);
 
-            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/teacher/teacher-profile', formData, {
+            const response = await axios.post('http://localhost:7000/api/v1/teacher/teacher-profile', formData, {
                 headers: {
                     Authorization: `Bearer ${tokenQuery}`
                 }
@@ -433,7 +502,7 @@ const ProfilePage = () => {
                 // window.location.href = `/Teacher-Profile-Verify?token=${tokenQuery}&id=${IdQuery}`;
                 window.location.href = `/Teacher-dashboard`;
 
-               
+
             }, 500);
         } catch (error) {
             console.log(error);
@@ -445,23 +514,6 @@ const ProfilePage = () => {
 
         }
     };
-
-
-
-    const handleNext = (e) => {
-        e.preventDefault();
-
-        if (validateForm()) {
-            setStep(prevStep => prevStep + 1);
-        }
-    };
-
-
-    const handlePrevious = () => {
-        setStep(prevStep => prevStep - 1);
-    };
-
-
 
     return (
         <div className="container w-100 mt-5 p-5">
@@ -507,133 +559,8 @@ const ProfilePage = () => {
 
                         </div>
                     </div>
-                    <div className="mb-4">
-                        <h3 className=" fw-bold">Teacher Communication Address</h3>
-                        <hr className="border-2 border-danger mt-0" />
-                    </div>
 
-                    {/* Permanent Address */}
-                    <h6 className=" fw-bold">Permanent Address (*) </h6>
-                    <div className="row">
-                        {/* Street Address. Input Field */}
-                        <div className="col-md-4 mb-3">
-                            <label className="form-label" htmlFor="streetAddress">Street Address.</label>
-                            <input
-                                type="text"
-                                className={`form-control ${errors.PermanentAddressstreetAddress ? 'is-invalid' : ''}`}
-                                name="streetAddress"
-                                id="streetAddress"
-                                placeholder="Enter Street Address"
-                                value={formData.PermanentAddress.streetAddress}
-                                onChange={(e) => handleNestedChange(e, 'PermanentAddress')}
-                            />
-                            {errors.PermanentAddressstreetAddress && <div className="invalid-feedback">{errors.PermanentAddressstreetAddress}</div>}
-                        </div>
 
-                        {/* Area Input Field */}
-                        <div className="col-md-4 mb-3">
-                            <label className="form-label" htmlFor="Area">Area</label>
-                            <input
-                                type="text"
-                                className={`form-control ${errors.PermanentAddressArea ? 'is-invalid' : ''}`}
-                                name="Area"
-                                id="Area"
-                                placeholder="Enter Area"
-                                value={formData.PermanentAddress.Area}
-                                onChange={(e) => handleNestedChange(e, 'PermanentAddress')}
-                            />
-                            {errors.PermanentAddressArea && <div className="invalid-feedback">{errors.PermanentAddressArea}</div>}
-                        </div>
-                        <div className="col-md-4 mb-3">
-                            <label className="form-label" htmlFor="City">City</label>
-                            <input
-                                type="text"
-                                className={`form-control }`}
-                                name="City"
-                                id="City"
-                                placeholder="Enter City"
-                                value={formData.PermanentAddress.City}
-                                onChange={(e) => handleNestedChange(e, 'PermanentAddress')}
-                            />
-                            {/* {errors.PermanentAddressArea && <div className="invalid-feedback">{errors.PermanentAddressArea}</div>} */}
-                        </div>
-                        {/* Landmark Input Field */}
-                        <div className="col-md-6 mb-3">
-                            <label className="form-label" htmlFor="LandMark">LandMark</label>
-                            <input
-                                type="text"
-                                className={`form-control ${errors.PermanentAddressLandMark ? 'is-invalid' : ''}`}
-                                name="LandMark"
-                                id="LandMark"
-                                placeholder="Enter Landmark"
-                                value={formData.PermanentAddress.LandMark}
-                                onChange={(e) => handleNestedChange(e, 'PermanentAddress')}
-                            />
-                            {errors.PermanentAddressLandMark && <div className="invalid-feedback">{errors.PermanentAddressLandMark}</div>}
-                        </div>
-
-                        {/* Pincode Input Field */}
-                        <div className="col-md-6 mb-3">
-                            <label className="form-label" htmlFor="Pincode">Pincode</label>
-                            <input
-                                type="text"
-                                className={`form-control ${errors.PermanentAddressPincode ? 'is-invalid' : ''}`}
-                                name="Pincode"
-                                id="Pincode"
-                                placeholder="Enter Pincode"
-                                value={formData.PermanentAddress.Pincode}
-                                onChange={(e) => handleNestedChange(e, 'PermanentAddress')}
-                            />
-                            {errors.PermanentAddressPincode && <div className="invalid-feedback">{errors.PermanentAddressPincode}</div>}
-                        </div>
-                    </div>
-                    <div>
-                        <label>
-                            <input
-                                type="checkbox"
-                                checked={isAddressSame}
-                                onChange={handleAddressSame}
-                            />
-                            Same as Permanent Address
-                        </label>
-                    </div>
-
-                    {/* Current Address */}
-                    <h6 className=" fw-bold">Current Address (*) </h6>
-
-                    <div className="row">
-                        <div className="col-md-6 mb-3">
-                            <label className="form-label" htmlFor="streetAddress">Street Address.</label>
-                            <input type="text" className={`form-control ${errors.CurrentAddressstreetAddress ? 'is-invalid' : ''}`} name="streetAddress" id="streetAddress" placeholder="Enter Street Address" value={formData.CurrentAddress.streetAddress} onChange={(e) => handleNestedChange(e, 'CurrentAddress')} />
-                            {errors.CurrentAddressstreetAddress && <div className="invalid-feedback">{errors.CurrentAddressstreetAddress}</div>}
-
-                        </div>
-                        <div className="col-md-6 mb-3">
-                            <label className="form-label" htmlFor="Area">Area</label>
-                            <input type="text" className={`form-control ${errors.CurrentAddressArea ? 'is-invalid' : ''}`} name="Area" id="Area" placeholder="Enter Area" value={formData.CurrentAddress.Area} onChange={(e) => handleNestedChange(e, 'CurrentAddress')} />
-                            {errors.CurrentAddressArea && <div className="invalid-feedback">{errors.CurrentAddressArea}</div>}
-
-                        </div>
-                        <div className="col-md-6 mb-3">
-                            <label className="form-label" htmlFor="City">City</label>
-                            <input type="text" className={`form-control`} name="City" id="City" placeholder="Enter City" value={formData.CurrentAddress.City} onChange={(e) => handleNestedChange(e, 'CurrentAddress')} />
-                            {/* {errors.CurrentAddressArea && <div className="invalid-feedback">{errors.CurrentAddressArea}</div>} */}
-
-                        </div>
-                        <div className="col-md-6 mb-3">
-                            <label className="form-label" htmlFor="LandMark">LandMark</label>
-                            <input type="text" className={`form-control ${errors.CurrentAddressLandMark ? 'is-invalid' : ''}`} name="LandMark" id="LandMark" placeholder="Enter Landmark" value={formData.CurrentAddress.LandMark} onChange={(e) => handleNestedChange(e, 'CurrentAddress')} />
-                            {errors.CurrentAddressLandMark && <div className="invalid-feedback">{errors.CurrentAddressLandMark}</div>}
-
-                        </div>
-                        <div className="col-md-6 mb-3">
-                            <label className="form-label" htmlFor="Pincode">Pincode</label>
-                            <input type="text" className={`form-control ${errors.CurrentAddressPincode ? 'is-invalid' : ''}`} name="Pincode" id="Pincode" placeholder="Enter Pincode" value={formData.CurrentAddress.Pincode} onChange={(e) => handleNestedChange(e, 'CurrentAddress')} />
-                            {errors.CurrentAddressPincode && <div className="invalid-feedback">{errors.CurrentAddressPincode}</div>}
-                        </div>
-                    </div>
-
-                    {/* Qualification, Teaching Experience, Expected Fees */}
                     <h6 className=" fw-bold">Other Details (*) </h6>
 
                     <div className="row">
@@ -654,7 +581,7 @@ const ProfilePage = () => {
                         </div>
                         <div className="col-md-6 mb-3">
                             <label className="form-label" htmlFor="VehicleOwned">Do You have Vehicle ?</label>
-                            <select className={`form-select p-half ${errors.VehicleOwned ? 'is-invalid' : ''}`} name={`VehicleOwned`} value={formData.VehicleOwned} onChange={handleChange}>
+                            <select className={`form-select p-1 p-half ${errors.VehicleOwned ? 'is-invalid' : ''}`} name={`VehicleOwned`} value={formData.VehicleOwned} onChange={handleChange}>
                                 <option value="">Select Yes Or No</option>
                                 <option value="true">Yes</option>
                                 <option value="false">No</option>
@@ -665,7 +592,6 @@ const ProfilePage = () => {
                         </div>
                     </div>
 
-                    {/* Dynamic Academic Information Section */}
                     <div className="row mb-3">
                         <div className="col-md-12">
                             <button type="button" className="btn btn-primary" onClick={handleAddClass}>Add Class</button>
@@ -675,7 +601,7 @@ const ProfilePage = () => {
                         <div key={index} className="row mb-3">
                             <div className="col-md-5 mb-3">
                                 <label className="form-label" htmlFor={`ClassId-${index}`}>Class</label>
-                                <select className={`form-select p-half ${errors.PermanentAddressPincode ? 'is-invalid' : ''}`} id={`ClassId-${index}`} name={`ClassId-${index}`} value={info.ClassId} onChange={(e) => handleClassChange(e, index)}>
+                                <select className={`form-select mt-3 p-2 p-half ${errors.PermanentAddressPincode ? 'is-invalid' : ''}`} id={`ClassId-${index}`} name={`ClassId-${index}`} value={info.ClassId} onChange={(e) => handleClassChange(e, index)}>
                                     <option value="">Select Class</option>
                                     {concatenatedData.map((item, idx) => (
                                         <option key={idx} value={item.id}>{item.class}</option>
@@ -684,43 +610,38 @@ const ProfilePage = () => {
                                 {errors[`AcademicClassId-${index}`] && <div className="text-danger">{errors[`AcademicClassId-${index}`]}</div>}
                             </div>
 
-                            <div className="col-md-5 mb-3">
+                            <div style={{position:'relative',zIndex:'99'}} className="col-md-5  mb-3">
                                 <label className="form-label" htmlFor={`SubjectNames-${index}`}>Subjects</label>
                                 <Select
                                     id={`SubjectNames-${index}`}
                                     name={`SubjectNames-${index}`}
-                                    isMulti // Enable multiple selections
-                                    options={subjects.map((item) => ({ label: item.SubjectName, value: item.SubjectName }))} // Convert subjects to options format
-                                    value={info.SubjectNames.map((subject) => ({ label: subject, value: subject }))} // Map selected subjects to react-select format
-                                    onChange={(selectedOptions) => handleSubjectNameChange(selectedOptions, index)} // Update function to handle react-select format
-
+                                    isMulti
+                                    options={subjects && subjects.map((item) => ({ label: item.SubjectName, value: item.SubjectName }))}
+                                    value={info.SubjectNames.map((subject) => ({ label: subject, value: subject }))}
+                                    onChange={(selectedOptions) => handleSubjectNameChange(selectedOptions, index)}
                                     className={`basic-multi-select p-half ${errors.PermanentAddressPincode ? 'is-invalid' : ''}`}
                                     classNamePrefix="select"
+                                    placeholder="Select subjects" // Add placeholder here
+                                    isClearable // Allows clearing the selection
                                 />
 
                                 {errors[`AcademicSubjectNames-${index}`] && <div className="text-danger">{errors[`AcademicSubjectNames-${index}`]}</div>}
                             </div>
-                            <div className="col-md-3 mb-3">
-                                <button type="button" className="btn btn-primary" onClick={() => handleRemoveClass(index)}>Remove Class</button>
+
+                            <div className="col-md-2 mb-3">
+
+
+                                <button type="button" style={{ marginTop: "35px" }} className="btn p-3 btn-primary" onClick={() => handleRemoveClass(index)}>Remove Class</button>
 
                             </div>
                         </div>
                     ))}
-                </div>
-            )}
-
-            {step === 2 && (
-                <div>
-
 
                     <div className="col-md-12 mb-3">
                         <label className="form-label" htmlFor="TeachingMode">Teaching Mode</label>
                         <select className={`form-select p-half ${errors.TeachingMode ? 'is-invalid' : ''}`} name={`TeachingMode`} value={formData.TeachingMode} onChange={handleChange}>
                             <option value="">Select Your's Teaching Mode</option>
-                            <option value="Home Tuition at Student\'s Home">Home Tuition at Student's Home</option>
-                            <option value="Home Tuition at Your Home">Home Tuition at Your Home</option>
-                            <option value="Institute or Group Tuition">Institute or Group Tuition</option>
-
+                            <option value="Offline Class">Offline Class</option>
                             <option value="Online Class">Online Class</option>
 
 
@@ -728,93 +649,104 @@ const ProfilePage = () => {
                         </select>
                         {errors.TeachingMode && <div className="text-danger">{errors.TeachingMode}</div>}
                     </div>
-                    <div className="mb-2 mt-4">
-                        <div className="form-group">
-                            <label htmlFor="radiusSelect">Select Radius (in km): </label>
-                            <select
-                                id="radiusSelect"
-                                className="form-control"
-                                value={radius}
-                                onChange={(e) => {
-                                    const selectedValue = e.target.value;
-                                    setRadius(selectedValue); 
-                                }}
-                            >
-                                <option value="">
-                                    --- SELECT YOUR RANGE FOR TEACHING ---
-                                </option>
-                                {[...Array(16)].map((_, index) => {
-                                    const value = (index + 1) * 5; // 5, 10, ..., 80
-                                    return (
-                                        <option key={value} value={value}>
-                                            {value} km
-                                        </option>
-                                    );
-                                })}
-                            </select>
-                        </div>
-                    </div>
 
                     {latitude && longitude && (
-                        <LoadScript googleMapsApiKey={"AIzaSyCBATa-tKn2Ebm1VbQ5BU8VOqda2nzkoTU"}>
-                            <GoogleMap
-                                center={{ lat: latitude, lng: longitude }}
+                        <div className="map-container" style={{ position: 'relative', zIndex: 1 }}>
+                            <MapContainer
+                                center={currentLocation}
                                 zoom={12}
-                                mapContainerStyle={{ width: "100%", height: "500px" }}
+                                scrollWheelZoom={true}
+                                style={{ height: '500px', width: '100%', borderRadius: '15px' }} // Adjust width to 100% for responsiveness
                             >
-
-                                {/* <Marker position={{ lat: latitude, lng: longitude }} /> */}
-
-
-                                <Circle
-                                    center={{ lat: latitude, lng: longitude }}
-                                    radius={radius * 1000}
-                                    options={{
-                                        fillColor: "rgba(0, 123, 255, 0.2)",
-                                        strokeColor: "#007bff",
-                                        strokeWeight: 2,
-                                    }}
+                                <TileLayer
+                                    attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                                 />
+                                <MapClickHandler handleMapClick={handleMapClick} />
+                                {currentLocation && (
+                                    <Marker position={currentLocation} icon={customIcon}>
+                                        <Popup>Your current location</Popup>
+                                    </Marker>
+                                )}
+                                {allPoints.map((point, index) =>
+                                    point.lat && point.lng ? (
+                                        <Marker
+                                            key={index}
+                                            icon={customIcon}
+                                            position={[point.lat, point.lng]}
+
+                                        >
 
 
-                            </GoogleMap>
-                        </LoadScript>
+                                        </Marker>
+                                    ) : null
+                                )}
+                            </MapContainer>
+
+                            {errorMessage && (
+                                <Alert variant="danger" className="mt-3">
+                                    {errorMessage}
+                                </Alert>
+                            )}
+
+                            <div className="mt-3">
+                                <h5>Selected Locations ({allPoints.length})</h5>
+                                <Table striped bordered hover size="sm">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Latitude</th>
+                                            <th>Longitude</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {allPoints.map((point, index) => (
+                                            <tr key={index}>
+                                                <td>{index + 1}</td>
+                                                <td>{point.lat.toFixed(6)}</td>
+                                                <td>{point.lng.toFixed(6)}</td>
+                                                <td>
+                                                    <button
+                                                        style={{
+                                                            backgroundColor: 'red',
+                                                            color: 'white',
+                                                            border: 'none',
+                                                            padding: '5px 10px',
+                                                            fontSize: '14px',
+                                                            cursor: 'pointer',
+                                                            borderRadius: '5px'// Rounded corners
+                                                        }}
+                                                        onClick={() => handleDoubleClick(point.lat, point.lng)}
+                                                    >
+                                                        Delete Location
+                                                    </button>
+                                                </td>
+
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </Table>
+                            </div>
+                        </div>
                     )}
+
                 </div>
             )}
 
+
             <div className="row mt-4 w-100">
-                <div className="col d-flex justify-content-between">
-                    {step > 1 && (
-                        <button
-                            type="button"
-                            className="btn btn-primary"
-                            onClick={handlePrevious}
-                        >
-                            Previous
-                        </button>
-                    )}
+                <div className="col-md-6 d-flex justify-content-between">
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className={`btn btn-success ${loading ? 'disabled' : ''} `}
+                        onClick={handleSubmit}
+                    >
+                        {loading ? "Please Wait ....." : "Submit"}
+                    </button>
 
-                    {step < 2 && (
-                        <button
-                            type="button"
-                            className="btn btn-success"
-                            onClick={handleNext}
-                        >
-                            Next
-                        </button>
-                    )}
 
-                    {step === 2 && (
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className={`btn btn-success ${loading ? 'disabled' : ''} `}
-                            onClick={handleSubmit}
-                        >
-                            {loading ? "Please Wait ....." : "Submit"}
-                        </button>
-                    )}
+
                 </div>
             </div>
 

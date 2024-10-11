@@ -61,7 +61,7 @@ const CreateBlogs = () => {
         try {
             const token = localStorage.getItem('Sr-token');
             await toast.promise(
-                axios.post('https://api.srtutorsbureau.com/api/v1/admin/Create-Blog', formDataToSubmit, {
+                axios.post('http://localhost:7000/api/v1/admin/Create-Blog', formDataToSubmit, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                         'Authorization': `Bearer ${token}`
