@@ -18,7 +18,7 @@ function Footer() {
 
         // Using toast.promise to handle the promise
         toast.promise(
-            axios.post('http://localhost:7000/api/v1/admin/join-newsletter', { email }),
+            axios.post('https://api.srtutorsbureau.com/api/v1/admin/join-newsletter', { email }),
             {
                 pending: "📧 Subscribing, please wait...",
                 success: "🎉 Success! You've been subscribed to our newsletter.",
@@ -41,9 +41,7 @@ function Footer() {
 
     return (
         <>
-            <button className="scroll__top scroll-to-target" data-target="html">
-                <i className="tg-flaticon-arrowhead-up"></i>
-            </button>
+    
 
             <footer className="footer-bg" style={{ backgroundColor: "#0b0505" }}>
                 <div className="footer__top-wrap">

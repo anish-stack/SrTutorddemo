@@ -8,7 +8,7 @@ function TeacherInfo() {
 
     const fetchTeacherData = async () => {
         try {
-            const response = await axios.get(`http://localhost:7000/api/v1/teacher/Teacher-details/${id}`)
+            const response = await axios.get(`https://api.srtutorsbureau.com/api/v1/teacher/Teacher-details/${id}`)
             setTeacherDetail(response.data.data)
         } catch (error) {
             console.log(error)

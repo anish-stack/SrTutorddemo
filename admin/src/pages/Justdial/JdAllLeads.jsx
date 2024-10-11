@@ -12,7 +12,7 @@ const JdAllLeads = () => {
   // Fetch leads from API
   const fetchLeads = async () => {
     try {
-      const response = await axios.get('http://localhost:7000/api/jd/get-Alllead');
+      const response = await axios.get('https://api.srtutorsbureau.com/api/jd/get-Alllead');
       if (response.data.success) {
         setLeads(response.data.data);
       } else {

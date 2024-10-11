@@ -66,7 +66,7 @@ function Course() {
   const fetchAllSubjects = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:7000/api/v1/admin/Get-All-Subject"
+        "https://api.srtutorsbureau.com/api/v1/admin/Get-All-Subject"
       );
       setSubjects(response.data.data);
     } catch (error) {
@@ -120,7 +120,8 @@ function Course() {
     setCurrentSubjectPage((prev) => prev + direction);
   };
   const handleClassSelect = (item) => {
-    const classRanges = ["I-V", "VI-IX", "VI-X", "X-XII"];
+    
+    const classRanges = ["I-V", "VI-VIII", "IX-X", "XI-XII"];
     const Tab = tab;
     setSelectedSubject({
       Class: item.Class,
@@ -148,9 +149,9 @@ function Course() {
       Subjects: item,
     });
 
-  
-      handleShow();
-   
+
+    handleShow();
+
   };
 
   if (loading) {
@@ -207,58 +208,63 @@ function Course() {
             </div>
           </div>
           <div className="row courses-active">
+            {/* Render Classes */}
             {tab === "Class" &&
-              paginatedClass.map((item, index) => (
-                <div
-                  className="col-lg-4 col-sm-6 grid-item cat-one"
-                  key={index}
-                >
+              paginatedClass
+                .sort((a, b) => a.postition - b.postition) // Sort by position
+                .map((item) => (
                   <div
-                    onClick={() => handleClassSelect(item)}
-                    className="categories__item-two tg-svg"
+                    className="col-lg-4 col-sm-6 grid-item cat-one"
+                    key={item.position} // Use item.position as the key
                   >
-                    <a>
-                      <div className="icon">
-                        <i
-                          className={
-                            item.course_img || "flaticon-graphic-design"
-                          }
-                        ></i>
-                      </div>
-                      <div className="info">
-                        <span className="name">{item.Class}</span>
-                        <span className="courses">
-                          {item.Subjects.length || "0"} Subjects
-                        </span>
-                      </div>
-                    </a>
+                    <div
+                      onClick={() => handleClassSelect(item)}
+                      className="categories__item-two tg-svg"
+                    >
+                      <a>
+                        <div className="icon">
+                          <i
+                            className={item.course_img || "flaticon-graphic-design"}
+                          ></i>
+                        </div>
+                        <div className="info">
+                          <span className="name">{item.Class}</span>
+                          <span className="courses">
+                            {item.Subjects.length || "0"} Subjects
+                          </span>
+                        </div>
+                      </a>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+
+            {/* Render Subjects */}
             {tab === "Subjects" &&
-              paginatedSubjects.map((subject, index) => (
-                <div
-                  className="col-lg-4 col-sm-6 grid-item cat-two"
-                  key={index}
-                >
-                  <div onClick={() => handleSubjectSelect(subject.SubjectName)} className="categories__item-two tg-svg">
-                    <a >
-                    <div className="icon">
-                        <i
-                          className={
-                            subject.course_img || "flaticon-graphic-design"
-                          }
-                        ></i>
-                      </div>
-                      <div className="info">
-                        <span className="name">{subject.SubjectName}</span>
-                      </div>
-                    </a>
+              paginatedSubjects
+                .sort((a, b) => a.position - b.position) // Sort by position
+                .map((subject) => (
+                  <div
+                    className="col-lg-4 col-sm-6 grid-item cat-two"
+                    key={subject.position} // Use subject.position as the key
+                  >
+                    <div onClick={() => handleSubjectSelect(subject.SubjectName)} className="categories__item-two tg-svg">
+                      <a>
+                        <div className="icon">
+                          <i
+                            className={subject.course_img || "flaticon-graphic-design"}
+                          ></i>
+                        </div>
+                        <div className="info">
+                          <span className="name">{subject.SubjectName}</span>
+                        </div>
+                      </a>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
           </div>
-          <div className="pagination-wrapper w-100  mt-4">
+
+          <div className="pagination-wrapper w-100 mt-4">
+            {/* Pagination for Classes */}
             {tab === "Class" && (
               <div className="pagination-controls">
                 <button
@@ -277,6 +283,8 @@ function Course() {
                 </button>
               </div>
             )}
+
+            {/* Pagination for Subjects */}
             {tab === "Subjects" && (
               <div className="pagination-controls">
                 <button
@@ -296,6 +304,7 @@ function Course() {
               </div>
             )}
           </div>
+
           <div className="courses__shapes">
             <div className="courses__shapes-item alltuchtopdown">
               <img src="assets/img/courses/course_shape01.png" alt="shape" />

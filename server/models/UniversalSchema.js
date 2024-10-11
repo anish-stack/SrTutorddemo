@@ -4,8 +4,8 @@ const SendEmail = require("../utils/SendEmails");
 
 // Define the unified Request schema
 const RequestSchema = new mongoose.Schema(
-    {   
-        ClassLangUage:{
+    {
+        ClassLangUage: {
             type: String,
         },
         requestId: {
@@ -26,19 +26,12 @@ const RequestSchema = new mongoose.Schema(
             type: String,
             trim: true,
             set: (v) => sanitizeHtml(v),
-            // required: true,
+         
         },
         subjects: [String],
         interestedInTypeOfClass: {
             type: String,
-            enum: [
-                "Online Class",
-                "Home Tuition at My Home",
-                "Home Tuition at Your Home",
-                "Willing to travel to Teacher Home",
-                "Require Teacher to Travel to My Home",
-            ],
-            // required: true,
+           
         },
         studentInfo: {
             studentName: {
@@ -55,9 +48,9 @@ const RequestSchema = new mongoose.Schema(
             },
             emailAddress: {
                 type: String,
-                // required: true,
+              
                 trim: true,
-                match: [/.+@.+\..+/, "Please enter a valid email address"],
+               
                 set: (v) => sanitizeHtml(v),
             },
         },
@@ -133,8 +126,8 @@ const RequestSchema = new mongoose.Schema(
         },
         teacherAcceptThis: {
             type: String,
-           default: "pending",
-            enum:["pending", "declined", "accepted"]
+            default: "pending",
+            enum: ["pending", "declined", "accepted"]
         },
         commentsByAdmin: [
             {

@@ -11,6 +11,7 @@ const {
   getSingleStudent,
   CheckNumber,
   studentDeleteById,
+  UpdateDetails,
 } = require("../controllers/Student.registration");
 const StudentRouter = express.Router();
 const isAdmin = require("../middlewares/admin");
@@ -89,7 +90,7 @@ StudentRouter.post("/admin-do-comment", addAdminCommentOnParticular);
 
 
 // Create a new class request
-StudentRouter.post('/Class-Teacher-Request', Protect,CreateClassRequest);
+StudentRouter.post('/Class-Teacher-Request', Protect, CreateClassRequest);
 StudentRouter.get('/Class-Teacher-Request', getAllClassRequest);
 StudentRouter.get('/Class-Request-By-StudnetId/:studentId', getClassRequestByStudentId);
 StudentRouter.delete('/Class-Delete-Request/:requestId', DeleteClassRequest);
@@ -100,11 +101,13 @@ StudentRouter.get('/Class-Get-Comments/:id', getCommentsForRequest);
 
 StudentRouter.get('/AllData', AllData)
 StudentRouter.get('/SingleAllData/:id', SingleAllData)
+StudentRouter.post('/update-details', Protect, UpdateDetails)
 
-StudentRouter.post('/universal-request',Protect, CreateUniversalRequest)
+
+StudentRouter.post('/universal-request', Protect, CreateUniversalRequest)
 StudentRouter.post('/checkNumber-request', CheckNumber)
 
-StudentRouter.delete('/studentDelete/:id',studentDeleteById)
+StudentRouter.delete('/studentDelete/:id', studentDeleteById)
 
 
 
