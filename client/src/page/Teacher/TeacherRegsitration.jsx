@@ -125,6 +125,7 @@ const TeacherRegistration = () => {
         console.log(verifyData)
         try {
             const response = await axios.post('https://api.srtutorsbureau.com/api/v1/teacher/resent-otp', { PhoneNumber: verifyData.PhoneNumber });
+                console.log(response)
             toast.success(response.data.message);
             setResendButtonClick(resendButtonClick + 1);
             setResendError('');

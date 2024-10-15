@@ -160,6 +160,7 @@ const ClassModel = ({ showModal, handleClose, subject }) => {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const { latitude, longitude } = position.coords;
+          console.log(latitude)
           try {
             const { data } = await axios.post('https://api.srtutorsbureau.com/Fetch-Current-Location', {
               lat: latitude,
