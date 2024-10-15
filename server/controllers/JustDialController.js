@@ -40,7 +40,7 @@ exports.CreateLead = async (req, res) => {
 
        
         if (newLead) {
-            const Message = `Thank You for Your Inquiry\n\nDear ${name},\n\nThank you for enquiring with Sr Tutors. We have received your inquiry and will contact you shortly to assist with your needs.\n\nIn the meantime, feel free to explore more about us on our website: www.srtutorsbureau.com.\n\nIf you have any immediate questions, don't hesitate to reach out to us:\n\nPhone: +91 9811382915\nEmail: sachinkumarsrtb@yahoo.in\n\nWe look forward to connecting with you soon!\n\nBest regards,\nSr Tutors Team\nwww.srtutorsbureau.com\n`;
+            const Message = `Thank You for Your Inquiry\n\nDear ${name},\n\nThank you for enquiring with S.R. Tutors. We have received your inquiry and will contact you shortly to assist with your needs.\n\nIn the meantime, feel free to explore more about us on our website: www.srtutorsbureau.com.\n\nIf you have any immediate questions, don't hesitate to reach out to us:\n\nPhone: +91 9811382915\nEmail: sachinkumarsrtb@yahoo.in\n\nWe look forward to connecting with you soon!\n\nBest regards,\nS.R. Tutors Team\nwww.srtutorsbureau.com\n`;
 
            const SendWhatsappMeg =  await SendWhatsAppMessage(Message, mobile || phone)
         //    if(!SendWhatsAppMessage){
