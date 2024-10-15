@@ -512,9 +512,9 @@ const ProfilePage = () => {
             toast.success("🎉 Profile submitted successfully! 📧");
             setLoading(false);
             const userPrefix = "teacher";
-            const { user } = response.data;
+       
             Cookies.set(`${userPrefix}Token`, tokenQuery, { expires: 1 });
-            Cookies.set(`${userPrefix}User`, JSON.stringify(user), { expires: 1 });
+            // Cookies.set(`${userPrefix}User`, JSON.stringify(user), { expires: 1 });
             setTimeout(() => {
                 // window.location.href = `/Teacher-Profile-Verify?token=${tokenQuery}&id=${IdQuery}`;
                 window.location.href = `/Teacher-dashboard`;
