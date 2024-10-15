@@ -64,8 +64,8 @@ const ForgetPassword = () => {
     const handleSubmitEmail = async (e) => {
         e.preventDefault();
         const apiUrl = SearchType === 'teacher'
-            ? 'https://api.srtutorsbureau.com/api/v1/teacher/teacher-Password-Change-Request'
-            : 'https://api.srtutorsbureau.com/api/v1/student/Student-Password-Change-Request';
+            ? 'http://localhost:7000/api/v1/teacher/teacher-Password-Change-Request'
+            : 'http://localhost:7000/api/v1/student/Student-Password-Change-Request';
 
         setLoading(true); // Start loading
 
@@ -106,8 +106,8 @@ const ForgetPassword = () => {
         }
 
         const apiUrl = SearchType === 'teacher'
-            ? 'https://api.srtutorsbureau.com/api/v1/teacher/teacher-Password-Verify-Otp'
-            : 'https://api.srtutorsbureau.com/api/v1/student/Student-Password-Verify-Otp';
+            ? 'http://localhost:7000/api/v1/teacher/teacher-Password-Verify-Otp'
+            : 'http://localhost:7000/api/v1/student/Student-Password-Verify-Otp';
 
         setLoading(true); // Start loading
 
@@ -135,8 +135,8 @@ const ForgetPassword = () => {
         }
 
         const apiUrl = SearchType === 'teacher'
-            ? 'https://api.srtutorsbureau.com/api/v1/teacher/teacher-Password-resend-otp'
-            : 'https://api.srtutorsbureau.com/api/v1/student/Student-Password-resend-Otp';
+            ? 'http://localhost:7000/api/v1/teacher/teacher-Password-resend-otp'
+            : 'http://localhost:7000/api/v1/student/Student-Password-resend-Otp';
 
         setLoading(true); // Start loading
 

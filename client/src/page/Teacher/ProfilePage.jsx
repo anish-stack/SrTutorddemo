@@ -48,7 +48,7 @@ const ProfilePage = () => {
         ranges: []
     });
     const [isAddressSame, setIsAddressSame] = useState(false);
-    const [currentLocation, setCurrentLocation] = useState([28.687446456774957, 77.14151483304185]);
+    const [currentLocation, setCurrentLocation] = useState({});
 
     const [allPoints, setAllPoints] = useState([]);
 
@@ -89,10 +89,16 @@ const ProfilePage = () => {
     };
 
     useEffect(() => {
-        if (coords) {
-            setCurrentLocation([coords.latitude, coords.longitude]);
+        if (coords && coords.latitude && coords.longitude) {
+            const { latitude, longitude } = coords;
+            console.log(coords);
+            setCurrentLocation([latitude, longitude]);
+        } else {
+            console.error("Geolocation coordinates are not available.");
         }
     }, [coords]);
+
+
 
 
     const location = new URLSearchParams(window.location.search)
@@ -156,29 +162,40 @@ const ProfilePage = () => {
 
     useEffect(() => {
         if (data) {
-            const filterOutClasses =["I-V", "VI-VIII", "IX-X", "XI-XII"];
-
+            // Step 1: Filter out specific classes
+            // const classRanges = ["I-V", "VI-VIII", "IX-X", "XI-XII"];
+            const filterOutClasses = ["I-V", "VI-VIII", "IX-X", "XI-XII"];
             const filteredClasses = data
+
                 .filter(item => !filterOutClasses.includes(item.Class))
                 .map(item => ({ class: item.Class, id: item._id }));
 
+            // Step 2: Map inner classes
             const rangeClasses = data
+
                 .filter(item => item.InnerClasses && item.InnerClasses.length > 0)
                 .flatMap(item => item.InnerClasses.map(innerClass => ({
                     class: innerClass.InnerClass,
                     id: innerClass._id
                 })));
 
-            const combinedData = rangeClasses.concat(filteredClasses);
-            setConcatenatedData(combinedData);
+            // Step 3: Concatenate filtered classes and inner classes
+            const concatenatedData = rangeClasses.concat(filteredClasses);
+
+            // Update state with concatenated data
+            setConcatenatedData(concatenatedData);
         }
     }, [data]);
 
     const handleMapClick = (event) => {
-        const { lat, lng } = event.latlng;
-        handleLocationClick(lat, lng, setAllPoints, allPoints);
-
+        if (event.latlng) {
+            const { lat, lng } = event.latlng;
+            handleLocationClick(lat, lng, setAllPoints, allPoints);
+        } else {
+            console.error("Event latlng is not valid:", event);
+        }
     };
+
 
     const handleDoubleClick = (lat, lng) => {
         handleLocationClick(lat, lng, setAllPoints, allPoints);
@@ -239,31 +256,27 @@ const ProfilePage = () => {
     //     }));
     // };
 
-
     const fetchNearbyPlaces = async () => {
-
         if (latitude && longitude) {
-            const url = `https://api.srtutorsbureau.com/nearby-places?lat=${latitude}&lng=${longitude}&radius=${radius * 1000}`;// Convert km to meters
-
+            const url = `http://localhost:7000/nearby-places?lat=${latitude}&lng=${longitude}&radius=${radius * 1000}`;
             try {
                 const response = await axios.get(url);
-                // console.log(response.data)
                 const data = response.data.FilterData;
-                console.log(data)
-                const nextPageToken = response.data.next_page_token;
-                setPlaces(
-                    data.map((place) => ({
-                        // name: place.name,
-                        lat: place.lat,
-                        lng: place.lng,
-                    }))
-                );
-
+                if (data && Array.isArray(data)) {
+                    setPlaces(data.map((place) => ({
+                        lat: place.lat || null,
+                        lng: place.lng || null,
+                    })));
+                } else {
+                    console.error("No valid data returned from API:", response.data);
+                }
             } catch (error) {
                 console.error("Error fetching nearby places:", error);
             }
         }
     };
+
+
     useEffect(() => {
         if (radius) {
             fetchNearbyPlaces();
@@ -273,7 +286,7 @@ const ProfilePage = () => {
     const fetchUser = async () => {
         try {
             const response = await axios.get(
-                `https://api.srtutorsbureau.com/api/v1/teacher/Teacher-details/${IdQuery}`
+                `http://localhost:7000/api/v1/teacher/Teacher-details/${IdQuery}`
             );
             console.log(response.data)
             setUser(response.data.data)
@@ -291,7 +304,7 @@ const ProfilePage = () => {
     const fetchSubjects = async (classId) => {
         try {
             const response = await axios.get(
-                `https://api.srtutorsbureau.com/api/v1/admin/Get-Class-Subject/${classId}`
+                `http://localhost:7000/api/v1/admin/Get-Class-Subject/${classId}`
             );
             console.log(response.data)
             if (response.data.data) {
@@ -489,16 +502,18 @@ const ProfilePage = () => {
         try {
             setLoading(true);
 
-            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/teacher/teacher-profile', formData, {
+            const response = await axios.post('http://localhost:7000/api/v1/teacher/teacher-profile', formData, {
                 headers: {
                     Authorization: `Bearer ${tokenQuery}`
                 }
             });
 
-            console.log(response.data);
+            // console.log(response.data);
             toast.success("🎉 Profile submitted successfully! 📧");
             setLoading(false);
-
+            const userPrefix = "teacher";
+            Cookies.set(`${userPrefix}Token`, token, { expires: 1 });
+            Cookies.set(`${userPrefix}User`, JSON.stringify(user), { expires: 1 });
             setTimeout(() => {
                 // window.location.href = `/Teacher-Profile-Verify?token=${tokenQuery}&id=${IdQuery}`;
                 window.location.href = `/Teacher-dashboard`;
@@ -611,7 +626,7 @@ const ProfilePage = () => {
                                 {errors[`AcademicClassId-${index}`] && <div className="text-danger">{errors[`AcademicClassId-${index}`]}</div>}
                             </div>
 
-                            <div style={{position:'relative',zIndex:'99'}} className="col-md-5  mb-3">
+                            <div style={{ position: 'relative', zIndex: '99' }} className="col-md-5  mb-3">
                                 <label className="form-label" htmlFor={`SubjectNames-${index}`}>Subjects</label>
                                 <Select
                                     id={`SubjectNames-${index}`}
@@ -653,36 +668,35 @@ const ProfilePage = () => {
 
                     {latitude && longitude && (
                         <div className="map-container" style={{ position: 'relative', zIndex: 1 }}>
-                            <MapContainer
+                            {console.log("Cuurent,",currentLocation.length)}
+                            {currentLocation.length > 0 && (
+                                <MapContainer
                                 center={currentLocation}
-                                zoom={12}
-                                scrollWheelZoom={true}
-                                style={{ height: '500px', width: '100%', borderRadius: '15px' }} // Adjust width to 100% for responsiveness
-                            >
-                                <TileLayer
-                                    attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                />
-                                <MapClickHandler handleMapClick={handleMapClick} />
-                                {currentLocation && (
+                                    zoom={12}
+                                    scrollWheelZoom={true}
+                                    style={{ height: '500px', width: '100%', borderRadius: '15px' }}
+                                >
+                                    <TileLayer
+                                        attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                    />
+                                    <MapClickHandler handleMapClick={handleMapClick} />
                                     <Marker position={currentLocation} icon={customIcon}>
                                         <Popup>Your current location</Popup>
                                     </Marker>
-                                )}
-                                {allPoints.map((point, index) =>
-                                    point.lat && point.lng ? (
-                                        <Marker
-                                            key={index}
-                                            icon={customIcon}
-                                            position={[point.lat, point.lng]}
-
-                                        >
-
-
-                                        </Marker>
-                                    ) : null
-                                )}
-                            </MapContainer>
+                                    {allPoints.map((point, index) =>
+                                        typeof point.lat === 'number' && typeof point.lng === 'number' ? (
+                                            <Marker
+                                                key={index}
+                                                icon={customIcon}
+                                                position={[point.lat, point.lng]}
+                                            >
+                                                <Popup>Your custom popup for point {index + 1}</Popup>
+                                            </Marker>
+                                        ) : null
+                                    )}
+                                </MapContainer>
+                            )}
 
                             {errorMessage && (
                                 <Alert variant="danger" className="mt-3">
@@ -704,8 +718,8 @@ const ProfilePage = () => {
                                         {allPoints.map((point, index) => (
                                             <tr key={index}>
                                                 <td>{index + 1}</td>
-                                                <td>{point.lat.toFixed(6)}</td>
-                                                <td>{point.lng.toFixed(6)}</td>
+                                                <td>{typeof point.lat === 'number' ? point.lat.toFixed(6) : 'N/A'}</td>
+                                                <td>{typeof point.lng === 'number' ? point.lng.toFixed(6) : 'N/A'}</td>
                                                 <td>
                                                     <button
                                                         style={{
@@ -715,14 +729,13 @@ const ProfilePage = () => {
                                                             padding: '5px 10px',
                                                             fontSize: '14px',
                                                             cursor: 'pointer',
-                                                            borderRadius: '5px'// Rounded corners
+                                                            borderRadius: '5px' // Rounded corners
                                                         }}
                                                         onClick={() => handleDoubleClick(point.lat, point.lng)}
                                                     >
                                                         Delete Location
                                                     </button>
                                                 </td>
-
                                             </tr>
                                         ))}
                                     </tbody>
@@ -730,6 +743,7 @@ const ProfilePage = () => {
                             </div>
                         </div>
                     )}
+
 
                 </div>
             )}

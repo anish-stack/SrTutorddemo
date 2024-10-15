@@ -11,7 +11,7 @@ export const AdvancedSearch = createAsyncThunk(
     async ({ Advanced, navigate }, thunkAPI) => {
         console.log(Advanced)
         try {
-            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/teacher/Get-Advanced-search', Advanced);
+            const response = await axios.post('http://localhost:7000/api/v1/teacher/Get-Advanced-search', Advanced);
             toast.success('Advanced search completed successfully!');
             navigate('/Search-result');  // Navigate on success
             return response.data.data;

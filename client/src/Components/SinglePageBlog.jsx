@@ -9,7 +9,7 @@ function SingleBlog() {
 
     const singleBlogFetch = async () => {
         try {
-            const { data } = await axios.get(`https://api.srtutorsbureau.com/api/v1/admin/Get-Blog/${id}`);
+            const { data } = await axios.get(`http://localhost:7000/api/v1/admin/Get-Blog/${id}`);
             setData(data.data);
         } catch (error) {
             console.error("Error fetching blog:", error);

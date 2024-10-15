@@ -20,7 +20,7 @@ const AllStudents = () => {
     useEffect(() => {
         const fetchStudents = async () => {
             try {
-                const response = await axios.get('https://api.srtutorsbureau.com/api/v1/student/get-all-students', {
+                const response = await axios.get('http://localhost:7000/api/v1/student/get-all-students', {
                     headers: {
                         Authorization: `Bearer ${Token}`
                     }
@@ -66,7 +66,7 @@ const AllStudents = () => {
     const handleDeleteStudent = async (studentId) => {
         try {
             await toast.promise(
-                axios.delete(`https://api.srtutorsbureau.com/api/v1/student/studentDelete/${studentId}`, {
+                axios.delete(`http://localhost:7000/api/v1/student/studentDelete/${studentId}`, {
                     headers: {
                         Authorization: `Bearer ${Token}`
                     }

@@ -62,7 +62,7 @@ exports.StudentRegister = CatchAsync(async (req, res) => {
                 existingStudent.hit += 1;
                 await existingStudent.save();
 
-                const message = `Dear ${existingStudent.StudentName},\nWe are pleased to inform you that your OTP for verification is: ${existingStudent.SignInOtp}\n${!Password ? `Your Default Password is ${existingStudent.PhoneNumber}\n` : ''}Please use this OTP to complete your verification process. This OTP is valid for a limited time, so kindly proceed without delay.\nIf you did not request this OTP, please disregard this message.\nBest regards,\nS R Tutors`;
+                const message = `Dear Student ${existingStudent.StudentName}, we are pleased to inform you that your OTP for verification is: ${existingStudent.SignInOtp}. ${!Password ? `Your default password is ${existingStudent.PhoneNumber}. ` : ''}Please use this OTP to complete your verification process. This OTP is valid for a limited time, so kindly proceed without delay. If you did not request this OTP, please disregard this message. Best regards, S.R. Tutors.`;
 
                 await SendWhatsAppMessage(message, PhoneNumber);
 
@@ -91,7 +91,7 @@ exports.StudentRegister = CatchAsync(async (req, res) => {
             OtpExpiresTime: otpExpiresTime
         });
 
-        const message = `Dear ${newStudent.StudentName},\nWe are pleased to inform you that your OTP for verification is: ${newStudent.SignInOtp}\n${!Password ? `Your Default Password is ${newStudent.PhoneNumber}\n` : ''}Please use this OTP to complete your verification process. This OTP is valid for a limited time, so kindly proceed without delay.\nIf you did not request this OTP, please disregard this message.\nBest regards,\nS R Tutors`;
+        const message = `Dear Student ${newStudent.StudentName},\nWe are pleased to inform you that your OTP for verification is: ${newStudent.SignInOtp}\n${!Password ? `Your Default Password is ${newStudent.PhoneNumber}\n` : ''}Please use this OTP to complete your verification process. This OTP is valid for a limited time, so kindly proceed without delay.\nIf you did not request this OTP, please disregard this message.\nBest regards,\nS.R. Tutors`;
 
         await SendWhatsAppMessage(message, PhoneNumber);
 
@@ -209,7 +209,7 @@ exports.StudentResendOtp = CatchAsync(async (req, res) => {
         student.OtpExpiresTime = Date.now() + 1 * 60 * 1000;
         student.hit += 1
 
-        const Message = `Your OTP for mobile number verification is: ${newOtp}\n\nPlease use this code to complete your verification process.\nThis OTP is valid for 10 minutes.\nIf you did not request this, please ignore this message.\nBest regards,\nS R Tutors`;
+        const Message = `Dear Student, your OTP for mobile number verification is: ${newOtp}. Please use this code to complete your verification process.If you did not request this, please ignore this message. Best regards, S.R. Tutors.`;
 
 
         const mes = await SendWhatsAppMessage(Message, student.PhoneNumber);
@@ -323,7 +323,7 @@ exports.CheckNumber = CatchAsync(async (req, res) => {
             }
 
             // Prepare message and send OTP
-            const Message = `Your OTP for mobile number verification is: ${otp}.\nPlease use this code to complete your verification process.\nThis OTP is valid for 10 minutes. If you did not request this, please ignore this message.\nBest regards,\nS R Tutors`;
+            const Message = `Dear Student, your OTP for mobile number verification is: ${otp}. Please use this code to complete your verification process. If you did not request this, please ignore this message. Best regards, S.R. Tutors.`;
             checkUser.SignInOtp = otp;
             checkUser.OtpExpiresTime = otpExpiresTime;
             checkUser.hit += 1; // Increment hit count
@@ -356,7 +356,7 @@ exports.CheckNumber = CatchAsync(async (req, res) => {
                 OtpExpiresTime: otpExpiresTime
             });
 
-            const Message = `Your OTP for mobile number verification is: ${otp}. Please use this code to complete your verification process. This OTP is valid for 10 minutes. If you did not request this, please ignore this message. Best regards, S R Tutors`;
+            const Message = `Dear Student, your OTP for mobile number verification is: ${otp}. Please use this code to complete your verification process. This OTP is valid for 10 minutes. If you did not request this, kindly ignore this message. Best regards, S.R. Tutors.`;
 
             const sendMsg = await SendWhatsAppMessage(Message, userNumber);
 
@@ -444,7 +444,7 @@ exports.StudentPasswordChangeRequest = CatchAsync(async (req, res) => {
         student.OtpExpiresTime = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
         await student.save();
 
-        const Message = `Password Change Request OTP Verification\n\nDear ${student.StudentName},\n\nYour OTP for verifying your password change is: ${student.ForgetPasswordOtp}.\n\nPlease use this OTP to complete your password change process. It is valid for a limited time, so kindly proceed without delay.\n\nIf you did not request this OTP, please disregard this message.\n\nBest regards,\nS R Tutors`;
+        const Message = `Dear ${student.StudentName}, your OTP for verifying your password change is: ${student.ForgetPasswordOtp}. Please use this OTP to complete the password change process. It is valid for a limited time, so kindly proceed without delay. If you did not request this OTP, please disregard this message. Best regards, S.R. Tutors.`;
         const sent = await SendWhatsAppMessage(Message, student.PhoneNumber)
         console.log(sent)
         if (!sent) {

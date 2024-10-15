@@ -67,7 +67,13 @@ exports.CreateUniversalRequest = CatchAsync(async (req, res) => {
 
 
         await newRequest.save();
-        await SendWhatsAppMessage(message, "7217619794")
+        if (!process.env.SR_WHATSAPP_NO) {
+            return res.status(403).json({
+                message: "WhatsApp number not found"
+            })
+        }
+        
+        await SendWhatsAppMessage(message, process.env.SR_WHATSAPP_NO)
 
         res.status(201).json({
             status: 'success',

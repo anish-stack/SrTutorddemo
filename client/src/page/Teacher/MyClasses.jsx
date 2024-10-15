@@ -48,7 +48,7 @@ const MyClasses = ({ Class, Profile }) => {
     const handleDelete = async (id) => {
         try {
             setLoadingId(id); // Set the loading ID
-            const response = await axios.delete('https://api.srtutorsbureau.com/api/v1/teacher/deleteClassOfTeacher', {
+            const response = await axios.delete('http://localhost:7000/api/v1/teacher/deleteClassOfTeacher', {
                 data: { ClassId: id },
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -67,7 +67,7 @@ const MyClasses = ({ Class, Profile }) => {
 
     const handleDeleteSubject = async (id, Subject) => {
         try {
-            const response = await axios.delete('https://api.srtutorsbureau.com/api/v1/teacher/delete-Subject', {
+            const response = await axios.delete('http://localhost:7000/api/v1/teacher/delete-Subject', {
                 data: { ClassID: id, subjectName: Subject },
                 headers: {
                     'Authorization': `Bearer ${token}`

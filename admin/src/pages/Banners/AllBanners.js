@@ -96,7 +96,7 @@ const AllBanners = () => {
                     formDataToSubmit.append('image', formValues.file?.imageFile?.file);
                 }
                 // Update existing banner
-                const response = await axios.put(`https://api.srtutorsbureau.com/api/v1/admin/update-Banner/${selectedBanner._id}`, formDataToSubmit, {
+                const response = await axios.put(`http://localhost:7000/api/v1/admin/update-Banner/${selectedBanner._id}`, formDataToSubmit, {
                     headers: { Authorization: `Bearer ${Token}` }
                 });
                 setIsLoading(false)
@@ -115,7 +115,7 @@ const AllBanners = () => {
                     formDataToSubmit.append('image', formValues.file?.imageFile?.file);
                 }
                 // Create new banner
-                await axios.post(`https://api.srtutorsbureau.com/api/v1/admin/Create-Banner`, formDataToSubmit, {
+                await axios.post(`http://localhost:7000/api/v1/admin/Create-Banner`, formDataToSubmit, {
                     headers: { Authorization: `Bearer ${Token}` }
                 });
             }
@@ -131,7 +131,7 @@ const AllBanners = () => {
     const handleDelete = async (id) => {
         setIsLoading(true)
         try {
-            await axios.delete(`https://api.srtutorsbureau.com/api/v1/admin/delete-Banner/${id}`, {
+            await axios.delete(`http://localhost:7000/api/v1/admin/delete-Banner/${id}`, {
                 headers: { Authorization: `Bearer ${Token}` }
             });
             setBanners(Banners.filter(banner => banner._id !== id));

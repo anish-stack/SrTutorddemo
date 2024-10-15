@@ -51,7 +51,7 @@ const TeacherDashboard = () => {
         if (teacherToken && teacherUser) {
             const handleFetch = async () => {
                 try {
-                    const { data } = await axios.get(`https://api.srtutorsbureau.com/api/v1/teacher/Get-Teacher/${teacherUser._id}`, {
+                    const { data } = await axios.get(`http://localhost:7000/api/v1/teacher/Get-Teacher/${teacherUser._id}`, {
                         headers: {
                             Authorization: `Bearer ${teacherToken}`,
                         },
@@ -78,7 +78,7 @@ const TeacherDashboard = () => {
         setLoading(true)
         try {
             const response = await axios.post(
-                `https://api.srtutorsbureau.com/api/v1/teacher/teacher-profile-pic/${profileInfo.TeacherUserId?._id}`,
+                `http://localhost:7000/api/v1/teacher/teacher-profile-pic/${profileInfo.TeacherUserId?._id}`,
                 formData, // Send formData directly here
                 {
                     headers: {
@@ -134,7 +134,7 @@ const TeacherDashboard = () => {
         if (teacherToken && teacherUser) {
             const handleClassFetch = async () => {
                 try {
-                    const { data } = await axios.get(`https://api.srtutorsbureau.com/api/v1/teacher/Get-My-Classes`, {
+                    const { data } = await axios.get(`http://localhost:7000/api/v1/teacher/Get-My-Classes`, {
                         headers: {
                             Authorization: `Bearer ${teacherToken}`,
                         },
@@ -302,13 +302,16 @@ const TeacherDashboard = () => {
                                                     <p style={{ fontSize: 12 }}>*For Update Image Double Click Your Image</p>
                                                 </>
                                             ) : (
-                                                <div>
-                                                    <ImageUploader
-                                                        style={{ height: 200, width: 200, borderRadius: '60%' }}
-                                                        onFileAdded={(img) => getImageFileObject(img)}
-                                                        onFileRemoved={(img) => runAfterImageDelete(img)}
-                                                    />
-                                                </div>
+                                                <div className="d-flex flex-column align-items-center justify-content-center text-center">
+                                                <ImageUploader
+                                                    style={{ height: 200, width: 200, borderRadius: '60%' }} // Custom styles for the image uploader
+                                                    onFileAdded={(img) => getImageFileObject(img)}
+                                                    onFileRemoved={(img) => runAfterImageDelete(img)}
+                                                    className="mb-2" // Adding margin-bottom for spacing
+                                                />
+                                                <p className="mb-0">Upload Your Original Picture</p> {/* Remove margin for paragraph to keep it compact */}
+                                            </div>
+                                            
                                             )}
 
                                             <div>
