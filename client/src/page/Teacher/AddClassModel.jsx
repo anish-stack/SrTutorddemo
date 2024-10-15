@@ -49,7 +49,7 @@ const AddClassModel = ({ isOpen, onClose }) => {
     const fetchSubjects = useCallback(async (classId) => {
         try {
             const response = await axios.get(
-                `http://localhost:7000/api/v1/admin/Get-Class-Subject/${classId}`,
+                `https://api.srtutorsbureau.com/api/v1/admin/Get-Class-Subject/${classId}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setSubjects(response.data.data.Subjects || []);
@@ -83,7 +83,7 @@ const AddClassModel = ({ isOpen, onClose }) => {
                 Subjects: selectedSubjects
             };
           
-            const response = await axios.post('http://localhost:7000/api/v1/teacher/Add-Class-Subject', payload, {
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/teacher/Add-Class-Subject', payload, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }

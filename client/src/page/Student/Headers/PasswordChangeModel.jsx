@@ -41,7 +41,7 @@ const PasswordChangeModel = ({ isOpen, onClose, Type }) => {
             }
 
             try {
-                const response = await axios.post('http://localhost:7000/api/v1/student/update-details', {
+                const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/update-details', {
                     Password: formData.Password
                 }, {
                     headers: {
@@ -75,7 +75,7 @@ const PasswordChangeModel = ({ isOpen, onClose, Type }) => {
                     toast.error("Please fill in at least one field.");
                     return;
                 }
-                const response = await axios.post('http://localhost:7000/api/v1/student/update-details', {
+                const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/update-details', {
                     StudentName: formData.StudentName,
                     Email: formData.Email,
                     PhoneNumber: formData.PhoneNumber

@@ -8,7 +8,7 @@ function Homeblog() {
     const fetchBlog = async () => {
         try {
 
-            const response = await axios.get('http://localhost:7000/api/v1/admin/get-Blogs');
+            const response = await axios.get('https://api.srtutorsbureau.com/api/v1/admin/get-Blogs');
             console.log(response.data.data)
             setBlog(response.data.data)
         } catch (error) {

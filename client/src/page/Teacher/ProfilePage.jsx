@@ -258,7 +258,7 @@ const ProfilePage = () => {
 
     const fetchNearbyPlaces = async () => {
         if (latitude && longitude) {
-            const url = `http://localhost:7000/nearby-places?lat=${latitude}&lng=${longitude}&radius=${radius * 1000}`;
+            const url = `https://api.srtutorsbureau.com/nearby-places?lat=${latitude}&lng=${longitude}&radius=${radius * 1000}`;
             try {
                 const response = await axios.get(url);
                 const data = response.data.FilterData;
@@ -286,7 +286,7 @@ const ProfilePage = () => {
     const fetchUser = async () => {
         try {
             const response = await axios.get(
-                `http://localhost:7000/api/v1/teacher/Teacher-details/${IdQuery}`
+                `https://api.srtutorsbureau.com/api/v1/teacher/Teacher-details/${IdQuery}`
             );
             console.log(response.data)
             setUser(response.data.data)
@@ -304,7 +304,7 @@ const ProfilePage = () => {
     const fetchSubjects = async (classId) => {
         try {
             const response = await axios.get(
-                `http://localhost:7000/api/v1/admin/Get-Class-Subject/${classId}`
+                `https://api.srtutorsbureau.com/api/v1/admin/Get-Class-Subject/${classId}`
             );
             console.log(response.data)
             if (response.data.data) {
@@ -502,7 +502,7 @@ const ProfilePage = () => {
         try {
             setLoading(true);
 
-            const response = await axios.post('http://localhost:7000/api/v1/teacher/teacher-profile', formData, {
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/teacher/teacher-profile', formData, {
                 headers: {
                     Authorization: `Bearer ${tokenQuery}`
                 }
