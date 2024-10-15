@@ -512,7 +512,8 @@ const ProfilePage = () => {
             toast.success("🎉 Profile submitted successfully! 📧");
             setLoading(false);
             const userPrefix = "teacher";
-            Cookies.set(`${userPrefix}Token`, token, { expires: 1 });
+            const { user } = response.data;
+            Cookies.set(`${userPrefix}Token`, tokenQuery, { expires: 1 });
             Cookies.set(`${userPrefix}User`, JSON.stringify(user), { expires: 1 });
             setTimeout(() => {
                 // window.location.href = `/Teacher-Profile-Verify?token=${tokenQuery}&id=${IdQuery}`;
@@ -668,10 +669,10 @@ const ProfilePage = () => {
 
                     {latitude && longitude && (
                         <div className="map-container" style={{ position: 'relative', zIndex: 1 }}>
-                            {console.log("Cuurent,",currentLocation.length)}
+                            {console.log("Cuurent,", currentLocation.length)}
                             {currentLocation.length > 0 && (
                                 <MapContainer
-                                center={currentLocation}
+                                    center={currentLocation}
                                     zoom={12}
                                     scrollWheelZoom={true}
                                     style={{ height: '500px', width: '100%', borderRadius: '15px' }}
