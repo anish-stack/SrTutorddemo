@@ -1,0 +1,158 @@
+.search-results {
+  padding: 20px 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+  background-color: #f9f9f9;
+}
+
+.title {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+.results-containes {
+  min-height: 100dvh;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.results-containers {
+  display: grid;
+  max-width: 100%;
+  gap: 2rem;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.teacher-card {
+  width: 300px;
+  background: #fff;
+  border-radius: 8px;
+  position: relative;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out;
+  overflow: hidden;
+}
+
+.teacher-card:hover {
+  transform: translateY(-5px);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  background-color: #ff0000c6;
+  color: #fff !important;
+}
+
+.teacher-image img {
+  width: 60px;
+  height: 60px;
+  border: 1px solid white;
+  border-radius: 50%;
+  margin-right: 15px;
+}
+
+.teacher-info {
+  flex: 1;
+  ;
+}
+
+.teacher-name {
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.teacher-details {
+  font-size: 14px;
+  color: white;
+  opacity: 0.8;
+}
+
+.card-body {
+    flex-direction: column;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+  padding: 15px;
+}
+
+.card-section {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.card-section i {
+  font-size: 16px;
+  margin-right: 10px;
+  margin-bottom: 15px;
+  color: #00aaa9;
+}
+
+.card-footer {
+  padding: 15px;
+  background-color: #f0fffe;
+  display: flex;
+  justify-content: space-between;
+}
+
+.btn-view,
+.btn-contact {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.btn-view {
+  background-color: #ff0000;
+  color: #fff;
+}
+
+.btn-view:hover {
+  color: white;
+  background-color: #082a5e;
+}
+
+.btn-contact {
+  background-color: #082a5e;
+  color: #fff;
+}
+
+.btn-contact:hover {
+  background-color: #2dbcb6;
+}
+.verified-tag {
+    position: absolute;
+    background-color: #082a5e;
+    color: #fff;
+    font-size: 12px;
+    right: 0;
+    padding: 2px 6px;
+    border-radius: 12px 0px;
+    margin-left: 8px;
+    display: inline-flex;
+    align-items: center;
+  }
+  
+  .verified-tag i {
+    margin-right: 4px;
+  }
+@media screen and (max-width:768px) {
+    .results-containers {
+ 
+        grid-template-columns: repeat(1, 1fr);
+      }
+}
+.card-registration .select-input.form-control[readonly]:not([disabled]) {
+  font-size: 1rem;
+  line-height: 2.15;
+  padding-left: .75em;
+  padding-right: .75em;
+  }
+  .card-registration .select-arrow {
+  top: 13px;
+  }

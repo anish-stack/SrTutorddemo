@@ -1,0 +1,64 @@
+ {
+           
+          
+            "Gender": "Female"
+            "TeachingExperience": "5",
+            "ExpectedFees": 2000,
+            "VehicleOwned": true,
+            "TeachingMode": "Home Tuition at Your Home",
+            "AcademicInformation": [
+                {
+                    "ClassId": "66c2cb9f6f6dc1eea6cd565f",
+                    "SubjectNames": [
+                        "Mathematics",
+                        "English",
+                        "Science King"
+                    ],
+                    "_id": "66d569d07995292a18b465f4"
+                },
+                {
+                    "ClassId": "66c2ccfee14938da64e9b7ff",
+                    "SubjectNames": [
+                        "Mathematics",
+                        "Physics",
+                        "Chemistry"
+                    ],
+                    "_id": "66d569d07995292a18b465f5"
+                },
+                {
+                    "ClassId": "66c2cd09e14938da64e9b805",
+                    "SubjectNames": [
+                        "Biology",
+                        "Chemistry",
+                        "Physics"
+                    ],
+                    "_id": "66d569d07995292a18b465f6"
+                },
+                {
+                    "ClassId": "66d1732924b572536959a1dc",
+                    "SubjectNames": [
+                        "Mathematics",
+                        "English",
+                        "Hindi",
+                        "Sanskrit",
+                        "Art Education",
+                        "Physical Education"
+                    ],
+                    "_id": "66d569d07995292a18b465f7"
+                },
+                {
+                    "ClassId": "66c2cd4de14938da64e9b81b",
+                    "SubjectNames": [
+                        "Mathematics",
+                        "Data Structures",
+                        "Software Engineering",
+                        "Operating Systems",
+                        "Object-Oriented Programming",
+                        "Web Technology"
+                    ],
+                    "_id": "66d569d07995292a18b465f8"
+                }
+            ],
+            "isAllDetailVerified": false,
+          
+        },

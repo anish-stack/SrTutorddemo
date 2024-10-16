@@ -1,0 +1,33 @@
+.bg-smoke{
+    background-color: #FEFEFF;
+    padding-bottom: 0;
+    padding-top: 0;
+    z-index: 6;
+    transition: all .2s ease;
+    box-shadow: 0rem 0.9375rem 1.875rem 0rem rgba(0, 0, 0, 0.02);
+}
+.px-12{
+    padding: 0rem 2.6rem;
+}
+.bg-transparent{
+    background-color: transparent;
+    background: transparent;
+
+}
+.dlabnav {
+    width: var(--dz-sidebar-width);
+    padding-bottom: 0;
+    height: calc(100% - var(--dz-header-height));
+    position: var(--dz-sidebar-pos);
+    top: var(--dz-header-height);
+    padding-top: 0;
+    z-index: 6;
+    background-color: var(--sidebar-bg);
+    transition: all .2s ease;
+    box-shadow: 0rem 0.9375rem 1.875rem 0rem rgba(0, 0, 0, 0.02);
+}
+
+.main-section-dash{
+    min-height: 100vh;
+    /* background-color: #F1F0F1; */
+}

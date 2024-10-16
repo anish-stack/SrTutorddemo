@@ -1,0 +1,91 @@
+.profile-page-header {
+  width: 100%;
+  background-color: #f8f9fa;
+}
+
+.header_teacher {
+  display: flex;
+  max-width: 1000px;
+  margin: 0 auto;
+  align-items: center;
+  width: 100%;
+  justify-content: space-around;
+}
+.image-teacher {
+  width: 30%;
+}
+.star-rating {
+    color: #ffd700; /* Gold star color */
+    font-size: 1.2rem;
+}
+
+.image-teacher img {
+  width: 250px;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 3px solid #ddd;
+}
+
+.information-section {
+  flex-grow: 1;
+  width: 70%;
+  padding-left: 20px;
+}
+
+.information h3 {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.information span {
+  color: #555;
+}
+
+.teacher-bio {
+  background-color: #fff;
+  padding: 40px 0;
+}
+
+.teacher-bio h2 {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.teacher-bio p {
+  font-size: 1rem;
+  color: #555;
+}
+
+.teacher-bio ul li {
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.teacher-review {
+  background-color: #f0f0f0;
+  padding: 40px 0;
+}
+
+.teacher-review h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+@media screen and (max-width:768px) {
+    .image-teacher {
+        width: 100%;
+        text-align: center;
+    }
+    .information-section {
+       margin-left: 12px;
+        width: 100%;
+        margin-top: 12px;
+ 
+    }
+}
