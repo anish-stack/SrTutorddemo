@@ -115,10 +115,15 @@ const AllBanners = () => {
                     formDataToSubmit.append('image', formValues.file?.imageFile?.file);
                 }
                 // Create new banner
+ 
                 const res = await axios.post(`https://api.srtutorsbureau.com/api/v1/admin/Create-Banner`, formDataToSubmit, {
                     headers: { Authorization: `Bearer ${Token}` }
                 });
                 console.log(res.data)
+                await axios.post(`https://api.srtutorsbureau.com/api/v1/admin/Create-Banner`, formDataToSubmit, {
+                    headers: { Authorization: `Bearer ${Token}` }
+                });
+ origin/main
             }
             dispatch(FetchBanner());
             closeModal();

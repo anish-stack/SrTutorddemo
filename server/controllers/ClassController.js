@@ -164,6 +164,12 @@ exports.EditClassName = CatchAsync(async (req, res) => {
     }
 });
 
+ 
+
+
+
+
+
 exports.EditSubjectName = CatchAsync(async (req, res) => {
     try {
         const ClassId = req.params.ClassId;

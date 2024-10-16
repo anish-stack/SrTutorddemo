@@ -1126,9 +1126,13 @@ exports.updateTeacherProfile = CatchAsync(async (req, res) => {
   }
 });
 
+
+//Get Teacher Profile Details
 exports.GetTeacherProfileId = CatchAsync(async (req, res) => {
   try {
     console.log("Hey, I am hit by you");
+
+    // Get Teacher Profile Details
     const TeacherId = req.params.id;
 
     if (!TeacherId) {
@@ -1138,9 +1142,10 @@ exports.GetTeacherProfileId = CatchAsync(async (req, res) => {
       });
     }
 
+    // Fetch profile from database
     const teacherProfile = await TeacherProfile.findOne({
       TeacherUserId: TeacherId,
-    }).populate('TeacherUserId').lean();
+    }).populate('TeacherUserId');
 
     console.log(teacherProfile);
 
@@ -1164,7 +1169,7 @@ exports.GetTeacherProfileId = CatchAsync(async (req, res) => {
           }
 
           if (!classExists) {
-            return ` ${info.ClassId}`;
+            return `${info.ClassId}`;
           }
 
           // Validate subject names
@@ -1179,7 +1184,7 @@ exports.GetTeacherProfileId = CatchAsync(async (req, res) => {
           );
 
           if (!allSubjectsValid) {
-            return "Class Deleted By You";
+            return "Some subjects are invalid for this class.";
           }
 
           return `${classExists.Class}`; 
@@ -1202,12 +1207,13 @@ exports.GetTeacherProfileId = CatchAsync(async (req, res) => {
       success: true,
       message: "Profile fetched successfully from DB",
       data: {
-        ...teacherProfile,
+        ...teacherProfile.toObject(),
         AcademicInformation: updatedAcademicInformation, // Include updated info
       },
     });
   } catch (error) {
-    console.error("Error fetching teacher profile:", error);
+    console.error("Error fetching teacher profile:", error); // Log the full error for debugging
+    
     res.status(500).json({
       success: false,
       message: "Error fetching profile",
@@ -1217,6 +1223,10 @@ exports.GetTeacherProfileId = CatchAsync(async (req, res) => {
 });
 
 
+ 
+
+   
+   
 //Get Teacher Profile Details
 exports.GetAllTeacherProfile = CatchAsync(async (req, res) => {
   try {
