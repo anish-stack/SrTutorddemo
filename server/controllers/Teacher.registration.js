@@ -81,6 +81,7 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
         });
       }
       else {
+        existingTeacher.PermanentAddress=address
         existingTeacher.hit = (existingTeacher.hit || 0) + 1;
         existingTeacher.Password = Password;
         existingTeacher.SignInOtp = crypto.randomInt(100000, 999999);
