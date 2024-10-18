@@ -2100,25 +2100,22 @@ exports.SingleAllData = CatchAsync(async (req, res) => {
 
 
 
-
 cron.schedule('0 0 * * *', async () => {
   try {
-    const now = new Date();
+    console.log("Cron job running at:", new Date());
+
+    // Get all blocked teachers
     const blockedTeachers = await Teacher.find({ isBlockForOtp: true });
 
-    blockedTeachers.forEach(async (teacher) => {
-      const blockTime = teacher.OtpBlockTime;
-      const timeDifference = now - blockTime;
-
-
-      if (timeDifference >= 24 * 60 * 60 * 1000) {
-        teacher.isBlockForOtp = false;
-        teacher.OtpBlockTime = null;
-        teacher.hit = 0
-        await teacher.save();
-        console.log(`Unblocked teacher: ${teacher.Email}`);
-      }
-    });
+    // Loop through each blocked teacher and unblock them
+    for (const teacher of blockedTeachers) {
+      teacher.isBlockForOtp = false;  // Unblock the teacher
+      teacher.OtpBlockTime = null;     // Clear the block time
+      teacher.hit = 0;                  // Reset hit count (if applicable)
+      
+      await teacher.save();             // Save changes to the database
+      console.log(`Unblocked teacher: ${teacher.Email}`);  // Log the unblocked teacher's email
+    }
   } catch (error) {
     console.error("Error in cron job for unblocking teachers:", error);
   }
