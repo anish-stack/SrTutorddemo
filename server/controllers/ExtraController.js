@@ -12,13 +12,20 @@ exports.CreateUniversalRequest = CatchAsync(async (req, res) => {
         const studentId = req.user.id;
 
         const {
+ 
+            requestByAdmin,
+
             ClassLangUage, requestType, classId, VehicleOwned, className, subjects,
             interestedInTypeOfClass, studentInfo, teacherGenderPreference,
             numberOfSessions, experienceRequired, minBudget, maxBudget,
             currentAddress, studentContactNumber,
             locality, startDate, specificRequirement, location, teacherId
         } = req.body;
+ 
+        // console.log(req.body)
+
         console.log(req.body)
+
         const requestId = crypto.randomInt(1000, 9999);
 
         const newRequest = new UniversalSchema({
@@ -41,7 +48,12 @@ exports.CreateUniversalRequest = CatchAsync(async (req, res) => {
             startDate,
             specificRequirement,
             location,
+ 
+            teacherId,
+            requestByAdmin,
+
             teacherId
+
         });
 
         let message;

@@ -31,6 +31,8 @@ import AllRequest from '../../pages/AllRequest/AllRequest'
 import AllContact from '../../pages/Contact/AllContact'
 import Profile from '../../pages/Profile/Profile'
 import JdAllLeads from '../../pages/Justdial/JdAllLeads'
+import AddRequest from '../../pages/AddRequest/AddRequest'
+import TeacherWithLead from '../../pages/Teacher/TeacherWithLead'
 const SideContent = () => {
   return (
     <Routes>
@@ -62,6 +64,9 @@ const SideContent = () => {
       <Route path='/Student-info/:id' element={<StudentInfo />} />
       <Route path='/Manage-Class-teacher-request' element={<ClassTeacherRequest />} />
       <Route path='/send-offers' element={<SendOfferMails />} />
+      <Route path='/Add-request' element={<AddRequest />} />
+      <Route path='/Manage-Leads' element={<TeacherWithLead />} />
+
 
       <Route path='/Manage-All-Requests' element={<AllRequest />} />
       <Route path='/Manage-Contact' element={<AllContact />} />

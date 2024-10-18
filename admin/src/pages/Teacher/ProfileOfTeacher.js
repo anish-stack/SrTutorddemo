@@ -41,6 +41,9 @@ const ProfileOfTeacher = () => {
         console.log(formData)
 
     };
+    const [addresses, setAddresses] = useState([]);
+ 
+ 
     const handleVerify = async (teacherId, status) => {
         try {
             const { data } = await axios.post(`https://api.srtutorsbureau.com/api/v1/teacher/Make-Document-verified`, {
@@ -53,8 +56,45 @@ const ProfileOfTeacher = () => {
             console.log(error)
         }
     }
+  
+    const fetchAddressName = async (lat, lng) => {
+        try {
+            const response = await axios.post(`https://api.srtutorsbureau.com/Fetch-Current-Location`, {
+           
+                    lat,
+                    lng
+           
+            });
+            if (response.data) {
+              
+                return response.data?.data?.
+                address?.completeAddress; 
+            }
+        } catch (error) {
+            console.error("Error fetching address name:", error);
+        }
+        return null;
+    };
+    useEffect(() => {
+        const fetchAllAddresses = async () => {
+            const fetchedAddresses = await Promise.all(
+                teacherData.RangeWhichWantToDoClasses.map(async (item) => {
+                    const lat = item.location.coordinates[1]; 
+                    const lng = item.location.coordinates[0]; 
+                    return await fetchAddressName(lat, lng); 
+                })
+            );
+            setAddresses(fetchedAddresses);
+        };
+
+        if (teacherData && teacherData.RangeWhichWantToDoClasses) {
+            fetchAllAddresses(); 
+        }
+    }, [teacherData]);
+ 
 
 
+ 
     if (loading) {
         return <div>Loading...</div>;
     }
@@ -68,6 +108,7 @@ const ProfileOfTeacher = () => {
     }
 
     return (
+        <div>
         <div className="p-6 max-w-7xl mx-auto bg-white shadow-md rounded-lg">
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-3xl font-bold">Profile of {teacherData.FullName}</h2>
@@ -293,19 +334,31 @@ const ProfileOfTeacher = () => {
 
             <div className="mb-6">
                 <h3 className="text-2xl font-semibold mb-2">Addresses</h3>
+  
+                <div className="grid gap-4 md:grid-cols-1">
+ 
                 <div className="grid gap-4 md:grid-cols-2">
+ 
                     <div className="bg-gray-100 p-4 rounded-md">
                         <h4 className="text-lg font-semibold mb-1">Permanent Address</h4>
                         <input
                             type="text"
                             name="PermanentAddress"
+  
+                            value={`${formData.PermanentAddress.Area}, ${formData.PermanentAddress.City}, ${formData.PermanentAddress.Pincode}, ${formData.PermanentAddress.streetAddress}`}
+ 
                             value={`${formData.PermanentAddress.HouseNo}, ${formData.PermanentAddress.LandMark}, ${formData.PermanentAddress.District}, ${formData.PermanentAddress.Pincode}`}
+ 
                             onChange={handleInputChange}
                             readOnly={!isEditing}
                             className={`block py-1 px-3 w-full bg-white border border-gray-300 rounded-md shadow-sm ${isEditing ? 'text-gray-900' : 'text-gray-500'}`}
                         />
                     </div>
+  
+                    {/* <div className="bg-gray-100 p-4 rounded-md">
+ 
                     <div className="bg-gray-100 p-4 rounded-md">
+ 
                         <h4 className="text-lg font-semibold mb-1">Current Address</h4>
                         <input
                             type="text"
@@ -315,7 +368,11 @@ const ProfileOfTeacher = () => {
                             readOnly={!isEditing}
                             className={`block py-1 px-3 w-full bg-white border border-gray-300 rounded-md shadow-sm ${isEditing ? 'text-gray-900' : 'text-gray-500'}`}
                         />
+  
+                    </div> */}
+ 
                     </div>
+ 
                 </div>
             </div>
 
@@ -323,7 +380,14 @@ const ProfileOfTeacher = () => {
                 <h3 className="text-2xl font-semibold mb-2">Academic Information</h3>
                 {teacherData.AcademicInformation.map((info) => (
                     <div key={info._id} className="bg-gray-100 p-4 rounded-md mb-4">
+  
+                        <h4 className="text-lg font-semibold mb-1">Class: {info.className || "Not-Disclosed"
+                        }</h4>
+                            <h4 className="text-lg font-semibold mb-1">Class Id: {info.ClassId || "Not-Disclosed"
+                        }</h4>
+ 
                         <h4 className="text-lg font-semibold mb-1">Class ID: {info.ClassId}</h4>
+ 
                         <input type="text" readOnly value={info.SubjectNames.join(', ')} className="block py-1 px-3 w-full bg-white border border-gray-300 rounded-md shadow-sm text-gray-900" />
                     </div>
                 ))}
@@ -332,13 +396,57 @@ const ProfileOfTeacher = () => {
             <div className="mb-6">
                 <h3 className="text-2xl font-semibold mb-2">Location</h3>
                 <div className="grid gap-4 md:grid-cols-2">
+  
+                    {/* <div className="bg-gray-100 p-4 rounded-md">
+ 
                     <div className="bg-gray-100 p-4 rounded-md">
+ 
                         <label className="block py- px-3 text-sm font-medium text-gray-700">Latitude</label>
                         <input type="text" readOnly value={teacherData.latitude} className="mt-1 py-1 px-3 block w-full bg-white border border-gray-300 rounded-md shadow-sm text-gray-900" />
                     </div>
                     <div className="bg-gray-100 p-4 rounded-md">
                         <label className="block py- px-3 text-sm font-medium text-gray-700">Longitude</label>
                         <input type="text" readOnly value={teacherData.longitude} className="mt-1 py-1 px-3 block w-full bg-white border border-gray-300 rounded-md shadow-sm text-gray-900" />
+  
+                    </div> */}
+                    <label className="block py- px-3 text-sm font-medium text-gray-700">Range for Classes In Km</label>
+                
+            {teacherData.RangeWhichWantToDoClasses.map((item, index) => (
+                <div key={index} className="bg-gray-100 gap-2 p-4 grid grid-cols-2 rounded-md md:col-span-2">
+                    <div>
+                        <label>Longitude</label>
+                        <input
+                            type="text"
+                            name="longitude"
+                            readOnly={true} // Not editable
+                            value={item.location.coordinates[0]} // Longitude
+                            className="mt-1 py-1 px-3 block w-full bg-white border border-gray-300 rounded-md shadow-sm text-gray-900"
+                        />
+                    </div>
+                    <div>
+                        <label>Latitude</label>
+                        <input
+                            type="text"
+                            name="latitude"
+                            readOnly={true} // Not editable
+                            value={item.location.coordinates[1]} // Latitude
+                            className="mt-1 py-1 px-3 block w-full bg-white border border-gray-300 rounded-md shadow-sm text-gray-900"
+                        />
+                    </div>
+                    <div className="col-span-2">
+                        <label>Address Name</label>
+                        <input
+                            type="text"
+                            name="address"
+                            value={addresses[index] || "Fetching address..."} // Show address for each lat/lng pair or loading text
+                            readOnly={true}
+                            className="mt-1 py-1 px-3 block w-full bg-white border border-gray-300 rounded-md shadow-sm text-gray-900"
+                        />
+                    </div>
+                </div>
+            ))}
+      
+ 
                     </div>
                     <label className="block py- px-3 text-sm font-medium text-gray-700">Range for Classes In Km</label>
                     {teacherData.RangeWhichWantToDoClasses.map((item, index) => (
@@ -366,6 +474,7 @@ const ProfileOfTeacher = () => {
                             </div>
                         </div>
                     ))}
+ 
 
                 </div>
             </div>

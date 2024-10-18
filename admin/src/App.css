@@ -12,6 +12,43 @@ html,
 body {
     width: 100%;
 }
+.checkbox-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.checkbox-input {
+  display: none; /* Hide the default checkbox */
+}
+
+.checkbox {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #4a90e2;
+  border-radius: 4px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.checkbox-input:checked + .checkbox {
+  background: #4a90e2; /* Change background when checked */
+}
+
+.checkmark {
+  display: none; /* Hide the checkmark by default */
+}
+
+.checkbox-input:checked + .checkbox .checkmark {
+  display: block; /* Show checkmark when checked */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  stroke: #ffffff; /* Set color of the checkmark */
+  stroke-width: 2; /* Adjust checkmark width */
+}
 
 @keyframes spin {
     0% { transform: rotate(0deg); }

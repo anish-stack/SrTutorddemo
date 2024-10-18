@@ -72,6 +72,7 @@ const StudentDetails = ({ student, teacher }) => {
             {loading ? (
                 <Loader/>
             ) : data ? (
+                <div>
                 <div className={`container mx-auto mt-4 pt-5 ${isBlurred ? 'blurThis' : ''}`}
                     style={isBlurred ? { filter: 'blur(15px)', pointerEvents: 'none' } : {}}>
                     <div className='row shadow-sm position-relative mt-5 mb-5'>
@@ -117,12 +118,20 @@ const StudentDetails = ({ student, teacher }) => {
                         </div>
                         <div className="col-lg-6 col-md-6">
                             <h3 className="text-danger mb-4">Budget Of Student</h3>
+ 
+                            {/* <div className="mb-4">
+   
                             <div className="mb-4">
+   
                                 <label htmlFor="disabledRangeMin" className="form-label">
                                     Minimum Budget: {data?.minBudget || 'N/A'}
                                 </label>
                                 <input type="range" className="form-range" readOnly min="0" max={data?.minBudget + 100} value={data?.minBudget} />
+ 
+                            </div> */}
+   
                             </div>
+   
                             <div>
                                 <label htmlFor="disabledRangeMax" className="form-label">
                                     Maximum Budget: {data?.maxBudget || 'N/A'}
@@ -131,7 +140,7 @@ const StudentDetails = ({ student, teacher }) => {
                                 <input type="range" className="form-range" readOnly min="0" max={data?.maxBudget + 100} value={data?.maxBudget} />
                             </div>
                         </div>
-                    </div>
+                 </div>
                     <div className='row border py-4 mb-4'>
                         <div className='col-md-5 mb-5'>
                             {location.lat && location.lng ? (

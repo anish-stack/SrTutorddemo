@@ -16,6 +16,10 @@ export const AllTeacher = createAsyncThunk(
                     Authorization: `Bearer ${Token}`
                 }
             });
+
+            console.log(response.data)
+
+
             return response.data; // Return the data needed
         } catch (error) {
             console.log(error);
@@ -34,7 +38,7 @@ export const SingleTeacher = createAsyncThunk(
                     Authorization: `Bearer ${Token}`
                 }
             });
-            console.log("Manage Teachert,",response.data)
+            console.log("Manage Teachert,", response.data)
 
             return response.data; // Return the data needed
         } catch (error) {

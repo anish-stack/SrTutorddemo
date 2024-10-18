@@ -127,7 +127,11 @@ const TeacherSchema = new mongoose.Schema({
     hit: {
         type: Number,
         default: 0
-    }
+    },
+    LeadIds: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'LeadSend'
+    }]
 }, { timestamps: true });
 
 // Hash password before saving

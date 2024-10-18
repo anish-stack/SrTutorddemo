@@ -87,6 +87,10 @@ const SideHeader = () => {
                                 <i className="fa-solid fa-chalkboard-teacher mr-3"></i>
                                 <a href={'/Manage-Justdial'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Manage Justdial</a>
                             </li>
+                            <li className="flex items-center">
+                                <i className="fa-solid fa-message mr-3"></i>
+                                <a href={'/Manage-Leads'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Manage Leads(Teacher)</a>
+                            </li>
                             {/* <li className="flex items-center">
                                 <i className="fa-solid fa-blog mr-3"></i>
                                 <Link to={'/Manage-Blogs'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Manage Blogs</Link>
@@ -99,6 +103,12 @@ const SideHeader = () => {
                                 <i className="fa-solid fa-image mr-3"></i>
                                 <Link to={'/Manage-Banners'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Manage Banners</Link>
                             </li>
+
+                            <li className="flex items-center">
+                                <i className="fa-solid fa-add mr-3"></i>
+                                <Link to={'/Add-request'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Add Request</Link>
+                            </li>
+
                             {/* <li className="flex items-center">
                                 <i className="fa-solid fa-book-open mr-3"></i>
                                 <Link to={'/Manage-Class-teacher-request'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Manage Class Teacher Request</Link>

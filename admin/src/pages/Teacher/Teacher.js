@@ -28,7 +28,7 @@ const Teacher = () => {
 
     useEffect(() => {
         if (data && data.data) {
-            setTeacherData(data.data); // Assuming data.data is an array of teachers
+            setTeacherData(data.data);
             setFilteredData(data.data);
         }
     }, [data]);
@@ -201,6 +201,11 @@ const Teacher = () => {
                             <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">Phone</th>
                             <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">Email</th>
                             <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">Verified</th>
+
+                            <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">Date</th>
+
+
+
                             {/* <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">Profile</th> */}
 
                             <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">Profile</th>
@@ -212,8 +217,13 @@ const Teacher = () => {
                                 <td className="py-1 whitespace-nowrap px-4 text-sm text-gray-900">{teacher.TeacherName}</td>
                                 <td className="py-1 whitespace-nowrap px-4 text-sm text-gray-600">{teacher.PhoneNumber}</td>
                                 <td className="py-1 whitespace-nowrap px-4 text-sm text-gray-600">{teacher.Email}</td>
+
+                                <td className="py-2 px-4 text-center border-b">{teacher.isTeacherVerified ? <MdVerifiedUser className='text-3xl  text-green-400' /> : <IoIosCloseCircle className='text-3xl  text-red-400' />}</td>
+                                <td className="py-1 whitespace-nowrap px-4 text-sm text-gray-600">{new Date(teacher?.createdAt || "Not-Available").toDateString('en-US')}</td>
+
                                 {/* <td className="py-1 whitespace-nowrap px-4 text-sm text-gray-600">{teacher.isTeacherVerified ? 'Yes' : 'No'}</td> */}
                                 <td className="py-2 px-4 text-center border-b">{teacher.isTeacherVerified ? <MdVerifiedUser className='text-3xl  text-green-400' /> : <IoIosCloseCircle className='text-3xl  text-red-400' />}</td>
+
 
                                 <td className="py-1 whitespace-nowrap px-4 text-sm">
                                     {teacher.TeacherProfile ? (

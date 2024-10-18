@@ -26,12 +26,14 @@ const RequestSchema = new mongoose.Schema(
             type: String,
             trim: true,
             set: (v) => sanitizeHtml(v),
-         
+ 
+
         },
         subjects: [String],
         interestedInTypeOfClass: {
             type: String,
-           
+ 
+
         },
         studentInfo: {
             studentName: {
@@ -48,9 +50,13 @@ const RequestSchema = new mongoose.Schema(
             },
             emailAddress: {
                 type: String,
+ 
+
+                trim: true,
+
               
                 trim: true,
-               
+
                 set: (v) => sanitizeHtml(v),
             },
         },
@@ -162,6 +168,12 @@ const RequestSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'TeacherProfile',
         },
+ 
+        requestByAdmin: {
+            type: Boolean,
+            default: false
+        }
+
     },
     { timestamps: true }
 );
