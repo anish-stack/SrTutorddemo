@@ -14,7 +14,7 @@ const SendWhatsAppMessage = async (Message, MobileNumber) => {
         if (!ValidateNumber.test(MobileNumber)) {
             return {
                 success: false,
-                message: 'Invalid mobile number. Please provide a valid mobile number.'
+                message: `Invalid mobile number. Please provide a valid mobile number. ${MobileNumber}`
             };
         }
 

@@ -17,6 +17,7 @@ const axios = require('axios');
 const Request = require("../models/UniversalSchema");
 const SendWhatsAppMessage = require("../utils/SendWhatsappMeg");
 const cron = require('node-cron');
+const sendLeadMessageToTeacher = require("../utils/SendLeadMsg");
 // Configure Cloudinary
 Cloudinary.config({
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -162,7 +163,7 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
       AltNumber,
       DOB,
       hit: 1,
-      PermanentAddress:address,
+      PermanentAddress: address,
       identityDocument: {
         DocumentType,
         DocumentImageUrl: documentUploadResult.secure_url,
@@ -206,7 +207,7 @@ exports.TeacherVerifyOtp = CatchAsync(async (req, res) => {
       $or: [{ PhoneNumber }, { Email }],
     });
 
-    console.log("Found Teacher",existingTeacher)
+    console.log("Found Teacher", existingTeacher)
     if (!existingTeacher) {
       return res.status(404).json({ message: "Teacher not found" });
     }
@@ -241,7 +242,7 @@ exports.TeacherVerifyOtp = CatchAsync(async (req, res) => {
     // Send token upon successful verification
     await sendToken(existingTeacher, res, 201);
   } catch (error) {
-    console.error(error); 
+    console.error(error);
     return res.status(500).json({ message: "Internal server error", error: error.message });
   }
 });
@@ -249,7 +250,7 @@ exports.TeacherVerifyOtp = CatchAsync(async (req, res) => {
 exports.TeacherResendOtp = CatchAsync(async (req, res) => {
   try {
     const { Email, PhoneNumber } = req.body;
-    console.log("i am",req.body)
+    console.log("i am", req.body)
     const Teachers = await Teacher.findOne({
       $or: [{ PhoneNumber }, { Email }],
     });
@@ -264,7 +265,7 @@ exports.TeacherResendOtp = CatchAsync(async (req, res) => {
 
     // Check if the teacher is blocked
     if (Teachers.isBlockForOtp) {
-      
+
       return res.status(429).json({
         message: "You have been temporarily blocked from requesting OTP. Please try again later.",
       });
@@ -301,7 +302,7 @@ exports.TeacherResendOtp = CatchAsync(async (req, res) => {
 
     try {
       await SendWhatsAppMessage(NewMessage, Teachers.PhoneNumber);
-      console.log("Message send",NewMessage)
+      console.log("Message send", NewMessage)
     } catch (error) {
       return res.status(500).json({
         message: "Failed to send OTP. Please try again later.",
@@ -1187,7 +1188,7 @@ exports.GetTeacherProfileId = CatchAsync(async (req, res) => {
             return "Some subjects are invalid for this class.";
           }
 
-          return `${classExists.Class}`; 
+          return `${classExists.Class}`;
 
         } catch (error) {
           console.error(`Error fetching class detail for ClassId ${info.ClassId}:`, error);
@@ -1213,7 +1214,7 @@ exports.GetTeacherProfileId = CatchAsync(async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching teacher profile:", error); // Log the full error for debugging
-    
+
     res.status(500).json({
       success: false,
       message: "Error fetching profile",
@@ -1223,10 +1224,10 @@ exports.GetTeacherProfileId = CatchAsync(async (req, res) => {
 });
 
 
- 
 
-   
-   
+
+
+
 //Get Teacher Profile Details
 exports.GetAllTeacherProfile = CatchAsync(async (req, res) => {
   try {
@@ -1324,6 +1325,34 @@ exports.GetAllTeacher = CatchAsync(async (req, res) => {
     });
   }
 });
+
+exports.GetTeacherWithLead = CatchAsync(async (req, res) => {
+  try {
+    const teachers = await TeacherProfile.find({}).populate('LeadIds');
+
+    const teachersWithLeads = teachers.filter(teacher => teacher.LeadIds.length > 0);
+
+    if (teachersWithLeads.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No teachers with leads found",
+      });
+    }
+    
+    res.status(200).json({
+      success: true,
+      message: "Teachers with leads fetched successfully from DB",
+      data: teachersWithLeads.reverse(), 
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching teachers",
+      error: error.message,
+    });
+  }
+});
+
 
 exports.MarkDocumentStatus = CatchAsync(async (req, res) => {
   try {
@@ -1544,9 +1573,11 @@ exports.AdvancedQueryForFindingTeacher = CatchAsync(async (req, res) => {
 
 exports.SearchByMinimumCondition = CatchAsync(async (req, res) => {
   try {
-    const { lat, lng, SearchPlaceLat, SearchPlaceLng, role, ClassNameValue, } = req.query;
+    const { ClassId, Subject } = req.params
+    const { lat, lng, SearchPlaceLat, SearchPlaceLng, role, ClassNameValue, locationParam } = req.query;
+    const url = `${process.env.FRONETND_URL}/Search-result?role=${role}&SearchPlaceLat=${SearchPlaceLat}&SearchPlaceLng=${SearchPlaceLng}&via-home-page&Location=Rohini-Delhi-India&ClassId=${ClassId}&ClassNameValue=${ClassNameValue}&Subject=${Subject}&lat=${lat}7&lng=${lng}&locationParam=${locationParam}`
 
-    // Validate latitude and longitude
+
     if (!lat || !lng || !SearchPlaceLat || !SearchPlaceLng) {
       return res.status(400).json({ message: 'Latitude and longitude are required.' });
     }
@@ -1560,7 +1591,7 @@ exports.SearchByMinimumCondition = CatchAsync(async (req, res) => {
     //   return res.status(400).json({ message: 'Valid latitude and longitude are required.' });
     // }
 
-    const { ClassId, Subject } = req.params
+
     if (!ClassId || !Subject) {
       return res.status(400).json({ message: 'ClassId and Subject are required.' });
     }
@@ -1585,7 +1616,6 @@ exports.SearchByMinimumCondition = CatchAsync(async (req, res) => {
         }
       });
 
-      // Flatten the AcademicInformation array and filter based on ClassId and Subject
       finalResults = locationResults.filter(profile => {
         const academicInfo = profile.AcademicInformation || [];
         return academicInfo.some(item => {
@@ -1594,6 +1624,14 @@ exports.SearchByMinimumCondition = CatchAsync(async (req, res) => {
             : false;
         });
       });
+
+      const lead = await sendLeadMessageToTeacher(finalResults.length, finalResults, url)
+      const redisClient = req.app.locals.redis;
+
+      if (!redisClient) {
+        throw new Error("Redis client is not available.");
+      }
+      await redisClient.del(`Teacher`);
     } else if (role === 'tutor') {
 
       try {
@@ -1618,7 +1656,7 @@ exports.SearchByMinimumCondition = CatchAsync(async (req, res) => {
       return res.status(400).json({ message: 'Invalid role.' });
     }
 
-    // Return results
+
     res.status(200).json({
       success: true,
       count: finalResults.length,

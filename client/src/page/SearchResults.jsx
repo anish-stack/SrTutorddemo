@@ -49,7 +49,7 @@ const SearchResults = () => {
       const fetchResults = async () => {
         try {
           const response = await axios.get(
-            `https://api.srtutorsbureau.com/api/v1/teacher/Get-Min-search/${classIdParam}/${subjectParam}?lat=${latParam}&lng=${longParam}&ClassNameValue=${ClassNameValue}&role=${role}&SearchPlaceLat=${SearchPlaceLat}&SearchPlaceLng=${SearchPlaceLng}`
+            `https://api.srtutorsbureau.com/api/v1/teacher/Get-Min-search/${classIdParam}/${subjectParam}?lat=${latParam}&lng=${longParam}&ClassNameValue=${ClassNameValue}&role=${role}&SearchPlaceLat=${SearchPlaceLat}&SearchPlaceLng=${SearchPlaceLng}&locationParam=${locationParam}`
           );
           ;
           const tutorsData = response.data.results;

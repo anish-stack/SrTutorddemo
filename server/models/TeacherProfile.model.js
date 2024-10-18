@@ -20,7 +20,7 @@ const TeacherProfileSchema = new mongoose.Schema({
     ProfilePic: {
         url: {
             type: String,
-           
+
         },
         publicId: {
             type: String,
@@ -48,44 +48,44 @@ const TeacherProfileSchema = new mongoose.Schema({
         type: String
     },
     PermanentAddress: {
-        streetAddress:{
+        streetAddress: {
             type: String,
         },
         City: {
             type: String,
-           
+
         },
         Area: {
             type: String,
-            
+
         },
         LandMark: {
             type: String,
             required: true
         },
-    
+
         Pincode: {
             type: String,
             required: true
         }
     },
     CurrentAddress: {
-        streetAddress:{
+        streetAddress: {
             type: String,
         },
         City: {
             type: String,
-           
+
         },
         Area: {
             type: String,
-          
+
         },
         LandMark: {
             type: String,
             required: true
         },
-      
+
         Pincode: {
             type: String,
             required: true
@@ -177,7 +177,11 @@ const TeacherProfileSchema = new mongoose.Schema({
     srVerifiedTag: {
         type: Boolean,
         default: false
-    }
+    },
+    LeadIds: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'LeadSend'
+    }]
 
 }, { timestamps: true });
 

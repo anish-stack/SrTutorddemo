@@ -1,5 +1,5 @@
 const express = require('express')
-const { TeacherRegister, TeacherVerifyOtp, TeacherResendOtp, TeacherPasswordChangeRequest, TeacherPasswordOtpResent, TeacherVerifyPasswordOtp, TeacherLogin, AddProfileDetailsOfVerifiedTeacher, TeacherProfileResendOtp, TeacherVerifyProfileOtp, updateTeacherProfile, GetTeacherProfileId, GetAllTeacherProfile, GetAllTeacher, AdvancedQueryForFindingTeacher, SearchByMinimumCondition, SingleTeacher, getMyClass, deleteClassOfTeacher, addMyClassMore, SubjectDelete, deleteSubjectOfTeacher, AddProfilePic, AddDocument, MarkDocumentStatus, teacherBlockForOtp, AddLocations } = require('../controllers/Teacher.registration')
+const { TeacherRegister, TeacherVerifyOtp, TeacherResendOtp, TeacherPasswordChangeRequest, TeacherPasswordOtpResent, TeacherVerifyPasswordOtp, TeacherLogin, AddProfileDetailsOfVerifiedTeacher, TeacherProfileResendOtp, TeacherVerifyProfileOtp, updateTeacherProfile, GetTeacherProfileId, GetAllTeacherProfile, GetAllTeacher, AdvancedQueryForFindingTeacher, SearchByMinimumCondition, SingleTeacher, getMyClass, deleteClassOfTeacher, addMyClassMore, SubjectDelete, deleteSubjectOfTeacher, AddProfilePic, AddDocument, MarkDocumentStatus, teacherBlockForOtp, AddLocations, GetTeacherWithLead } = require('../controllers/Teacher.registration')
 const Protect = require('../middlewares/Auth')
 const TeacherRouter = express.Router()
 const multer = require('multer');
@@ -34,6 +34,8 @@ TeacherRouter.get('/Get-Teacher-Profile', Protect, GetAllTeacherProfile)
 TeacherRouter.get('/Get-Teacher-By-Profile', GetAllTeacherProfile)
 
 TeacherRouter.get('/Get-Teacher', Protect, GetAllTeacher)
+TeacherRouter.get('/Get-Teacher-With-Lead', GetTeacherWithLead)
+
 TeacherRouter.post('/Make-Document-verified', MarkDocumentStatus)
 
 TeacherRouter.post('/Add-Class-Subject', Protect, addMyClassMore)
