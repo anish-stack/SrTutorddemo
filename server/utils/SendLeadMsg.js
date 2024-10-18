@@ -53,7 +53,7 @@ const sendLeadMessageToTeacher = async (teacherLength, result, SearchUrl) => {
         const recentLeads = matchedLeads.filter((lead) => {
             const leadSendTime = new Date(lead.LeadSendTime);
             const timeDifferenceInMinutes = (currentTime - leadSendTime) / 60000;
-            return timeDifferenceInMinutes < process.env.MAX_TIME && lead.SearchUrl === SearchUrl;
+            return timeDifferenceInMinutes < 5 && lead.SearchUrl === SearchUrl;
         });
 
         const recentTeacherIds = new Set(recentLeads.flatMap(lead => lead.LeadTeacherIds.map(id => id.toString())));
