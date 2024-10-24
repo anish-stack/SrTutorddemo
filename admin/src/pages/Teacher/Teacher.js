@@ -222,7 +222,7 @@ const Teacher = () => {
                                 <td className="py-1 whitespace-nowrap px-4 text-sm text-gray-600">{new Date(teacher?.createdAt || "Not-Available").toDateString('en-US')}</td>
 
                                 {/* <td className="py-1 whitespace-nowrap px-4 text-sm text-gray-600">{teacher.isTeacherVerified ? 'Yes' : 'No'}</td> */}
-                                <td className="py-2 px-4 text-center border-b">{teacher.isTeacherVerified ? <MdVerifiedUser className='text-3xl  text-green-400' /> : <IoIosCloseCircle className='text-3xl  text-red-400' />}</td>
+                                {/* <td className="py-2 px-4 text-center border-b">{teacher.isTeacherVerified ? <MdVerifiedUser className='text-3xl  text-green-400' /> : <IoIosCloseCircle className='text-3xl  text-red-400' />}</td> */}
 
 
                                 <td className="py-1 whitespace-nowrap px-4 text-sm">
