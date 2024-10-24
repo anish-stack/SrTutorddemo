@@ -100,7 +100,7 @@ const StudentDetails = ({ student, teacher }) => {
                             <ul className="list-unstyled">
                                 <li className="mb-3 l">
                                     <strong className="text-secondary">Student's Locality: </strong>
-                                    <span className="text-dark">{data?.locality || 'N/A'}</span>
+                                    <span className="text-dark">{data?.locality || data?.currentAddress || 'N/A'}</span>
                                 </li>
                                 <li className="mb-3 l">
                                     <strong className="text-secondary">Student Wants Classes From: </strong>
@@ -117,7 +117,7 @@ const StudentDetails = ({ student, teacher }) => {
                             </ul>
                         </div>
                         <div className="col-lg-6 col-md-6">
-                            <h3 className="text-danger mb-4">Budget Of Student</h3>
+                            
  
                             {/* <div className="mb-4">
    
@@ -133,6 +133,7 @@ const StudentDetails = ({ student, teacher }) => {
                             </div>
    
                             <div>
+                            <h3 className="text-danger mb-4">Budget Of Student</h3>
                                 <label htmlFor="disabledRangeMax" className="form-label">
                                     Maximum Budget: {data?.maxBudget || 'N/A'}
                                 </label>
@@ -141,7 +142,7 @@ const StudentDetails = ({ student, teacher }) => {
                             </div>
                         </div>
                  </div>
-                    <div className='row border py-4 mb-4'>
+                    <div className='row w-75 mx-auto border py-4 mb-4'>
                         <div className='col-md-5 mb-5'>
                             {location.lat && location.lng ? (
                                 <MapContainer
@@ -149,7 +150,7 @@ const StudentDetails = ({ student, teacher }) => {
                                     zoom={13}
 
                                     scrollWheelZoom={false}
-                                    style={{ height: '250px', zIndex: 9 }}
+                                    style={{ height: '350px', zIndex: 9 }}
                                 >
                                     <TileLayer
                                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

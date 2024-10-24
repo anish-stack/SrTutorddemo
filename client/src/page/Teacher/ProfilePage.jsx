@@ -10,10 +10,10 @@ import 'leaflet/dist/leaflet.css';
 import { Alert, Table } from 'react-bootstrap';
 import { useGeolocated } from 'react-geolocated';
 import toast from "react-hot-toast";
-
+import Joyride from 'react-joyride';
 const ProfilePage = () => {
     const [step, setStep] = useState(1);
-
+    const [runTour, setRunTour] = useState(false);
     const [formData, setFormData] = useState({
         FullName: '',
         DOB: '',
@@ -73,6 +73,18 @@ const ProfilePage = () => {
             }
         });
     };
+
+
+    const steps = [
+      
+    
+        {
+            target: '.map-container',
+            content: 'Choose the location where you would like to teach. You can select multiple locations on the map.',
+        }
+    ];
+    
+
 
     const MapClickHandler = ({ handleMapClick }) => {
         const map = useMap();
@@ -512,7 +524,7 @@ const ProfilePage = () => {
             toast.success("🎉 Profile submitted successfully! 📧");
             setLoading(false);
             const userPrefix = "teacher";
-       
+
             Cookies.set(`${userPrefix}Token`, tokenQuery, { expires: 1 });
             // Cookies.set(`${userPrefix}User`, JSON.stringify(user), { expires: 1 });
             setTimeout(() => {
@@ -533,267 +545,283 @@ const ProfilePage = () => {
     };
 
     return (
-        <div className="container w-100 mt-5 p-5">
-            <div className="mb-4">
-                <h1>Teacher Profile</h1>
-            </div>
+        <>
+        
+            <Joyride
+                steps={steps}
+                run={runTour}
+                callback={(data) => {
+                    const { status } = data;
+                    if (status === 'finished' || status === 'skipped') {
+                        setRunTour(false);
+                    }
+                }}
+            />
+            <div className="container w-100 mt-5 p-5">
+                <div className="mb-4">
+                    <h1>Teacher Profile</h1>
+                </div>
 
-            {step === 1 && (
-                <div>
-                    {/* Full Name, DOB, Gender */}
-                    <div className="row">
-                        <div className="col-md-4 mb-3">
-                            <label className="form-label" htmlFor="FullName">Full Name</label>
-                            <input type="text" readOnly className={`form-control `} name="FullName" id="FullName" placeholder="Enter Your Full Name" value={formData.FullName} onChange={handleChange} />
+                {step === 1 && (
+                    <div>
+                        {/* Full Name, DOB, Gender */}
+                        <div className="row">
+                            <div className="col-md-4 mb-3">
+                                <label className="form-label" htmlFor="FullName">Full Name</label>
+                                <input type="text" readOnly className={`form-control `} name="FullName" id="FullName" placeholder="Enter Your Full Name" value={formData.FullName} onChange={handleChange} />
 
-                        </div>
-                        <div className="col-md-4 mb-3">
-                            <label className="form-label" htmlFor="DOB">DOB (Date-Of-Birth)</label>
-                            <input type="date" className={`form-control `} id="DOB" name="DOB" placeholder="Enter Date Of Birth" value={formData.DOB} onChange={handleChange} />
-                        </div>
-                        <div className="col-md-4 mb-3">
-                            <label className="form-label" htmlFor="Gender">Gender</label>
-                            <select disabled className={`form-select p-half `} id="Gender" name="Gender" value={formData.Gender} onChange={handleChange}>
-                                <option value="">Select Gender</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    {/* Contact Numbers */}
-                    <div className="row">
-                        <div className="col-md-6 mb-3">
-                            <label className="form-label" htmlFor="ContactNumber">Contact Number <span className="text-danger">*</span></label>
-                            <input type="text" className={`form-control`} name="ContactNumber" id="ContactNumber" placeholder="Enter Your Contact Number" value={formData.ContactNumber} onChange={handleChange} />
-
-                        </div>
-
-                        <div className="col-md-6 mb-3">
-                            <label className="form-label" htmlFor="AlternateContact">Alternate Contact Number (optional)</label>
-                            <input type="text" className={`form-control`} name="AlternateContact" id="AlternateContact" placeholder="Enter Your Alternate Contact Number" value={formData.AlternateContact} onChange={handleChange} />
-
-                        </div>
-                    </div>
-
-
-                    <h6 className=" fw-bold">Other Details (*) </h6>
-
-                    <div className="row">
-                        <div className="col-md-6 mb-3">
-                            <label className="form-label" htmlFor="Qualification">Qualification</label>
-                            <input type="text" className={`form-control ${errors.Qualification ? 'is-invalid' : ''}`} name="Qualification" id="Qualification" placeholder="Enter Qualification" value={formData.Qualification} onChange={handleChange} />
-                            {errors.Qualification && <div className="text-danger">{errors.Qualification}</div>}
-                        </div>
-                        <div className="col-md-6 mb-3">
-                            <label className="form-label" htmlFor="TeachingExperience">Teaching Experience</label>
-                            <input type="text" className={`form-control ${errors.TeachingExperience ? 'is-invalid' : ''}`} name="TeachingExperience" id="TeachingExperience" placeholder="Enter Teaching Experience" value={formData.TeachingExperience} onChange={handleChange} />
-                            {errors.TeachingExperience && <div className="text-danger">{errors.TeachingExperience}</div>}
-                        </div>
-                        <div className="col-md-6 mb-3">
-                            <label className="form-label" htmlFor="ExpectedFees">Expected Fees</label>
-                            <input type="text" className={`form-control ${errors.ExpectedFees ? 'is-invalid' : ''}`} name="ExpectedFees" id="ExpectedFees" placeholder="Enter Expected Fees" value={formData.ExpectedFees} onChange={handleChange} />
-                            {errors.ExpectedFees && <div className="text-danger">{errors.ExpectedFees}</div>}
-                        </div>
-                        <div className="col-md-6 mb-3">
-                            <label className="form-label" htmlFor="VehicleOwned">Do You have Vehicle ?</label>
-                            <select className={`form-select p-1 p-half ${errors.VehicleOwned ? 'is-invalid' : ''}`} name={`VehicleOwned`} value={formData.VehicleOwned} onChange={handleChange}>
-                                <option value="">Select Yes Or No</option>
-                                <option value="true">Yes</option>
-                                <option value="false">No</option>
-
-
-                            </select>
-                            {errors.VehicleOwned && <div className="text-danger">{errors.VehicleOwned}</div>}
-                        </div>
-                    </div>
-
-                    <div className="row mb-3">
-                        <div className="col-md-12">
-                            <button type="button" className="btn btn-primary" onClick={handleAddClass}>Add Class</button>
-                        </div>
-                    </div>
-                    {formData.AcademicInformation.map((info, index) => (
-                        <div key={index} className="row mb-3">
-                            <div className="col-md-5 mb-3">
-                                <label className="form-label" htmlFor={`ClassId-${index}`}>Class</label>
-                                <select className={`form-select mt-3 p-2 p-half ${errors.PermanentAddressPincode ? 'is-invalid' : ''}`} id={`ClassId-${index}`} name={`ClassId-${index}`} value={info.ClassId} onChange={(e) => handleClassChange(e, index)}>
-                                    <option value="">Select Class</option>
-                                    {concatenatedData.map((item, idx) => (
-                                        <option key={idx} value={item.id}>{item.class}</option>
-                                    ))}
+                            </div>
+                            <div className="col-md-4 mb-3">
+                                <label className="form-label" htmlFor="DOB">DOB (Date-Of-Birth)</label>
+                                <input type="date" className={`form-control `} id="DOB" name="DOB" placeholder="Enter Date Of Birth" value={formData.DOB} onChange={handleChange} />
+                            </div>
+                            <div className="col-md-4 mb-3 your-first-element">
+                                <label className="form-label" htmlFor="Gender">Gender</label>
+                                <select disabled className={`form-select p-half `} id="Gender" name="Gender" value={formData.Gender} onChange={handleChange}>
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="other">Other</option>
                                 </select>
-                                {errors[`AcademicClassId-${index}`] && <div className="text-danger">{errors[`AcademicClassId-${index}`]}</div>}
+                            </div>
+                        </div>
+
+                        {/* Contact Numbers */}
+                        <div className="row your-second-element">
+                            <div className="col-md-6 mb-3">
+                                <label className="form-label" htmlFor="ContactNumber">Contact Number <span className="text-danger">*</span></label>
+                                <input type="text" className={`form-control`} name="ContactNumber" id="ContactNumber" placeholder="Enter Your Contact Number" value={formData.ContactNumber} onChange={handleChange} />
+
                             </div>
 
-                            <div style={{ position: 'relative', zIndex: '99' }} className="col-md-5  mb-3">
-                                <label className="form-label" htmlFor={`SubjectNames-${index}`}>Subjects</label>
-                                <Select
-                                    id={`SubjectNames-${index}`}
-                                    name={`SubjectNames-${index}`}
-                                    isMulti
-                                    options={subjects && subjects.map((item) => ({ label: item.SubjectName, value: item.SubjectName }))}
-                                    value={info.SubjectNames.map((subject) => ({ label: subject, value: subject }))}
-                                    onChange={(selectedOptions) => handleSubjectNameChange(selectedOptions, index)}
-                                    className={`basic-multi-select p-half ${errors.PermanentAddressPincode ? 'is-invalid' : ''}`}
-                                    classNamePrefix="select"
-                                    placeholder="Select subjects" // Add placeholder here
-                                    isClearable // Allows clearing the selection
-                                />
-
-                                {errors[`AcademicSubjectNames-${index}`] && <div className="text-danger">{errors[`AcademicSubjectNames-${index}`]}</div>}
-                            </div>
-
-                            <div className="col-md-2 mb-3">
-
-
-                                <button type="button" style={{ marginTop: "35px" }} className="btn p-3 btn-primary" onClick={() => handleRemoveClass(index)}>Remove Class</button>
+                            <div className="col-md-6 mb-3">
+                                <label className="form-label" htmlFor="AlternateContact">Alternate Contact Number (optional)</label>
+                                <input type="text" className={`form-control`} name="AlternateContact" id="AlternateContact" placeholder="Enter Your Alternate Contact Number" value={formData.AlternateContact} onChange={handleChange} />
 
                             </div>
                         </div>
-                    ))}
-
-                    <div className="col-md-12 mb-3">
-                        <label className="form-label" htmlFor="TeachingMode">Teaching Mode</label>
-                        <select className={`form-select p-half ${errors.TeachingMode ? 'is-invalid' : ''}`} name={`TeachingMode`} value={formData.TeachingMode} onChange={handleChange}>
-                            <option value="">Select Your's Teaching Mode</option>
-                            <option value="Offline Class">Offline Class</option>
-                            <option value="Online Class">Online Class</option>
 
 
+                        <h6 className=" fw-bold">Other Details (*) </h6>
 
-                        </select>
-                        {errors.TeachingMode && <div className="text-danger">{errors.TeachingMode}</div>}
-                    </div>
+                        <div className="row">
+                            <div className="col-md-6 mb-3">
+                                <label className="form-label" htmlFor="Qualification">Qualification</label>
+                                <input type="text" className={`form-control ${errors.Qualification ? 'is-invalid' : ''}`} name="Qualification" id="Qualification" placeholder="Enter Qualification" value={formData.Qualification} onChange={handleChange} />
+                                {errors.Qualification && <div className="text-danger">{errors.Qualification}</div>}
+                            </div>
+                            <div className="col-md-6 mb-3">
+                                <label className="form-label" htmlFor="TeachingExperience">Teaching Experience</label>
+                                <input type="text" className={`form-control ${errors.TeachingExperience ? 'is-invalid' : ''}`} name="TeachingExperience" id="TeachingExperience" placeholder="Enter Teaching Experience" value={formData.TeachingExperience} onChange={handleChange} />
+                                {errors.TeachingExperience && <div className="text-danger">{errors.TeachingExperience}</div>}
+                            </div>
+                            <div className="col-md-6 mb-3">
+                                <label className="form-label" htmlFor="ExpectedFees">Expected Fees</label>
+                                <input type="text" className={`form-control ${errors.ExpectedFees ? 'is-invalid' : ''}`} name="ExpectedFees" id="ExpectedFees" placeholder="Enter Expected Fees" value={formData.ExpectedFees} onChange={handleChange} />
+                                {errors.ExpectedFees && <div className="text-danger">{errors.ExpectedFees}</div>}
+                            </div>
+                            <div className="col-md-6 mb-3">
+                                <label className="form-label" htmlFor="VehicleOwned">Do You have Vehicle ?</label>
+                                <select className={`form-select p-1 p-half ${errors.VehicleOwned ? 'is-invalid' : ''}`} name={`VehicleOwned`} value={formData.VehicleOwned} onChange={handleChange}>
+                                    <option value="">Select Yes Or No</option>
+                                    <option value="true">Yes</option>
+                                    <option value="false">No</option>
 
-                    {latitude && longitude && (
-                        <div className="map-container" style={{ position: 'relative', zIndex: 1 }}>
-                            {console.log("Cuurent,", currentLocation.length)}
-                            {currentLocation.length > 0 && (
-                                <MapContainer
-                                    center={currentLocation}
-                                    zoom={12}
-                                    scrollWheelZoom={true}
-                                    style={{ height: '500px', width: '100%', borderRadius: '15px' }}
-                                >
-                                    <TileLayer
-                                        attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                    />
-                                    <MapClickHandler handleMapClick={handleMapClick} />
-                                    <Marker position={currentLocation} icon={customIcon}>
-                                        <Popup>Your current location</Popup>
-                                    </Marker>
-                                    {allPoints.map((point, index) =>
-                                        typeof point.lat === 'number' && typeof point.lng === 'number' ? (
-                                            <Marker
-                                                key={index}
-                                                icon={customIcon}
-                                                position={[point.lat, point.lng]}
-                                            >
-                                                <Popup>Your custom popup for point {index + 1}</Popup>
-                                            </Marker>
-                                        ) : null
-                                    )}
-                                </MapContainer>
-                            )}
 
-                            {errorMessage && (
-                                <Alert variant="danger" className="mt-3">
-                                    {errorMessage}
-                                </Alert>
-                            )}
+                                </select>
+                                {errors.VehicleOwned && <div className="text-danger">{errors.VehicleOwned}</div>}
+                            </div>
+                        </div>
 
-                            <div className="mt-3">
-                                <h5>Selected Locations ({allPoints.length})</h5>
-                                <Table striped bordered hover size="sm">
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Latitude</th>
-                                            <th>Longitude</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {allPoints.map((point, index) => (
-                                            <tr key={index}>
-                                                <td>{index + 1}</td>
-                                                <td>{typeof point.lat === 'number' ? point.lat.toFixed(6) : 'N/A'}</td>
-                                                <td>{typeof point.lng === 'number' ? point.lng.toFixed(6) : 'N/A'}</td>
-                                                <td>
-                                                    <button
-                                                        style={{
-                                                            backgroundColor: 'red',
-                                                            color: 'white',
-                                                            border: 'none',
-                                                            padding: '5px 10px',
-                                                            fontSize: '14px',
-                                                            cursor: 'pointer',
-                                                            borderRadius: '5px' // Rounded corners
-                                                        }}
-                                                        onClick={() => handleDoubleClick(point.lat, point.lng)}
-                                                    >
-                                                        Delete Location
-                                                    </button>
-                                                </td>
-                                            </tr>
+                        <div className="row mb-3">
+                            <div className="col-md-12">
+                                <button type="button" className="btn btn-primary" onClick={handleAddClass}>Add Class</button>
+                            </div>
+                        </div>
+                        {formData.AcademicInformation.map((info, index) => (
+                            <div key={index} className="row mb-3">
+                                <div className="col-md-5 mb-3">
+                                    <label className="form-label" htmlFor={`ClassId-${index}`}>Class</label>
+                                    <select className={`form-select mt-3 p-2 p-half ${errors.PermanentAddressPincode ? 'is-invalid' : ''}`} id={`ClassId-${index}`} name={`ClassId-${index}`} value={info.ClassId} onChange={(e) => handleClassChange(e, index)}>
+                                        <option value="">Select Class</option>
+                                        {concatenatedData.map((item, idx) => (
+                                            <option key={idx} value={item.id}>{item.class}</option>
                                         ))}
-                                    </tbody>
-                                </Table>
+                                    </select>
+                                    {errors[`AcademicClassId-${index}`] && <div className="text-danger">{errors[`AcademicClassId-${index}`]}</div>}
+                                </div>
+
+                                <div style={{ position: 'relative', zIndex: '99' }} className="col-md-5  mb-3">
+                                    <label className="form-label" htmlFor={`SubjectNames-${index}`}>Subjects</label>
+                                    <Select
+                                        id={`SubjectNames-${index}`}
+                                        name={`SubjectNames-${index}`}
+                                        isMulti
+                                        options={subjects && subjects.map((item) => ({ label: item.SubjectName, value: item.SubjectName }))}
+                                        value={info.SubjectNames.map((subject) => ({ label: subject, value: subject }))}
+                                        onChange={(selectedOptions) => handleSubjectNameChange(selectedOptions, index)}
+                                        className={`basic-multi-select p-half ${errors.PermanentAddressPincode ? 'is-invalid' : ''}`}
+                                        classNamePrefix="select"
+                                        placeholder="Select subjects" // Add placeholder here
+                                        isClearable // Allows clearing the selection
+                                    />
+
+                                    {errors[`AcademicSubjectNames-${index}`] && <div className="text-danger">{errors[`AcademicSubjectNames-${index}`]}</div>}
+                                </div>
+
+                                <div className="col-md-2 mb-3">
+
+
+                                    <button type="button" style={{ marginTop: "35px" }} className="btn p-3 btn-primary" onClick={() => handleRemoveClass(index)}>Remove Class</button>
+
+                                </div>
                             </div>
+                        ))}
+
+                        <div className="col-md-12 mb-3">
+                            <label className="form-label" htmlFor="TeachingMode">Teaching Mode</label>
+                            <select  className={`form-select p-half ${errors.TeachingMode ? 'is-invalid' : ''}`} name={`TeachingMode`} value={formData.TeachingMode}    onChange={(event) => { 
+            handleChange(event); 
+            setRunTour(true); 
+        }}>
+                                <option value="">Select Your's Teaching Mode</option>
+                                <option value="Offline Class">Offline Class</option>
+                                <option value="Online Class">Online Class</option>
+
+
+
+                            </select>
+                            {errors.TeachingMode && <div className="text-danger">{errors.TeachingMode}</div>}
                         </div>
-                    )}
+                        <h2>Please choose location where you want to teach</h2>
+                        {latitude && longitude && (
+                            <div className="map-container" style={{ position: 'relative', zIndex: 1 }}>
+                                {console.log("Cuurent,", currentLocation.length)}
+                                {currentLocation.length > 0 && (
+                                    <MapContainer
+                                        center={currentLocation}
+                                        zoom={12}
+                                        scrollWheelZoom={true}
+                                        style={{ height: '500px', width: '100%', borderRadius: '15px' }}
+                                    >
+                                        <TileLayer
+                                            attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                        />
+                                        <MapClickHandler handleMapClick={handleMapClick} />
+                                        <Marker position={currentLocation} icon={customIcon}>
+                                            <Popup>Your current location</Popup>
+                                        </Marker>
+                                        {allPoints.map((point, index) =>
+                                            typeof point.lat === 'number' && typeof point.lng === 'number' ? (
+                                                <Marker
+                                                    key={index}
+                                                    icon={customIcon}
+                                                    position={[point.lat, point.lng]}
+                                                >
+                                                    <Popup>Your custom popup for point {index + 1}</Popup>
+                                                </Marker>
+                                            ) : null
+                                        )}
+                                    </MapContainer>
+                                )}
 
+                                {errorMessage && (
+                                    <Alert variant="danger" className="mt-3">
+                                        {errorMessage}
+                                    </Alert>
+                                )}
 
-                </div>
-            )}
-
-
-            <div className="row mt-4 w-100">
-                <div className="col-md-6 d-flex justify-content-between">
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className={`btn btn-success ${loading ? 'disabled' : ''} `}
-                        onClick={handleSubmit}
-                    >
-                        {loading ? "Please Wait ....." : "Submit"}
-                    </button>
-
-
-
-                </div>
-            </div>
-
-            {errorModel && (
-                <div className="modal show d-block" tabIndex="-1" role="dialog">
-                    <div className="modal-dialog" role="document">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title">Submission Review</h5>
-                                <button type="button" className="close" onClick={() => setErrorModel(false)} aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
+                                <div className="mt-3">
+                                    <h5>Selected Locations ({allPoints.length})</h5>
+                                    <Table striped bordered hover size="sm">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Latitude</th>
+                                                <th>Longitude</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {allPoints.map((point, index) => (
+                                                <tr key={index}>
+                                                    <td>{index + 1}</td>
+                                                    <td>{typeof point.lat === 'number' ? point.lat.toFixed(6) : 'N/A'}</td>
+                                                    <td>{typeof point.lng === 'number' ? point.lng.toFixed(6) : 'N/A'}</td>
+                                                    <td>
+                                                        <button
+                                                            style={{
+                                                                backgroundColor: 'red',
+                                                                color: 'white',
+                                                                border: 'none',
+                                                                padding: '5px 10px',
+                                                                fontSize: '14px',
+                                                                cursor: 'pointer',
+                                                                borderRadius: '5px' // Rounded corners
+                                                            }}
+                                                            onClick={() => handleDoubleClick(point.lat, point.lng)}
+                                                        >
+                                                            Delete Location
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </Table>
+                                </div>
                             </div>
-                            <div className="modal-body">
-                                <p>Are you sure you want to submit this information?</p>
-                            </div>
+                        )}
 
-                            <div className="modal-footer">
-                                <button type="button" className="btn btn-secondary">
-                                    Cancel
-                                </button>
-                                <button type="button" className="btn btn-primary" onClick={handleSubmit}>
-                                    Submit
-                                </button>
+
+                    </div>
+                )}
+
+
+                <div className="row mt-4 w-100">
+                    <div className="col-md-6 d-flex justify-content-between">
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className={`btn btn-success ${loading ? 'disabled' : ''} `}
+                            onClick={handleSubmit}
+                        >
+                            {loading ? "Please Wait ....." : "Submit"}
+                        </button>
+
+
+
+                    </div>
+                </div>
+
+                {errorModel && (
+                    <div className="modal show d-block" tabIndex="-1" role="dialog">
+                        <div className="modal-dialog" role="document">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h5 className="modal-title">Submission Review</h5>
+                                    <button type="button" className="close" onClick={() => setErrorModel(false)} aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div className="modal-body">
+                                    <p>Are you sure you want to submit this information?</p>
+                                </div>
+
+                                <div className="modal-footer">
+                                    <button type="button" className="btn btn-secondary">
+                                        Cancel
+                                    </button>
+                                    <button type="button" className="btn btn-primary" onClick={handleSubmit}>
+                                        Submit
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
 
-        </div>
+            </div>
+        </>
     );
 };
 

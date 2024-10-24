@@ -15,24 +15,26 @@ const TeacherWithLead = () => {
     const [selectedlead, setSelectedLead] = useState([])
 
     // Fetch data from the server
-    const fetchData = async () => {
+const fetchData = async () => {
         setLoading(true);
         try {
             const { data } = await axios.get('https://api.srtutorsbureau.com/api/v1/teacher/Get-Teacher-With-Lead');
             if (data.data) {
                 setData(data.data);
+
                 setFilteredData(data.data);
             }
         } catch (error) {
             console.log(error);
         }
         setLoading(false);
-    };
+};
 
-    const handleOpen = (lead) => {
+const handleOpen = (lead) => {
         setOpen(true)
         setSelectedLead(lead)
-    }
+}
+
     const handleClose = () => {
         setOpen(false)
         setSelectedLead([])
@@ -41,7 +43,6 @@ const TeacherWithLead = () => {
         fetchData();
     }, []);
 
-    // Handle search by name, number, or gender
     const handleSearch = (e) => {
         setSearch(e.target.value);
         filterData(e.target.value, startDate, endDate);

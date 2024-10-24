@@ -212,7 +212,7 @@ app.get('/nearby-places', async (req, res) => {
     console.log(metersRadius);
 
     // Include pagetoken if provided
-    const apiUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=${metersRadius}&sensor=false&type=school&key=${apiKey}&rankby=prominence&maxResults=50${pagetoken ? `&pagetoken=${pagetoken}` : ''}`;
+    const apiUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=${metersRadius}&sensor=false&key=${apiKey}&rankby=prominence&maxResults=50${pagetoken ? `&pagetoken=${pagetoken}` : ''}`;
 
     try {
         const response = await axios.get(apiUrl);

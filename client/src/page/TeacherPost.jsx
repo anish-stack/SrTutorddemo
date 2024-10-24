@@ -125,7 +125,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
                     ...formData,
                     location: {
                         type: 'Point',
-                        coordinates: [ClickLatitude, ClickLatitude]
+                        coordinates: [ClickLongitude, ClickLatitude]
                     }
                 });
             }
@@ -267,7 +267,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
             experienceRequired: formData.experienceRequired,
             minBudget: "500",
             maxBudget: formData.maxBudget || '1000',
-            locality: formData.locality,
+            locality: formData.currentAddress,
             startDate: formData.startDate,
             specificRequirement: "no",
             currentAddress: formData.currentAddress,

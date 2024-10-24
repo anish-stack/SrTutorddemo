@@ -88,6 +88,29 @@ const EditClass = () => {
         }));
     };
 
+    const handleAddSubject = async () => {
+        const lastSubjectName = formData.Subjects[formData.Subjects.length - 1].SubjectName;
+        try {
+            const response = await axios.put(
+                `https://api.srtutorsbureau.com/api/v1/admin/Add-Subjects/${id}`,
+                {
+                    Subjects: [{ SubjectName: lastSubjectName }]
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${Token}`
+                    }
+                }
+            );
+            toast.success('Subject added successfully');
+            console.log(response.data);
+            fetchClass();
+        } catch (error) {
+            toast.error('Failed to add subject');
+            console.log(error);
+        }
+    }
+
     const removeSubject = (index) => {
         setFormData((prevData) => ({
             ...prevData,
@@ -142,7 +165,11 @@ const EditClass = () => {
             console.log(error);
         }
     };
-
+    const handleSubjectChange = (index, value) => {
+        const newSubjects = [...formData.Subjects];
+        newSubjects[index].SubjectName = value; // Update the subject name
+        setFormData({ ...formData, Subjects: newSubjects });
+    };
     const handleDeleteSubject = async (subject_id) => {
         try {
             await toast.promise(
@@ -180,6 +207,12 @@ const EditClass = () => {
                     className={`px-4 py-2 border-b-2 ${activeTab === 'subjects' ? 'border-blue-500' : 'border-transparent'} focus:outline-none`}
                 >
                     Edit Subjects
+                </button>
+                <button
+                    onClick={() => setActiveTab('add-subjects')}
+                    className={`px-4 py-2 border-b-2 ${activeTab === 'add-subjects' ? 'border-blue-500' : 'border-transparent'} focus:outline-none`}
+                >
+                    Add Subjects
                 </button>
             </div>
 
@@ -233,7 +266,7 @@ const EditClass = () => {
                                     disabled={loading}
                                     className="w-full cursor-pointer items-center gap-1 rounded border border-blue-300 bg-gradient-to-b from-blue-50 to-blue-200 px-4 py-2 font-semibold hover:opacity-90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-300 focus-visible:ring-offset-2 active:opacity-100"
                                 >
-                                    {loading ?'Please Wait...':"Submit"}
+                                    {loading ? 'Please Wait...' : "Submit"}
                                 </button>
                             </form>
                         </div>
@@ -241,48 +274,48 @@ const EditClass = () => {
                 </div>
             )}
 
-{activeTab === 'subjects' && (
-    <div>
-        <div className="max-w-7xl mx-auto p-2">
-            <div className="bg-white p-4 rounded-lg shadow-xl">
-                <h2 className="text-2xl font-semibold mb-4">Edit Subjects</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {formData.Subjects.map((subject, index) => (
-                        <div
-                            key={index}
-                            className="items-center relative space-y-2 sm:space-y-0 sm:space-x-3 mb-4 p-4 border border-gray-200 rounded-lg shadow-sm bg-white"
-                        >
-                            <input
-                                type="text"
-                                name="SubjectName"
-                                value={subject.SubjectName || ''}
-                                onChange={(e) => handleChange(e, index, 'subject')}
-                                className="p-3 border w-full border-gray-300 rounded-lg flex-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                placeholder="Subject Name"
-                                required
-                            />
-                            <div className="flex mt-5 items-center justify-between">
-                                <button
-                                    type="button"
-                                    onClick={() => subject._id ? handleDeleteSubject(subject._id) : removeSubject(index)}
-                                    className="whitespace-nowrap gap-1 mt-2 flex items-center justify-center rounded border text-xs border-red-400 bg-gradient-to-r from-red-100 to-red-200 px-4 py-1 font-semibold text-red-600 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-offset-2 active:opacity-100 transition duration-150"
-                                    disabled={formData.Subjects.length <= 1}
-                                >
-                                    Remove <IoIosRemoveCircleOutline />
-                                </button>
-                                
-                                <button
-                                    type="button"
-                                    onClick={() => handleSubjectNameEdit(subject._id, subject.SubjectName)}
-                                    className="whitespace-nowrap gap-1 mt-2 text-xs flex items-center justify-center rounded border border-green-400 bg-gradient-to-r from-green-100 to-green-200 px-4 py-1 font-semibold text-green-600 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-green-300 focus:ring-offset-2 active:opacity-100 transition duration-150"
-                                >
-                                    Update <RxUpdate />
-                                </button>
+            {activeTab === 'subjects' && (
+                <div>
+                    <div className="max-w-7xl mx-auto p-2">
+                        <div className="bg-white p-4 rounded-lg shadow-xl">
+                            <h2 className="text-2xl font-semibold mb-4">Edit Subjects</h2>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {formData.Subjects.map((subject, index) => (
+                                    <div
+                                        key={index}
+                                        className="items-center relative space-y-2 sm:space-y-0 sm:space-x-3 mb-4 p-4 border border-gray-200 rounded-lg shadow-sm bg-white"
+                                    >
+                                        <input
+                                            type="text"
+                                            name="SubjectName"
+                                            value={subject.SubjectName || ''}
+                                            onChange={(e) => handleChange(e, index, 'subject')}
+                                            className="p-3 border w-full border-gray-300 rounded-lg flex-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            placeholder="Subject Name"
+                                            required
+                                        />
+                                        <div className="flex mt-5 items-center justify-between">
+                                            <button
+                                                type="button"
+                                                onClick={() => subject._id ? handleDeleteSubject(subject._id) : removeSubject(index)}
+                                                className="whitespace-nowrap gap-1 mt-2 flex items-center justify-center rounded border text-xs border-red-400 bg-gradient-to-r from-red-100 to-red-200 px-4 py-1 font-semibold text-red-600 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-offset-2 active:opacity-100 transition duration-150"
+                                                disabled={formData.Subjects.length <= 1}
+                                            >
+                                                Remove <IoIosRemoveCircleOutline />
+                                            </button>
+
+                                            <button
+                                                type="button"
+                                                onClick={() => handleSubjectNameEdit(subject._id, subject.SubjectName)}
+                                                className="whitespace-nowrap gap-1 mt-2 text-xs flex items-center justify-center rounded border border-green-400 bg-gradient-to-r from-green-100 to-green-200 px-4 py-1 font-semibold text-green-600 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-green-300 focus:ring-offset-2 active:opacity-100 transition duration-150"
+                                            >
+                                                Update <RxUpdate />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
-                        </div>
-                    ))}
-                </div>
-                {/* <div className='grid grid-cols-1 '>
+                            {/* <div className='grid grid-cols-1 '>
                 
                     <button
                         type="button"
@@ -292,11 +325,41 @@ const EditClass = () => {
                         Add Subject <IoMdAdd />
                     </button>
                 </div> */}
-            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+{activeTab === 'add-subjects' && (
+    <div className="p-4 bg-gray-100 rounded-lg shadow-md">
+        <h2 className="text-xl font-semibold mb-4">Add Subjects</h2>
+        <div className="space-y-4">
+            {formData.Subjects.map((subject, index) => (
+                <div key={index} className="flex items-center space-x-2">
+                    <input
+                        type="text"
+                        value={subject.SubjectName}
+                        onChange={(e) => handleSubjectChange(index, e.target.value)} // Update the subject name on change
+                        placeholder={`Subject ${index + 1}`}
+                        className="flex-1 border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    />
+                    <button
+                        onClick={() => handleAddSubject(index)} // Add subject for the specific index
+                        className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-200"
+                    >
+                        Add Subject
+                    </button>
+                </div>
+            ))}
         </div>
+        <button
+            onClick={addSubject} // Add a new input for an additional subject
+            className="mt-4 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-200"
+        >
+            Add Another Subject
+        </button>
     </div>
 )}
-
 
         </>
     );

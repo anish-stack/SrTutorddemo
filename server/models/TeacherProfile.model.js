@@ -185,6 +185,13 @@ const TeacherProfileSchema = new mongoose.Schema({
 
 }, { timestamps: true });
 
+TeacherProfileSchema.pre('save', function(next) {
+    this.updatedAt = new Date();
+    if (this.isNew) {
+        this.createdAt = new Date();
+    }
+    next();
+});
 
 // Create the Teacher Profile model
 TeacherProfileSchema.index({ 'RangeWhichWantToDoClasses.location': '2dsphere' })
