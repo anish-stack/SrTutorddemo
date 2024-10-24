@@ -6,13 +6,14 @@ const axios = require('axios');
 const crypto = require('crypto');
 const sendEmail = require('../utils/SendEmails');
 const SendWhatsAppMessage = require('../utils/SendWhatsappMeg');
+const sendLeadMessageToTeacher = require('../utils/SendLeadMsg');
 
 exports.CreateUniversalRequest = CatchAsync(async (req, res) => {
     try {
         const studentId = req.user.id;
 
         const {
- 
+
             requestByAdmin,
 
             ClassLangUage, requestType, classId, VehicleOwned, className, subjects,
@@ -21,8 +22,8 @@ exports.CreateUniversalRequest = CatchAsync(async (req, res) => {
             currentAddress, studentContactNumber,
             locality, startDate, specificRequirement, location, teacherId
         } = req.body;
- 
-        // console.log(req.body)
+
+
 
         console.log(req.body)
 
@@ -48,7 +49,7 @@ exports.CreateUniversalRequest = CatchAsync(async (req, res) => {
             startDate,
             specificRequirement,
             location,
- 
+
             teacherId,
             requestByAdmin,
 
@@ -75,16 +76,29 @@ exports.CreateUniversalRequest = CatchAsync(async (req, res) => {
 
             }
         }
+        const userLocation = {
+            type: 'Point',
+            coordinates: [location.coordinates[1], location.coordinates[0]]
+        };
+        const findTeacherWhichTechInLocation = await TeacherProfile.find({
+            'RangeWhichWantToDoClasses.location': {
+                $near: {
+                    $geometry: userLocation,
+                    $maxDistance: 5000
+                }
+            }
+        })
+        const url = `${process.env.FRONETND_URL}/Search-result?role=student&SearchPlaceLat=${location.coordinates[0]}&SearchPlaceLng=${location.coordinates[1]}&via-home-page&Location=${locality || currentAddress}&ClassId=${classId}&ClassNameValue=${className}&Subject=${subjects[0]}&lat=${location.coordinates[0]}7&lng=${location.coordinates[1]}&locationParam=${locality || currentAddress}`
 
-
-
+        await sendLeadMessageToTeacher(findTeacherWhichTechInLocation.length, findTeacherWhichTechInLocation, url)
+        // console.log("teachers",findTeacherWhichTechInLocation.length)
         await newRequest.save();
         if (!process.env.SR_WHATSAPP_NO_SINGLE) {
             return res.status(403).json({
                 message: "WhatsApp number not found"
             })
         }
-        
+
         await SendWhatsAppMessage(message, process.env.SR_WHATSAPP_NO_SINGLE)
 
         res.status(201).json({

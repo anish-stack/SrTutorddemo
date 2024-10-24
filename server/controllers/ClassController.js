@@ -483,11 +483,14 @@ exports.GetSubjectsWithClassIds = CatchAsync(async (req, res) => {
     }
 });
 
-
 exports.AddSubjectInClass = CatchAsync(async (req, res) => {
     try {
         const { ClassId } = req.params;
-        const { Subjects } = req.body;
+        const { Subjects } = req.body; // Expecting an array of objects
+
+        // Log received data for debugging
+        console.log(ClassId);
+        console.log(Subjects);
 
         const checkClass = await Classes.findById(ClassId);
         if (!checkClass) {
@@ -499,6 +502,7 @@ exports.AddSubjectInClass = CatchAsync(async (req, res) => {
             });
         }
 
+        // Ensure Subjects is an array and has at least one subject
         if (!Subjects || !Array.isArray(Subjects) || Subjects.length === 0) {
             return res.status(400).json({
                 success: false,
@@ -507,7 +511,15 @@ exports.AddSubjectInClass = CatchAsync(async (req, res) => {
             });
         }
 
-        checkClass.Subjects.push(...Subjects);
+        // Process subjects and assign a default name if SubjectName is missing
+        const processedSubjects = Subjects.map(subject => {
+            return {
+                SubjectName: subject.SubjectName ? subject.SubjectName : 'Unnamed Subject' // Set a default name
+            };
+        });
+
+        // Append new subjects to the existing Subjects array
+        checkClass.Subjects.push(...processedSubjects); // Append new subjects
 
         const redisClient = req.app.locals.redis;
 
@@ -529,6 +541,7 @@ exports.AddSubjectInClass = CatchAsync(async (req, res) => {
             },
         });
     } catch (error) {
+        console.log(error.message);
         ServerError('Error adding subjects', error.message);
         return res.status(500).json({
             success: false,
@@ -538,6 +551,8 @@ exports.AddSubjectInClass = CatchAsync(async (req, res) => {
         });
     }
 });
+
+
 
 
 exports.GetUniqueAllSubjects = CatchAsync(async (req, res) => {

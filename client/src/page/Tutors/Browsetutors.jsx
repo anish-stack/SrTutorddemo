@@ -118,7 +118,7 @@ const Browsetutors = () => {
     };
     const handleFilterChange = (e) => {
         const { name, value, type, checked } = e.target;
-    
+
         if (name === 'Gender' && type === 'checkbox') {
             setFilterOptions(prev => ({
                 ...prev,
@@ -145,7 +145,7 @@ const Browsetutors = () => {
                 const newSubjects = checked
                     ? [...(prev.Subject || []), value] // Add selected subject
                     : prev.Subject.filter(subject => subject !== value); // Remove unselected subject
-    
+
                 return {
                     ...prev,
                     Subject: newSubjects // Update the Subject filter with the new array
@@ -163,7 +163,7 @@ const Browsetutors = () => {
             }));
         }
     };
-    
+
 
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
@@ -262,25 +262,68 @@ const Browsetutors = () => {
                         Both
                     </label>
                 </div>
-
+                {/* Type of Class Flter */}
+                <h5>Filter By Mode Of Class</h5>
+                <div className="form-check">
+                    <input
+                        type="checkbox"
+                        className="form-check-input"
+                        id="ModeOfTuition"
+                        name="ModeOfTuition"
+                        value="Online Class"
+                        checked={FilterOptions.ModeOfTuition === 'Online Class'}
+                        onChange={handleFilterChange}
+                    />
+                    <label className="form-check-label" htmlFor="Online Class">
+                    Online Class
+                    </label>
+                </div>
+                <div className="form-check">
+                    <input
+                        type="checkbox"
+                        className="form-check-input"
+                        id="Offline Class"
+                        name="ModeOfTuition"
+                        value="Offline Class"
+                        checked={FilterOptions.ModeOfTuition === 'Offline Class'}
+                        onChange={handleFilterChange}
+                    />
+                    <label className="form-check-label" htmlFor="Offline Class">
+                    Offline Class
+                    </label>
+                </div>
+                <div className="form-check">
+                    <input
+                        type="checkbox"
+                        className="form-check-input"
+                        id="All"
+                        name="ModeOfTuition"
+                        value="All"
+                        checked={FilterOptions.ModeOfTuition === 'All'}
+                        onChange={handleFilterChange}
+                    />
+                    <label className="form-check-label" htmlFor="All">
+                    All Modes
+                    </label>
+                </div>
                 {/* Subjects Filter */}
                 <h5 className="mt-4">Subjects</h5>
                 {paginatedSubjects.map((item, index) => (
-    <div key={index} className="form-check">
-        <input
-            type="checkbox"
-            className="form-check-input"
-            id={`subject-${index}`}
-            name="Subject"
-            value={item.SubjectName}
-            checked={FilterOptions.Subject && FilterOptions.Subject.includes(item.SubjectName)} // Check if the subject is in the selected array
-            onChange={handleFilterChange}
-        />
-        <label className="form-check-label" htmlFor={`subject-${index}`}>
-            {item.SubjectName}
-        </label>
-    </div>
-))}
+                    <div key={index} className="form-check">
+                        <input
+                            type="checkbox"
+                            className="form-check-input"
+                            id={`subject-${index}`}
+                            name="Subject"
+                            value={item.SubjectName}
+                            checked={FilterOptions.Subject && FilterOptions.Subject.includes(item.SubjectName)} // Check if the subject is in the selected array
+                            onChange={handleFilterChange}
+                        />
+                        <label className="form-check-label" htmlFor={`subject-${index}`}>
+                            {item.SubjectName}
+                        </label>
+                    </div>
+                ))}
 
 
                 {/* Pagination */}

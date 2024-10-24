@@ -36,23 +36,12 @@ const StudentCardForTeacher = ({ result }) => {
                             <div className="card position-relative ">
                                 <div className="card-img text-center">
                                     <img
-                                        src={student?.ProfilePic?.url || "https://i.ibb.co/8zn4h3K/no-picture-taking.png"}
+                                        src={student?.ProfilePic?.url || "https://i.ibb.co/jzXNG7z/graduated.png"}
                                         className="img-fluid shadow-sm p-2 border border-black border-3 rounded-circle"
                                         style={{ width: '100px', height: '100px', objectFit: 'cover' }}
                                     />
                                 </div>
-                                <div className="card-body p-0 text-sm-center  text-center">
-                                    <div className="profile-name w-100 d-flex align-item-center flex-column justify-content-center text-center">
-                                        <h4 className="text-black text-center mb-0 fw-bold">{student.studentInfo.studentName || "Amelia Jackson"}</h4>
-
-                                        <p className="fs-14 text-gray-200">
-                                            {student.specificRequirement || null}
-
-                                        </p>
-
-                                    </div>
-
-                                </div>
+                               
 
 
                             </div>
@@ -68,7 +57,7 @@ const StudentCardForTeacher = ({ result }) => {
                                         </div>
                                         <div className="contact-desc">
                                             <a href="tel: 9811382915 " className="text-black fw-5">
-                                                I Want {student.teacherGender} Teacher
+                                                I Want {student.teacherGenderPreference} Teacher
                                             </a>
                                         </div>
                                     </div>
@@ -80,9 +69,36 @@ const StudentCardForTeacher = ({ result }) => {
                                         </div>
                                         <div className="contact-desc">
                                             <p className="mb-0 text-black fw-5">
-                                                {student.className}
+                                               For Class {student.className}
                                             </p>
                                         </div>
+                                        
+                                    </div>
+                                </div>
+                                <div className="col-sm-12 mb-sm-0 mb-20">
+                                    <div className="contact-box justify-content-start gap-2 d-flex align-items-center">
+                                        <div className="contact-icon d-flex justify-content-center align-items-center">
+                                            <i className="fas fa-location text-orange-500" style={{ fontSize: '18px' }}></i>
+                                        </div>
+                                        <div className="contact-desc">
+                                            <p className="mb-0 text-black fw-5">
+                                           Location: {student.locality || "Not Disclosed"}
+                                            </p>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                                <div className="col-sm-12 mb-sm-0 mb-20">
+                                    <div className="contact-box justify-content-start gap-2 d-flex align-items-center">
+                                        <div className="contact-icon d-flex justify-content-center align-items-center">
+                                            <i className="fas fa-school text-orange-500" style={{ fontSize: '18px' }}></i>
+                                        </div>
+                                        <div className="contact-desc">
+                                            <p className="mb-0 text-black fw-5">
+                                           Mode: {student.interestedInTypeOfClass || "Not Disclosed"}
+                                            </p>
+                                        </div>
+                                        
                                     </div>
                                 </div>
                                 <div className="col-sm-12">
@@ -141,9 +157,9 @@ const StudentCardForTeacher = ({ result }) => {
                         <p><strong>Teacher Preference:</strong> {selectedStudent.teacherGenderPreference}</p>
                         <p><strong>Number of Sessions:</strong> {selectedStudent.numberOfSessions}</p>
                         <p><strong>Budget:</strong> {selectedStudent.minBudget} - {selectedStudent.maxBudget}</p>
-                        {/* <p><strong>Locality:</strong> {selectedStudent.location}</p> */}
-                        {/* <p><strong>Start Date:</strong> {selectedStudent.StartDate}</p> */}
-                        <p><strong>Specific Requirements:</strong> {selectedStudent.specificRequirement}</p>
+                        <p><strong>Locality:</strong> {selectedStudent.locality}</p>
+                        <p><strong>Start Date:</strong> {selectedStudent.startDate}</p>
+
                         {/* <p><strong>Post Verified:</strong> {selectedStudent.PostIsVerifiedOrNot ? 'Yes' : 'No'}</p> */}
                     </Modal.Body>
                     <Modal.Footer>

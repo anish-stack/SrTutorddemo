@@ -35,9 +35,9 @@ function Testimonials() {
                                             id="testimonial-svg"
                                             data-svg-icon="assets/img/icons/title_shape.svg"
                                         />
-                                        Student
+                                        Student & Teacher
                                     </span>{" "}
-                                    Think
+                                    Think For us
                                 </h2>
                             </div>
                         </div>

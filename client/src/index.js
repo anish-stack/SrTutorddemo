@@ -1,3 +1,4 @@
+import { TourProvider } from '@reactour/tour'
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
@@ -10,18 +11,21 @@ import { PersistGate } from 'redux-persist/integration/react';
 
 import { Toaster } from 'react-hot-toast';
 const root = ReactDOM.createRoot(document.getElementById('root'));
-
 root.render(
   <BrowserRouter>
-    <Provider store={Store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <App />
-        <Toaster
-          position="top-center"
-          reverseOrder={false}
-        />
-      </PersistGate>
-    </Provider>
+    <TourProvider>
+
+
+      <Provider store={Store}>
+        <PersistGate loading={null} persistor={persistor}>
+          <App />
+          <Toaster
+            position="top-center"
+            reverseOrder={false}
+          />
+        </PersistGate>
+      </Provider>
+    </TourProvider>
   </BrowserRouter>
 );
 

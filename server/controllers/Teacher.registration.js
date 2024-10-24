@@ -1149,8 +1149,6 @@ exports.GetTeacherProfileId = CatchAsync(async (req, res) => {
       TeacherUserId: TeacherId,
     }).populate('TeacherUserId');
 
-    console.log(teacherProfile);
-
     if (!teacherProfile) {
       return res.status(404).json({
         success: false,
@@ -1158,26 +1156,44 @@ exports.GetTeacherProfileId = CatchAsync(async (req, res) => {
       });
     }
 
-    // Fetch class names based on ClassId in AcademicInformation
-    const classNames = await Promise.all(
+    // Fetch class names and combine with the academic info
+    const updatedAcademicInformation = await Promise.all(
       teacherProfile.AcademicInformation.map(async (info) => {
         try {
-          // Check if the class exists directly or in InnerClasses
-          let classExists = await Class.findById(info.ClassId).lean();
+          // Check if the class exists directly
+          let classExists = await Class.findById(info.ClassId);
+          console.log('classExists by ClassId:', classExists);  // Debugging log
+
+          // If the ClassId is not found, try finding it within InnerClasses
           if (!classExists) {
             classExists = await Class.findOne({
               "InnerClasses._id": info.ClassId,
-            }).lean();
+            });
+            console.log('classExists by InnerClasses:', classExists);  // Debugging log
           }
 
+          // If class is still not found, return a default message
           if (!classExists) {
-            return `${info.ClassId}`;
+            console.warn(`ClassId ${info.ClassId} not found.`);
+            return {
+              ...info,
+              className: `ClassId ${info.ClassId} not found.`,
+            };
           }
 
-          // Validate subject names
-          const classSubjects = classExists.Subjects.map(
-            (subject) => subject.SubjectName
+          // Check if ClassId belongs to an InnerClass
+          let className = classExists.Class;
+          const innerClassMatch = classExists.InnerClasses.find(innerClass =>
+            innerClass._id.toString() === info.ClassId
           );
+
+          if (innerClassMatch) {
+            className = innerClassMatch.InnerClass;
+          }
+
+          // Validate subject names against the class' subjects
+          const classSubjects = classExists.Subjects.map((subject) => subject.SubjectName);
+          console.log('classSubjects:', classSubjects);  // Debugging log
 
           const allSubjectsValid = info.SubjectNames.every((subject) =>
             classSubjects.some((classSubject) =>
@@ -1186,31 +1202,37 @@ exports.GetTeacherProfileId = CatchAsync(async (req, res) => {
           );
 
           if (!allSubjectsValid) {
-            return "Some subjects are invalid for this class.";
+            console.warn(`Invalid subjects for ClassId ${info.ClassId}`);
+            return {
+              ...info,
+              className: className,
+              subjectsValidationResult: `Invalid subjects for ClassId ${info.ClassId}`,
+            };
           }
 
-          return `${classExists.Class}`;
+          return {
+            ...info,  // Spread the original academic information
+            className: className,  // Add the fetched class name
+            subjectsValidationResult: 'All subjects valid',  // Add subject validation result
+          };
 
         } catch (error) {
           console.error(`Error fetching class detail for ClassId ${info.ClassId}:`, error);
-          return "Unknown Class"; // Default value in case of an error
+          return {
+            ...info,  // Spread the original academic information
+            className: 'Unknown Class',  // Default value in case of an error
+            subjectsValidationResult: 'Error occurred',  // Error message
+          };
         }
       })
     );
-
-    // Combine class names with AcademicInformation
-    const updatedAcademicInformation = teacherProfile.AcademicInformation.map((info, index) => ({
-      ...info,
-      className: classNames[index], // Add the corresponding class name
-    }));
 
     // Return the response with updated AcademicInformation
     res.status(200).json({
       success: true,
       message: "Profile fetched successfully from DB",
       data: {
-        ...teacherProfile.toObject(),
-        AcademicInformation: updatedAcademicInformation, // Include updated info
+        ...teacherProfile.toObject()
       },
     });
   } catch (error) {
@@ -1329,7 +1351,7 @@ exports.GetAllTeacher = CatchAsync(async (req, res) => {
 
 exports.GetTeacherWithLead = CatchAsync(async (req, res) => {
   try {
-    const teachers = await TeacherProfile.find({}).populate('LeadIds');
+    const teachers = await TeacherProfile.find({}).populate('LeadIds').sort({"updatedAt":1});
 
     const teachersWithLeads = teachers.filter(teacher => teacher.LeadIds.length > 0);
 
@@ -1636,15 +1658,17 @@ exports.SearchByMinimumCondition = CatchAsync(async (req, res) => {
     } else if (role === 'tutor') {
 
       try {
+        console.log(ClassNameValue,Subject)
         const { data } = await axios.get('https://api.srtutorsbureau.com/api/v1/uni/get-all-universal-Request')
+        console.log(data.data[9])
         const CombinedData = data?.data
-        const findTeacherRequest = CombinedData.filter(item => item.className === ClassNameValue && item.subjects.includes(Subject))
+        const findTeacherRequest = CombinedData.filter(item => item.className === ClassNameValue.toString() && item.subjects.includes(Subject))
 
 
         if (findTeacherRequest.length === 0) {
           return res.status(404).json({ message: 'No teachers found.' });
         }
-        // console.log("findTeacherRequest", findTeacherRequest)
+       
         finalResults = findTeacherRequest;
       } catch (error) {
         return res.status(403).json({
@@ -1720,7 +1744,12 @@ exports.BrowseTutorsNearMe = CatchAsync(async (req, res) => {
     // console.log(Subject)
 
     if (ModeOfTuition) {
-      locationResults = locationResults.filter(teacher => teacher.TeachingMode === ModeOfTuition);
+      if(ModeOfTuition === "All"){
+      
+      }else{
+
+        locationResults = locationResults.filter(teacher => teacher.TeachingMode === ModeOfTuition);
+      }
     }
 
     if (verified) {
@@ -1742,17 +1771,14 @@ exports.BrowseTutorsNearMe = CatchAsync(async (req, res) => {
         )
       );
       locationResults = subjectFilter;
-      // console.log(locationResults); // Debugging: Check filtered results
     }
 
 
     if (Experience !== undefined && Experience !== null) {
-      // If Experience is greater than 0, apply the filter
       if (Experience > 0) {
         locationResults = locationResults.filter(teacher => teacher.TeachingExperience >= Experience);
       }
-      // // If Experience is 0, show all teachers (no need to filter)
-      // console.log(locationResults);
+    
     }
 
     // if (maxRange && minRange) {

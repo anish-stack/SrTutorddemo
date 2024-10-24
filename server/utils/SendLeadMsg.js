@@ -29,7 +29,7 @@ const extractParametersFromUrl = (url) => {
 };
 
 const sendLeadMessageToTeacher = async (teacherLength, result, SearchUrl) => {
-    console.log(SearchUrl);
+
 
     const { ClassNameValue, locationParam, Subject } = extractParametersFromUrl(SearchUrl);
 
@@ -49,6 +49,7 @@ const sendLeadMessageToTeacher = async (teacherLength, result, SearchUrl) => {
         if (findTeacher.length === 0) {
             return { success: false, message: 'Teacher not found' };
         }
+        console.log("findTeacher", findTeacher.length);
 
         const recentLeads = matchedLeads.filter((lead) => {
             const leadSendTime = new Date(lead.LeadSendTime);
@@ -74,13 +75,14 @@ const sendLeadMessageToTeacher = async (teacherLength, result, SearchUrl) => {
             WhichTeacherHasNotSendMessage: [] // Initialize this array
         };
 
+        let selectedTeacherIds
         if (eligibleTeacherIds.length <= 5) {
             console.log("Sending lead to the following eligible teacher IDs:", eligibleTeacherIds);
             leadData.LeadTeacherIds = eligibleTeacherIds;
             leadData.LeadSendTeacherNumber = eligibleTeacherIds.length;
 
         } else {
-            const selectedTeacherIds = getRandomElements(eligibleTeacherIds, 5);
+            selectedTeacherIds = getRandomElements(eligibleTeacherIds, 5);
             console.log("Sending lead to randomly selected teacher IDs:", selectedTeacherIds);
             leadData.LeadTeacherIds = selectedTeacherIds;
             leadData.LeadSendTeacherNumber = selectedTeacherIds.length;
@@ -88,37 +90,47 @@ const sendLeadMessageToTeacher = async (teacherLength, result, SearchUrl) => {
 
         const newLeadSend = await leadModel.create(leadData);
 
-        for (const teacher of findTeacher) {
-            teacher.LeadIds.push(newLeadSend._id);
-            await teacher.save();
-        }
+
 
         const contactDetails = `📞 *Contact SR Tutor:*\n*Phone:* +1234567890\n*Email:* info@srtutors.com`;
         const Message = `🌟 *Hello Teacher,* *Exciting news!*\n\n You have a new lead in your area for the following class:\n\n *Class:* ${ClassNameValue},\n *Subject:* ${Subject},\n *Location:* ${locationParam}.\n 💼 *This is a great opportunity for you to connect with students and expand your reach!* *Don’t miss out! Please contact us to grab this lead and start earning money today.*\n\n 📞 *Contact Details*\n\n **Phone:** ${process.env.SR_WHATSAPP_NO},\n **Email:** ${process.env.SR_EMAIL}\n\n *Best regards,*\n *S.R. Tutors*`;
 
         const teachersWithLeads = findTeacher.filter(teacher =>
-            eligibleTeacherIds.toString().includes(teacher._id.toString())
+            selectedTeacherIds.toString().includes(teacher._id.toString())
         );
 
+        console.log("teachersWithLeads", teachersWithLeads.length || 0)
         const teachersNotSentMessage = [];
+        for (const teacher of teachersWithLeads) {
+            teacher.LeadIds.push(newLeadSend._id);
+            await teacher.save();
+        }
+        let messagesSentCount = 0;
+        const maxMessagesToSend = 5; // Set your desired limit here
 
         for (const teacher of teachersWithLeads) {
+            if (messagesSentCount >= maxMessagesToSend) {
+                // Break the loop if the limit is reached
+                break;
+            }
+
             if (teacher.ContactNumber) {
                 // Validate phone number format here if necessary
                 try {
                     const send = await SendWhatsAppMessage(Message, teacher.ContactNumber);
                     if (!send) {
-                        console.log(`Failed to send message to ${teacher.ContactNumber}`)
+                        console.log(`Failed to send message to ${teacher.ContactNumber}`);
                         newLeadSend.WhichTeacherHasNotSendMessage.push({
                             teacherId: teacher._id,
                             contactNumber: teacher.ContactNumber
                         });
                         await newLeadSend.save();
+                    } else {
+                        // Increment the counter if the message was sent successfully
+                        messagesSentCount++;
                     }
-
                 } catch (error) {
                     console.error(`Failed to send message to teacher ID: ${teacher._id}, Error: ${error.message}`);
-
                     teachersNotSentMessage.push({
                         teacherId: teacher._id,
                         contactNumber: teacher.ContactNumber
@@ -132,7 +144,6 @@ const sendLeadMessageToTeacher = async (teacherLength, result, SearchUrl) => {
                 });
             }
         }
-
         if (teachersNotSentMessage.length > 0) {
             console.log('Teachers who did not receive messages:', teachersNotSentMessage);
         }
