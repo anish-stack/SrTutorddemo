@@ -94,7 +94,7 @@ const sendLeadMessageToTeacher = async (teacherLength, result, SearchUrl) => {
 
 
         const contactDetails = `📞 *Contact SR Tutor:*\n*Phone:* +1234567890\n*Email:* info@srtutors.com`;
-        const Message = `🌟 *Hello Teacher,* *Exciting news!*\n\n You have a new lead in your area for the following class:\n\n *Class:* ${ClassNameValue},\n *Subject:* ${Subject},\n *Location:* ${locationParam}.\n 💼 *This is a great opportunity for you to connect with students and expand your reach!* *Don’t miss out! Please contact us to grab this lead and start earning money today.*\n\n 📞 *Contact Details*\n\n **Phone:** ${process.env.SR_WHATSAPP_NO},\n **Email:** ${process.env.SR_EMAIL}\n\n *Best regards,*\n *S.R. Tutors*`;
+        const Message = `🌟 *Hello Teacher,* *Exciting news!*\n\n You have a new lead in your area for the following class:\n\n *Class:* ${ClassNameValue},\n *Subject:* ${Subject},\n *Location:* ${locationParam}.\n 💼 *This is a great opportunity for you to connect with students and expand your reach!* *Don’t miss out! Please contact us to grab this lead and start earning money today.*\n\n 📞 *Contact Details*\n\n **Phone:** ${process.env.SR_WHATSAPP_NO},\n **Website:** https://www.srtutorsbureau.com,\n **Email:** ${process.env.SR_EMAIL}\n\n *Best regards,*\n *S.R. Tutors*`;
 
         const teachersWithLeads = findTeacher.filter(teacher =>
             selectedTeacherIds.toString().includes(teacher._id.toString())
