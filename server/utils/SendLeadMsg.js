@@ -59,7 +59,7 @@ const sendLeadMessageToTeacher = async (teacherLength, result, SearchUrl) => {
 
         const recentTeacherIds = new Set(recentLeads.flatMap(lead => lead.LeadTeacherIds.map(id => id.toString())));
 
-        const eligibleTeacherIds = teacherIds.filter(id => !recentTeacherIds.has(id.toString()));
+        let eligibleTeacherIds = teacherIds.filter(id => !recentTeacherIds.has(id.toString()));
 
         if (eligibleTeacherIds.length === 0) {
             throw new Error('All teachers have received leads within the last 30 minutes for this URL');
@@ -78,6 +78,7 @@ const sendLeadMessageToTeacher = async (teacherLength, result, SearchUrl) => {
         let selectedTeacherIds
         if (eligibleTeacherIds.length <= 5) {
             console.log("Sending lead to the following eligible teacher IDs:", eligibleTeacherIds);
+            selectedTeacherIds =eligibleTeacherIds
             leadData.LeadTeacherIds = eligibleTeacherIds;
             leadData.LeadSendTeacherNumber = eligibleTeacherIds.length;
 
