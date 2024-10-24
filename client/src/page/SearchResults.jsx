@@ -54,6 +54,7 @@ const SearchResults = () => {
           ;
           const tutorsData = response.data.results;
           setResults(response.data.results);
+          console.log(response.data.results)
           const ids = tutorsData.flatMap((item) => item.AcademicInformation);
           setClassIds(ids);
           FetchTeacherClassNames(ids)
@@ -294,6 +295,17 @@ const SearchResults = () => {
                                 <div className="contact-desc">
                                   <a href="tel:+1 4078461474" className="text-black fw-5"
                                   >{item.TeachingExperience} Years Of Experience </a>
+                                </div>
+                              </div>
+                              <div className="contact-box d-flex justify-content-start gap-2  align-items-center">
+                                <div
+                                  className="contact-icon  justify-content-center align-items-center"
+                                >
+                                 📳
+                                </div>
+                                <div className="contact-desc">
+                                  <a href="tel:+1 4078461474" className="text-black fw-5"
+                                  >{item.TeachingMode} </a>
                                 </div>
                               </div>
                             </div>
