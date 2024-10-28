@@ -10,6 +10,11 @@ const Browsetutors = () => {
     const searchQueryForlng = searchQuery.get('lng');
 
     const [data, setData] = useState([]);
+    const [location, setLocation] = useState({
+        lat: null,
+        lng: null,
+    });
+
     const [Count, setCount] = useState('0');
     const [FilterOptions, setFilterOptions] = useState({
         verified: '',
@@ -19,6 +24,8 @@ const Browsetutors = () => {
         Class: '',
         Gender: '',
         Experience: '',
+        panSearch: 'Current City Teachers',
+        currentCity: '',
         ModeOfTuition: ''
     });
     const [currentPage, setCurrentPage] = useState(1);
@@ -38,6 +45,39 @@ const Browsetutors = () => {
         }
     }, [classIds]);
 
+    useEffect(() => {
+        if (searchQueryForlat && searchQueryForlng) {
+            setLocation({
+                lat: parseFloat(searchQueryForlat),
+                lng: parseFloat(searchQueryForlng)
+            });
+
+        }
+    }, [searchQueryForlat])
+
+    const fetchLocation = async () => {
+
+        try {
+            const { data } = await axios.post('https://api.srtutorsbureau.com/Fetch-Current-Location', {
+                lat: searchQueryForlat || location.lat,
+                lng: searchQueryForlng || location.lng
+            });
+
+            const address = data?.data?.address;
+            console.log(address);
+            setFilterOptions((prev) => ({
+                ...prev,
+                currentCity: address?.city,
+            }))
+        } catch (error) {
+            console.log(error)
+        }
+    };
+
+    useEffect(() => {
+        fetchLocation();
+    }, []);
+
     const fetchAllSubjects = async () => {
         try {
             const response = await axios.get("https://api.srtutorsbureau.com/api/v1/admin/Get-All-Subject");
@@ -53,13 +93,13 @@ const Browsetutors = () => {
     const lngEmergency = 77.1518306;
     const fetchTutors = async () => {
         try {
-            const response = await axios.get(`https://api.srtutorsbureau.com/api/v1/student/BrowseTutorsNearMe?lat=${searchQueryForlat || latEmergency}&lng=${searchQueryForlng || lngEmergency}`, {
+            const response = await axios.get(`http://localhost:7000/api/v1/student/BrowseTutorsNearMe?lat=${searchQueryForlat || latEmergency}&lng=${searchQueryForlng || lngEmergency}`, {
                 params: { ...FilterOptions }
             });
 
             setCount(response.data.count);
             const tutorsData = response.data.results;
-            console.log(tutorsData)
+            // console.log(tutorsData)
             setData(tutorsData);
 
             // Extract class IDs for fetching class names
@@ -179,6 +219,7 @@ const Browsetutors = () => {
                     Subject: '',
                     Class: '',
                     Gender: '',
+                    panSearch: '',
                     Experience: '',
                     ModeOfTuition: ''
                 })}
@@ -234,6 +275,7 @@ const Browsetutors = () => {
                         Verified Teacher
                     </label>
                 </div>
+
                 <div className="form-check">
                     <input
                         type="checkbox"
@@ -248,6 +290,7 @@ const Browsetutors = () => {
                         Un-Verified Teacher
                     </label>
                 </div>
+
                 <div className="form-check">
                     <input
                         type="checkbox"
@@ -262,20 +305,51 @@ const Browsetutors = () => {
                         Both
                     </label>
                 </div>
+                <h5>Show Teacher By City</h5>
+                <div className="form-check">
+                    <input
+                        type="checkbox"
+                        className="form-check-input"
+                        id="panSearch1"  // Unique ID
+                        name="panSearch"
+                        value="Pan India Teacher"
+                        checked={FilterOptions.panSearch.includes('Pan India Teacher')}  // Check if this value is in the array
+                        onChange={handleFilterChange}
+                    />
+                    <label className="form-check-label" htmlFor="panSearch1">
+                        Pan India Teachers
+                    </label>
+                </div>
+                <div className="form-check">
+                    <input
+                        type="checkbox"
+                        className="form-check-input"
+                        id="panSearch2"  // Unique ID
+                        name="panSearch"
+                        value="Current City Teachers"
+                        checked={FilterOptions.panSearch.includes('Current City Teachers')}
+                        onChange={handleFilterChange}
+                    />
+                    <label className="form-check-label" htmlFor="panSearch2">
+                        Current City Teachers
+                    </label>
+                </div>
+
+
                 {/* Type of Class Flter */}
                 <h5>Filter By Mode Of Class</h5>
                 <div className="form-check">
                     <input
                         type="checkbox"
                         className="form-check-input"
-                        id="ModeOfTuition"
+                        id="Online_Class"
                         name="ModeOfTuition"
                         value="Online Class"
                         checked={FilterOptions.ModeOfTuition === 'Online Class'}
                         onChange={handleFilterChange}
                     />
-                    <label className="form-check-label" htmlFor="Online Class">
-                    Online Class
+                    <label className="form-check-label" htmlFor="Online_Class">
+                        Online Class
                     </label>
                 </div>
                 <div className="form-check">
@@ -289,7 +363,7 @@ const Browsetutors = () => {
                         onChange={handleFilterChange}
                     />
                     <label className="form-check-label" htmlFor="Offline Class">
-                    Offline Class
+                        Offline Class
                     </label>
                 </div>
                 <div className="form-check">
@@ -303,7 +377,7 @@ const Browsetutors = () => {
                         onChange={handleFilterChange}
                     />
                     <label className="form-check-label" htmlFor="All">
-                    All Modes
+                        All Modes
                     </label>
                 </div>
                 {/* Subjects Filter */}

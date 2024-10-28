@@ -23,9 +23,9 @@ universal.get('/get-Request-teacher', GetRequestFromTeacherId)
 universal.get('/perform-advance-search', PerformAdvancedSearch)
 
 
-universal.post('/create-contact', CreateContact); 
-universal.get('/get-all-contacts', GetAllContact); 
-universal.delete('/delete-contact/:id', DeleteContact); 
+universal.post('/create-contact', CreateContact);
+universal.get('/get-all-contacts', GetAllContact);
+universal.delete('/delete-contact/:id', DeleteContact);
 
 
 

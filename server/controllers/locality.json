@@ -1,0 +1,3866 @@
+[
+  {
+    "locid": 1,
+    "cityId": 1,
+    "localityname": "Laxmi Nagar",
+    "lattitude": "4546",
+    "longitude": "11111",
+    "isactive": "0"
+  },
+  {
+    "locid": 2,
+    "cityId": 1,
+    "localityname": "Nirman Vihar",
+    "lattitude": "789974",
+    "longitude": "14415464",
+    "isactive": "0"
+  },
+  {
+    "locid": 3,
+    "cityId": 3,
+    "localityname": "fsdfsdf",
+    "lattitude": "222",
+    "longitude": "44",
+    "isactive": "0"
+  },
+  {
+    "locid": 4,
+    "cityId": 3,
+    "localityname": "dfgdfgfd g",
+    "lattitude": "432",
+    "longitude": "234234",
+    "isactive": "0"
+  },
+  {
+    "locid": 5,
+    "cityId": 5,
+    "localityname": "ANAND VIHAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 6,
+    "cityId": 5,
+    "localityname": "ASHOKA NIKETAN",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 7,
+    "cityId": 5,
+    "localityname": "ARJUN NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 8,
+    "cityId": 5,
+    "localityname": "AGCR ENCLAVE",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 9,
+    "cityId": 5,
+    "localityname": "BAHUBALI ENCLAVE",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 10,
+    "cityId": 5,
+    "localityname": "BHOLANATH NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 11,
+    "cityId": 5,
+    "localityname": "BHAJANPURA",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 12,
+    "cityId": 5,
+    "localityname": "BRIJ VIHAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 13,
+    "cityId": 5,
+    "localityname": "BABARPUR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 14,
+    "cityId": 5,
+    "localityname": "CHITRA VIHAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 15,
+    "cityId": 5,
+    "localityname": "DAYANANAD VIHAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 16,
+    "cityId": 5,
+    "localityname": "EAST KRISHNA NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 17,
+    "cityId": 5,
+    "localityname": "GAGAN VIHAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 18,
+    "cityId": 5,
+    "localityname": "GANDHI NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 19,
+    "cityId": 5,
+    "localityname": "GANESH NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 20,
+    "cityId": 5,
+    "localityname": "GAZIPUR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 21,
+    "cityId": 5,
+    "localityname": "GEETA COLONY",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 22,
+    "cityId": 5,
+    "localityname": "GEETANJALI APPT.",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 23,
+    "cityId": 5,
+    "localityname": "GTB ENCLAVE",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 24,
+    "cityId": 5,
+    "localityname": "HARGOVIND ENCLAVE",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 25,
+    "cityId": 5,
+    "localityname": "I P EXTN.",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 26,
+    "cityId": 5,
+    "localityname": "JAGATPURI",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 27,
+    "cityId": 5,
+    "localityname": "JAGRITI ENCLAVE",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 28,
+    "cityId": 5,
+    "localityname": "JHEEL",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 29,
+    "cityId": 5,
+    "localityname": "JHILMIL COLONY",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 30,
+    "cityId": 5,
+    "localityname": "JITAR NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 31,
+    "cityId": 5,
+    "localityname": "KARKARDUMA",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 32,
+    "cityId": 5,
+    "localityname": "KRISHNA NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 33,
+    "cityId": 5,
+    "localityname": "KANTI NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 34,
+    "cityId": 5,
+    "localityname": "KAILASH NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 35,
+    "cityId": 5,
+    "localityname": "KHAJURI KHAS",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 36,
+    "cityId": 5,
+    "localityname": "KHICHRIPUR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 37,
+    "cityId": 5,
+    "localityname": "KONDLI",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 38,
+    "cityId": 5,
+    "localityname": "KOTLA",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 39,
+    "cityId": 5,
+    "localityname": "LAXMI NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 40,
+    "cityId": 5,
+    "localityname": "MADHUBAN",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 41,
+    "cityId": 5,
+    "localityname": "MADHU VIHAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 42,
+    "cityId": 5,
+    "localityname": "MANDAWALI",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 43,
+    "cityId": 5,
+    "localityname": "MAUSAM VIHAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 44,
+    "cityId": 5,
+    "localityname": "MAYUR VIHAR-1",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 45,
+    "cityId": 5,
+    "localityname": "MAYUR VIHAR-2",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 46,
+    "cityId": 5,
+    "localityname": "MAYUR VIHAR-3",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 47,
+    "cityId": 5,
+    "localityname": "NIRMAN VIHAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 48,
+    "cityId": 5,
+    "localityname": "NEW RAJDHANI ENCLAVE",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 49,
+    "cityId": 5,
+    "localityname": "PANDAV NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 50,
+    "cityId": 5,
+    "localityname": "PARWANA ROAD",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 51,
+    "cityId": 5,
+    "localityname": "PREET VIHAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 52,
+    "cityId": 5,
+    "localityname": "PRIYA ENCLAVE",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 53,
+    "cityId": 5,
+    "localityname": "PUSHPANJALI ENCLAVE",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 54,
+    "cityId": 5,
+    "localityname": "RADHEPURI",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 55,
+    "cityId": 5,
+    "localityname": "RAJENDER NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 56,
+    "cityId": 5,
+    "localityname": "RAM NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 57,
+    "cityId": 5,
+    "localityname": "RAM VIHAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 58,
+    "cityId": 5,
+    "localityname": "RAMPRASTHA",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 59,
+    "cityId": 5,
+    "localityname": "SURAJMAL VIHAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 60,
+    "cityId": 5,
+    "localityname": "SURYA NIKETAN",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 61,
+    "cityId": 5,
+    "localityname": "SHRESTHA VIHAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 62,
+    "cityId": 5,
+    "localityname": "SURYA NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 63,
+    "cityId": 5,
+    "localityname": "SWASTHYE VIHAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 64,
+    "cityId": 5,
+    "localityname": "SHANKAR VIHAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 65,
+    "cityId": 5,
+    "localityname": "SHAKARPUR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 66,
+    "cityId": 5,
+    "localityname": "SHAHDARA",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 67,
+    "cityId": 5,
+    "localityname": "SHALIMAR GARDEN",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 68,
+    "cityId": 5,
+    "localityname": "SHASTRI NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 69,
+    "cityId": 5,
+    "localityname": "SHASTRI PARK",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 70,
+    "cityId": 5,
+    "localityname": "TRILOK PURI",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 71,
+    "cityId": 5,
+    "localityname": "VIGYAN VIHAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 72,
+    "cityId": 5,
+    "localityname": "VIGYAN LOK",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 73,
+    "cityId": 5,
+    "localityname": "VINOD NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 74,
+    "cityId": 5,
+    "localityname": "VIKAS MARG",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 75,
+    "cityId": 5,
+    "localityname": "VISHWAS NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 76,
+    "cityId": 5,
+    "localityname": "VIVEK VIHAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 77,
+    "cityId": 5,
+    "localityname": "YOJNA VIHAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 78,
+    "cityId": 5,
+    "localityname": "YAMUNA VIHAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 79,
+    "cityId": 3,
+    "localityname": "NOIDA",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 80,
+    "cityId": 4,
+    "localityname": "KAUSAMBI",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 81,
+    "cityId": 4,
+    "localityname": "VAISHALI",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 82,
+    "cityId": 4,
+    "localityname": "VASUNDHARA",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 83,
+    "cityId": 4,
+    "localityname": "INDRAPURAM",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 84,
+    "cityId": 4,
+    "localityname": "GOVINDPURAM",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 85,
+    "cityId": 4,
+    "localityname": "RAJ NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 86,
+    "cityId": 4,
+    "localityname": "KAVI NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 87,
+    "cityId": 8,
+    "localityname": "GURGAON",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 88,
+    "cityId": 9,
+    "localityname": "FARIDABAD",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 89,
+    "cityId": 6,
+    "localityname": "AIIMS",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 90,
+    "cityId": 6,
+    "localityname": "ALAKNANDA",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 91,
+    "cityId": 6,
+    "localityname": "ASHRAM CHOWK",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 92,
+    "cityId": 6,
+    "localityname": "BHOGAL",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 93,
+    "cityId": 6,
+    "localityname": "C R PARK",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 94,
+    "cityId": 6,
+    "localityname": "CHANAKYAPURI",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 95,
+    "cityId": 6,
+    "localityname": "DEFANCE COLONY",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 96,
+    "cityId": 6,
+    "localityname": "DHAULA KUAN",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 97,
+    "cityId": 6,
+    "localityname": "EAST OF KAILASH",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 98,
+    "cityId": 6,
+    "localityname": "GOVIND PURI",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 99,
+    "cityId": 6,
+    "localityname": "GK",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 100,
+    "cityId": 6,
+    "localityname": "GREEN PARK",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 101,
+    "cityId": 6,
+    "localityname": "HAUZ KHAS",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 102,
+    "cityId": 6,
+    "localityname": "JASOLA",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 103,
+    "cityId": 6,
+    "localityname": "JIA SARAI",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 104,
+    "cityId": 6,
+    "localityname": "JNU",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 105,
+    "cityId": 6,
+    "localityname": "JOR BAGH",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 106,
+    "cityId": 6,
+    "localityname": "JANGPURA",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 107,
+    "cityId": 6,
+    "localityname": "KALKAJI",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 108,
+    "cityId": 6,
+    "localityname": "KALU SARAI",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 109,
+    "cityId": 6,
+    "localityname": "KAPASHERA",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 110,
+    "cityId": 6,
+    "localityname": "KATWARIA SARAI",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 111,
+    "cityId": 6,
+    "localityname": "KHAN PUR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 112,
+    "cityId": 6,
+    "localityname": "LAJPAT NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 113,
+    "cityId": 6,
+    "localityname": "LODHI COLONY",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 114,
+    "cityId": 6,
+    "localityname": "MAHARANI BAGH",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 115,
+    "cityId": 6,
+    "localityname": "MAHIPALPUR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 116,
+    "cityId": 6,
+    "localityname": "MALVIYA NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 117,
+    "cityId": 6,
+    "localityname": "MEHRULI",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 118,
+    "cityId": 6,
+    "localityname": "MOTI BAGH",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 119,
+    "cityId": 6,
+    "localityname": "MUNIRKA",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 120,
+    "cityId": 6,
+    "localityname": "NEHRU PALACE",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 121,
+    "cityId": 6,
+    "localityname": "NEW FRIENDS COLONY",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 122,
+    "cityId": 6,
+    "localityname": "NIZAMUDDIN",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 123,
+    "cityId": 6,
+    "localityname": "OKHLA",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 124,
+    "cityId": 6,
+    "localityname": "R K PURAM",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 125,
+    "cityId": 6,
+    "localityname": "SUFDURJUNG ENCLAVE",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 126,
+    "cityId": 6,
+    "localityname": "SAINIK FARMS",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 127,
+    "cityId": 6,
+    "localityname": "SAKET",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 128,
+    "cityId": 6,
+    "localityname": "SARITA VIHAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 129,
+    "cityId": 6,
+    "localityname": "SAROJINI NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 130,
+    "cityId": 6,
+    "localityname": "SOUTH EX.",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 131,
+    "cityId": 6,
+    "localityname": "VASANT VIHAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 132,
+    "cityId": 6,
+    "localityname": "VASANT KUNJ",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 133,
+    "cityId": 2,
+    "localityname": "ASHOK VIHAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 134,
+    "cityId": 2,
+    "localityname": "BADLI",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 135,
+    "cityId": 2,
+    "localityname": "CIVIL LINES",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 136,
+    "cityId": 2,
+    "localityname": "GUJARAWALA",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 137,
+    "cityId": 2,
+    "localityname": "INDERLOK",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 138,
+    "cityId": 2,
+    "localityname": "KAMLA NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 139,
+    "cityId": 2,
+    "localityname": "KASHMIRI GATE",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 140,
+    "cityId": 2,
+    "localityname": "KESHAV PURAM",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 141,
+    "cityId": 2,
+    "localityname": "KINGSWAY CAMP",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 142,
+    "cityId": 2,
+    "localityname": "KOHAT ENCLAVE",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 143,
+    "cityId": 2,
+    "localityname": "MEERA BAGH",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 144,
+    "cityId": 1,
+    "localityname": "MODEL TOWN",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "0"
+  },
+  {
+    "locid": 145,
+    "cityId": 2,
+    "localityname": "MODEL TOWN",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 146,
+    "cityId": 2,
+    "localityname": "MUKHERJEE NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 147,
+    "cityId": 2,
+    "localityname": "NANGLOI",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 148,
+    "cityId": 2,
+    "localityname": "NORTH CAMPUS",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 149,
+    "cityId": 2,
+    "localityname": "PASCHIM PURI",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 150,
+    "cityId": 2,
+    "localityname": "PASCHIM VIHAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 151,
+    "cityId": 2,
+    "localityname": "PITAMPURA",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 152,
+    "cityId": 2,
+    "localityname": "RANI BAGH",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 153,
+    "cityId": 2,
+    "localityname": "ROHINI",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 154,
+    "cityId": 2,
+    "localityname": "SHALIMAR BAGH",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 155,
+    "cityId": 2,
+    "localityname": "SONIYA VIHAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 156,
+    "cityId": 2,
+    "localityname": "YAMUNA VIHAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 157,
+    "cityId": 7,
+    "localityname": "AJMERI GATE",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 158,
+    "cityId": 7,
+    "localityname": "ANAND PARVAT",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 159,
+    "cityId": 7,
+    "localityname": "BENGALI MARKET",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 160,
+    "cityId": 7,
+    "localityname": "CONNAUGHT PLACE",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 161,
+    "cityId": 7,
+    "localityname": "DARYAGANJ",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 162,
+    "cityId": 7,
+    "localityname": "DELHI HIGH COURT",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 163,
+    "cityId": 7,
+    "localityname": "INDERPURI",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 164,
+    "cityId": 7,
+    "localityname": "JAMA MASJID",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 165,
+    "cityId": 7,
+    "localityname": "JANPATH",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 166,
+    "cityId": 7,
+    "localityname": "KAROL BAGH",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 167,
+    "cityId": 7,
+    "localityname": "MINTO ROAD",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 168,
+    "cityId": 7,
+    "localityname": "NORTH AVENU",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 169,
+    "cityId": 7,
+    "localityname": "PAHARGANJ",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 170,
+    "cityId": 7,
+    "localityname": "PANDARA ROAD",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 171,
+    "cityId": 7,
+    "localityname": "PARLIMENT HOUSE",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 172,
+    "cityId": 7,
+    "localityname": "PATIALA HOUSE",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 173,
+    "cityId": 7,
+    "localityname": "PRAGATI MAIDAN",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 174,
+    "cityId": 7,
+    "localityname": "RAJENDER PALACE",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 175,
+    "cityId": 7,
+    "localityname": "RASHTRAPATI BHAWAN",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 176,
+    "cityId": 7,
+    "localityname": "SANSAD MARG",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 177,
+    "cityId": 1,
+    "localityname": "ASHOK NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 178,
+    "cityId": 1,
+    "localityname": "DWARKA MOR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 179,
+    "cityId": 1,
+    "localityname": "DWARKA",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 180,
+    "cityId": 1,
+    "localityname": "HARI NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 181,
+    "cityId": 1,
+    "localityname": "JANAKPURI",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 182,
+    "cityId": 1,
+    "localityname": "KIRTI NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 183,
+    "cityId": 1,
+    "localityname": "MOTI NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 184,
+    "cityId": 1,
+    "localityname": "MANSAROVER GARDEN",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 185,
+    "cityId": 1,
+    "localityname": "MUNDKA",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 186,
+    "cityId": 1,
+    "localityname": "NANGLOI",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 187,
+    "cityId": 1,
+    "localityname": "PATEL NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 188,
+    "cityId": 1,
+    "localityname": "PUNJABI BAGH",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 189,
+    "cityId": 1,
+    "localityname": "RAJORI GARDEN",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 190,
+    "cityId": 1,
+    "localityname": "RAMESH NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 191,
+    "cityId": 1,
+    "localityname": "SHADIPUR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 192,
+    "cityId": 1,
+    "localityname": "TAGORE GARDEN",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 193,
+    "cityId": 1,
+    "localityname": "TILAK NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 194,
+    "cityId": 1,
+    "localityname": "NAWADA",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 195,
+    "cityId": 1,
+    "localityname": "UTTAM NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 196,
+    "cityId": 1,
+    "localityname": "PALAM",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 197,
+    "cityId": 7,
+    "localityname": "INDRAPRASTHA",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 198,
+    "cityId": 7,
+    "localityname": "GURU GOBIND SINGH MARG",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 199,
+    "cityId": 7,
+    "localityname": "DADA GHOSH BHAWAN",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 200,
+    "cityId": 7,
+    "localityname": "DELHI HIGH COURT EXTENTION",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 201,
+    "cityId": 7,
+    "localityname": "NIRMAN BHAWAN",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 202,
+    "cityId": 7,
+    "localityname": "CONSTITUTION HOUSE",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 203,
+    "cityId": 7,
+    "localityname": "GANDHI SMARAK NIDHI",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 204,
+    "cityId": 7,
+    "localityname": "PATEL NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 205,
+    "cityId": 1,
+    "localityname": "ASHOK PARK EXTENTION",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 206,
+    "cityId": 1,
+    "localityname": "BAKKARWALA",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 207,
+    "cityId": 1,
+    "localityname": "CHAND NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 208,
+    "cityId": 1,
+    "localityname": "CHAUKHAND",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 209,
+    "cityId": 1,
+    "localityname": "D.E.S.U.COLONY",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 210,
+    "cityId": 1,
+    "localityname": "D.K MOHAN GARDEN",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 211,
+    "cityId": 1,
+    "localityname": "DELHI INDUSTRIAL AREA",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 212,
+    "cityId": 1,
+    "localityname": "PASCHISM VIHAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 213,
+    "cityId": 1,
+    "localityname": "PEERAGARH",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 214,
+    "cityId": 1,
+    "localityname": "VIKASPURI",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 215,
+    "cityId": 1,
+    "localityname": "VINOD NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 216,
+    "cityId": 5,
+    "localityname": "AKSHARDHAM",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 217,
+    "cityId": 5,
+    "localityname": "AZAD NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 218,
+    "cityId": 5,
+    "localityname": "GHAZIPUR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 219,
+    "cityId": 5,
+    "localityname": "GHONDA",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 220,
+    "cityId": 5,
+    "localityname": "HARSH VIHAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 221,
+    "cityId": 5,
+    "localityname": "HIMMATPURI",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 222,
+    "cityId": 5,
+    "localityname": "JAGJIT NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 223,
+    "cityId": 5,
+    "localityname": "JHILMIL",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 224,
+    "cityId": 5,
+    "localityname": "JHILMIL TAHIRPUR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 225,
+    "cityId": 6,
+    "localityname": "KAILASH ",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 226,
+    "cityId": 6,
+    "localityname": "DAKSHINPURI",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 227,
+    "cityId": 6,
+    "localityname": "ABDUL FAZAL ENCLAVE",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 228,
+    "cityId": 6,
+    "localityname": "DEOLI",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 229,
+    "cityId": 6,
+    "localityname": "DR.AMBEDKAR NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 230,
+    "cityId": 6,
+    "localityname": "GAUTAM NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 231,
+    "cityId": 6,
+    "localityname": "HAMDARD NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 232,
+    "cityId": 6,
+    "localityname": "GREATER KAILASH",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 233,
+    "cityId": 6,
+    "localityname": "HARI NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 234,
+    "cityId": 6,
+    "localityname": "LADO SARAI",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 235,
+    "cityId": 6,
+    "localityname": "UDHYOG BHAWAN",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 236,
+    "cityId": 6,
+    "localityname": "SAFDARJUNG ENCLAVE",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 237,
+    "cityId": 6,
+    "localityname": "KHANPUR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 238,
+    "cityId": 6,
+    "localityname": "JUNGPURA",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 239,
+    "cityId": 6,
+    "localityname": "DEFENCE COLONY",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 240,
+    "cityId": 6,
+    "localityname": "NEHRU PLACE",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 241,
+    "cityId": 6,
+    "localityname": "KASTURBA NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 242,
+    "cityId": 2,
+    "localityname": "KASHMERE GATE",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 243,
+    "cityId": 2,
+    "localityname": "BURARI",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 244,
+    "cityId": 2,
+    "localityname": "SHAKTI NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 245,
+    "cityId": 6,
+    "localityname": "INA",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 246,
+    "cityId": 6,
+    "localityname": "BADARPUR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 247,
+    "cityId": 6,
+    "localityname": "TUGHLAKABAD",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 248,
+    "cityId": 5,
+    "localityname": "PATPARGANJ",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 249,
+    "cityId": 0,
+    "localityname": "VAISHALI",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 250,
+    "cityId": 6,
+    "localityname": "JAMIA NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 251,
+    "cityId": 6,
+    "localityname": "CHIRAG DELHI",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 1196,
+    "cityId": 2,
+    "localityname": "RAMESH NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 2196,
+    "cityId": 6,
+    "localityname": "KHAN MARKET",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 2197,
+    "cityId": 4,
+    "localityname": "GAZIABAD",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 2198,
+    "cityId": 1,
+    "localityname": "SHIV VIHAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 3198,
+    "cityId": 5,
+    "localityname": "DILSHAD GARDEN",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 3199,
+    "cityId": 1,
+    "localityname": "SHASTRI NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 4198,
+    "cityId": 5,
+    "localityname": "GOVINDPURI",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 4199,
+    "cityId": 5,
+    "localityname": "WEST GURU ANGAD NAGAR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5198,
+    "cityId": 299,
+    "localityname": "sri ganganagar",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5199,
+    "cityId": 10,
+    "localityname": "puttaparthi",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5200,
+    "cityId": 10,
+    "localityname": "housing board colony",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5201,
+    "cityId": 10,
+    "localityname": "rudrampeta",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5202,
+    "cityId": 10,
+    "localityname": "ram nagar",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5203,
+    "cityId": 10,
+    "localityname": "Penukonda",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5204,
+    "cityId": 10,
+    "localityname": "somnath nagar",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5205,
+    "cityId": 10,
+    "localityname": "hindupur",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5206,
+    "cityId": 10,
+    "localityname": "kovur nagar",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5207,
+    "cityId": 10,
+    "localityname": "chila mathur",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "0"
+  },
+  {
+    "locid": 5208,
+    "cityId": 10,
+    "localityname": "Chilamathur",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5209,
+    "cityId": 10,
+    "localityname": "Georgepet",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5210,
+    "cityId": 10,
+    "localityname": "Kadiri",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5211,
+    "cityId": 10,
+    "localityname": "Amadagur",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5212,
+    "cityId": 10,
+    "localityname": "Uravakonda",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5213,
+    "cityId": 10,
+    "localityname": "Ferrer Nagar",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5214,
+    "cityId": 10,
+    "localityname": "Papampeta",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5215,
+    "cityId": 10,
+    "localityname": "Rapthadu",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5216,
+    "cityId": 10,
+    "localityname": "Palasamudram",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5217,
+    "cityId": 10,
+    "localityname": "Kanaganapalli",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5218,
+    "cityId": 10,
+    "localityname": "Itkalapalla",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5219,
+    "cityId": 10,
+    "localityname": "Gooty",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5220,
+    "cityId": 10,
+    "localityname": "Sai Nagar",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5221,
+    "cityId": 10,
+    "localityname": "Guntakal",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5222,
+    "cityId": 10,
+    "localityname": "Old Town",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5223,
+    "cityId": 10,
+    "localityname": "Tadipatri",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5224,
+    "cityId": 10,
+    "localityname": "Syndicate Nagar",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5225,
+    "cityId": 10,
+    "localityname": "Brahmanapalle",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5226,
+    "cityId": 10,
+    "localityname": "Kakkalapalli Colony",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5227,
+    "cityId": 10,
+    "localityname": "Adarsh Nagar",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5228,
+    "cityId": 10,
+    "localityname": "Kalyandurg",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5229,
+    "cityId": 10,
+    "localityname": "Pamidi",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5230,
+    "cityId": 10,
+    "localityname": "Upparapalli",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5231,
+    "cityId": 10,
+    "localityname": "Maroor",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5232,
+    "cityId": 10,
+    "localityname": "Garaladinne",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5233,
+    "cityId": 10,
+    "localityname": "Tapovanam",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5234,
+    "cityId": 10,
+    "localityname": "Mudigubba",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5235,
+    "cityId": 10,
+    "localityname": "Lenin Nagar",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5236,
+    "cityId": 10,
+    "localityname": "Penakacherla",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5237,
+    "cityId": 10,
+    "localityname": "Honnampalli",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5238,
+    "cityId": 10,
+    "localityname": "Lolur",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5239,
+    "cityId": 10,
+    "localityname": "Podaralla",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5240,
+    "cityId": 10,
+    "localityname": "Somandepalli",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5241,
+    "cityId": 10,
+    "localityname": "Maruthi Nagar",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5242,
+    "cityId": 10,
+    "localityname": "Rachanapalle",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5243,
+    "cityId": 10,
+    "localityname": "Prasannaya Palli",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5244,
+    "cityId": 10,
+    "localityname": "Dodagatta",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5245,
+    "cityId": 10,
+    "localityname": "Parigi",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5246,
+    "cityId": 10,
+    "localityname": "Yadiki",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5247,
+    "cityId": 10,
+    "localityname": "Adimurthy nagar",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5248,
+    "cityId": 10,
+    "localityname": "Pilligundla",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5249,
+    "cityId": 10,
+    "localityname": "Chinnapolamada",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5250,
+    "cityId": 10,
+    "localityname": "Priyanka Nagar",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5251,
+    "cityId": 10,
+    "localityname": "Azad Nagar",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5252,
+    "cityId": 10,
+    "localityname": "Rotarypuram Village",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5253,
+    "cityId": 10,
+    "localityname": "Gulzarpet",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5254,
+    "cityId": 10,
+    "localityname": "Nallamada",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5255,
+    "cityId": 10,
+    "localityname": "Y.Rampuram",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5256,
+    "cityId": 10,
+    "localityname": "Sharada Nagar",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5257,
+    "cityId": 10,
+    "localityname": "Guddam Palli",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5258,
+    "cityId": 10,
+    "localityname": "Dimmagudi",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5259,
+    "cityId": 10,
+    "localityname": "Tanakallu",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5260,
+    "cityId": 11,
+    "localityname": "Madhavaram",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5261,
+    "cityId": 11,
+    "localityname": "Chittoor",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5262,
+    "cityId": 11,
+    "localityname": "Palamaner",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5263,
+    "cityId": 11,
+    "localityname": "Tirupati Rural\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5264,
+    "cityId": 11,
+    "localityname": "K.V.P.puram\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5265,
+    "cityId": 11,
+    "localityname": "Nagari\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5266,
+    "cityId": 11,
+    "localityname": "Pichatur\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5267,
+    "cityId": 11,
+    "localityname": "Nindra\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5268,
+    "cityId": 11,
+    "localityname": "Srikalahasti\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5269,
+    "cityId": 11,
+    "localityname": "Madanapalle\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5270,
+    "cityId": 11,
+    "localityname": "Pileru\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5271,
+    "cityId": 11,
+    "localityname": "Puthalpattu\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5272,
+    "cityId": 11,
+    "localityname": "Akkurthi\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5273,
+    "cityId": 11,
+    "localityname": "Puttur\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5274,
+    "cityId": 11,
+    "localityname": "Karvetinagar\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5275,
+    "cityId": 11,
+    "localityname": "Satyavedu\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5276,
+    "cityId": 11,
+    "localityname": "Gurramkonda\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5277,
+    "cityId": 11,
+    "localityname": "Thottambedu\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5278,
+    "cityId": 11,
+    "localityname": "Yerpedu\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5279,
+    "cityId": 11,
+    "localityname": "Vadamalapeta\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5280,
+    "cityId": 11,
+    "localityname": "Kalakada\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5281,
+    "cityId": 11,
+    "localityname": "Arugonda\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5282,
+    "cityId": 11,
+    "localityname": "Renigunta\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5283,
+    "cityId": 11,
+    "localityname": "Chandragiri\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5284,
+    "cityId": 11,
+    "localityname": "Vijaya Puram\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5285,
+    "cityId": 11,
+    "localityname": "Murakambattu\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5286,
+    "cityId": 11,
+    "localityname": "Gudi Palle\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5287,
+    "cityId": 11,
+    "localityname": "Chinnagottigallu\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5288,
+    "cityId": 11,
+    "localityname": "Tirupati Urban\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5289,
+    "cityId": 11,
+    "localityname": "Bhakarapet\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5290,
+    "cityId": 11,
+    "localityname": "Madanpalle\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5291,
+    "cityId": 11,
+    "localityname": "Veduru Kuppam\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5292,
+    "cityId": 11,
+    "localityname": "Kalikiri\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5293,
+    "cityId": 11,
+    "localityname": "Pakala\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5294,
+    "cityId": 11,
+    "localityname": "Varadaiahpalem\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5295,
+    "cityId": 11,
+    "localityname": "Vayalpad\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5296,
+    "cityId": 11,
+    "localityname": "Tirupati\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5297,
+    "cityId": 11,
+    "localityname": "Damalacheruvu\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5298,
+    "cityId": 11,
+    "localityname": "Vengalrajukuppam\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5299,
+    "cityId": 11,
+    "localityname": "Kanipakam\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5300,
+    "cityId": 12,
+    "localityname": "Yerraguntla\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "0"
+  },
+  {
+    "locid": 5301,
+    "cityId": 12,
+    "localityname": "Rayachoty\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "0"
+  },
+  {
+    "locid": 5302,
+    "cityId": 12,
+    "localityname": "Rayachoti\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "0"
+  },
+  {
+    "locid": 5303,
+    "cityId": 12,
+    "localityname": "Pulivendla\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "0"
+  },
+  {
+    "locid": 5304,
+    "cityId": 12,
+    "localityname": "Nandalur\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "0"
+  },
+  {
+    "locid": 5305,
+    "cityId": 12,
+    "localityname": "Sambepalle\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "0"
+  },
+  {
+    "locid": 5306,
+    "cityId": 12,
+    "localityname": "Chakrayapet\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "0"
+  },
+  {
+    "locid": 5307,
+    "cityId": 12,
+    "localityname": "Simhadripuram\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "0"
+  },
+  {
+    "locid": 5308,
+    "cityId": 12,
+    "localityname": "Porumamilla\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "0"
+  },
+  {
+    "locid": 5309,
+    "cityId": 12,
+    "localityname": "Atlur\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "0"
+  },
+  {
+    "locid": 5310,
+    "cityId": 12,
+    "localityname": "Lingala\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "0"
+  },
+  {
+    "locid": 5311,
+    "cityId": 12,
+    "localityname": "Cuddapah\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "0"
+  },
+  {
+    "locid": 5312,
+    "cityId": 12,
+    "localityname": "Vempalle\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "0"
+  },
+  {
+    "locid": 5313,
+    "cityId": 12,
+    "localityname": "Chennur\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "0"
+  },
+  {
+    "locid": 5314,
+    "cityId": 12,
+    "localityname": "Payasampalle\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "0"
+  },
+  {
+    "locid": 5315,
+    "cityId": 12,
+    "localityname": "Mydukur\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "0"
+  },
+  {
+    "locid": 5316,
+    "cityId": 12,
+    "localityname": "Vallur\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "0"
+  },
+  {
+    "locid": 5317,
+    "cityId": 12,
+    "localityname": "Jammalamadugu\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "0"
+  },
+  {
+    "locid": 5318,
+    "cityId": 12,
+    "localityname": "Pullampeta\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "0"
+  },
+  {
+    "locid": 5319,
+    "cityId": 12,
+    "localityname": "Lakkireddipalle\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "0"
+  },
+  {
+    "locid": 5320,
+    "cityId": 12,
+    "localityname": "Thondangi\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5321,
+    "cityId": 12,
+    "localityname": "Gollaprolu\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5322,
+    "cityId": 12,
+    "localityname": "Amalapuram.\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5323,
+    "cityId": 12,
+    "localityname": "Sakhinetipalli Mandal\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5324,
+    "cityId": 12,
+    "localityname": "Tuni\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5325,
+    "cityId": 12,
+    "localityname": "Addateegala\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5326,
+    "cityId": 12,
+    "localityname": "Mamidikuduru\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5327,
+    "cityId": 12,
+    "localityname": "Mummidivaram\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5328,
+    "cityId": 12,
+    "localityname": "Ainavilli\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5329,
+    "cityId": 12,
+    "localityname": "Ramachandrapuram\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5330,
+    "cityId": 12,
+    "localityname": "Alamuru\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5331,
+    "cityId": 12,
+    "localityname": "",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "0"
+  },
+  {
+    "locid": 5332,
+    "cityId": 12,
+    "localityname": "Rajahmundry (Urban)\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5333,
+    "cityId": 12,
+    "localityname": "Allavaram\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5334,
+    "cityId": 12,
+    "localityname": "Kotananduru\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5335,
+    "cityId": 12,
+    "localityname": "Amalapuram\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5336,
+    "cityId": 12,
+    "localityname": "Kothapalli\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5337,
+    "cityId": 12,
+    "localityname": "Ambajipeta\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5338,
+    "cityId": 12,
+    "localityname": "Rajavommangi\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5339,
+    "cityId": 12,
+    "localityname": "Gangavaram\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5340,
+    "cityId": 12,
+    "localityname": "Anaparthi\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5341,
+    "cityId": 12,
+    "localityname": "Uppalaguptan Mandal\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5342,
+    "cityId": 12,
+    "localityname": "Kapileswarapuram\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5343,
+    "cityId": 12,
+    "localityname": "Atreyapuram\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5344,
+    "cityId": 12,
+    "localityname": "Sankhavaram\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5345,
+    "cityId": 12,
+    "localityname": "Sakhinetipalle\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5346,
+    "cityId": 12,
+    "localityname": "Peddapuram\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5347,
+    "cityId": 12,
+    "localityname": "Kakinada (Rural)\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5348,
+    "cityId": 12,
+    "localityname": "Razole\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5349,
+    "cityId": 12,
+    "localityname": "Razole Mandal\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5350,
+    "cityId": 12,
+    "localityname": "Karapa\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5351,
+    "cityId": 12,
+    "localityname": "Biccavolu\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5352,
+    "cityId": 12,
+    "localityname": "Mandapeta\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5353,
+    "cityId": 12,
+    "localityname": "Gokavaram",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5354,
+    "cityId": 12,
+    "localityname": "Atreyapuram Mandal\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5355,
+    "cityId": 12,
+    "localityname": "Kothapeta Taluk\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5356,
+    "cityId": 12,
+    "localityname": "Kirlampudi\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5357,
+    "cityId": 12,
+    "localityname": "Katrenikona\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5358,
+    "cityId": 12,
+    "localityname": "Amalapuram Mandal\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5359,
+    "cityId": 12,
+    "localityname": "Allavaram Mandal\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5360,
+    "cityId": 12,
+    "localityname": "Yeleswaram\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5361,
+    "cityId": 13,
+    "localityname": "huvvanur",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5362,
+    "cityId": 13,
+    "localityname": "sambagallu",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5363,
+    "cityId": 13,
+    "localityname": "naranapuram",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5364,
+    "cityId": 13,
+    "localityname": "naganathana halli",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5365,
+    "cityId": 13,
+    "localityname": "Arekal\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5366,
+    "cityId": 13,
+    "localityname": "Baladur\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5367,
+    "cityId": 13,
+    "localityname": "Ballekallu\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5368,
+    "cityId": 13,
+    "localityname": "Basapuram\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5369,
+    "cityId": 13,
+    "localityname": "Basarakodu\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5370,
+    "cityId": 13,
+    "localityname": "Bychigeri\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5371,
+    "cityId": 13,
+    "localityname": "Chagi\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5372,
+    "cityId": 13,
+    "localityname": "Chinna Gonehal\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5373,
+    "cityId": 13,
+    "localityname": "Chinna Harivanam\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5374,
+    "cityId": 13,
+    "localityname": "Chinnapendekal\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5375,
+    "cityId": 13,
+    "localityname": "Dayyalaguddam\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5376,
+    "cityId": 13,
+    "localityname": "Dhanapuram\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5377,
+    "cityId": 13,
+    "localityname": "Dibbanakal\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5378,
+    "cityId": 13,
+    "localityname": "Doddanakeri\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5379,
+    "cityId": 13,
+    "localityname": "G Hosalli\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5380,
+    "cityId": 13,
+    "localityname": "Ganekal\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5381,
+    "cityId": 13,
+    "localityname": "Gonabavi\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5382,
+    "cityId": 13,
+    "localityname": "Hanavalu\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5383,
+    "cityId": 13,
+    "localityname": "Isvi\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5384,
+    "cityId": 13,
+    "localityname": "Jalibenchi\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5385,
+    "cityId": 13,
+    "localityname": "Kadithota\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5386,
+    "cityId": 13,
+    "localityname": "Kapati\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5387,
+    "cityId": 13,
+    "localityname": "Kuppagal\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5388,
+    "cityId": 13,
+    "localityname": "Madire\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5389,
+    "cityId": 13,
+    "localityname": "Mandagiri\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5390,
+    "cityId": 13,
+    "localityname": "Mantriki\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5391,
+    "cityId": 13,
+    "localityname": "Nettekal\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5392,
+    "cityId": 13,
+    "localityname": "Pandavagallu\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5393,
+    "cityId": 13,
+    "localityname": "Pedda Harivanam\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5394,
+    "cityId": 13,
+    "localityname": "Pedda Thumbalam\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5395,
+    "cityId": 13,
+    "localityname": "Pesalabanda\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5396,
+    "cityId": 13,
+    "localityname": "S Kondapuram\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5397,
+    "cityId": 13,
+    "localityname": "Salakalakonda\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5398,
+    "cityId": 13,
+    "localityname": "Sambagallu\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5399,
+    "cityId": 13,
+    "localityname": "Santhekudlur\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5400,
+    "cityId": 13,
+    "localityname": "Sulthanapuram\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5401,
+    "cityId": 13,
+    "localityname": "V Kondapuram\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5402,
+    "cityId": 13,
+    "localityname": "Virupapuram\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 5403,
+    "cityId": 13,
+    "localityname": "Yadavalle\t",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 6198,
+    "cityId": 50,
+    "localityname": "MADHOPUR",
+    "lattitude": "26.0517°",
+    "longitude": "85.7256°",
+    "isactive": "1"
+  },
+  {
+    "locid": 6199,
+    "cityId": 230,
+    "localityname": "THANE",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 6200,
+    "cityId": 154,
+    "localityname": "Eranad Malappuram",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 6201,
+    "cityId": 398,
+    "localityname": "lucknow",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 6202,
+    "cityId": 0,
+    "localityname": "HARYANA",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 6203,
+    "cityId": 418,
+    "localityname": "KASHIPUR",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 6204,
+    "cityId": 418,
+    "localityname": "",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 7203,
+    "cityId": 400,
+    "localityname": "VRINDAVAN",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 7204,
+    "cityId": 1,
+    "localityname": "NAJAFGARH",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 7205,
+    "cityId": 371,
+    "localityname": "Setellite",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 7206,
+    "cityId": 6,
+    "localityname": "Chhatarpur",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 7207,
+    "cityId": 384,
+    "localityname": "Indirapuram",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 7208,
+    "cityId": 384,
+    "localityname": "Vasundhara",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 7209,
+    "cityId": 384,
+    "localityname": "Vaishali",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 7210,
+    "cityId": 384,
+    "localityname": "Raj Nagar",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 7211,
+    "cityId": 384,
+    "localityname": "Raj Nagar Extension ",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 7212,
+    "cityId": 384,
+    "localityname": "Sahibabad",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  },
+  {
+    "locid": 7213,
+    "cityId": 384,
+    "localityname": "Gautam Budh Nagar",
+    "lattitude": "",
+    "longitude": "",
+    "isactive": "1"
+  }
+]

@@ -6,11 +6,10 @@ const rangeSchema = new mongoose.Schema({
         type: {
             type: String,
             enum: ['Point'],
-            default: 'Point'  // Automatically sets to 'Point'
+            default: 'Point'
         },
         coordinates: {
-            type: [Number], // [longitude, latitude]
-            required: true
+            type: [Number],
         }
     }
 })
@@ -123,15 +122,24 @@ const TeacherProfileSchema = new mongoose.Schema({
         default: false
     },
 
-    TeachingMode: {
-        type: String,
-        required: true
+    TeachingLocation: {
+        State: {
+            type: String,
+        
+        },
+        City: {
+            type: String,
+           
+        },
+        Area: [String]
     },
+   
     AcademicInformation: [{
         ClassId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Class'
         },
+        className: String,
         SubjectNames: [String]
     }],
     latitude: {
@@ -181,11 +189,15 @@ const TeacherProfileSchema = new mongoose.Schema({
     LeadIds: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'LeadSend'
-    }]
+    }],
+    TeachingMode:{
+        type: String,
+       default: 'Online'
+    }
 
 }, { timestamps: true });
 
-TeacherProfileSchema.pre('save', function(next) {
+TeacherProfileSchema.pre('save', function (next) {
     this.updatedAt = new Date();
     if (this.isNew) {
         this.createdAt = new Date();

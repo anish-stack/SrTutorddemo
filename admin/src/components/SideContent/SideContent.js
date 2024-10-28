@@ -33,6 +33,7 @@ import Profile from '../../pages/Profile/Profile'
 import JdAllLeads from '../../pages/Justdial/JdAllLeads'
 import AddRequest from '../../pages/AddRequest/AddRequest'
 import TeacherWithLead from '../../pages/Teacher/TeacherWithLead'
+import SearchTeacher from '../../pages/AdvancedSearch/SearchTeacher'
 const SideContent = () => {
   return (
     <Routes>
@@ -43,6 +44,8 @@ const SideContent = () => {
       <Route path='/Manage-Class' element={<AllClass />} />
       <Route path='/Add-New-Class' element={<AddNewsClass />} />
       <Route path='/Edit-Class/:id' element={<EditClass />} />
+      <Route path='/Search-teacher' element={<SearchTeacher />} />
+
       <Route path='/Manage-Student' element={<AllStudents />} />
       {/* <Route path='/Manage-Blogs' element={<AllBlogs />} /> */}
       {/* <Route path='/create-blog' element={<CreateBlogs />} /> */}

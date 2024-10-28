@@ -3,7 +3,7 @@ const { TeacherRegister, TeacherVerifyOtp, TeacherResendOtp, TeacherPasswordChan
 const Protect = require('../middlewares/Auth')
 const TeacherRouter = express.Router()
 const multer = require('multer');
-const { UploadXlsxFileAndExtractData, UploadXlsxFileAndExtractDataStudent } = require('../controllers/TeacherUpload');
+const { UploadXlsxFileAndExtractData, UploadXlsxFileAndExtractDataStudent, UploadLocality } = require('../controllers/TeacherUpload');
 const { singleUploadImage, UploadViaFieldName } = require('../middlewares/multer');
 const upload = multer({ dest: 'files/' });
 //User Actions With 
@@ -50,9 +50,10 @@ TeacherRouter.delete('/deleteClassOfTeacher', Protect, deleteClassOfTeacher)
 
 TeacherRouter.post('/upload-xlsx', upload.single('file'), UploadXlsxFileAndExtractData)
 
+
 TeacherRouter.post('/upload-xlsxs', upload.single('file'), UploadXlsxFileAndExtractDataStudent)
 
-
+TeacherRouter.post('/crearte' ,upload.single('file'), UploadLocality)
 
 
 

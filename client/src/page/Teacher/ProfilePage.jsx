@@ -4,16 +4,12 @@ import axios from "axios";
 import { ClassSearch } from "../../Slices/Class.slice";
 import Cookies from "js-cookie";
 import Select from 'react-select';
-import { MapContainer, TileLayer, Marker, Popup, Tooltip, useMap } from 'react-leaflet';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import { Alert, Table } from 'react-bootstrap';
-import { useGeolocated } from 'react-geolocated';
 import toast from "react-hot-toast";
-import Joyride from 'react-joyride';
+import CreatableSelect from 'react-select/creatable';
+
 const ProfilePage = () => {
-    const [step, setStep] = useState(1);
-    const [runTour, setRunTour] = useState(false);
+
+
     const [formData, setFormData] = useState({
         FullName: '',
         DOB: '',
@@ -40,100 +36,34 @@ const ProfilePage = () => {
         ExpectedFees: '',
         VehicleOwned: '',
         TeachingMode: '',
-        RangeWhichWantToDoClasses: '',
+        TeachingLocation: {
+            State: '',
+            City: '',
+            Area: '',
+            lat:'',
+            lng:''
+        },
         AcademicInformation: [{
             classid: '',
+            className: '',
             SubjectNames: ['']
         }],
-        ranges: []
+
+
     });
-    const [isAddressSame, setIsAddressSame] = useState(false);
-    const [currentLocation, setCurrentLocation] = useState({});
-
-    const [allPoints, setAllPoints] = useState([]);
-
-    const [errorMessage, setErrorMessage] = useState(null);
-
-    const { coords, isGeolocationAvailable, isGeolocationEnabled } = useGeolocated({
-        positionOptions: {
-            enableHighAccuracy: true,
-        },
-        watchPosition: false,
-        userDecisionTimeout: 5000,
-    });
-
-    const handleLocationClick = (lat, lng, setAllPoints, allPoints) => {
-        setAllPoints((prevPoints) => {
-            const existingIndex = prevPoints.findIndex(point => point.lat === lat && point.lng === lng);
-
-            if (existingIndex > -1) {
-                return prevPoints.filter((_, index) => index !== existingIndex);
-            } else {
-                return [...prevPoints, { lng, lat }];
-            }
-        });
-    };
-
-
-    const steps = [
-      
-    
-        {
-            target: '.map-container',
-            content: 'Choose the location where you would like to teach. You can select multiple locations on the map.',
-        }
-    ];
-    
-
-
-    const MapClickHandler = ({ handleMapClick }) => {
-        const map = useMap();
-
-        useEffect(() => {
-            map.on('click', handleMapClick);
-
-            return () => {
-                map.off('click', handleMapClick);
-            };
-        }, [map, handleMapClick]);
-
-        return null;
-    };
-
-    useEffect(() => {
-        if (coords && coords.latitude && coords.longitude) {
-            const { latitude, longitude } = coords;
-            console.log(coords);
-            setCurrentLocation([latitude, longitude]);
-        } else {
-            console.error("Geolocation coordinates are not available.");
-        }
-    }, [coords]);
-
-
-
-
     const location = new URLSearchParams(window.location.search)
     const tokenQuery = location.get('token')
     const IdQuery = location.get('encoded')
-
     const [concatenatedData, setConcatenatedData] = useState([]);
     const { data } = useSelector((state) => state.Class);
     const dispatch = useDispatch();
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false)
-
-    const [errorModel, setErrorModel] = useState(false)
     const [subjects, setSubjects] = useState();
-    const [latitude, setLatitude] = useState(null);
+    const [states, setStates] = useState([]);
+    const [cities, setCities] = useState([]);
+    const [areas, setAreas] = useState([]);
 
-    const [longitude, setLongitude] = useState(null);
-    const [radius, setRadius] = useState('');
-    const [places, setPlaces] = useState([]);
-
-    const [selectedPlace, setSelectedPlace] = useState(null);
-    const [permissionDenied, setPermissionDenied] = useState(false);
-    const [initialConfirm, setInitialConfirm] = useState(false);
 
     const [user, setUser] = useState({
         TeacherName: '',
@@ -167,9 +97,12 @@ const ProfilePage = () => {
         }],
     });
 
+
     useEffect(() => {
         dispatch(ClassSearch());
     }, [dispatch]);
+
+
 
 
     useEffect(() => {
@@ -179,11 +112,14 @@ const ProfilePage = () => {
             const filterOutClasses = ["I-V", "VI-VIII", "IX-X", "XI-XII"];
             const filteredClasses = data
 
+
                 .filter(item => !filterOutClasses.includes(item.Class))
                 .map(item => ({ class: item.Class, id: item._id }));
 
+
             // Step 2: Map inner classes
             const rangeClasses = data
+
 
                 .filter(item => item.InnerClasses && item.InnerClasses.length > 0)
                 .flatMap(item => item.InnerClasses.map(innerClass => ({
@@ -191,109 +127,18 @@ const ProfilePage = () => {
                     id: innerClass._id
                 })));
 
+
             // Step 3: Concatenate filtered classes and inner classes
             const concatenatedData = rangeClasses.concat(filteredClasses);
+
 
             // Update state with concatenated data
             setConcatenatedData(concatenatedData);
         }
     }, [data]);
 
-    const handleMapClick = (event) => {
-        if (event.latlng) {
-            const { lat, lng } = event.latlng;
-            handleLocationClick(lat, lng, setAllPoints, allPoints);
-        } else {
-            console.error("Event latlng is not valid:", event);
-        }
-    };
 
 
-    const handleDoubleClick = (lat, lng) => {
-        handleLocationClick(lat, lng, setAllPoints, allPoints);
-    };
-
-    const requestLocation = () => {
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                setLatitude(position.coords.latitude);
-                setLongitude(position.coords.longitude);
-            },
-            (error) => {
-                if (error.code === error.PERMISSION_DENIED) {
-                    setPermissionDenied(true);
-                }
-                console.error("Error getting location:", error);
-            }
-        );
-    };
-
-    useEffect(() => {
-        if (allPoints.length < 2) {
-            setErrorMessage('You must select at least 2 locations.');
-        } else {
-            setErrorMessage(null);
-        }
-    }, [allPoints]);
-
-    const customIcon = L.divIcon({
-        className: 'custom-div-icon',
-        html: `<div style="color: red; font-size: 24px;">
-            <i class="fas fa-map-marker-alt"></i>
-          </div>`,
-        iconSize: [30, 42],
-        iconAnchor: [15, 42],
-    });
-
-
-    useEffect(() => {
-        const confirmAccess = window.confirm("We would like to access your location to provide a better experience. Do you allow?");
-        if (confirmAccess) {
-            setInitialConfirm(true); // Mark that user clicked OK
-            requestLocation();
-        }
-    }, []);
-
-    // const handleAddressSame = () => {
-    //     setFormData(prevState => ({
-    //         ...prevState,
-    //         isAddressSame: !prevState.isAddressSame,
-    //         CurrentAddress: !prevState.isAddressSame ? prevState.PermanentAddress : {
-    //             streetAddress: '',
-    //             City: '',
-    //             Area: '',
-    //             LandMark: '',
-    //             Pincode: ''
-    //         }
-    //     }));
-    // };
-
-    const fetchNearbyPlaces = async () => {
-        if (latitude && longitude) {
-            const url = `https://api.srtutorsbureau.com/nearby-places?lat=${latitude}&lng=${longitude}&radius=${radius * 1000}`;
-            try {
-                const response = await axios.get(url);
-                const data = response.data.FilterData;
-                if (data && Array.isArray(data)) {
-                    setPlaces(data.map((place) => ({
-                        lat: place.lat || null,
-                        lng: place.lng || null,
-                    })));
-                } else {
-                    console.error("No valid data returned from API:", response.data);
-                }
-            } catch (error) {
-                console.error("Error fetching nearby places:", error);
-            }
-        }
-    };
-
-
-    useEffect(() => {
-        if (radius) {
-            fetchNearbyPlaces();
-        }
-    }, [radius]);
 
     const fetchUser = async () => {
         try {
@@ -307,10 +152,10 @@ const ProfilePage = () => {
         }
     };
 
+
     useEffect(() => {
         fetchUser()
     }, [IdQuery])
-
 
 
     const fetchSubjects = async (classId) => {
@@ -321,6 +166,7 @@ const ProfilePage = () => {
             console.log(response.data)
             if (response.data.data) {
 
+
                 setSubjects(response.data.data.Subjects);
             } else {
                 setSubjects([]);
@@ -330,7 +176,10 @@ const ProfilePage = () => {
         }
     };
 
+
     const handleSubjectNameChange = (selectedOptions, index) => {
+
+
         const selectedSubjects = selectedOptions.map(option => option.value); // Extract values from selected options
         const updatedAcademicInformation = [...formData.AcademicInformation];
         updatedAcademicInformation[index].SubjectNames = selectedSubjects; // Update SubjectNames with selected values
@@ -340,12 +189,20 @@ const ProfilePage = () => {
         });
     };
 
+
     const handleClassChange = (event, index) => {
-        const { value } = event.target;
+        const [id, className] = event.target.value.split('|');
+        console.log(id, className);
+
 
         setFormData(prevState => {
             const updatedAcademicInformation = [...prevState.AcademicInformation];
-            updatedAcademicInformation[index].ClassId = value;
+            updatedAcademicInformation[index] = {
+                ...updatedAcademicInformation[index],
+                ClassId: id,
+                className: className,
+            };
+
 
             return {
                 ...prevState,
@@ -353,9 +210,9 @@ const ProfilePage = () => {
             };
         });
 
-        fetchSubjects(value);
-    };
 
+        fetchSubjects(id);
+    };
 
 
     const handleChange = (e) => {
@@ -365,17 +222,6 @@ const ProfilePage = () => {
             [name]: value
         }));
     };
-
-    // const handleNestedChange = (e, addressType) => {
-    //     const { name, value } = e.target;
-    //     setFormData(prevState => ({
-    //         ...prevState,
-    //         [addressType]: {
-    //             ...prevState[addressType],
-    //             [name]: value
-    //         }
-    //     }));
-    // };
 
 
     useEffect(() => {
@@ -414,17 +260,20 @@ const ProfilePage = () => {
             }));
         }
 
+
     }, [user]);
+
 
     const handleAddClass = () => {
         setFormData(prevState => ({
             ...prevState,
             AcademicInformation: [
                 ...prevState.AcademicInformation,
-                { ClassId: '', SubjectNames: [] }
+                { ClassId: '', className: '', SubjectNames: [] }
             ]
         }));
     };
+
 
     const handleRemoveClass = (index) => {
         setFormData(prevState => ({
@@ -433,348 +282,291 @@ const ProfilePage = () => {
         }));
     };
 
-    const validateForm = () => {
-        const newErrors = {};
 
-        if (step === 1) {
-            if (!formData.PermanentAddress.streetAddress) newErrors.PermanentAddressstreetAddress = 'Street Address. is required';
-            if (!formData.PermanentAddress.Area) newErrors.PermanentAddressArea = 'Area is required';
-            if (!formData.PermanentAddress.LandMark) newErrors.PermanentAddressLandMark = 'Landmark is required';
-            if (!formData.PermanentAddress.Pincode) newErrors.PermanentAddressPincode = 'Pincode is required';
-            if (!formData.CurrentAddress.streetAddress) newErrors.CurrentAddressstreetAddress = 'Street Address. is required';
-            if (!formData.CurrentAddress.Area) newErrors.CurrentAddressArea = 'Area is required';
-            if (!formData.CurrentAddress.LandMark) newErrors.CurrentAddressLandMark = 'Landmark is required';
-            if (!formData.CurrentAddress.Pincode) newErrors.CurrentAddressPincode = 'Pincode is required';
-            if (!formData.Qualification) newErrors.Qualification = 'Qualification is required';
-            if (!formData.TeachingExperience) newErrors.TeachingExperience = 'Experience is required';
-            if (!formData.ExpectedFees) newErrors.ExpectedFees = 'Fees are required';
-            if (!formData.VehicleOwned) newErrors.VehicleOwned = 'Vehicle info is required';
-            formData.AcademicInformation.forEach((info, index) => {
-                if (!info.ClassId) {
-                    newErrors[`AcademicClassId-${index}`] = 'Class ID is required';
-                    console.log(`Academic Class ID at index ${index} is missing`);
-                }
-                if (info.SubjectNames.length === 0) {
-                    newErrors[`AcademicSubjectNames-${index}`] = 'Subject names are required';
-                    console.log(`Academic Subject Names at index ${index} are missing`);
-                }
-            });
-        } else {
-
-            if (!formData.TeachingMode) newErrors.TeachingMode = 'Teaching mode is required';
+    const getState = async () => {
+        try {
+            const { data } = await axios.get("http://localhost:7000/api/jd/getStates");
+            setStates(data.map(state => ({ value: state, label: state }))); // Format for react-select
+        } catch (error) {
+            console.log(error);
         }
-
-        Object.values(newErrors).forEach((error) => toast.error(error));
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
     };
 
-    if (permissionDenied) {
-        return (
-            <div className="d-flex justify-content-center align-items-center vh-100">
-                <div className="alert alert-danger text-center p-4" role="alert" style={{ maxWidth: '500px' }}>
-                    <h4 className="alert-heading">Location Access Denied</h4>
-                    <p>
-                        It looks like you have denied location access. Please enable it in your browser settings to continue.
-                    </p>
-                    <hr />
-                    <p className="mb-3">
-                        For the best experience, please allow location access or adjust your browser permissions.
-                    </p>
-                    {/* Button that opens a help page or provides guidance */}
-                    <a href="https://support.google.com/chrome/answer/142065?hl=en" target="_blank" rel="noopener noreferrer">
-                        <button className="btn btn-primary">Go to Location Settings</button>
-                    </a>
-                </div>
-            </div>
-        );
-    }
 
+    const getCity = async (state) => {
+        try {
+            const { data } = await axios.get(`http://localhost:7000/api/jd/getCitiesByState?state=${state}`);
+            setCities(data.map(city => ({ value: city, label: city }))); // Format for react-select
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+
+    const getAreasByCity = async (city) => {
+        try {
+            const { data } = await axios.get(`http://localhost:7000/api/jd/getAreasByCity?city=${city}`);
+            setAreas(data.map(area => ({ value: `${area.placename}|${area.lat}|${area.lng}`, label: area.placename }))); 
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+
+    // Handle changes in the state selector
+    const handleStateChange = (selectedOption) => {
+        console.log(selectedOption)
+        const selectedState = selectedOption.value;
+        setFormData({
+            ...formData,
+            TeachingLocation: { ...formData.TeachingLocation, State: selectedState, City: '', Area: [] },
+        });
+        setCities([]); 
+        setAreas([]);
+        getCity(selectedState);
+    };
+
+
+    const handleCityChange = (selectedOption) => {
+        const selectedCity = selectedOption.value;
+        setFormData({
+            ...formData,
+            TeachingLocation: { ...formData.TeachingLocation, City: selectedCity, Area: [] },
+        });
+        setAreas([]);
+        getAreasByCity(selectedCity);
+    };
+
+
+    const handleAreaChange = (selectedOptions) => {
+        console.log(selectedOptions);
+    
+        const selectedAreas = selectedOptions.map(option => {
+            const [placename, lat, lng] = option.value.split('|'); 
+            return {
+                placename, 
+                lat:lat,
+                lng:lng  
+            };
+        });
+    
+        setFormData({
+            ...formData,
+            TeachingLocation: {
+                ...formData.TeachingLocation,
+                Area: selectedAreas, 
+            },
+        });
+    };
+    // console.log(formData)
+    
 
 
     const handleSubmit = async (e, retry = false) => {
         e.preventDefault();
 
-        if (validateForm()) {
-            if (typeof allPoints !== 'undefined') {
-                setFormData((prevData) => ({
-                    ...prevData,
-                    RangeWhichWantToDoClasses: [allPoints]
-                }));
-            } else {
-                alert('Are You Sure');
-                console.error("allPoints is not defined or is undefined");
-                return; // Exit the function if allPoints is undefined
-            }
-        } else {
-            console.log("Form validation failed. Errors:", errors);
-            return;
-        }
+
+        console.log(formData)
+
 
         try {
             setLoading(true);
 
-            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/teacher/teacher-profile', formData, {
+
+            await axios.post('http://localhost:7000/api/v1/teacher/teacher-profile', formData, {
                 headers: {
                     Authorization: `Bearer ${tokenQuery}`
                 }
             });
 
-            // console.log(response.data);
+
             toast.success("🎉 Profile submitted successfully! 📧");
             setLoading(false);
             const userPrefix = "teacher";
 
+
             Cookies.set(`${userPrefix}Token`, tokenQuery, { expires: 1 });
-            // Cookies.set(`${userPrefix}User`, JSON.stringify(user), { expires: 1 });
             setTimeout(() => {
-                // window.location.href = `/Teacher-Profile-Verify?token=${tokenQuery}&id=${IdQuery}`;
                 window.location.href = `/Teacher-dashboard`;
-
-
             }, 500);
         } catch (error) {
             console.log(error);
             setLoading(false);
-
-            if (!loading) {
-                setErrorModel(true)
-            }
-
         }
     };
+    const handleAddNewArea = (inputValue) => {
+        const newOption = { value: inputValue, label: inputValue };
+        console.log(newOption);
+
+    };
+
+    useEffect(() => {
+        getState()
+    }, [])
+
 
     return (
         <>
-        
-            <Joyride
-                steps={steps}
-                run={runTour}
-                callback={(data) => {
-                    const { status } = data;
-                    if (status === 'finished' || status === 'skipped') {
-                        setRunTour(false);
-                    }
-                }}
-            />
             <div className="container w-100 mt-5 p-5">
                 <div className="mb-4">
                     <h1>Teacher Profile</h1>
                 </div>
+                <div>
+                    <h6 className=" fw-bold">Other Details (*) </h6>
 
-                {step === 1 && (
-                    <div>
-                        {/* Full Name, DOB, Gender */}
-                        <div className="row">
-                            <div className="col-md-4 mb-3">
-                                <label className="form-label" htmlFor="FullName">Full Name</label>
-                                <input type="text" readOnly className={`form-control `} name="FullName" id="FullName" placeholder="Enter Your Full Name" value={formData.FullName} onChange={handleChange} />
 
-                            </div>
-                            <div className="col-md-4 mb-3">
-                                <label className="form-label" htmlFor="DOB">DOB (Date-Of-Birth)</label>
-                                <input type="date" className={`form-control `} id="DOB" name="DOB" placeholder="Enter Date Of Birth" value={formData.DOB} onChange={handleChange} />
-                            </div>
-                            <div className="col-md-4 mb-3 your-first-element">
-                                <label className="form-label" htmlFor="Gender">Gender</label>
-                                <select disabled className={`form-select p-half `} id="Gender" name="Gender" value={formData.Gender} onChange={handleChange}>
-                                    <option value="">Select Gender</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                    <option value="other">Other</option>
-                                </select>
-                            </div>
+                    <div className="row">
+                        <div className="col-md-6 mb-3">
+                            <label className="form-label" htmlFor="Qualification">Qualification</label>
+                            <input type="text" className={`form-control`} name="Qualification" id="Qualification" placeholder="Enter Qualification" value={formData.Qualification} onChange={handleChange} />
+
+
                         </div>
+                        <div className="col-md-6 mb-3">
+                            <label className="form-label" htmlFor="TeachingExperience">Teaching Experience</label>
+                            <input type="text" className={`form-control`} name="TeachingExperience" id="TeachingExperience" placeholder="Enter Teaching Experience" value={formData.TeachingExperience} onChange={handleChange} />
 
-                        {/* Contact Numbers */}
-                        <div className="row your-second-element">
-                            <div className="col-md-6 mb-3">
-                                <label className="form-label" htmlFor="ContactNumber">Contact Number <span className="text-danger">*</span></label>
-                                <input type="text" className={`form-control`} name="ContactNumber" id="ContactNumber" placeholder="Enter Your Contact Number" value={formData.ContactNumber} onChange={handleChange} />
 
-                            </div>
-
-                            <div className="col-md-6 mb-3">
-                                <label className="form-label" htmlFor="AlternateContact">Alternate Contact Number (optional)</label>
-                                <input type="text" className={`form-control`} name="AlternateContact" id="AlternateContact" placeholder="Enter Your Alternate Contact Number" value={formData.AlternateContact} onChange={handleChange} />
-
-                            </div>
                         </div>
+                        <div className="col-md-6 mb-3">
+                            <label className="form-label" htmlFor="ExpectedFees">Expected Fees</label>
+                            <input type="text" className={`form-control `} name="ExpectedFees" id="ExpectedFees" placeholder="Enter Expected Fees" value={formData.ExpectedFees} onChange={handleChange} />
 
 
-                        <h6 className=" fw-bold">Other Details (*) </h6>
-
-                        <div className="row">
-                            <div className="col-md-6 mb-3">
-                                <label className="form-label" htmlFor="Qualification">Qualification</label>
-                                <input type="text" className={`form-control ${errors.Qualification ? 'is-invalid' : ''}`} name="Qualification" id="Qualification" placeholder="Enter Qualification" value={formData.Qualification} onChange={handleChange} />
-                                {errors.Qualification && <div className="text-danger">{errors.Qualification}</div>}
-                            </div>
-                            <div className="col-md-6 mb-3">
-                                <label className="form-label" htmlFor="TeachingExperience">Teaching Experience</label>
-                                <input type="text" className={`form-control ${errors.TeachingExperience ? 'is-invalid' : ''}`} name="TeachingExperience" id="TeachingExperience" placeholder="Enter Teaching Experience" value={formData.TeachingExperience} onChange={handleChange} />
-                                {errors.TeachingExperience && <div className="text-danger">{errors.TeachingExperience}</div>}
-                            </div>
-                            <div className="col-md-6 mb-3">
-                                <label className="form-label" htmlFor="ExpectedFees">Expected Fees</label>
-                                <input type="text" className={`form-control ${errors.ExpectedFees ? 'is-invalid' : ''}`} name="ExpectedFees" id="ExpectedFees" placeholder="Enter Expected Fees" value={formData.ExpectedFees} onChange={handleChange} />
-                                {errors.ExpectedFees && <div className="text-danger">{errors.ExpectedFees}</div>}
-                            </div>
-                            <div className="col-md-6 mb-3">
-                                <label className="form-label" htmlFor="VehicleOwned">Do You have Vehicle ?</label>
-                                <select className={`form-select p-1 p-half ${errors.VehicleOwned ? 'is-invalid' : ''}`} name={`VehicleOwned`} value={formData.VehicleOwned} onChange={handleChange}>
-                                    <option value="">Select Yes Or No</option>
-                                    <option value="true">Yes</option>
-                                    <option value="false">No</option>
-
-
-                                </select>
-                                {errors.VehicleOwned && <div className="text-danger">{errors.VehicleOwned}</div>}
-                            </div>
                         </div>
+                        <div className="col-md-6 mb-3">
+                            <label className="form-label" htmlFor="VehicleOwned">Do You have Vehicle ?</label>
+                            <select className={`form-select p-1 p-half ${errors.VehicleOwned ? 'is-invalid' : ''}`} name={`VehicleOwned`} value={formData.VehicleOwned} onChange={handleChange}>
+                                <option value="">Select Yes Or No</option>
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
 
-                        <div className="row mb-3">
-                            <div className="col-md-12">
-                                <button type="button" className="btn btn-primary" onClick={handleAddClass}>Add Class</button>
-                            </div>
-                        </div>
-                        {formData.AcademicInformation.map((info, index) => (
-                            <div key={index} className="row mb-3">
-                                <div className="col-md-5 mb-3">
-                                    <label className="form-label" htmlFor={`ClassId-${index}`}>Class</label>
-                                    <select className={`form-select mt-3 p-2 p-half ${errors.PermanentAddressPincode ? 'is-invalid' : ''}`} id={`ClassId-${index}`} name={`ClassId-${index}`} value={info.ClassId} onChange={(e) => handleClassChange(e, index)}>
-                                        <option value="">Select Class</option>
-                                        {concatenatedData.map((item, idx) => (
-                                            <option key={idx} value={item.id}>{item.class}</option>
-                                        ))}
-                                    </select>
-                                    {errors[`AcademicClassId-${index}`] && <div className="text-danger">{errors[`AcademicClassId-${index}`]}</div>}
-                                </div>
-
-                                <div style={{ position: 'relative', zIndex: '99' }} className="col-md-5  mb-3">
-                                    <label className="form-label" htmlFor={`SubjectNames-${index}`}>Subjects</label>
-                                    <Select
-                                        id={`SubjectNames-${index}`}
-                                        name={`SubjectNames-${index}`}
-                                        isMulti
-                                        options={subjects && subjects.map((item) => ({ label: item.SubjectName, value: item.SubjectName }))}
-                                        value={info.SubjectNames.map((subject) => ({ label: subject, value: subject }))}
-                                        onChange={(selectedOptions) => handleSubjectNameChange(selectedOptions, index)}
-                                        className={`basic-multi-select p-half ${errors.PermanentAddressPincode ? 'is-invalid' : ''}`}
-                                        classNamePrefix="select"
-                                        placeholder="Select subjects" // Add placeholder here
-                                        isClearable // Allows clearing the selection
-                                    />
-
-                                    {errors[`AcademicSubjectNames-${index}`] && <div className="text-danger">{errors[`AcademicSubjectNames-${index}`]}</div>}
-                                </div>
-
-                                <div className="col-md-2 mb-3">
-
-
-                                    <button type="button" style={{ marginTop: "35px" }} className="btn p-3 btn-primary" onClick={() => handleRemoveClass(index)}>Remove Class</button>
-
-                                </div>
-                            </div>
-                        ))}
-
-                        <div className="col-md-12 mb-3">
-                            <label className="form-label" htmlFor="TeachingMode">Teaching Mode</label>
-                            <select  className={`form-select p-half ${errors.TeachingMode ? 'is-invalid' : ''}`} name={`TeachingMode`} value={formData.TeachingMode}    onChange={(event) => { 
-            handleChange(event); 
-            setRunTour(true); 
-        }}>
-                                <option value="">Select Your's Teaching Mode</option>
-                                <option value="Offline Class">Offline Class</option>
-                                <option value="Online Class">Online Class</option>
 
 
 
                             </select>
-                            {errors.TeachingMode && <div className="text-danger">{errors.TeachingMode}</div>}
+                            {errors.VehicleOwned && <div className="text-danger">{errors.VehicleOwned}</div>}
                         </div>
-                        <h2>Please choose location where you want to teach</h2>
-                        {latitude && longitude && (
-                            <div className="map-container" style={{ position: 'relative', zIndex: 1 }}>
-                                {console.log("Cuurent,", currentLocation.length)}
-                                {currentLocation.length > 0 && (
-                                    <MapContainer
-                                        center={currentLocation}
-                                        zoom={12}
-                                        scrollWheelZoom={true}
-                                        style={{ height: '500px', width: '100%', borderRadius: '15px' }}
-                                    >
-                                        <TileLayer
-                                            attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                        />
-                                        <MapClickHandler handleMapClick={handleMapClick} />
-                                        <Marker position={currentLocation} icon={customIcon}>
-                                            <Popup>Your current location</Popup>
-                                        </Marker>
-                                        {allPoints.map((point, index) =>
-                                            typeof point.lat === 'number' && typeof point.lng === 'number' ? (
-                                                <Marker
-                                                    key={index}
-                                                    icon={customIcon}
-                                                    position={[point.lat, point.lng]}
-                                                >
-                                                    <Popup>Your custom popup for point {index + 1}</Popup>
-                                                </Marker>
-                                            ) : null
-                                        )}
-                                    </MapContainer>
-                                )}
-
-                                {errorMessage && (
-                                    <Alert variant="danger" className="mt-3">
-                                        {errorMessage}
-                                    </Alert>
-                                )}
-
-                                <div className="mt-3">
-                                    <h5>Selected Locations ({allPoints.length})</h5>
-                                    <Table striped bordered hover size="sm">
-                                        <thead>
-                                            <tr>
-                                                <th>#</th>
-                                                <th>Latitude</th>
-                                                <th>Longitude</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {allPoints.map((point, index) => (
-                                                <tr key={index}>
-                                                    <td>{index + 1}</td>
-                                                    <td>{typeof point.lat === 'number' ? point.lat.toFixed(6) : 'N/A'}</td>
-                                                    <td>{typeof point.lng === 'number' ? point.lng.toFixed(6) : 'N/A'}</td>
-                                                    <td>
-                                                        <button
-                                                            style={{
-                                                                backgroundColor: 'red',
-                                                                color: 'white',
-                                                                border: 'none',
-                                                                padding: '5px 10px',
-                                                                fontSize: '14px',
-                                                                cursor: 'pointer',
-                                                                borderRadius: '5px' // Rounded corners
-                                                            }}
-                                                            onClick={() => handleDoubleClick(point.lat, point.lng)}
-                                                        >
-                                                            Delete Location
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </Table>
-                                </div>
-                            </div>
-                        )}
-
-
                     </div>
-                )}
+
+
+                    <div className="row mb-3">
+                        <div className="col-md-12">
+                            <button type="button" className="btn btn-primary" onClick={handleAddClass}>Add Class</button>
+                        </div>
+                    </div>
+                    {formData.AcademicInformation.map((info, index) => (
+                        <div key={index} className="row position-relative mb-3">
+                            <div className="col-md-5 mb-3">
+                                <label className="form-label" htmlFor={`ClassId-${index}`}>Class</label>
+                                <select
+                                    className={`form-select mt-3 p-2 p-half`}
+                                    id={`ClassId-${index}`}
+                                    name={`ClassId-${index}`}
+                                    value={info.classid}
+                                    onChange={(e) => handleClassChange(e, index)}
+                                >
+                                    <option value="">Select Class</option>
+                                    {concatenatedData.map((item, idx) => (
+                                        <option key={idx} value={`${item.id}|${item.class}`}>
+                                            {item.class}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+
+                            <div className="col-md-5 mb-3">
+                                <label className="form-label" htmlFor={`SubjectNames-${index}`}>Subjects</label>
+                                <Select
+                                    id={`SubjectNames-${index}`}
+                                    name={`SubjectNames-${index}`}
+                                    isMulti
+                                    options={subjects && subjects.map((item) => ({ label: item.SubjectName, value: item.SubjectName }))}
+                                    value={info.SubjectNames.map((subject) => ({ label: subject, value: subject }))}
+                                    onChange={(selectedOptions) => handleSubjectNameChange(selectedOptions, index)}
+                                    className={`basic-multi-select p-half ${errors.PermanentAddressPincode ? 'is-invalid' : ''}`}
+                                    classNamePrefix="select"
+                                    placeholder="Select subjects"
+                                    isClearable
+                                    styles={{
+                                        menu: (base) => ({
+                                            ...base,
+                                            zIndex: 9999 // Ensure menu has high z-index
+                                        })
+                                    }}
+                                />
+                            </div>
+
+
+                            <div className="col-md-2 mb-3">
+                                <button
+                                    type="button"
+                                    style={{ marginTop: "35px" }}
+                                    className="btn p-3 btn-primary"
+                                    onClick={() => handleRemoveClass(index)}
+                                >
+                                    Remove Class
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+
+
+
+
+                    <div className="col-md-12 mb-3">
+                        <label className="form-label" htmlFor="TeachingMode">Teaching Mode</label>
+                        <select className={`form-select p-half `} name={`TeachingMode`} value={formData.TeachingMode} onChange={(event) => {
+                            handleChange(event);
+
+
+                        }}>
+                            <option value="">Select Your's Teaching Mode</option>
+                            <option value="Offline Class">Offline Class</option>
+                            <option value="Online Class">Online Class</option>
+                            <option value="Both">Both</option>
+
+                        </select>
+                    </div>
+                    <h2>Please choose location where you want to teach</h2>
+
+
+                    <div className="row">
+                        <div className="col-md-4 mb-3">
+                            <label className="form-label" htmlFor="state">Select Your State</label>
+                            <Select
+                                options={states}
+                                onChange={handleStateChange}
+                                placeholder="Select Your State"
+                            />
+                        </div>
+                        <div className="col-md-4 mb-3">
+                            <label className="form-label" htmlFor="city">Select Your Teshil (जिला)</label>
+                            <Select
+                                options={cities}
+                                onChange={handleCityChange}
+                                placeholder="Select Your City"
+                            />
+                        </div>
+                        <div className="col-md-4 mb-3">
+                            <label className="form-label" htmlFor="area">Select Your Area (multiple)</label>
+                            <Select
+                                isMulti
+                                options={areas}
+                                onChange={handleAreaChange}
+                                placeholder="Select Your Area For Teaching"
+                            />
+
+                        </div>
+                    </div>
+
+
+                </div>
+
+
+
+
 
 
                 <div className="row mt-4 w-100">
@@ -790,39 +582,24 @@ const ProfilePage = () => {
 
 
 
+
+
+
                     </div>
                 </div>
 
-                {errorModel && (
-                    <div className="modal show d-block" tabIndex="-1" role="dialog">
-                        <div className="modal-dialog" role="document">
-                            <div className="modal-content">
-                                <div className="modal-header">
-                                    <h5 className="modal-title">Submission Review</h5>
-                                    <button type="button" className="close" onClick={() => setErrorModel(false)} aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div className="modal-body">
-                                    <p>Are you sure you want to submit this information?</p>
-                                </div>
 
-                                <div className="modal-footer">
-                                    <button type="button" className="btn btn-secondary">
-                                        Cancel
-                                    </button>
-                                    <button type="button" className="btn btn-primary" onClick={handleSubmit}>
-                                        Submit
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
+
+
+
 
             </div>
         </>
     );
 };
 
+
 export default ProfilePage;
+
+
+

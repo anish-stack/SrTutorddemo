@@ -223,6 +223,77 @@ const AllRequest = () => {
         if (newPage < 1 || newPage > totalPages) return;
         setPage(newPage);
     };
+    const [formData, setFormData] = useState({
+        className: '',
+        locality: '',
+        subjects: [],
+        teacherGenderPreference: '',
+        ClassId: '',
+        Area: '',
+        lat: '',
+        lng: '',
+    });
+
+    const handleLocationLatAndLngFetch = async (address) => {
+        const options = {
+            method: 'GET',
+            url: `https://api.srtutorsbureau.com/geocode?address=${encodeURIComponent(address)}` // Use encodeURIComponent
+        };
+
+        try {
+            const response = await axios.request(options);
+            const result = response.data;
+
+            if (result && result.formatted_address && result.latitude && result.longitude) {
+                setFormData((prev) => ({
+                    ...prev,
+                    Area: result.formatted_address,
+                    lat: result.latitude,
+                    lng: result.longitude,
+
+                    className: prev.className,
+                    locality: prev.locality,
+                    subjects: prev.subjects,
+                    teacherGenderPreference: prev.teacherGenderPreference,
+                    ClassId: prev.ClassId?._id
+                }));
+            } else {
+                console.error("Unexpected response structure:", result);
+
+            }
+
+        } catch (error) {
+            console.error("Error fetching location:", error);
+
+        }
+    };
+
+
+    const perFromAdvanced = async (request) => {
+        const { classId, className, locality, subjects, teacherGenderPreference } = request;
+
+        // Update state with all provided values
+        setFormData((prev) => ({
+            ...prev,
+            className: className || prev.className,
+            locality: locality || prev.locality,
+            subjects: subjects.length > 0 ? subjects : prev.subjects,
+            teacherGenderPreference: teacherGenderPreference || prev.teacherGenderPreference,
+            ClassId: classId?._id || prev.ClassId
+        }));
+
+
+        await handleLocationLatAndLngFetch(locality);
+        try {
+            const response = await axios.post('http://localhost:7000/api/v1/admin/make-search', formData);
+            console.log(response.data)
+        } catch (error) {
+            console.log(error)
+
+        }
+    };
+
+
 
     return (
         <div>
@@ -313,11 +384,11 @@ const AllRequest = () => {
 
                                                         </Tooltip>
                                                     )}
-                                                    <Tooltip message="Perform Advance Search 🚀">
+                                                    {/* <Tooltip message="Perform Advance Search 🚀">
 
-                                                        <span onClick={() => handleCommentModelOpen(request)} className="text-violet-900 text-lg cursor-pointer m-2"><i class="fa-brands fa-searchengin"></i></span>
+                                                        <span onClick={() => perFromAdvanced(request)} className="text-violet-900 text-lg cursor-pointer m-2"><i class="fa-brands fa-searchengin"></i></span>
 
-                                                    </Tooltip>
+                                                    </Tooltip> */}
 
                                                 </td>
                                                 <td className="whitespace-nowrap px-6  py-4">
