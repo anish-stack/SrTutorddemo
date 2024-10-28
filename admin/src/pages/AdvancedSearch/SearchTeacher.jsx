@@ -324,7 +324,7 @@ const SearchTeacher = () => {
                                         <option value="">Select Teaching Mode...</option>
                                         <option value="Online">Online</option>
                                         <option value="Offline">Offline</option>
-                                        <option value="Hybrid">Hybrid</option>
+                                        <option value="Any">Any</option>
                                     </select>
                                 </div>
                             </div>
