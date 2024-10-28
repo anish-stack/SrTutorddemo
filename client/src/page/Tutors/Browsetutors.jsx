@@ -93,7 +93,7 @@ const Browsetutors = () => {
     const lngEmergency = 77.1518306;
     const fetchTutors = async () => {
         try {
-            const response = await axios.get(`http://localhost:7000/api/v1/student/BrowseTutorsNearMe?lat=${searchQueryForlat || latEmergency}&lng=${searchQueryForlng || lngEmergency}`, {
+            const response = await axios.get(`https://api.srtutorsbureau.com/api/v1/student/BrowseTutorsNearMe?lat=${searchQueryForlat || latEmergency}&lng=${searchQueryForlng || lngEmergency}`, {
                 params: { ...FilterOptions }
             });
 

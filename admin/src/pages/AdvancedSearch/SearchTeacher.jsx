@@ -99,7 +99,7 @@ const SearchTeacher = () => {
 
     const getCities = async () => {
         try {
-            const { data } = await axios.get("http://localhost:7000/api/jd/getStates");
+            const { data } = await axios.get("https://api.srtutorsbureau.com/api/jd/getStates");
             setCities(data.map(City => ({ value: City, label: City })));
         } catch (error) {
             console.log(error);
@@ -108,7 +108,7 @@ const SearchTeacher = () => {
 
     const getDistricts = async (city) => {
         try {
-            const { data } = await axios.get(`http://localhost:7000/api/jd/getCitiesByState?state=${city}`);
+            const { data } = await axios.get(`https://api.srtutorsbureau.com/api/jd/getCitiesByState?state=${city}`);
             setDistricts(data.map(district => ({ value: district, label: district })));
         } catch (error) {
             console.log(error);
@@ -117,7 +117,7 @@ const SearchTeacher = () => {
 
     const getAreasByDistrict = async (city) => {
         try {
-            const { data } = await axios.get(`http://localhost:7000/api/jd/getAreasByCity?city=${city}`);
+            const { data } = await axios.get(`https://api.srtutorsbureau.com/api/jd/getAreasByCity?city=${city}`);
             setAreas(data.map(area => ({ value: area.placename, label: area.placename })));
         } catch (error) {
             console.log(error);
@@ -130,7 +130,7 @@ const SearchTeacher = () => {
         setLoading(true);
         setError(null);
         try {
-            const response = await axios.post('http://localhost:7000/api/v1/admin/make-search', formData);
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/admin/make-search', formData);
             console.log(response.data.data)
             if (response.data.data.length > 0) {
                 setResults(response.data.data);
