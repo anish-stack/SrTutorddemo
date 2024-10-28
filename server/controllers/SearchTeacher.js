@@ -30,7 +30,7 @@ const MakeSearch = async (req, res) => {
                 matches = false;
             }
 
-            if (TeachingMode && TeachingMode !== 'Hybrid' && teacher.TeachingMode.toLowerCase() !== TeachingMode.toLowerCase()) {
+            if (TeachingMode && TeachingMode !== 'Any' && teacher.TeachingMode.toLowerCase() !== TeachingMode.toLowerCase()) {
                 matches = false;
             }
 
