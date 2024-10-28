@@ -137,7 +137,7 @@ exports.deleteCity = async (req, res) => {
     }
 
     // Delete the city from the database
-    await city.remove();
+    await city.deleteOne();
 
     res.status(200).json({
       success: true,
@@ -147,6 +147,7 @@ exports.deleteCity = async (req, res) => {
     ServerError(`Error deleting city: ${error.message}`, "City Controller", "deleteCity");
     res.status(500).json({
       success: false,
+      error: error.message,
       message: "Internal Server Error",
     });
   }
