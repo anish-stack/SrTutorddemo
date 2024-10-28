@@ -285,7 +285,7 @@ const AllRequest = () => {
 
         await handleLocationLatAndLngFetch(locality);
         try {
-            const response = await axios.post('http://localhost:7000/api/v1/admin/make-search', formData);
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/admin/make-search', formData);
             console.log(response.data)
         } catch (error) {
             console.log(error)
