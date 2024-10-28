@@ -239,7 +239,7 @@ app.get('/nearby-places', async (req, res) => {
 
 app.get('/geocode', async (req, res) => {
     const { address } = req.query; // Get address from query parameters
-    console.log(address)
+
     if (!address) {
         return res.status(400).send({ error: 'Address is required' });
     }

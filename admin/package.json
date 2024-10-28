@@ -19,6 +19,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cookie-parser": "^1.4.6",
+    "country-state-city": "^3.2.1",
     "dompurify": "^3.1.6",
     "jodit-react": "^4.1.2",
     "lucide-react": "^0.407.0",

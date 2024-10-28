@@ -76,10 +76,12 @@ exports.CreateUniversalRequest = CatchAsync(async (req, res) => {
 
             }
         }
+
         const userLocation = {
             type: 'Point',
             coordinates: [location.coordinates[1], location.coordinates[0]]
         };
+
         const findTeacherWhichTechInLocation = await TeacherProfile.find({
             'RangeWhichWantToDoClasses.location': {
                 $near: {
@@ -88,6 +90,7 @@ exports.CreateUniversalRequest = CatchAsync(async (req, res) => {
                 }
             }
         })
+        
         const url = `${process.env.FRONETND_URL}/Search-result?role=student&SearchPlaceLat=${location.coordinates[0]}&SearchPlaceLng=${location.coordinates[1]}&via-home-page&Location=${locality || currentAddress}&ClassId=${classId}&ClassNameValue=${className}&Subject=${subjects[0]}&lat=${location.coordinates[0]}7&lng=${location.coordinates[1]}&locationParam=${locality || currentAddress}`
 
         await sendLeadMessageToTeacher(findTeacherWhichTechInLocation.length, findTeacherWhichTechInLocation, url)

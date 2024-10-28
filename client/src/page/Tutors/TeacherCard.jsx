@@ -17,7 +17,7 @@ const TeacherCard = ({ classes, item, tokenStudent, showBio }) => {
     useEffect(() => {
         if (item) {
             setTeacher(item)
-            console.log(item)
+         
         } else {
             setTeacher(null)
         }

@@ -347,7 +347,6 @@ const ProfileOfTeacher = () => {
 
                                     value={`${formData.PermanentAddress.Area}, ${formData.PermanentAddress.City}, ${formData.PermanentAddress.Pincode}, ${formData.PermanentAddress.streetAddress}`}
 
-                                    // value={`${formData.PermanentAddress.HouseNo}, ${formData.PermanentAddress.LandMark}, ${formData.PermanentAddress.District}, ${formData.PermanentAddress.Pincode}`}
 
                                     onChange={handleInputChange}
                                     readOnly={!isEditing}
@@ -355,21 +354,6 @@ const ProfileOfTeacher = () => {
                                 />
                             </div>
 
-                            {/* <div className="bg-gray-100 p-4 rounded-md">
- 
-                    <div className="bg-gray-100 p-4 rounded-md">
- 
-                        <h4 className="text-lg font-semibold mb-1">Current Address</h4>
-                        <input
-                            type="text"
-                            name="CurrentAddress"
-                            value={`${formData.CurrentAddress.HouseNo}, ${formData.CurrentAddress.LandMark}, ${formData.CurrentAddress.District}, ${formData.CurrentAddress.Pincode}`}
-                            onChange={handleInputChange}
-                            readOnly={!isEditing}
-                            className={`block py-1 px-3 w-full bg-white border border-gray-300 rounded-md shadow-sm ${isEditing ? 'text-gray-900' : 'text-gray-500'}`}
-                        />
-  
-                    </div> */}
 
                         </div>
 
@@ -387,6 +371,11 @@ const ProfileOfTeacher = () => {
                         }</h4> */}
 
                             <h4 className="text-lg font-semibold mb-1">Class ID: {info.ClassId}</h4>
+                            {info.className && (
+
+                                <h4 className="text-lg font-semibold mb-1">Class ID: {info.className}</h4>
+
+                            )}
 
                             <input type="text" readOnly value={info?.SubjectNames?.join(',')} className="block py-1 px-3 w-full bg-white border border-gray-300 rounded-md shadow-sm text-gray-900" />
                         </div>
@@ -394,51 +383,86 @@ const ProfileOfTeacher = () => {
                 </div>
 
                 <div className="mb-6">
-                    <h3 className="text-2xl font-semibold mb-2">Location</h3>
+
                     <div className="grid gap-4 md:grid-cols-2">
+                        {teacherData.TeachingLocation ? (
+                            null
+                        ) : (
+                            teacherData.RangeWhichWantToDoClasses && teacherData.RangeWhichWantToDoClasses.length > 0 ? (
+                                teacherData.RangeWhichWantToDoClasses.map((item, index) => (
+                                    <div key={index} className="bg-gray-100 gap-2 p-4 grid grid-cols-2 rounded-md shadow-md">
+                                        {/* Longitude */}
+                                        <div>
+                                            <label className="text-gray-700 font-medium">Longitude</label>
+                                            <input
+                                                type="text"
+                                                name="longitude"
+                                                readOnly
+                                                value={item.location.coordinates[0] || "Unavailable"}
+                                                className="mt-1 py-1 px-3 block w-full bg-white border border-gray-300 rounded-md shadow-sm text-gray-900"
+                                            />
+                                        </div>
 
+                                        {/* Latitude */}
+                                        <div>
+                                            <label className="text-gray-700 font-medium">Latitude</label>
+                                            <input
+                                                type="text"
+                                                name="latitude"
+                                                readOnly
+                                                value={item.location.coordinates[1] || "Unavailable"}
+                                                className="mt-1 py-1 px-3 block w-full bg-white border border-gray-300 rounded-md shadow-sm text-gray-900"
+                                            />
+                                        </div>
 
-                        {teacherData.RangeWhichWantToDoClasses.map((item, index) => (
-                            <div key={index} className="bg-gray-100 gap-2 p-4 grid grid-cols-2 rounded-md md:col-span-2">
-                                <div>
-                                    <label>Longitude</label>
-                                    <input
-                                        type="text"
-                                        name="longitude"
-                                        readOnly={true} // Not editable
-                                        value={item.location.coordinates[0]} // Longitude
-                                        className="mt-1 py-1 px-3 block w-full bg-white border border-gray-300 rounded-md shadow-sm text-gray-900"
-                                    />
+                                        {/* Address */}
+                                        <div className="col-span-2">
+                                            <label className="text-gray-700 font-medium">Address Name</label>
+                                            <input
+                                                type="text"
+                                                name="address"
+                                                value={addresses[index] || "Fetching address..."}
+                                                readOnly
+                                                className="mt-1 py-1 px-3 block w-full bg-white border border-gray-300 rounded-md shadow-sm text-gray-900"
+                                            />
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="col-span-2 text-center text-gray-500">
+                                    <p>No available teaching locations.</p>
                                 </div>
-                                <div>
-                                    <label>Latitude</label>
-                                    <input
-                                        type="text"
-                                        name="latitude"
-                                        readOnly={true} // Not editable
-                                        value={item.location.coordinates[1]} // Latitude
-                                        className="mt-1 py-1 px-3 block w-full bg-white border border-gray-300 rounded-md shadow-sm text-gray-900"
-                                    />
-                                </div>
-                                <div className="col-span-2">
-                                    <label>Address Name</label>
-                                    <input
-                                        type="text"
-                                        name="address"
-                                        value={addresses[index] || "Fetching address..."} // Show address for each lat/lng pair or loading text
-                                        readOnly={true}
-                                        className="mt-1 py-1 px-3 block w-full bg-white border border-gray-300 rounded-md shadow-sm text-gray-900"
-                                    />
-                                </div>
-                            </div>
-                        ))}
-
-
+                            )
+                        )}
                     </div>
 
 
+                    <h3 className="text-center text-gray-800 font-semibold mb-4">Location Via Teaching Location Data</h3>
+                    {teacherData.TeachingLocation && (
+                        <div className="col-span-2">
+                            <ul className="bg-white shadow-lg rounded-lg p-6 space-y-6">
+                                <li className="border-b pb-4 last:border-b-0">
+                                    <p className="text-gray-800 font-medium">
+                                        <strong>Location Name:</strong>
+                                    </p>
+                                    <ul className="list-disc ml-6 text-gray-700">
+                                        {teacherData.TeachingLocation.Area.map((item, index) => (
+                                            <li key={index} className="py-1">{item}</li>
+                                        ))}
+                                    </ul>
+                                    <p className="text-gray-800 font-medium">
+                                        <strong>District:</strong> {teacherData.TeachingLocation.City}
+                                    </p>
+                                    <p className="text-gray-800 font-medium">
+                                        <strong>City:</strong> {teacherData.TeachingLocation.State}
+                                    </p>
+                                </li>
+                            </ul>
+                        </div>
+                    )}
 
                 </div>
+
             </div>
 
             <div className="mb-6">

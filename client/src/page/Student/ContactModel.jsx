@@ -143,9 +143,9 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
 
   useEffect(() => {
     if (formData.ClassId) {
-      console.log("id", formData.ClassId)
+      // console.log("id", formData.ClassId)
       const selectedClass = concatenatedData.find(item => item.id === formData.ClassId);
-      console.log("i am done", selectedClass)
+      // console.log("i am done", selectedClass)
       if (selectedClass) {
         setFormData(prevFormData => ({
           ...prevFormData,
@@ -221,14 +221,14 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
     try {
       const response = await axios.request(options);
       const result = response.data;
-      console.log("Result from us", result)
+      // console.log("Result from us", result)
       if (result) {
         // Update state with latitude and longitude from the result
         setClickLatitude(result?.latitude);
         setClickLongitude(result?.longitude);
       }
-      console.log("Result from setClickLatitude", ClickLatitude)
-      console.log("Result from setClickLongitude", ClickLongitude)
+      // console.log("Result from setClickLatitude", ClickLatitude)
+      // console.log("Result from setClickLongitude", ClickLongitude)
 
     } catch (error) {
       console.error("Error fetching location coordinates:", error);
@@ -308,7 +308,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
                     });
 
                     const address = data?.data?.address;
-                    console.log(address);
+                    // console.log(address);
                     if (address) {
                       setFormData((prev) => ({
                         ...prev,
@@ -334,7 +334,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
 
   useEffect(() => {
     fetchLocation()
-  }, [])
+  }, [formData])
 
 
   const validateFields = () => {
@@ -408,16 +408,16 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
   }, []);
 
   useEffect(() => {
-    console.log('Resend Button Click Count:', resendButtonClick); // Log the count
+    // console.log('Resend Button Click Count:', resendButtonClick); // Log the count
     localStorage.setItem('resendButtonClickCheck', resendButtonClick);
   }, [resendButtonClick]);
 
   const resendOtp = async () => {
-    console.log(loginNumber)
+    // console.log(loginNumber)
     try {
 
       const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/resent-otp', { PhoneNumber: loginNumber, HowManyHit: resendButtonClick });
-      console.log(response.data)
+      // console.log(response.data)
       toast.success(response.data.message);
       setResendButtonClick((prev) => prev + 1);
     } catch (error) {
@@ -436,7 +436,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
       });
       toast.success("Student Verified Successfully");
       const { token, user } = response.data;
-      console.log(response.data)
+      // console.log(response.data)
       Cookies.set('studentToken', token, { expires: 1 });
       Cookies.set('studentUser', JSON.stringify(user), { expires: 1 });
       sessionStorage.removeItem('OtpSent')
@@ -551,13 +551,13 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
         emailAddress: formData.StudentEmail,
       },
     };
-    console.log("submittedData", submittedData)
+    // console.log("submittedData", submittedData)
     setLoading(true);
     try {
       const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/universal-request', submittedData, {
         headers: { Authorization: `Bearer ${student || studentToken}` }
       });
-      console.log(response.data)
+      // console.log(response.data)
       setLoading(false);
       toast.success("Request Submit Successful")
 

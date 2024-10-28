@@ -152,6 +152,7 @@ const Slider = () => {
     },
     userDecisionTimeout: 5000,
   });
+
   useEffect(() => {
     // Check if coords is defined
     if (coords) {
@@ -235,7 +236,7 @@ const Slider = () => {
 
 
 
-                      <div className="col-md-4 col-lg-4 mb-2">
+                      <div className="col-md-12 col-lg-4 mb-2">
                         <div className="position-relative">
 
 

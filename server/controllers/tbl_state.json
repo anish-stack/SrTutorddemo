@@ -1,0 +1,162 @@
+[
+  {
+    "stid": 1,
+    "state": "Uttar Pradesh1",
+    "isactive": "0"
+  },
+  {
+    "stid": 2,
+    "state": "Delhi",
+    "isactive": "1"
+  },
+  {
+    "stid": 3,
+    "state": "NCR",
+    "isactive": "1"
+  },
+  {
+    "stid": 4,
+    "state": "Andhra Pradesh",
+    "isactive": "1"
+  },
+  {
+    "stid": 5,
+    "state": "Arunachal Pradesh",
+    "isactive": "1"
+  },
+  {
+    "stid": 6,
+    "state": "Assam",
+    "isactive": "1"
+  },
+  {
+    "stid": 7,
+    "state": "Bihar",
+    "isactive": "1"
+  },
+  {
+    "stid": 8,
+    "state": "Chhattisgarh",
+    "isactive": "1"
+  },
+  {
+    "stid": 9,
+    "state": "Goa",
+    "isactive": "1"
+  },
+  {
+    "stid": 10,
+    "state": "Gujarat",
+    "isactive": "1"
+  },
+  {
+    "stid": 11,
+    "state": "Haryana",
+    "isactive": "1"
+  },
+  {
+    "stid": 12,
+    "state": "Himachal Pradesh",
+    "isactive": "1"
+  },
+  {
+    "stid": 13,
+    "state": "Jharkhand",
+    "isactive": "1"
+  },
+  {
+    "stid": 14,
+    "state": "Karnataka",
+    "isactive": "1"
+  },
+  {
+    "stid": 15,
+    "state": "Kerala",
+    "isactive": "1"
+  },
+  {
+    "stid": 16,
+    "state": "Madhya Pradesh",
+    "isactive": "1"
+  },
+  {
+    "stid": 17,
+    "state": "Maharashtra",
+    "isactive": "1"
+  },
+  {
+    "stid": 18,
+    "state": "Manipur",
+    "isactive": "1"
+  },
+  {
+    "stid": 19,
+    "state": "Meghalaya",
+    "isactive": "1"
+  },
+  {
+    "stid": 20,
+    "state": "Mizoram",
+    "isactive": "1"
+  },
+  {
+    "stid": 21,
+    "state": "Nagaland",
+    "isactive": "1"
+  },
+  {
+    "stid": 22,
+    "state": "Odisha",
+    "isactive": "1"
+  },
+  {
+    "stid": 23,
+    "state": "Punjab",
+    "isactive": "1"
+  },
+  {
+    "stid": 24,
+    "state": "Rajasthan",
+    "isactive": "1"
+  },
+  {
+    "stid": 25,
+    "state": "Sikkim",
+    "isactive": "1"
+  },
+  {
+    "stid": 26,
+    "state": "Tamil Nadu",
+    "isactive": "1"
+  },
+  {
+    "stid": 27,
+    "state": "Telangana",
+    "isactive": "1"
+  },
+  {
+    "stid": 28,
+    "state": "Tripura",
+    "isactive": "1"
+  },
+  {
+    "stid": 29,
+    "state": "Uttar Pradesh",
+    "isactive": "1"
+  },
+  {
+    "stid": 30,
+    "state": "Uttarakhand",
+    "isactive": "1"
+  },
+  {
+    "stid": 31,
+    "state": "West Bengal",
+    "isactive": "1"
+  },
+  {
+    "stid": 32,
+    "state": "Jammu and Kashmir",
+    "isactive": "1"
+  }
+]

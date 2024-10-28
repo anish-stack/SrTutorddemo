@@ -8,6 +8,7 @@ const { createBanner, getAllBanner, deleteBanner, ChangePosition, updateBanner, 
 const { createCity, getAllCities, deleteCity, updateCity } = require('../controllers/City.Controller')
 const { GetTopTeacher } = require('../controllers/Teacher.registration')
 const { JoinNewsLetter, getAllSubscriptions, updateSubscription, deleteSubscription, sendEmailsInBatches, getAllTemplates, editTemplate, deleteTemplate, CreateTemplate } = require('../controllers/Newsletter.controller')
+const { MakeSearch } = require('../controllers/SearchTeacher')
 const AdminRouter = express.Router()
 
 
@@ -79,6 +80,10 @@ AdminRouter.post('/add-template', CreateTemplate);
 AdminRouter.get('/get-all-templates', getAllTemplates);
 AdminRouter.put('/edit-template/:id', editTemplate);
 AdminRouter.delete('/delete-template/:id', deleteTemplate);
+
+
+AdminRouter.post('/make-search', MakeSearch);
+
 
 
 

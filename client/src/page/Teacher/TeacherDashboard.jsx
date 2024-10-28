@@ -56,13 +56,24 @@ const TeacherDashboard = () => {
                             Authorization: `Bearer ${teacherToken}`,
                         },
                     });
-                    console.log(data.data)
+
+                    console.log(data.data);
                     setProfileInfo(data.data);
-                    // console.log(data.data.RangeWhichWantToDoClasses);
-                    setTeachingLocations(data?.data?.RangeWhichWantToDoClasses || [])
+
+                    const createdDate = new Date(data?.data?.createAt);
+                    const referenceDate = new Date("2024-10-24"); 
+                    if (createdDate < referenceDate) {
+                        setTeachingLocations(data?.data?.RangeWhichWantToDoClasses || []);
+                    } else {
+                        setTeachingLocations(data?.data?.TeachingLocation || []);
+                    }
+                    console.log("i am good",teachingLocations)
+            
                 } catch (error) {
                     console.error("Error fetching teacher data", error);
+                  
                 }
+
             };
             handleFetch();
         }
@@ -218,7 +229,7 @@ const TeacherDashboard = () => {
                                 Show My Classes
                             </a>
                         </li>
-                        <li className="nav-item">
+                        {/* <li className="nav-item">
                             <a
                                 className={`nav-link ${activeTab === 'resetLocation' ? 'active' : ''}`}
                                 href="#resetLocation"
@@ -226,7 +237,7 @@ const TeacherDashboard = () => {
                             >
                                 Location
                             </a>
-                        </li>
+                        </li> */}
                         {/* <li className="nav-item">
                             <a
                                 className={`nav-link ${activeTab === 'Documents' ? 'active' : ''}`}
@@ -303,15 +314,15 @@ const TeacherDashboard = () => {
                                                 </>
                                             ) : (
                                                 <div className="d-flex flex-column align-items-center justify-content-center text-center">
-                                                <ImageUploader
-                                                    style={{ height: 200, width: 200, borderRadius: '60%' }} // Custom styles for the image uploader
-                                                    onFileAdded={(img) => getImageFileObject(img)}
-                                                    onFileRemoved={(img) => runAfterImageDelete(img)}
-                                                    className="mb-2" // Adding margin-bottom for spacing
-                                                />
-                                                <p className="mb-0">Upload Your Original Picture</p> {/* Remove margin for paragraph to keep it compact */}
-                                            </div>
-                                            
+                                                    <ImageUploader
+                                                        style={{ height: 200, width: 200, borderRadius: '60%' }} // Custom styles for the image uploader
+                                                        onFileAdded={(img) => getImageFileObject(img)}
+                                                        onFileRemoved={(img) => runAfterImageDelete(img)}
+                                                        className="mb-2" // Adding margin-bottom for spacing
+                                                    />
+                                                    <p className="mb-0">Upload Your Original Picture</p> {/* Remove margin for paragraph to keep it compact */}
+                                                </div>
+
                                             )}
 
                                             <div>
@@ -367,9 +378,9 @@ const TeacherDashboard = () => {
                     {activeTab === 'Document' && (
                         <Upload teacherId={profileInfo} />
                     )}
-                    {activeTab === 'resetLocation' && (
+                    {/* {activeTab === 'resetLocation' && (
                         <MyLocations locations={teachingLocations} />
-                    )}
+                    )} */}
                     {activeTab === 'editProfile' && (
                         <CompleteProfile title={"Edit"} readable={false} profileInfo={profileInfo} />
                     )}

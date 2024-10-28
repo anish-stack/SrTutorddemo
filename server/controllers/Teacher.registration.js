@@ -81,7 +81,7 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
         });
       }
       else {
-        existingTeacher.PermanentAddress=address
+        existingTeacher.PermanentAddress = address
         existingTeacher.hit = (existingTeacher.hit || 0) + 1;
         existingTeacher.Password = Password;
         existingTeacher.SignInOtp = crypto.randomInt(100000, 999999);
@@ -571,6 +571,7 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
       CurrentAddress,
       isAddressSame,
       Qualification,
+      TeachingLocation,
       TeachingExperience,
       ExpectedFees,
       VehicleOwned,
@@ -581,11 +582,21 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
       RangeWhichWantToDoClasses,
 
     } = req.body;
-    const ranges = RangeWhichWantToDoClasses.flatMap((range) => range)
-    console.log(ranges)
+    
+
+    const RangeableData = req.body.TeachingLocation
+    console.log(RangeableData)
+    const MakeRangebaleData = RangeableData.Area && RangeableData.Area.length > 0 ? 
+    RangeableData.Area.map(item => ({
+        location: {
+            type: 'Point', 
+            coordinates: [item.lng, item.lat] 
+        }
+    })) : [];
+    // console.log(MakeRangebaleData)
+
     const emptyFields = [];
 
-    // Validate that all required fields are present and not empty
     if (!FullName) emptyFields.push('FullName');
     if (!DOB) emptyFields.push('DOB');
     if (!Gender) emptyFields.push('Gender');
@@ -597,15 +608,14 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
     if (!ExpectedFees) emptyFields.push('ExpectedFees');
     if (!TeachingMode) emptyFields.push('TeachingMode');
     if (!AcademicInformation) emptyFields.push('AcademicInformation');
-    if (!RangeWhichWantToDoClasses) emptyFields.push('RangeWhichWantToDoClasses');
 
-    // If there are any missing fields, return an error
     if (emptyFields.length > 0) {
       return res.status(400).json({
         message: `Please complete the following required fields: ${emptyFields.join(', ')}`,
       });
     }
-    // Validate that PermanentAddress and CurrentAddress contain required sub-fields
+
+
     const requiredAddressFields = [
       "streetAddress",
       "City",
@@ -632,54 +642,14 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
       });
     }
 
-
-
-
-
-    for (const element of AcademicInformation) {
-      let classExists = await Class.findById(element.ClassId);
-      if (!classExists) {
-        // Check if the class ID exists in inner classes
-        const classInInnerClasses = await Class.findOne({
-          "InnerClasses._id": element.ClassId,
-        });
-        if (!classInInnerClasses) {
-          return res.status(400).json({
-            message: `Class with ID ${element.ClassId} does not exist`,
-          });
-        }
-        classExists = classInInnerClasses;
-      }
-
-      // Extract subject names from the found class
-      const classSubjects = classExists.Subjects.map(
-        (subject) => subject.SubjectName
-      );
-
-      // Check if all subjects in AcademicInformation are included in classSubjects
-      const allSubjectsValid = element.SubjectNames.every((subject) =>
-        classSubjects.some((classSubject) =>
-          classSubject.toLowerCase().includes(subject.toLowerCase())
-        )
-      );
-
-      if (!allSubjectsValid) {
-        return res.status(400).json({
-          message: "Some subjects in Academic Information are invalid",
-        });
-      }
-    }
-
-    // Generate OTP and its expiration time
     const SubmitOtp = crypto.randomInt(100000, 999999);
     const OtpExpiresTime = Date.now() + 2 * 60 * 1000;
 
-    const formattedRanges = ranges.map(range => ({
-      location: {
-        type: 'Point',
-        coordinates: [range.lng, range.lat]
-      }
-    }));
+    const TeachingLocations = {
+      State: RangeableData.State,
+      City: RangeableData.City,
+      Area: RangeableData.Area.map(item => item.placename) 
+  };
 
     const teacherProfile = new TeacherProfile({
       TeacherUserId: userId,
@@ -692,23 +662,22 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
       CurrentAddress,
       isAddressSame,
       Qualification,
-
       TeachingExperience,
       ExpectedFees,
+      TeachingLocation:TeachingLocations,
       VehicleOwned,
       TeachingMode,
       AcademicInformation,
       latitude,
       longitude,
-      RangeWhichWantToDoClasses: formattedRanges,
+      RangeWhichWantToDoClasses: MakeRangebaleData,
       SubmitOtp,
       OtpExpired: OtpExpiresTime,
       isAllDetailVerified: true, // Assuming profile is not verified yet
     });
     CheckTeacher.TeacherProfile = teacherProfile._id;
-    // Send OTP via email
-    const Email = req.user.id.Email;
-    // console.log(Email);
+
+
     const Message = `Dear Teacher ${teacherProfile?.FullName}, congratulations on successfully completing your onboarding process at S.R. Tutors! We are thrilled to have you join our team. Summary of Your Details: Teaching Experience: **${teacherProfile?.TeachingExperience}**, Expected Fee: **₹${teacherProfile?.ExpectedFees}**, Teaching Mode: **${teacherProfile?.TeachingMode}**. We are committed to supporting you every step of the way. If you have any questions or need help, our support team is here for you. Best regards, S.R. Tutors. Mobile: +91 98113 82915.`;
 
     if (!CheckTeacher.DOB) {
@@ -749,7 +718,7 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
   }
 });
 
-//Add Profile Pic
+
 
 exports.AddProfilePic = async (req, res) => {
   try {
@@ -1351,7 +1320,7 @@ exports.GetAllTeacher = CatchAsync(async (req, res) => {
 
 exports.GetTeacherWithLead = CatchAsync(async (req, res) => {
   try {
-    const teachers = await TeacherProfile.find({}).populate('LeadIds').sort({"updatedAt":1});
+    const teachers = await TeacherProfile.find({}).populate('LeadIds').sort({ "updatedAt": 1 });
 
     const teachersWithLeads = teachers.filter(teacher => teacher.LeadIds.length > 0);
 
@@ -1361,11 +1330,11 @@ exports.GetTeacherWithLead = CatchAsync(async (req, res) => {
         message: "No teachers with leads found",
       });
     }
-    
+
     res.status(200).json({
       success: true,
       message: "Teachers with leads fetched successfully from DB",
-      data: teachersWithLeads.reverse(), 
+      data: teachersWithLeads.reverse(),
     });
   } catch (error) {
     res.status(500).json({
@@ -1658,7 +1627,7 @@ exports.SearchByMinimumCondition = CatchAsync(async (req, res) => {
     } else if (role === 'tutor') {
 
       try {
-        console.log(ClassNameValue,Subject)
+        console.log(ClassNameValue, Subject)
         const { data } = await axios.get('https://api.srtutorsbureau.com/api/v1/uni/get-all-universal-Request')
         console.log(data.data[9])
         const CombinedData = data?.data
@@ -1668,7 +1637,7 @@ exports.SearchByMinimumCondition = CatchAsync(async (req, res) => {
         if (findTeacherRequest.length === 0) {
           return res.status(404).json({ message: 'No teachers found.' });
         }
-       
+
         finalResults = findTeacherRequest;
       } catch (error) {
         return res.status(403).json({
@@ -1700,19 +1669,18 @@ exports.BrowseTutorsNearMe = CatchAsync(async (req, res) => {
   try {
     const {
       lat, lng, Page = 1, verified, maxRange, minRange,
-      Subject, Experience, ModeOfTuition, Gender
+      Subject, Experience, ModeOfTuition, Gender, currentCity, panSearch
     } = req.query;
-    // console.log(req.query)
+
+    console.log(req.query);
+
+    // Check for required latitude and longitude
     if (!lat || !lng) {
       return res.status(400).json({ message: 'Latitude and longitude are required.' });
     }
 
-    // Parse and validate ResultLimit and Page
-
+    // Parse and validate Page
     const page = parseInt(Page, 10);
-
-
-
     if (isNaN(page) || page <= 0) {
       return res.status(400).json({ message: 'Invalid Page value.' });
     }
@@ -1723,46 +1691,45 @@ exports.BrowseTutorsNearMe = CatchAsync(async (req, res) => {
       coordinates: [parseFloat(lng), parseFloat(lat)]
     };
 
-    // Find teachers within the given radius
-    let locationResults = await TeacherProfile.find({
-      'RangeWhichWantToDoClasses.location': {
-        $near: {
-          $geometry: userLocation,
-          $maxDistance: 10000 // 10km radius in meters
+    let locationResults;
+
+    // Fetch teachers based on panSearch
+    if (panSearch === "Current City Teachers") {
+      locationResults = await TeacherProfile.find({
+        'PermanentAddress.City': currentCity
+      });
+      // console.log("locationResults - Current",locationResults)
+    } else if (panSearch === "Pan India Teacher" || panSearch === "Both") {
+      locationResults = await TeacherProfile.find();
+    } else {
+      locationResults = await TeacherProfile.find({
+        'RangeWhichWantToDoClasses.location': {
+          $near: {
+            $geometry: userLocation,
+            $maxDistance: 10000 // 10km radius in meters
+          }
         }
-      }
-    })
+      });
+    }
 
-
-      .exec(); // Execute the query
-    // Apply additional filters
-    console.log(Experience)
+    // Additional filters
     if (Gender) {
       locationResults = locationResults.filter(teacher => teacher.Gender === Gender);
     }
 
-    // console.log(Subject)
-
-    if (ModeOfTuition) {
-      if(ModeOfTuition === "All"){
-      
-      }else{
-
-        locationResults = locationResults.filter(teacher => teacher.TeachingMode === ModeOfTuition);
-      }
+    if (ModeOfTuition && ModeOfTuition !== "All") {
+      locationResults = locationResults.filter(teacher => teacher.TeachingMode === ModeOfTuition);
     }
 
     if (verified) {
-      if (verified === 'Both') {
-        // No filtering needed for "Both"
-      } else {
-        const isVerified = verified === 'true';
+      const isVerified = verified === 'true';
+      if (verified !== 'Both') {
         locationResults = locationResults.filter(teacher => teacher.srVerifiedTag === isVerified);
       }
     }
 
     if (Subject && Array.isArray(Subject) && Subject.length > 0) {
-      const subjectFilter = locationResults.filter(teacher =>
+      locationResults = locationResults.filter(teacher =>
         teacher.AcademicInformation.some(item =>
           // Check if teacher has all selected subjects
           Subject.every(selectedSubject =>
@@ -1770,28 +1737,22 @@ exports.BrowseTutorsNearMe = CatchAsync(async (req, res) => {
           )
         )
       );
-      locationResults = subjectFilter;
     }
 
-
-    if (Experience !== undefined && Experience !== null) {
-      if (Experience > 0) {
-        locationResults = locationResults.filter(teacher => teacher.TeachingExperience >= Experience);
-      }
-    
+    if (Experience !== undefined && Experience > 0) {
+      locationResults = locationResults.filter(teacher => teacher.TeachingExperience >= Experience);
     }
 
-    // if (maxRange && minRange) {
-    //   locationResults = locationResults.filter(teacher => {
-    //     const maxRangeValue = parseFloat(maxRange);
-    //     const minRangeValue = parseFloat(minRange);
-    //     // Implement the range logic according to your requirements
-    //     return teacher.ExpectedFees >= minRangeValue && teacher.ExpectedFees <= maxRangeValue;
-    //   });
-    // }
+    // Implement maxRange and minRange logic if required
+    if (maxRange && minRange) {
+      const maxRangeValue = parseFloat(maxRange);
+      const minRangeValue = parseFloat(minRange);
+      locationResults = locationResults.filter(teacher =>
+        teacher.ExpectedFees >= minRangeValue && teacher.ExpectedFees <= maxRangeValue
+      );
+    }
 
     const count = locationResults.length;
-    // console.log(count)
 
     // Respond with the filtered results and count
     return res.status(200).json({
@@ -2138,7 +2099,7 @@ cron.schedule('0 0 * * *', async () => {
       teacher.isBlockForOtp = false;  // Unblock the teacher
       teacher.OtpBlockTime = null;     // Clear the block time
       teacher.hit = 0;                  // Reset hit count (if applicable)
-      
+
       await teacher.save();             // Save changes to the database
       console.log(`Unblocked teacher: ${teacher.Email}`);  // Log the unblocked teacher's email
     }
