@@ -18,7 +18,7 @@ const AllContact = () => {
     useEffect(() => {
         const fetchContacts = async () => {
             try {
-                const response = await axios.get('https://api.srtutorsbureau.com/api/v1/uni/get-all-contacts');
+                const response = await axios.get('http://localhost:7000/api/v1/uni/get-all-contacts');
                 if (response.data.success) {
                     console.log(response.data.data);
                     setContacts(response.data.data);
@@ -38,7 +38,7 @@ const AllContact = () => {
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this contact?')) {
             try {
-                await axios.delete(`https://api.srtutorsbureau.com/api/v1/uni/delete-contact/${id}`);
+                await axios.delete(`http://localhost:7000/api/v1/uni/delete-contact/${id}`);
                 setContacts(contacts.filter((contact) => contact._id !== id));
                 toast.success('Contact deleted successfully.');
             } catch (error) {

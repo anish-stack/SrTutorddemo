@@ -31,6 +31,8 @@ const SearchResults = () => {
   const classIdParam = params.get("ClassId");
   const subjectParam = params.get("Subject");
   const latParam = params.get("lat");
+  const loc = params.get("result");
+
   const SearchPlaceLat = params.get("SearchPlaceLat");
   const ClassNameValue = params.get("ClassNameValue");
 
@@ -49,7 +51,7 @@ const SearchResults = () => {
       const fetchResults = async () => {
         try {
           const response = await axios.get(
-            `https://api.srtutorsbureau.com/api/v1/teacher/Get-Min-search/${classIdParam}/${subjectParam}?lat=${latParam}&lng=${longParam}&ClassNameValue=${ClassNameValue}&role=${role}&SearchPlaceLat=${SearchPlaceLat}&SearchPlaceLng=${SearchPlaceLng}&locationParam=${locationParam}`
+            `http://localhost:7000/api/v1/teacher/Get-Min-search/${classIdParam}/${subjectParam}?ClassNameValue=${ClassNameValue}&role=${role}&SearchPlaceLat=${SearchPlaceLat}&SearchPlaceLng=${SearchPlaceLng}&locationParam=${locationParam}&result=${loc}`
           );
           ;
           const tutorsData = response.data.results;
@@ -94,7 +96,7 @@ const SearchResults = () => {
 
   const FetchTeacherClassNames = async (classIds) => {
     try {
-      const { data } = await axios.get("https://api.srtutorsbureau.com/api/v1/admin/Get-Classes");
+      const { data } = await axios.get("http://localhost:7000/api/v1/admin/Get-Classes");
       const classData = data.data;
       let matchedClassNames = {};
 
@@ -204,7 +206,7 @@ const SearchResults = () => {
   }
 
   return (
-    <div className="search-results container py-4">
+    <div className="search-results container-fluid py-4">
       <h3 className="mb-4">
         Search Results for <span className="text-primary">{Subject}</span> in Location{" "}
         <span className="text-secondary">{Location}</span>
@@ -223,7 +225,7 @@ const SearchResults = () => {
                   const genderImage =
                     item.Gender === "Male"
                       ? "https://i.ibb.co/MDMfwVV/Men-item.png"
-                      : "https://i.ibb.co/8YZgKMd/teacher.png";
+                      : "https://i.ibb.co/N7syqWH/female.jpg";
 
                   return (
                     <div key={index} className="col-lg-3 position-relative col-md-4 hs col-12">
@@ -237,7 +239,7 @@ const SearchResults = () => {
                           <div className="card position-relative ">
                             <div className="card-img text-center">
                               <img
-                                src={item?.ProfilePic?.url || "https://i.ibb.co/8zn4h3K/no-picture-taking.png"}
+                                src={item?.ProfilePic?.url || genderImage}
                                 className="img-fluid shadow-sm p-2 border border-black border-3 rounded-circle"
                                 style={{ width: '100px', height: '100px', objectFit: 'cover' }}
                               />

@@ -21,7 +21,7 @@ const EditClass = () => {
 
     const fetchClass = async () => {
         try {
-            const response = await axios.get(`https://api.srtutorsbureau.com/api/v1/admin/Get-Classes`);
+            const response = await axios.get(`http://localhost:7000/api/v1/admin/Get-Classes`);
             const data = response.data.data;
             const filterData = data.find(item => item._id === id);
             console.log(filterData);
@@ -92,7 +92,7 @@ const EditClass = () => {
         const lastSubjectName = formData.Subjects[formData.Subjects.length - 1].SubjectName;
         try {
             const response = await axios.put(
-                `https://api.srtutorsbureau.com/api/v1/admin/Add-Subjects/${id}`,
+                `http://localhost:7000/api/v1/admin/Add-Subjects/${id}`,
                 {
                     Subjects: [{ SubjectName: lastSubjectName }]
                 },
@@ -121,7 +121,7 @@ const EditClass = () => {
     const handleSubjectNameEdit = async (subjectId, updatedSubjectName) => {
         try {
             const response = await axios.post(
-                `https://api.srtutorsbureau.com/api/v1/admin/Edit-Subject/${id}`,
+                `http://localhost:7000/api/v1/admin/Edit-Subject/${id}`,
                 {
                     SubjectId: subjectId,
                     UpdatedSubjectName: updatedSubjectName
@@ -145,7 +145,7 @@ const EditClass = () => {
         e.preventDefault();
         setLoading(true)
         try {
-            const response = await axios.put(`https://api.srtutorsbureau.com/api/v1/admin/Edit-Class/${id}`, {
+            const response = await axios.put(`http://localhost:7000/api/v1/admin/Edit-Class/${id}`, {
                 UpdatedClassName: formData.Class,
                 UpdatedInnerClasses: formData.InnerClasses
             }, {
@@ -173,7 +173,7 @@ const EditClass = () => {
     const handleDeleteSubject = async (subject_id) => {
         try {
             await toast.promise(
-                axios.delete(`https://api.srtutorsbureau.com/api/v1/admin/delete-Class/${id}/${subject_id}`, {
+                axios.delete(`http://localhost:7000/api/v1/admin/delete-Class/${id}/${subject_id}`, {
                     headers: {
                         Authorization: `Bearer ${Token}`
                     }

@@ -15,7 +15,7 @@ exports.CreateUniversalRequest = CatchAsync(async (req, res) => {
         const {
 
             requestByAdmin,
-
+            AddressDetails,
             ClassLangUage, requestType, classId, VehicleOwned, className, subjects,
             interestedInTypeOfClass, studentInfo, teacherGenderPreference,
             numberOfSessions, experienceRequired, minBudget, maxBudget,
@@ -40,6 +40,7 @@ exports.CreateUniversalRequest = CatchAsync(async (req, res) => {
             ClassLangUage,
             interestedInTypeOfClass,
             studentInfo,
+            AddressDetails,
             teacherGenderPreference,
             numberOfSessions,
             experienceRequired,

@@ -19,7 +19,7 @@ const SideHeader = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get('https://api.srtutorsbureau.com/api/v1/student/admin-teacher-Request', {
+                const response = await axios.get('http://localhost:7000/api/v1/student/admin-teacher-Request', {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -35,7 +35,7 @@ const SideHeader = () => {
 
         const fetchDataParticular = async () => {
             try {
-                const response = await axios.get('https://api.srtutorsbureau.com/api/v1/student/admin-particular-Request', {
+                const response = await axios.get('http://localhost:7000/api/v1/student/admin-particular-Request', {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 console.log(response.data.data)

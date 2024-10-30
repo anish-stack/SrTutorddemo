@@ -99,7 +99,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
     const handleLocationFetch = async (input) => {
         try {
             const res = await axios.get(
-                `https://api.srtutorsbureau.com/autocomplete?input=${input}`);
+                `http://localhost:7000/autocomplete?input=${input}`);
 
             setLocationSuggestions(res.data || []);
         } catch (error) {
@@ -111,7 +111,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
     const handleLocationLatAndLngFetch = async (address) => {
         const options = {
             method: 'GET',
-            url: `https://api.srtutorsbureau.com/geocode?address=${address}`
+            url: `http://localhost:7000/geocode?address=${address}`
         };
 
         try {
@@ -271,6 +271,16 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
             startDate: formData.startDate,
             specificRequirement: "no",
             currentAddress: formData.currentAddress,
+            AddressDetails:{
+                completeAddress: apiAddress?.completeAddress,
+                city: apiAddress?.city,
+                area: apiAddress?.area,
+                district: apiAddress?.district,
+                postalCode:apiAddress?.postalCode,
+                landmark: null,
+                lat:apiAddress?.lat,
+                lng: apiAddress?.lng
+              },
             location: formData.location || {
                 type: 'Point',
                 coordinates: [ClickLongitude || 0, ClickLatitude || 0]
@@ -285,7 +295,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
         setLoading(true);
 
         try {
-            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/universal-request', submittedData, {
+            const response = await axios.post('http://localhost:7000/api/v1/student/universal-request', submittedData, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             console.log(response.data);
@@ -298,6 +308,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
             toast.error("Server Error, Please try again later.");
         }
     };
+    const [apiAddress,setApiAddress] = useState(null)
 
     const fetchLocation = async () => {
         if (navigator.geolocation) {
@@ -305,13 +316,13 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
                 async (position) => {
                     const { latitude, longitude } = position.coords;
                     try {
-                        const { data } = await axios.post('https://api.srtutorsbureau.com/Fetch-Current-Location', {
+                        const { data } = await axios.post('http://localhost:7000/Fetch-Current-Location', {
                             lat: latitude,
                             lng: longitude
                         });
     
                         const address = data?.data?.address;
-                        console.log(address);
+                        setApiAddress(address)
                         if (address) {
                             setFormData((prev) => ({
                                 ...prev,
@@ -339,77 +350,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
         fetchLocation()
     }, [])
 
-    // const resendOtp = async () => {
-    //     try {
-    //         if (sessionData.number || sessionData.otpSent) {
-    //             const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/resent-otp', { PhoneNumber: sessionData.number });
-    //             toast.success(response.data.message);
-    //         } else {
-    //             toast.error("Unauthorized Action")
-    //         }
-    //     } catch (error) {
-    //         console.log(error)
-    //         toast.error(error.response?.data?.message || "An error occurred");
-    //     }
-    // };
-
-    // const verifyOtp = async () => {
-    //     try {
-
-    //         const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/Verify-Student', {
-    //             PhoneNumber: loginNumber,
-    //             otp
-    //         });
-    //         toast.success("Student Verified Successfully");
-    //         const { token, user } = response.data;
-    //         console.log(response.data)
-    //         Cookies.set('studentToken', token, { expires: 1 });
-    //         Cookies.set('studentUser', JSON.stringify(user), { expires: 1 });
-    //         sessionStorage.removeItem('OtpSent')
-    //         sessionStorage.removeItem('number')
-    //         sessionStorage.removeItem('verified')
-
-    //         setLogin(true)
-    //         setStep(1);
-
-    //     } catch (error) {
-    //         toast.error(error.response?.data?.message || "An error occurred");
-    //     }
-    // };
-
-
-    // const handleLoginNumberCheck = async (e) => {
-    //     e.preventDefault()
-
-
-
-    //     try {
-    //         const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/checkNumber-request', {
-    //             userNumber: loginNumber
-    //         })
-    //         console.log(response.data)
-    //         setShowOtp(true)
-    //         const newUrl = new URL(window.location.href);
-    //         newUrl.searchParams.set('otpSent', 'true');
-    //         newUrl.searchParams.set('number', loginNumber);
-    //         newUrl.searchParams.set('verified', 'false');
-
-    //         sessionStorage.setItem('OtpSent', true)
-    //         sessionStorage.setItem('number', loginNumber)
-    //         sessionStorage.setItem('verified', false)
-
-
-    //         navigate(`${window.location.pathname}?${newUrl.searchParams.toString()}`, { replace: true });
-    //     } catch (error) {
-    //         console.log(error.response)
-
-    //         if (error.response?.data?.success === false &&
-    //             error.response?.data?.message === "User with this phone number already exists.") {
-    //             setShowOtp(true)
-    //             setStep(1); // Correctly set the state
-    //         }
-    //     }
-    // }
+  
     const updateUrlParams = (params) => {
         const newUrl = new URL(window.location.href);
         Object.keys(params).forEach(key => {
@@ -428,7 +369,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
     const resendOtp = async () => {
         console.log(loginNumber);
         try {
-            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/resent-otp', {
+            const response = await axios.post('http://localhost:7000/api/v1/student/resent-otp', {
                 PhoneNumber: loginNumber,
                 HowManyHit: resendButtonClick
             });
@@ -446,7 +387,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
 
     const verifyOtp = async () => {
         try {
-            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/Verify-Student', {
+            const response = await axios.post('http://localhost:7000/api/v1/student/Verify-Student', {
                 PhoneNumber: loginNumber,
                 otp
             });
@@ -483,7 +424,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
         }
 
         try {
-            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/checkNumber-request', {
+            const response = await axios.post('http://localhost:7000/api/v1/student/checkNumber-request', {
                 userNumber: loginNumber,
                 HowManyHit: resendButtonClick
             });

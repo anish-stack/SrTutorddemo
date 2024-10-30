@@ -18,7 +18,7 @@ const TeacherWithLead = () => {
 const fetchData = async () => {
         setLoading(true);
         try {
-            const { data } = await axios.get('https://api.srtutorsbureau.com/api/v1/teacher/Get-Teacher-With-Lead');
+            const { data } = await axios.get('http://localhost:7000/api/v1/teacher/Get-Teacher-With-Lead');
             if (data.data) {
                 setData(data.data);
 

@@ -16,6 +16,7 @@ const ClassRequest = require('../models/ClassRequest')
 const axios = require('axios');
 const Request = require("../models/UniversalSchema");
 const SendWhatsAppMessage = require("../utils/SendWhatsappMeg");
+const locality = require("../models/Locality.model")
 const cron = require('node-cron');
 const sendLeadMessageToTeacher = require("../utils/SendLeadMsg");
 // Configure Cloudinary
@@ -582,17 +583,17 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
       RangeWhichWantToDoClasses,
 
     } = req.body;
-    
+
 
     const RangeableData = req.body.TeachingLocation
     console.log(RangeableData)
-    const MakeRangebaleData = RangeableData.Area && RangeableData.Area.length > 0 ? 
-    RangeableData.Area.map(item => ({
+    const MakeRangebaleData = RangeableData.Area && RangeableData.Area.length > 0 ?
+      RangeableData.Area.map(item => ({
         location: {
-            type: 'Point', 
-            coordinates: [item.lng, item.lat] 
+          type: 'Point',
+          coordinates: [item.lng, item.lat]
         }
-    })) : [];
+      })) : [];
     // console.log(MakeRangebaleData)
 
     const emptyFields = [];
@@ -648,8 +649,8 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
     const TeachingLocations = {
       State: RangeableData.State,
       City: RangeableData.City,
-      Area: RangeableData.Area.map(item => item.placename) 
-  };
+      Area: RangeableData.Area.map(item => item.placename)
+    };
 
     const teacherProfile = new TeacherProfile({
       TeacherUserId: userId,
@@ -664,7 +665,7 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
       Qualification,
       TeachingExperience,
       ExpectedFees,
-      TeachingLocation:TeachingLocations,
+      TeachingLocation: TeachingLocations,
       VehicleOwned,
       TeachingMode,
       AcademicInformation,
@@ -1563,53 +1564,38 @@ exports.AdvancedQueryForFindingTeacher = CatchAsync(async (req, res) => {
   }
 });
 
+
 exports.SearchByMinimumCondition = CatchAsync(async (req, res) => {
   try {
-    const { ClassId, Subject } = req.params
-    const { lat, lng, SearchPlaceLat, SearchPlaceLng, role, ClassNameValue, locationParam } = req.query;
-    const url = `${process.env.FRONETND_URL}/Search-result?role=${role}&SearchPlaceLat=${SearchPlaceLat}&SearchPlaceLng=${SearchPlaceLng}&via-home-page&Location=Rohini-Delhi-India&ClassId=${ClassId}&ClassNameValue=${ClassNameValue}&Subject=${Subject}&lat=${lat}7&lng=${lng}&locationParam=${locationParam}`
+    const { ClassId, Subject } = req.params;
+    const { role, ClassNameValue, locationParam, result } = req.query;
 
+    // Parse the 'result' parameter as JSON and destructure address details
+    const ParsedResult = JSON.parse(result);
+    const { city, area, district, lat, lng, completeAddress } = ParsedResult.addressDetails;
+    console.log("Parsed Address Details:", completeAddress);
 
-    if (!lat || !lng || !SearchPlaceLat || !SearchPlaceLng) {
-      return res.status(400).json({ message: 'Latitude and longitude are required.' });
-    }
-
-    const userLat = parseFloat(lat);
-    const userLng = parseFloat(lng);
-    const searchPlaceLat = parseFloat(SearchPlaceLat);
-    const searchPlaceLng = parseFloat(SearchPlaceLng);
-
-    // if (isNaN(userLat) || isNaN(userLng) || isNaN(searchPlaceLat) || isNaN(searchPlaceLng)) {
-    //   return res.status(400).json({ message: 'Valid latitude and longitude are required.' });
-    // }
-
-
+    // Validate required parameters
     if (!ClassId || !Subject) {
       return res.status(400).json({ message: 'ClassId and Subject are required.' });
     }
 
+    // Convert ClassId to a Mongoose ObjectId for querying
     const objectClass = new Mongoose.Types.ObjectId(ClassId);
-
-    const userLocation = {
-      type: 'Point',
-      coordinates: [searchPlaceLng, searchPlaceLat]
-    };
-
     let finalResults = [];
 
     if (role === 'student') {
-      // Fetch teacher profiles within the specified range
+      // Initial query based on city, district, and area
       const locationResults = await TeacherProfile.find({
-        'RangeWhichWantToDoClasses.location': {
-          $near: {
-            $geometry: userLocation,
-            $maxDistance: 5000
-          }
-        }
+        'TeachingLocation.State': city,
+        'TeachingLocation.City': { $regex: district, $options: 'i' },
+        'TeachingLocation.Area': { $in: [area] },
       });
 
+      // Filter based on AcademicInformation within each teacher's profile
       finalResults = locationResults.filter(profile => {
         const academicInfo = profile.AcademicInformation || [];
+
         return academicInfo.some(item => {
           return item.ClassId instanceof Mongoose.Types.ObjectId
             ? item.ClassId.equals(objectClass) && item.SubjectNames.includes(Subject)
@@ -1617,45 +1603,46 @@ exports.SearchByMinimumCondition = CatchAsync(async (req, res) => {
         });
       });
 
-      const lead = await sendLeadMessageToTeacher(finalResults.length, finalResults, url)
-      const redisClient = req.app.locals.redis;
+      console.log("Filtered Final Results:", finalResults);
 
-      if (!redisClient) {
-        throw new Error("Redis client is not available.");
+      if (finalResults.length === 0) {
+       
+
+          const addressKeywords = completeAddress
+          .split(',')
+          .map(part => part.trim())
+          .filter(Boolean) // Remove empty elements
+          .join('|');
+
+        console.log(addressKeywords)
+        
+        const fallbackResults = await TeacherProfile.find({
+          'TeachingLocation.State': city,
+          'TeachingLocation.City': { $regex: district, $options: 'i' },
+          // 'TeachingLocation.Area': { $regex: new RegExp(`\\b(${addressKeywords})\\b`, 'i') },
+          'TeachingLocation.Area': { $regex: new RegExp(`\\b(${addressKeywords})\\b`, 'i') },
+        });
+        console.log("Fallback completeAddress results:", fallbackResults);
+
+        finalResults = fallbackResults.filter(profile => {
+          const academicInfo = profile.AcademicInformation || [];
+
+          return academicInfo.some(item => {
+            return item.ClassId instanceof Mongoose.Types.ObjectId
+              ? item.ClassId.equals(objectClass) && item.SubjectNames.includes(Subject)
+              : false;
+          });
+        });
       }
-      await redisClient.del(`Teacher`);
-    } else if (role === 'tutor') {
-
-      try {
-        console.log(ClassNameValue, Subject)
-        const { data } = await axios.get('https://api.srtutorsbureau.com/api/v1/uni/get-all-universal-Request')
-        console.log(data.data[9])
-        const CombinedData = data?.data
-        const findTeacherRequest = CombinedData.filter(item => item.className === ClassNameValue.toString() && item.subjects.includes(Subject))
-
-
-        if (findTeacherRequest.length === 0) {
-          return res.status(404).json({ message: 'No teachers found.' });
-        }
-
-        finalResults = findTeacherRequest;
-      } catch (error) {
-        return res.status(403).json({
-          success: false,
-          message: "No Request Found For This LocationOops! Something went wrong"
-        })
-      }
-
-    } else {
-      return res.status(400).json({ message: 'Invalid role.' });
     }
 
-
+    // Respond with the filtered results
     res.status(200).json({
       success: true,
       count: finalResults.length,
       results: finalResults,
     });
+
   } catch (error) {
     console.error("Error in SearchByMinimumCondition:", error);
     res.status(500).json({
@@ -1664,6 +1651,8 @@ exports.SearchByMinimumCondition = CatchAsync(async (req, res) => {
     });
   }
 });
+
+
 
 exports.BrowseTutorsNearMe = CatchAsync(async (req, res) => {
   try {

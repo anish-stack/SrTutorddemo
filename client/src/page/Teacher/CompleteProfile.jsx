@@ -106,7 +106,7 @@ const CompleteProfile = ({ profileInfo, readable, title }) => {
                 return;
             }
 
-            const response = await axios.put('https://api.srtutorsbureau.com/api/v1/teacher/update-profile-details', updatedFields, {
+            const response = await axios.put('http://localhost:7000/api/v1/teacher/update-profile-details', updatedFields, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }

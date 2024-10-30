@@ -1264,3 +1264,59 @@ html {
     border: 1px solid rgba(255, 255, 255, 0.3);
   }
 }
+
+/* Custom File Input Container */
+.custom-file {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+/* Hide the default file input */
+.custom-file-input {
+  font-size: 1rem; /* Set font size */
+  width: 100%; /* Full width */
+  height: 48px; /* Height of the input */
+  opacity: 0; /* Hide the default input */
+  position: absolute; /* Position it absolutely */
+  z-index: 2; /* Layer above other elements */
+  cursor: pointer; /* Change cursor to pointer */
+}
+
+/* Style for the custom label */
+.custom-file-label {
+  display: block; /* Block display */
+  background-color: #f8f9fa; /* Light background */
+  border: 1px solid #ced4da; /* Border styling */
+  border-radius: 0.25rem; /* Rounded corners */
+  padding: 12px 16px; /* Padding for the label */
+  font-size: 1rem; /* Set font size */
+  color: #495057; /* Text color */
+  transition: all 0.3s ease; /* Smooth transition */
+  z-index: 1; /* Layer below the input */
+}
+
+/* Change the appearance of the label when the file is selected */
+.custom-file-input:focus + .custom-file-label,
+.custom-file-input:valid + .custom-file-label {
+  border-color: #80bdff; /* Border color on focus */
+  background-color: #e9ecef; /* Background color on focus */
+  color: #495057; /* Text color on focus */
+}
+
+/* Show the selected file name */
+.custom-file-input:focus + .custom-file-label::after {
+  content: "Selected"; /* Change label content */
+  display: inline-block; /* Show content inline */
+  color: #007bff; /* Link color */
+}
+
+/* Styles for the label when a file is selected */
+.custom-file-input:valid + .custom-file-label::after {
+  content: attr(data-file); /* Show the selected file name */
+}
+
+/* Optional: Add a hover effect */
+.custom-file-label:hover {
+  background-color: #e2e6ea; /* Change background on hover */
+}

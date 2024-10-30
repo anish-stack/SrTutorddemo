@@ -51,7 +51,7 @@ const TeacherDashboard = () => {
         if (teacherToken && teacherUser) {
             const handleFetch = async () => {
                 try {
-                    const { data } = await axios.get(`https://api.srtutorsbureau.com/api/v1/teacher/Get-Teacher/${teacherUser._id}`, {
+                    const { data } = await axios.get(`http://localhost:7000/api/v1/teacher/Get-Teacher/${teacherUser._id}`, {
                         headers: {
                             Authorization: `Bearer ${teacherToken}`,
                         },
@@ -89,7 +89,7 @@ const TeacherDashboard = () => {
         setLoading(true)
         try {
             const response = await axios.post(
-                `https://api.srtutorsbureau.com/api/v1/teacher/teacher-profile-pic/${profileInfo.TeacherUserId?._id}`,
+                `http://localhost:7000/api/v1/teacher/teacher-profile-pic/${profileInfo.TeacherUserId?._id}`,
                 formData, // Send formData directly here
                 {
                     headers: {
@@ -145,7 +145,7 @@ const TeacherDashboard = () => {
         if (teacherToken && teacherUser) {
             const handleClassFetch = async () => {
                 try {
-                    const { data } = await axios.get(`https://api.srtutorsbureau.com/api/v1/teacher/Get-My-Classes`, {
+                    const { data } = await axios.get(`http://localhost:7000/api/v1/teacher/Get-My-Classes`, {
                         headers: {
                             Authorization: `Bearer ${teacherToken}`,
                         },

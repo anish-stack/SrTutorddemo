@@ -40,7 +40,7 @@ const AddRequest = () => {
 
     const fetchClass = async () => {
         try {
-            const response = await axios.get('https://api.srtutorsbureau.com/api/v1/admin/Get-Classes', {
+            const response = await axios.get('http://localhost:7000/api/v1/admin/Get-Classes', {
                 headers: {
                     Authorization: `Bearer ${Token}`
                 }
@@ -79,7 +79,7 @@ const AddRequest = () => {
     const fetchSubjects = async (classId) => {
         try {
             const response = await axios.get(
-                `https://api.srtutorsbureau.com/api/v1/admin/Get-Class-Subject/${classId}`
+                `http://localhost:7000/api/v1/admin/Get-Class-Subject/${classId}`
             );
             setSubjects(response.data.data.Subjects || []);
         } catch (error) {
@@ -109,7 +109,7 @@ const AddRequest = () => {
 
         if (input.length > 2) {
             try {
-                const res = await axios.get(`https://api.srtutorsbureau.com/autocomplete?input=${input}`);
+                const res = await axios.get(`http://localhost:7000/autocomplete?input=${input}`);
                 setLocationSuggestions(res.data || []);
             } catch (error) {
                 console.error("Error fetching location suggestions:", error);
@@ -133,7 +133,7 @@ const AddRequest = () => {
     const handleLocationLatAndLngFetch = async (address) => {
         const options = {
             method: 'GET',
-            url: `https://api.srtutorsbureau.com/geocode?address=${address}`
+            url: `http://localhost:7000/geocode?address=${address}`
         };
 
         try {
@@ -190,7 +190,7 @@ const AddRequest = () => {
         e.preventDefault();
         console.log(formData)
         try {
-            await axios.post('https://api.srtutorsbureau.com/api/v1/student/universal-request', formData, {
+            await axios.post('http://localhost:7000/api/v1/student/universal-request', formData, {
                 headers: {
                     Authorization: `Bearer ${Token}`
                 }

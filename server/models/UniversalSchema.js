@@ -11,29 +11,29 @@ const RequestSchema = new mongoose.Schema(
         requestId: {
             type: String,
         },
+        
         requestType: {
             type: String,
             required: true
         },
+
         classId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Class",
         },
+
         VehicleOwned: {
             type: String,
         },
+
         className: {
             type: String,
             trim: true,
             set: (v) => sanitizeHtml(v),
- 
-
         },
         subjects: [String],
         interestedInTypeOfClass: {
             type: String,
- 
-
         },
         studentInfo: {
             studentName: {
@@ -60,6 +60,7 @@ const RequestSchema = new mongoose.Schema(
                 set: (v) => sanitizeHtml(v),
             },
         },
+
         teacherGenderPreference: {
             type: String,
             enum: ["Male", "Female", "Any"],
@@ -69,6 +70,7 @@ const RequestSchema = new mongoose.Schema(
             type: String,
             // required: true,
         },
+
         experienceRequired: {
             type: Number,
             default: 0,
@@ -78,6 +80,7 @@ const RequestSchema = new mongoose.Schema(
             // required: true,
             min: 0,
         },
+
         maxBudget: {
             type: Number,
             // required: true,
@@ -89,6 +92,19 @@ const RequestSchema = new mongoose.Schema(
             set: (v) => sanitizeHtml(v),
             // required: true,
         },
+        AddressDetails:{
+            completeAddress:String,
+            city: String,
+            area: String,
+            district: String,
+            postalCode: String,
+            landmark: String,
+            lat: String,
+            lng: String
+        },
+
+
+
         startDate: {
             type: String,
 

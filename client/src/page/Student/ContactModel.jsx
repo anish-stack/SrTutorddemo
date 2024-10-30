@@ -142,10 +142,11 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
   }, [data, teacherData]);
 
   useEffect(() => {
+   
     if (formData.ClassId) {
-      // console.log("id", formData.ClassId)
+      console.log("id", formData.ClassId)
       const selectedClass = concatenatedData.find(item => item.id === formData.ClassId);
-      // console.log("i am done", selectedClass)
+      console.log("i am done", selectedClass.class)
       if (selectedClass) {
         setFormData(prevFormData => ({
           ...prevFormData,
@@ -153,11 +154,11 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
         }));
       }
     }
-  }, [formData.ClassId, concatenatedData]);
+  }, [formData.ClassId]);
 
   const fetchSubjects = async (classId) => {
     try {
-      const response = await axios.get(`https://api.srtutorsbureau.com/api/v1/admin/Get-Class-Subject/${classId}`);
+      const response = await axios.get(`http://localhost:7000/api/v1/admin/Get-Class-Subject/${classId}`);
       const fetchedSubjects = response.data.data.Subjects;
 
       if (fetchedSubjects) {
@@ -215,34 +216,28 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
   const handleLocationLatAndLngFetch = async (address) => {
     const options = {
       method: 'GET',
-      url: `https://api.srtutorsbureau.com/geocode?address=${address}`
+      url: `http://localhost:7000/geocode?address=${address}`
     };
 
     try {
       const response = await axios.request(options);
       const result = response.data;
-      // console.log("Result from us", result)
       if (result) {
-        // Update state with latitude and longitude from the result
         setClickLatitude(result?.latitude);
         setClickLongitude(result?.longitude);
       }
-      // console.log("Result from setClickLatitude", ClickLatitude)
-      // console.log("Result from setClickLongitude", ClickLongitude)
+   
 
     } catch (error) {
       console.error("Error fetching location coordinates:", error);
     }
   };
-  useEffect(() => {
-    // console.log("Updated ClickLatitude:", ClickLatitude);
-    // console.log("Updated ClickLongitude:", ClickLongitude);
-  }, [ClickLatitude, ClickLongitude]);
+
 
   const handleLocationFetch = async (input) => {
     try {
       const res = await axios.get(
-        `https://api.srtutorsbureau.com/autocomplete?input=${input}`);
+        `http://localhost:7000/autocomplete?input=${input}`);
 
       setLocationSuggestions(res.data || []);
     } catch (error) {
@@ -291,10 +286,15 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
   const handleClassChange = (e) => {
     const classId = e ? e.target.value : "";
     setSelectedClass(classId);
-    setFormData(prevState => ({ ...prevState, Subject: [] }));
+    setFormData(prevState => ({ ...prevState,
+      ClassId: classId,
+
+
+       Subject: [] }));
     fetchSubjects(classId);
   };
 
+  const [apiAddress,setApiAddress] = useState(null)
 
   const fetchLocation = async () => {
     if (navigator.geolocation) {
@@ -302,13 +302,13 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
             async (position) => {
                 const { latitude, longitude } = position.coords;
                 try {
-                    const { data } = await axios.post('https://api.srtutorsbureau.com/Fetch-Current-Location', {
+                    const { data } = await axios.post('http://localhost:7000/Fetch-Current-Location', {
                         lat: latitude,
                         lng: longitude
                     });
 
                     const address = data?.data?.address;
-                    // console.log(address);
+                    setApiAddress(address)
                     if (address) {
                       setFormData((prev) => ({
                         ...prev,
@@ -334,7 +334,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
 
   useEffect(() => {
     fetchLocation()
-  }, [formData])
+  }, [coords])
 
 
   const validateFields = () => {
@@ -416,7 +416,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
     // console.log(loginNumber)
     try {
 
-      const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/resent-otp', { PhoneNumber: loginNumber, HowManyHit: resendButtonClick });
+      const response = await axios.post('http://localhost:7000/api/v1/student/resent-otp', { PhoneNumber: loginNumber, HowManyHit: resendButtonClick });
       // console.log(response.data)
       toast.success(response.data.message);
       setResendButtonClick((prev) => prev + 1);
@@ -430,7 +430,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
   const verifyOtp = async () => {
     try {
 
-      const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/Verify-Student', {
+      const response = await axios.post('http://localhost:7000/api/v1/student/Verify-Student', {
         PhoneNumber: loginNumber,
         otp
       });
@@ -468,7 +468,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
     }
 
     try {
-      const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/checkNumber-request', {
+      const response = await axios.post('http://localhost:7000/api/v1/student/checkNumber-request', {
         userNumber: loginNumber,
         HowManyHit: resendButtonClick,
       });
@@ -525,10 +525,11 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
     const latEmergency = 28.6909129;
     const lngEmergency = 77.1518306;
     const student = Cookies.get("studentToken");
+    console.log("formData: ", formData)
     const submittedData = {
       requestType: "Particular Teacher Request",
-      classId: formData?.ClassId || null,
-      className: formData?.className,
+      classId: formData?.ClassId || selectedClass,
+      className: formData?.className || selectedClass,
       subjects: formData?.Subject,
       ClassLangUage: formData.ClassLangUage,
       interestedInTypeOfClass: formData?.TeachingMode,
@@ -540,6 +541,16 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
       locality: formData?.locality,
       startDate: formData?.StartDate,
       specificRequirement: formData?.SpecificRequirement,
+      AddressDetails:{
+        completeAddress: apiAddress?.completeAddress,
+        city: apiAddress?.city,
+        area: apiAddress?.area,
+        district: apiAddress?.district,
+        postalCode:apiAddress?.postalCode,
+        landmark: null,
+        lat:apiAddress?.lat,
+        lng: apiAddress?.lng
+      },
       location: formData.Location || {
         type: 'Point',
         coordinates: [ClickLongitude || lngEmergency, ClickLatitude || latEmergency]
@@ -551,17 +562,17 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
         emailAddress: formData.StudentEmail,
       },
     };
-    // console.log("submittedData", submittedData)
-    setLoading(true);
+    console.log("submittedData", submittedData)
+    // setLoading(true);
     try {
-      const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/universal-request', submittedData, {
+      const response = await axios.post('http://localhost:7000/api/v1/student/universal-request', submittedData, {
         headers: { Authorization: `Bearer ${student || studentToken}` }
       });
       // console.log(response.data)
       setLoading(false);
       toast.success("Request Submit Successful")
 
-      window.location.href = "/thankYou";
+      // window.location.href = "/thankYou";
     } catch (error) {
       console.log(error);
       setLoading(false);

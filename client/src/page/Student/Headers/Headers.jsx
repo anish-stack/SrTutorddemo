@@ -57,7 +57,7 @@ const Headers = () => {
         e.preventDefault(); // Prevent the default form submission
         console.log(formData)
         try {
-            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/uni/create-contact', formData);
+            const response = await axios.post('http://localhost:7000/api/v1/uni/create-contact', formData);
             if (response.data.success) {
                 toast.success("Your message has been sent successfully! We will get back to you shortly.");
                 // setFormData({ Name: '', Email: '', Phone: '', Subject: '', Message: '' }); // Reset form fields
@@ -109,7 +109,7 @@ const Headers = () => {
     const MyPost = async () => {
         setLoding(true)
         try {
-            const { data } = await axios.get('https://api.srtutorsbureau.com/api/v1/student/Get-My-Post', {
+            const { data } = await axios.get('http://localhost:7000/api/v1/student/Get-My-Post', {
                 headers: {
                     Authorization: `Bearer ${studentToken}`
                 },
@@ -137,7 +137,7 @@ const Headers = () => {
         try {
             setLoding(true)
 
-            const { data } = await axios.get('https://api.srtutorsbureau.com/api/v1/student/Get-My-Subscribed-Teacher', {
+            const { data } = await axios.get('http://localhost:7000/api/v1/student/Get-My-Subscribed-Teacher', {
                 headers: {
                     Authorization: `Bearer ${studentToken}`
                 }

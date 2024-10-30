@@ -1,4 +1,5 @@
 
+
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ClassSearch } from "../Slices/Class.slice";
@@ -10,7 +11,8 @@ import bannerImg02 from "./banner/pngwing.com (11).png";
 import bannerImg03 from "./banner/banner_img03.png";
 import { useGeolocated } from "react-geolocated";
 
-const Slider = () => {
+
+const Slider = ({ areas }) => {
   const { data, loading, error } = useSelector((state) => state.Class);
   const dispatch = useDispatch();
   const [classes, setClasses] = useState([]);
@@ -31,48 +33,55 @@ const Slider = () => {
     dispatch(ClassSearch());
   }, [dispatch]);
 
+
   const [selectedRole, setSelectedRole] = useState('student');
   const handleRoleChange = (role) => {
     setSelectedRole(role);
+
 
   };
   useEffect(() => {
     if (data) {
       // Step 1: Filter out specific classes
       // const classRanges = ["I-V", "VI-VIII", "IX-X", "XI-XII"];
-      const filterOutClasses =["I-V", "VI-VIII", "IX-X", "XI-XII"];
+      const filterOutClasses = ["I-V", "VI-VIII", "IX-X", "XI-XII"];
       const filteredClasses = data
-      
+
         .filter(item => !filterOutClasses.includes(item.Class))
         .map(item => ({ class: item.Class, id: item._id }));
 
+
       // Step 2: Map inner classes
       const rangeClasses = data
-      
+
         .filter(item => item.InnerClasses && item.InnerClasses.length > 0)
         .flatMap(item => item.InnerClasses.map(innerClass => ({
           class: innerClass.InnerClass,
           id: innerClass._id
         })));
 
+
       // Step 3: Concatenate filtered classes and inner classes
       const concatenatedData = rangeClasses.concat(filteredClasses);
+
 
       // Update state with concatenated data
       setConcatenatedData(concatenatedData);
     }
   }, [data]);
 
+
   const fetchSubjects = async (classId) => {
     try {
       const response = await axios.get(
-        `https://api.srtutorsbureau.com/api/v1/admin/Get-Class-Subject/${classId}`
+        `http://localhost:7000/api/v1/admin/Get-Class-Subject/${classId}`
       );
       setSubjects(response.data.data.Subjects || []);
     } catch (error) {
       console.error("Error fetching subjects:", error);
     }
   };
+
 
   const handleSubjectChange = (event) => {
     const selectedSubjectId = event.target.value;
@@ -82,16 +91,21 @@ const Slider = () => {
     setSelectedSubject(selectedSubjectObj ? selectedSubjectObj.SubjectName : "");
   };
 
+
   const handleLocationFetch = async (input) => {
     setLocationInput(input);
+
 
     if (input.length > 2) {
       try {
 
 
 
+
+
+
         const res = await axios.get(
-          `https://api.srtutorsbureau.com/autocomplete?input=${input}`);
+          `http://localhost:7000/autocomplete?input=${input}`);
         console.log("Google", res.data)
         setLocationSuggestions(res.data || []);
       } catch (error) {
@@ -102,6 +116,7 @@ const Slider = () => {
       setLocationSuggestions([]);
     }
   };
+
 
   const handleClassChange = (event) => {
     const selectedClassId = event.target.value;
@@ -116,33 +131,54 @@ const Slider = () => {
     }
   };
 
+
   const handleLocationSelect = (suggestion) => {
     setLocationInput(suggestion);
     setLocationSuggestions([]);
     handleLocationLatAndLngFetch(suggestion)
   };
-  const [ClickLatitude, setClickLatitude] = useState(null)
-  const [ClickLongitude, setClickLongitude] = useState(null)
+
+  const [completeResult,setCompleteResult] = useState(null)
 
   const handleLocationLatAndLngFetch = async (address) => {
     const options = {
       method: 'GET',
-      url: `https://api.srtutorsbureau.com/geocode?address=${address}`
+      url: `http://localhost:7000/geocode?address=${address}`
     };
+
 
     try {
       const response = await axios.request(options);
       const result = response.data
       if (result) {
-        setClickLatitude(result ? result.latitude : null);
-        setClickLongitude(result ? result.longitude : null)
+        setCompleteResult(result)
+ 
       }
-      console.log(response.data);
+     
+      fetchAreaAndCity(result.latitude, result.longitude)
     } catch (error) {
       console.error(error);
     }
+  }
 
+  const fetchAreaAndCity = async (lat, lng) => {
+    try {
+      const { data } = await axios.post(`http://localhost:7000/Fetch-Current-Location`,{
+        lat: lat,
+        lng: lng
+      })
+      const addressDetails = data?.data?.address
+      if(addressDetails){
+        setCompleteResult((prev)=>({
+          ...prev,
+          addressDetails
+        }))
+      }
+      console.log(data.data)
+    } catch (error) {
+      console.log(error)
 
+    }
   }
 
 
@@ -152,6 +188,7 @@ const Slider = () => {
     },
     userDecisionTimeout: 5000,
   });
+
 
   useEffect(() => {
     // Check if coords is defined
@@ -169,19 +206,22 @@ const Slider = () => {
       );
     };
 
+
     // Encode parameters for the URL
     const locationParam = cleanAndEncode(locationInput);
     const classParam = encodeURIComponent(selectedClass.classid);
     const classNameParam = encodeURIComponent(selectedClass.classNameValue);
     const subjectParam = encodeURIComponent(selectedSubject);
+    const result = JSON.stringify(completeResult)
 
-    // Default coordinates for emergency if not available
-    const latEmergency = 28.6909129;
-    const lngEmergency = 77.1518306;
+
+    window.location.href = `/Search-result?role=${selectedRole}&via-home-page&Location=${locationParam}&ClassId=${classParam}&ClassNameValue=${classNameParam}&Subject=${subjectParam}&result=${result}`;
 
     // Construct the URL with parameters
-    window.location.href = `/Search-result?role=${selectedRole}&SearchPlaceLat=${ClickLatitude || locationData.lat || latEmergency}&SearchPlaceLng=${ClickLongitude || locationData.lng || lngEmergency}&via-home-page&Location=${locationParam}&ClassId=${classParam}&ClassNameValue=${classNameParam}&Subject=${subjectParam}&lat=${locationData.lat || latEmergency}&lng=${locationData.lng || lngEmergency}`;
+    // window.location.href = `/Search-result?role=${selectedRole}&SearchPlaceLat=${ClickLatitude || locationData.lat || latEmergency}&SearchPlaceLng=${ClickLongitude || locationData.lng || lngEmergency}&via-home-page&Location=${locationParam}&ClassId=${classParam}&ClassNameValue=${classNameParam}&Subject=${subjectParam}&lat=${locationData.lat || latEmergency}&lng=${locationData.lng || lngEmergency}`;
   };
+
+
 
 
   return (
@@ -211,7 +251,8 @@ const Slider = () => {
               </h3>
               <div className="col-12 my-3">
                 <div className="row">
-                 
+
+
 
                   <div class="form-check col-md-6 px-5 col-lg-6">
                     <input onChange={() => handleRoleChange('student')} class="form-check-input" type="radio" name="flexRadioDefault" value={'student'} id="flexRadioDefault1" checked={selectedRole === 'student'} />
@@ -230,14 +271,21 @@ const Slider = () => {
               <div className="banner__search-form w-100">
                 <form action="#" className="search-form">
 
+
                   <div className="search-form__container d-flex gap-2 justify-content-between">
+
 
                     <div className="row col-12 col-lg-12 col-md-12">
 
 
 
+
+
+
                       <div className="col-md-12 col-lg-4 mb-2">
                         <div className="position-relative">
+
+
 
 
                           <input
@@ -248,6 +296,7 @@ const Slider = () => {
                             onChange={(e) => handleLocationFetch(e.target.value)}
                             className="form-control py-3"
                           />
+
 
                           {locationSuggestions.length > 0 && (
                             <div
@@ -273,8 +322,16 @@ const Slider = () => {
 
 
 
+
+
+
+
+
                         </div>
                       </div>
+
+
+
 
 
 
@@ -292,6 +349,7 @@ const Slider = () => {
                           ))}
                         </select>
                       </div>
+
 
                       <div className="col-md-4 col-lg-4">
                         <select
@@ -328,7 +386,13 @@ const Slider = () => {
 
 
 
+
+
+
             <img src={backSvg} alt="img" />
+
+
+
 
 
 
@@ -340,4 +404,8 @@ const Slider = () => {
   );
 };
 
+
 export default Slider;
+
+
+
