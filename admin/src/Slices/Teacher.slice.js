@@ -11,7 +11,7 @@ export const AllTeacher = createAsyncThunk(
     'Teacher/AllTeacher',
     async (_, thunkAPI) => {
         try {
-            const response = await axios.get('http://localhost:7000/api/v1/teacher/Get-Teacher', {
+            const response = await axios.get('https://api.srtutorsbureau.com/api/v1/teacher/Get-Teacher', {
                 headers: {
                     Authorization: `Bearer ${Token}`
                 }
@@ -33,7 +33,7 @@ export const SingleTeacher = createAsyncThunk(
     'Teacher/SingleTeacher',
     async (id, thunkAPI) => {
         try {
-            const response = await axios.get(`http://localhost:7000/api/v1/teacher/Get-Teacher/${id}`, {
+            const response = await axios.get(`https://api.srtutorsbureau.com/api/v1/teacher/Get-Teacher/${id}`, {
                 headers: {
                     Authorization: `Bearer ${Token}`
                 }

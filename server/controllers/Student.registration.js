@@ -433,9 +433,15 @@ exports.AdminLogin = CatchAsync(async (req, res) => {
 //Student Password Change Request
 exports.StudentPasswordChangeRequest = CatchAsync(async (req, res) => {
     try {
-        const { Email } = req.body;
-        console.log(Email)
-        const student = await Student.findOne({ Email });
+        const { any } = req.body;
+        // console.log(Email)
+        const student = await Student.findOne({
+            $or: [
+                { Email: any },
+                { PhoneNumber: any }
+            ]
+        });
+        
         if (!student) {
             return res.status(404).json({ message: 'Student not found' });
         }
@@ -459,9 +465,12 @@ exports.StudentPasswordChangeRequest = CatchAsync(async (req, res) => {
 
 //Student Verify Password Otp
 exports.StudentVerifyPasswordOtp = CatchAsync(async (req, res) => {
-    const { Email, otp, newPassword } = req.body;
+    const { any, otp, newPassword } = req.body;
 
-    const student = await Student.findOne({ Email });
+    const student = await Student.findOne({   $or: [
+        { Email: any },
+        { PhoneNumber: any }
+    ] });
     if (!student) {
         return res.status(404).json({ message: 'Student not found' });
     }

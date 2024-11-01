@@ -74,7 +74,7 @@ const Slider = ({ areas }) => {
   const fetchSubjects = async (classId) => {
     try {
       const response = await axios.get(
-        `http://localhost:7000/api/v1/admin/Get-Class-Subject/${classId}`
+        `https://api.srtutorsbureau.com/api/v1/admin/Get-Class-Subject/${classId}`
       );
       setSubjects(response.data.data.Subjects || []);
     } catch (error) {
@@ -105,7 +105,7 @@ const Slider = ({ areas }) => {
 
 
         const res = await axios.get(
-          `http://localhost:7000/autocomplete?input=${input}`);
+          `https://api.srtutorsbureau.com/autocomplete?input=${input}`);
         console.log("Google", res.data)
         setLocationSuggestions(res.data || []);
       } catch (error) {
@@ -138,23 +138,24 @@ const Slider = ({ areas }) => {
     handleLocationLatAndLngFetch(suggestion)
   };
 
-  const [completeResult,setCompleteResult] = useState(null)
+  const [completeResult, setCompleteResult] = useState(null)
 
   const handleLocationLatAndLngFetch = async (address) => {
     const options = {
       method: 'GET',
-      url: `http://localhost:7000/geocode?address=${address}`
+      url: `https://api.srtutorsbureau.com/geocode?address=${address}`
     };
 
 
     try {
       const response = await axios.request(options);
       const result = response.data
+      console.log(result)
       if (result) {
         setCompleteResult(result)
- 
+
       }
-     
+
       fetchAreaAndCity(result.latitude, result.longitude)
     } catch (error) {
       console.error(error);
@@ -163,20 +164,21 @@ const Slider = ({ areas }) => {
 
   const fetchAreaAndCity = async (lat, lng) => {
     try {
-      const { data } = await axios.post(`http://localhost:7000/Fetch-Current-Location`,{
+      const { data } = await axios.post(`https://api.srtutorsbureau.com/Fetch-Current-Location`, {
         lat: lat,
         lng: lng
       })
       const addressDetails = data?.data?.address
-      if(addressDetails){
-        setCompleteResult((prev)=>({
+      console.log("address", addressDetails)
+      if (addressDetails) {
+        setCompleteResult((prev) => ({
           ...prev,
           addressDetails
         }))
       }
       console.log(data.data)
     } catch (error) {
-      console.log(error)
+      console.log("i am also error", error)
 
     }
   }
@@ -251,18 +253,32 @@ const Slider = ({ areas }) => {
               </h3>
               <div className="col-12 my-3">
                 <div className="row">
-
-
-
-                  <div class="form-check col-md-6 px-5 col-lg-6">
-                    <input onChange={() => handleRoleChange('student')} class="form-check-input" type="radio" name="flexRadioDefault" value={'student'} id="flexRadioDefault1" checked={selectedRole === 'student'} />
-                    <label class="form-check-label text-white" for="flexRadioDefault1">
+                  <div className="form-check col-md-6 px-5 col-lg-6">
+                    <input
+                      onChange={() => handleRoleChange('student')}
+                      className="form-check-input"
+                      type="radio"
+                      name="flexRadioDefault"
+                      value="student"
+                      id="flexRadioDefault1"
+                      checked={selectedRole === 'student'}
+                    />
+                    <label className="form-check-label text-white" htmlFor="flexRadioDefault1">
                       Tutor
                     </label>
                   </div>
-                  <div class="form-check col-md-6 px-5 col-lg-6">
-                    <input onChange={() => handleRoleChange('tutor')} class="form-check-input" type="radio" value={'tutor'} name="flexRadioDefault" id="flexRadioDefault2" checked={selectedRole === 'tutor'} />
-                    <label class="form-check-label text-white" for="flexRadioDefault2">
+
+                  <div className="form-check col-md-6 px-5 col-lg-6">
+                    <input
+                      onChange={() => handleRoleChange('tutor')}
+                      className="form-check-input"
+                      type="radio"
+                      name="flexRadioDefault"
+                      value="tutor"
+                      id="flexRadioDefault2"
+                      checked={selectedRole === 'tutor'}
+                    />
+                    <label className="form-check-label text-white" htmlFor="flexRadioDefault2">
                       Student
                     </label>
                   </div>
@@ -282,53 +298,39 @@ const Slider = ({ areas }) => {
 
 
 
-                      <div className="col-md-12 col-lg-4 mb-2">
-                        <div className="position-relative">
+                      {selectedRole === 'student' && (
+                        <div className="col-md-12 col-lg-4 mb-2">
+                          <div className="position-relative">
+                            <input
+                              type="text"
+                              name="Location"
+                              value={locationInput}
+                              placeholder="Location . . ."
+                              onChange={(e) => handleLocationFetch(e.target.value)}
+                              className="form-control py-3"
+                            />
 
-
-
-
-                          <input
-                            type="text"
-                            name="Location"
-                            value={locationInput}
-                            placeholder="Location . . ."
-                            onChange={(e) => handleLocationFetch(e.target.value)}
-                            className="form-control py-3"
-                          />
-
-
-                          {locationSuggestions.length > 0 && (
-                            <div
-                              className="position-absolute top-100 start-0 mt-2 w-100 bg-white border border-secondary rounded shadow-lg overflow-auto"
-                              style={{ maxHeight: "200px" }}
-                            >
-                              <ul className="list-unstyled mb-0">
-                                {locationSuggestions.map((suggestion, index) => (
-                                  <li
-                                    key={index}
-                                    className="p-2 hover:bg-light cursor-pointer"
-                                    onClick={() => handleLocationSelect(suggestion.description)}
-                                  >
-                                    {suggestion.description}
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          )
-                          }
-
-
-
-
-
-
-
-
-
-
+                            {locationSuggestions.length > 0 && (
+                              <div
+                                className="position-absolute top-100 start-0 mt-2 w-100 bg-white border border-secondary rounded shadow-lg overflow-auto"
+                                style={{ maxHeight: "200px" }}
+                              >
+                                <ul className="list-unstyled mb-0">
+                                  {locationSuggestions.map((suggestion, index) => (
+                                    <li
+                                      key={index}
+                                      className="p-2 hover:bg-light cursor-pointer"
+                                      onClick={() => handleLocationSelect(suggestion.description)}
+                                    >
+                                      {suggestion.description}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      </div>
+                      )}
 
 
 

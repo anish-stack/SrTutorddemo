@@ -99,7 +99,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
     const handleLocationFetch = async (input) => {
         try {
             const res = await axios.get(
-                `http://localhost:7000/autocomplete?input=${input}`);
+                `https://api.srtutorsbureau.com/autocomplete?input=${input}`);
 
             setLocationSuggestions(res.data || []);
         } catch (error) {
@@ -111,7 +111,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
     const handleLocationLatAndLngFetch = async (address) => {
         const options = {
             method: 'GET',
-            url: `http://localhost:7000/geocode?address=${address}`
+            url: `https://api.srtutorsbureau.com/geocode?address=${address}`
         };
 
         try {
@@ -295,7 +295,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
         setLoading(true);
 
         try {
-            const response = await axios.post('http://localhost:7000/api/v1/student/universal-request', submittedData, {
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/universal-request', submittedData, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             console.log(response.data);
@@ -316,7 +316,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
                 async (position) => {
                     const { latitude, longitude } = position.coords;
                     try {
-                        const { data } = await axios.post('http://localhost:7000/Fetch-Current-Location', {
+                        const { data } = await axios.post('https://api.srtutorsbureau.com/Fetch-Current-Location', {
                             lat: latitude,
                             lng: longitude
                         });
@@ -369,7 +369,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
     const resendOtp = async () => {
         console.log(loginNumber);
         try {
-            const response = await axios.post('http://localhost:7000/api/v1/student/resent-otp', {
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/resent-otp', {
                 PhoneNumber: loginNumber,
                 HowManyHit: resendButtonClick
             });
@@ -387,7 +387,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
 
     const verifyOtp = async () => {
         try {
-            const response = await axios.post('http://localhost:7000/api/v1/student/Verify-Student', {
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/Verify-Student', {
                 PhoneNumber: loginNumber,
                 otp
             });
@@ -424,7 +424,7 @@ const TeacherPost = ({ item, isOpen, OnClose }) => {
         }
 
         try {
-            const response = await axios.post('http://localhost:7000/api/v1/student/checkNumber-request', {
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/checkNumber-request', {
                 userNumber: loginNumber,
                 HowManyHit: resendButtonClick
             });

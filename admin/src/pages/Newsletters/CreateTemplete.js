@@ -11,7 +11,7 @@ const CreateTemplate = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('http://localhost:7000/api/v1/admin/add-template', {
+            await axios.post('https://api.srtutorsbureau.com/api/v1/admin/add-template', {
                 subject,
                 message: content,
             });

@@ -46,7 +46,7 @@ const ProfileOfTeacher = () => {
 
     const handleVerify = async (teacherId, status) => {
         try {
-            const { data } = await axios.post(`http://localhost:7000/api/v1/teacher/Make-Document-verified`, {
+            const { data } = await axios.post(`https://api.srtutorsbureau.com/api/v1/teacher/Make-Document-verified`, {
                 teacherId: teacherId,
                 status: status
             })
@@ -59,7 +59,7 @@ const ProfileOfTeacher = () => {
 
     const fetchAddressName = async (lat, lng) => {
         try {
-            const response = await axios.post(`http://localhost:7000/Fetch-Current-Location`, {
+            const response = await axios.post(`https://api.srtutorsbureau.com/Fetch-Current-Location`, {
 
                 lat,
                 lng

@@ -5,6 +5,7 @@ const localities = require('../models/Locality.model');
 const MakeSearch = async (req, res) => {
     try {
         const { Subject, Area, Class, ClassId, Gender, Experience, Pincode, TeachingMode, City, District } = req.body;
+        console.log(TeachingMode)
         const query = {};
 
         if (ClassId || Class || Subject) {
@@ -29,8 +30,8 @@ const MakeSearch = async (req, res) => {
             if (Gender && teacher.Gender !== Gender) {
                 matches = false;
             }
-
-            if (TeachingMode && TeachingMode !== 'Any' && teacher.TeachingMode.toLowerCase() !== TeachingMode.toLowerCase()) {
+            const normalizedTeachingMode = teacher.TeachingMode.toLowerCase().replace(' class', '');
+            if (TeachingMode && TeachingMode !== 'Any' && normalizedTeachingMode !== TeachingMode.toLowerCase()) {
                 matches = false;
             }
 

@@ -43,23 +43,7 @@ function App() {
   const [areas, setAreas] = useState([]);
   const [loading, setLoading] = useState(true);
 
- 
-    const fetchAreas = async () => {
-      try {
-        const response = await axios.get('http://localhost:7000/api/jd/GetAllAreas');
-        console.log("i am call",response.data.data)
-        setAreas(response.data.data);
-        setLoading(false); 
-      } catch (error) {
-        console.error('Error fetching areas:', error);
-      
-        setLoading(false); 
-      }
-    };
 
- useEffect(()=>{
-  fetchAreas()
- },[])
 
 
   useEffect(() => {
@@ -100,9 +84,7 @@ function App() {
     });
   }, [location.pathname]);
 
-  if(loading) {
-    return <Loader/>
-  }
+
   return (
     <>
       {header && <Header />}

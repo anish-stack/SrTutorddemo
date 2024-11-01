@@ -28,7 +28,7 @@ const AllRequest = () => {
     useEffect(() => {
         const fetchRequest = async () => {
             try {
-                const response = await axios.get('http://localhost:7000/api/v1/uni/get-all-universal-Request', {
+                const response = await axios.get('https://api.srtutorsbureau.com/api/v1/uni/get-all-universal-Request', {
                     headers: {
                         Authorization: `Bearer ${Token}`
                     }
@@ -85,7 +85,7 @@ const AllRequest = () => {
 
     const UpdateStatusByAdmin = async (requestId, status) => {
         try {
-            const response = await axios.post('http://localhost:7000/api/v1/uni/Accept-Request', {
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/uni/Accept-Request', {
                 requestId,
                 status,
                 requestType: "admin"
@@ -142,7 +142,7 @@ const AllRequest = () => {
             // If the user confirms, proceed with the delete request
             if (result.isConfirmed) {
                 // Send delete request to the server
-                const response = await axios.delete(`http://localhost:7000/api/v1/uni/delete-Request/${requestId}`);
+                const response = await axios.delete(`https://api.srtutorsbureau.com/api/v1/uni/delete-Request/${requestId}`);
 
                 // Check if deletion was successful
                 if (response.data.status === 'success') {
@@ -193,7 +193,7 @@ const AllRequest = () => {
 
     const handleDealDone = async (id) => {
         try {
-            await axios.post(`http://localhost:7000/api/v1/uni/deal-done-Request`, {
+            await axios.post(`https://api.srtutorsbureau.com/api/v1/uni/deal-done-Request`, {
                 requestId: id, status: true
             })
             setAllData((prevData) =>
@@ -237,7 +237,7 @@ const AllRequest = () => {
     const handleLocationLatAndLngFetch = async (address) => {
         const options = {
             method: 'GET',
-            url: `http://localhost:7000/geocode?address=${encodeURIComponent(address)}` // Use encodeURIComponent
+            url: `https://api.srtutorsbureau.com/geocode?address=${encodeURIComponent(address)}` // Use encodeURIComponent
         };
 
         try {
@@ -285,7 +285,7 @@ const AllRequest = () => {
 
         await handleLocationLatAndLngFetch(locality);
         try {
-            const response = await axios.post('http://localhost:7000/api/v1/admin/make-search', formData);
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/admin/make-search', formData);
             console.log(response.data)
         } catch (error) {
             console.log(error)

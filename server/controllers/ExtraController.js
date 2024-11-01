@@ -77,12 +77,33 @@ exports.CreateUniversalRequest = CatchAsync(async (req, res) => {
 
             }
         }
-
-        const userLocation = {
+        let userLocation = {
             type: 'Point',
-            coordinates: [location.coordinates[1], location.coordinates[0]]
+            coordinates: []
         };
-
+        
+        // Check if request type is for a particular teacher request
+        if (requestType === "Particular Teacher Request") {
+            // Use AddressDetails coordinates
+            userLocation.coordinates = [
+                AddressDetails.lng, // Longitude
+                AddressDetails.lat   // Latitude
+            ];
+        } else if (location && Array.isArray(location.coordinates) && location.coordinates.length >= 2) {
+            // Check if location is defined and has valid coordinates
+            userLocation.coordinates = [
+                location.coordinates[1], // Longitude
+                location.coordinates[0]  // Latitude
+            ];
+        } else {
+            // Fallback to AddressDetails if location is invalid
+            userLocation.coordinates = [
+                AddressDetails.lng,
+                AddressDetails.lat
+            ];
+        }
+        
+        // Find teachers within the specified location
         const findTeacherWhichTechInLocation = await TeacherProfile.find({
             'RangeWhichWantToDoClasses.location': {
                 $near: {
@@ -90,10 +111,14 @@ exports.CreateUniversalRequest = CatchAsync(async (req, res) => {
                     $maxDistance: 5000
                 }
             }
-        })
+        });
         
-        const url = `${process.env.FRONETND_URL}/Search-result?role=student&SearchPlaceLat=${location.coordinates[0]}&SearchPlaceLng=${location.coordinates[1]}&via-home-page&Location=${locality || currentAddress}&ClassId=${classId}&ClassNameValue=${className}&Subject=${subjects[0]}&lat=${location.coordinates[0]}7&lng=${location.coordinates[1]}&locationParam=${locality || currentAddress}`
-
+        // Construct the URL with proper fallback values
+        const lat = (location && location.coordinates && location.coordinates[0]) ? location.coordinates[0] : AddressDetails.lat;
+        const lng = (location && location.coordinates && location.coordinates[1]) ? location.coordinates[1] : AddressDetails.lng;
+        
+        const url = `${process.env.FRONETND_URL}/Search-result?role=student&SearchPlaceLat=${lat}&SearchPlaceLng=${lng}&via-home-page&Location=${locality || currentAddress}&ClassId=${classId}&ClassNameValue=${className}&Subject=${subjects[0]}&lat=${lat}&lng=${lng}&locationParam=${locality || currentAddress}`;
+        
         await sendLeadMessageToTeacher(findTeacherWhichTechInLocation.length, findTeacherWhichTechInLocation, url)
         // console.log("teachers",findTeacherWhichTechInLocation.length)
         await newRequest.save();

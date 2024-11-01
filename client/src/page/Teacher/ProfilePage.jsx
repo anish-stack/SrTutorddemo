@@ -143,7 +143,7 @@ const ProfilePage = () => {
     const fetchUser = async () => {
         try {
             const response = await axios.get(
-                `http://localhost:7000/api/v1/teacher/Teacher-details/${IdQuery}`
+                `https://api.srtutorsbureau.com/api/v1/teacher/Teacher-details/${IdQuery}`
             );
             console.log(response.data)
             setUser(response.data.data)
@@ -161,7 +161,7 @@ const ProfilePage = () => {
     const fetchSubjects = async (classId) => {
         try {
             const response = await axios.get(
-                `http://localhost:7000/api/v1/admin/Get-Class-Subject/${classId}`
+                `https://api.srtutorsbureau.com/api/v1/admin/Get-Class-Subject/${classId}`
             );
             console.log(response.data)
             if (response.data.data) {
@@ -285,7 +285,7 @@ const ProfilePage = () => {
 
     const getState = async () => {
         try {
-            const { data } = await axios.get("http://localhost:7000/api/jd/getStates");
+            const { data } = await axios.get("https://api.srtutorsbureau.com/api/jd/getStates");
             setStates(data.map(state => ({ value: state, label: state }))); // Format for react-select
         } catch (error) {
             console.log(error);
@@ -295,7 +295,7 @@ const ProfilePage = () => {
 
     const getCity = async (state) => {
         try {
-            const { data } = await axios.get(`http://localhost:7000/api/jd/getCitiesByState?state=${state}`);
+            const { data } = await axios.get(`https://api.srtutorsbureau.com/api/jd/getCitiesByState?state=${state}`);
             setCities(data.map(city => ({ value: city, label: city }))); // Format for react-select
         } catch (error) {
             console.log(error);
@@ -305,7 +305,7 @@ const ProfilePage = () => {
 
     const getAreasByCity = async (city) => {
         try {
-            const { data } = await axios.get(`http://localhost:7000/api/jd/getAreasByCity?city=${city}`);
+            const { data } = await axios.get(`https://api.srtutorsbureau.com/api/jd/getAreasByCity?city=${city}`);
             setAreas(data.map(area => ({ value: `${area.placename}|${area.lat}|${area.lng}`, label: area.placename })));
         } catch (error) {
             console.log(error);
@@ -383,7 +383,7 @@ const ProfilePage = () => {
             setLoading(true);
 
 
-            await axios.post('http://localhost:7000/api/v1/teacher/teacher-profile', formData, {
+            await axios.post('https://api.srtutorsbureau.com/api/v1/teacher/teacher-profile', formData, {
                 headers: {
                     Authorization: `Bearer ${tokenQuery}`
                 }
@@ -414,7 +414,7 @@ const ProfilePage = () => {
         };
         
         try {
-           await axios.post('http://localhost:7000/api/v1/admin/AddNewArea', data);
+           await axios.post('https://api.srtutorsbureau.com/api/v1/admin/AddNewArea', data);
             // console.log("New Area:", addNewArea.data); // Log the response data
             getAreasByCity(formData.TeachingLocation.City)
         } catch (error) {

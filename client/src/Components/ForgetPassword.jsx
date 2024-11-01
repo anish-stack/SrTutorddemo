@@ -13,6 +13,7 @@ const ForgetPassword = () => {
 
     const [formData, setFormData] = useState({
         Email: '',
+        PhoneNumber:'',
         otp: '',
         password: '',
         confirmPassword: ''
@@ -64,19 +65,20 @@ const ForgetPassword = () => {
     const handleSubmitEmail = async (e) => {
         e.preventDefault();
         const apiUrl = SearchType === 'teacher'
-            ? 'http://localhost:7000/api/v1/teacher/teacher-Password-Change-Request'
-            : 'http://localhost:7000/api/v1/student/Student-Password-Change-Request';
+            ? 'https://api.srtutorsbureau.com/api/v1/teacher/teacher-Password-Change-Request'
+            : 'https://api.srtutorsbureau.com/api/v1/student/Student-Password-Change-Request';
 
         setLoading(true); // Start loading
 
         try {
-            await axios.post(apiUrl, { Email: formData.Email });
+            await axios.post(apiUrl, { any: formData.Email });
             toast.success('OTP sent to your Whatsapp  number!');
             setStep(2);
             setIsEmailVerified(true); // Mark email as verified
             setOtpResendDisabled(true); // Disable resend OTP for a period
             setTimer(300); // Reset timer to 2 minutes
         } catch (error) {
+            console.log(error)
             toast.error(error.response?.data?.message || 'Please enter a valid email');
         } finally {
             setLoading(false); // Stop loading
@@ -106,14 +108,14 @@ const ForgetPassword = () => {
         }
 
         const apiUrl = SearchType === 'teacher'
-            ? 'http://localhost:7000/api/v1/teacher/teacher-Password-Verify-Otp'
-            : 'http://localhost:7000/api/v1/student/Student-Password-Verify-Otp';
+            ? 'https://api.srtutorsbureau.com/api/v1/teacher/teacher-Password-Verify-Otp'
+            : 'https://api.srtutorsbureau.com/api/v1/student/Student-Password-Verify-Otp';
 
         setLoading(true); // Start loading
 
         try {
             await axios.post(apiUrl, {
-                Email: formData.Email,
+                any: formData.Email,
                 otp: formData.otp,
                 newPassword: formData.password
             });
@@ -135,13 +137,13 @@ const ForgetPassword = () => {
         }
 
         const apiUrl = SearchType === 'teacher'
-            ? 'http://localhost:7000/api/v1/teacher/teacher-Password-resend-otp'
-            : 'http://localhost:7000/api/v1/student/Student-Password-resend-Otp';
+            ? 'https://api.srtutorsbureau.com/api/v1/teacher/teacher-Password-resend-otp'
+            : 'https://api.srtutorsbureau.com/api/v1/student/Student-Password-resend-Otp';
 
         setLoading(true); // Start loading
 
         try {
-            await axios.post(apiUrl, { Email: formData.Email, howManyHit: resendCount });
+            await axios.post(apiUrl, { any: formData.Email, howManyHit: resendCount });
             toast.success('OTP resent successfully!');
 
             // Increment resend attempts and update localStorage
@@ -165,15 +167,16 @@ const ForgetPassword = () => {
                     <form onSubmit={handleSubmitEmail} className="border p-4 rounded">
                         <h3 className="text-center mb-4">Forget Password</h3>
                         <div className="mb-3">
-                            <label htmlFor="Email" className="form-label">Email</label>
+                            <label htmlFor="Email" className="form-label">                    Write your Email Or Contact Number
+                            </label>
                             <input
-                                type="email"
+                                type="text"
                                 className="form-control"
                                 id="Email"
                                 name="Email"
                                 value={formData.Email}
                                 onChange={handleChange}
-                                placeholder="Enter your registered email"
+                                placeholder="Enter your registered email or phone number any"
                                 required
                             />
                         </div>

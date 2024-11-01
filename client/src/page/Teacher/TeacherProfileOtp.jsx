@@ -34,7 +34,7 @@ const TeacherProfileOtp = () => {
         setError('');
         try {
             const res = await axios.post(
-                'http://localhost:7000/api/v1/teacher/Verify-profile-otp',
+                'https://api.srtutorsbureau.com/api/v1/teacher/Verify-profile-otp',
                 { otp },
                 {
                     headers: {
@@ -68,7 +68,7 @@ const TeacherProfileOtp = () => {
 
         try {
             const res = await axios.post(
-                'http://localhost:7000/api/v1/teacher/profile-otp',
+                'https://api.srtutorsbureau.com/api/v1/teacher/profile-otp',
                 { HowManyRequest: otpCount },
                 {
                     headers: {
