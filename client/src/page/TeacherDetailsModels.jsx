@@ -90,7 +90,7 @@ const TeacherDetailsModels = ({ isOpen, isClose, item, teacherClasses }) => {
                                     </div>
                                 </div>
                                 {/* Review Section */}
-                                <div className='teacher-review py-3 bg-light'>
+                                {/* <div className='teacher-review py-3 bg-light'>
                                     <h6 className='mb-4 text-center'>Student Reviews</h6>
                                     <div className='row'>
                                         <Swiper
@@ -143,7 +143,7 @@ const TeacherDetailsModels = ({ isOpen, isClose, item, teacherClasses }) => {
 
                                         </Swiper>
                                     </div>
-                                </div>
+                                </div> */}
                             </div>
 
                         </div>

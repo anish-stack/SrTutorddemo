@@ -332,6 +332,7 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
             }
         }
     };
+    const [apiAddress,setApiAddress] = useState(null)
 
     const fetchLocation = async () => {
         if (navigator.geolocation) {
@@ -345,7 +346,7 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
                         });
     
                         const address = data?.data?.address;
-                        console.log(address);
+                        setApiAddress(address)
                         if (address) {
                             setFormData((prev) => ({
                                 ...prev,
@@ -396,6 +397,16 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
             maxBudget: formData.Maxmimu || '1000',
             locality: formData.Location,
             startDate: formData.StartDate,
+            AddressDetails:{
+                completeAddress: apiAddress?.completeAddress,
+                city: apiAddress?.city,
+                area: apiAddress?.area,
+                district: apiAddress?.district,
+                postalCode:apiAddress?.postalCode,
+                landmark: null,
+                lat:apiAddress?.lat,
+                lng: apiAddress?.lng
+              },
             specificRequirement: formData.specificrequirement,
             currentAddress: formData.currentAddress || null,
             location: formData.location || {
@@ -712,7 +723,7 @@ const SubjectModel = ({ showModal, handleClose, subject }) => {
                                         <Col md={12}>
                                             <Form.Group className="mb-1"
                                                 required>
-                                                <Form.Label>User Contact Info  <b className="text-danger fs-5">*</b></Form.Label>
+                                                <Form.Label>Student Contact Info  <b className="text-danger fs-5">*</b></Form.Label>
                                                 <Form.Control
                                                     type="text"
                                                     name="Name"

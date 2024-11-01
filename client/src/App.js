@@ -11,6 +11,8 @@ import PlansAndTerms from "./page/Policy/PlansAndTerms";
 import RefundPolicy from "./page/Policy/RefundPolicy";
 import ForgetPassword from "./Components/ForgetPassword";
 import Google from "./Google";
+import Loader from "./Components/Loader";
+import axios from "axios";
 // Lazy load components
 const Home = lazy(() => import("./page/Home"));
 const Aboutus = lazy(() => import("./page/Aboutus"));
@@ -38,6 +40,9 @@ function App() {
   const location = useLocation();
   const [login, setLogin] = useState(false)
   const [studentLogin, setStudentLogin] = useState(false)
+  const [areas, setAreas] = useState([]);
+  const [loading, setLoading] = useState(true);
+
 
 
 
@@ -71,13 +76,14 @@ function App() {
       showHeader(true);
       setFooter(true);
     }
-// asdde
-    // Scroll to top on route change
+ 
+
     window.scrollTo({
       top: 0,
-      behavior: "smooth", // 'smooth' for animated scroll, 'auto' for instant scroll
+      behavior: "smooth", 
     });
   }, [location.pathname]);
+
 
   return (
     <>
@@ -86,7 +92,7 @@ function App() {
       <Suspense fallback={<div style={{height:'100vh'}} className="w-100 d-flex align-items-center justify-content-center"><HomeLoader/> </div>}>
    
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Home data={areas} />} />
           <Route path="/about-us" element={<Aboutus />} />
           <Route path="/blogs/:id" element={<SingleBlog />} />
           <Route path="/Student-register" element={<StudentRegistration />} />

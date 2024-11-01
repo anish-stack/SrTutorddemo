@@ -142,10 +142,11 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
   }, [data, teacherData]);
 
   useEffect(() => {
+   
     if (formData.ClassId) {
-      // console.log("id", formData.ClassId)
+      console.log("id", formData.ClassId)
       const selectedClass = concatenatedData.find(item => item.id === formData.ClassId);
-      // console.log("i am done", selectedClass)
+      console.log("i am done", selectedClass.class)
       if (selectedClass) {
         setFormData(prevFormData => ({
           ...prevFormData,
@@ -153,7 +154,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
         }));
       }
     }
-  }, [formData.ClassId, concatenatedData]);
+  }, [formData.ClassId]);
 
   const fetchSubjects = async (classId) => {
     try {
@@ -221,23 +222,17 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
     try {
       const response = await axios.request(options);
       const result = response.data;
-      // console.log("Result from us", result)
       if (result) {
-        // Update state with latitude and longitude from the result
         setClickLatitude(result?.latitude);
         setClickLongitude(result?.longitude);
       }
-      // console.log("Result from setClickLatitude", ClickLatitude)
-      // console.log("Result from setClickLongitude", ClickLongitude)
+   
 
     } catch (error) {
       console.error("Error fetching location coordinates:", error);
     }
   };
-  useEffect(() => {
-    // console.log("Updated ClickLatitude:", ClickLatitude);
-    // console.log("Updated ClickLongitude:", ClickLongitude);
-  }, [ClickLatitude, ClickLongitude]);
+
 
   const handleLocationFetch = async (input) => {
     try {
@@ -291,10 +286,15 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
   const handleClassChange = (e) => {
     const classId = e ? e.target.value : "";
     setSelectedClass(classId);
-    setFormData(prevState => ({ ...prevState, Subject: [] }));
+    setFormData(prevState => ({ ...prevState,
+      ClassId: classId,
+
+
+       Subject: [] }));
     fetchSubjects(classId);
   };
 
+  const [apiAddress,setApiAddress] = useState(null)
 
   const fetchLocation = async () => {
     if (navigator.geolocation) {
@@ -308,7 +308,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
                     });
 
                     const address = data?.data?.address;
-                    // console.log(address);
+                    setApiAddress(address)
                     if (address) {
                       setFormData((prev) => ({
                         ...prev,
@@ -334,7 +334,7 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
 
   useEffect(() => {
     fetchLocation()
-  }, [formData])
+  }, [coords])
 
 
   const validateFields = () => {
@@ -525,10 +525,11 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
     const latEmergency = 28.6909129;
     const lngEmergency = 77.1518306;
     const student = Cookies.get("studentToken");
+    console.log("formData: ", formData)
     const submittedData = {
       requestType: "Particular Teacher Request",
-      classId: formData?.ClassId || null,
-      className: formData?.className,
+      classId: formData?.ClassId || selectedClass,
+      className: formData?.className || selectedClass,
       subjects: formData?.Subject,
       ClassLangUage: formData.ClassLangUage,
       interestedInTypeOfClass: formData?.TeachingMode,
@@ -540,6 +541,16 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
       locality: formData?.locality,
       startDate: formData?.StartDate,
       specificRequirement: formData?.SpecificRequirement,
+      AddressDetails:{
+        completeAddress: apiAddress?.completeAddress,
+        city: apiAddress?.city,
+        area: apiAddress?.area,
+        district: apiAddress?.district,
+        postalCode:apiAddress?.postalCode,
+        landmark: null,
+        lat:apiAddress?.lat,
+        lng: apiAddress?.lng
+      },
       location: formData.Location || {
         type: 'Point',
         coordinates: [ClickLongitude || lngEmergency, ClickLatitude || latEmergency]
@@ -551,8 +562,8 @@ const ContactTeacherModal = ({ isOpen, isClose, teachersData }) => {
         emailAddress: formData.StudentEmail,
       },
     };
-    // console.log("submittedData", submittedData)
-    setLoading(true);
+    console.log("submittedData", submittedData)
+    // setLoading(true);
     try {
       const response = await axios.post('https://api.srtutorsbureau.com/api/v1/student/universal-request', submittedData, {
         headers: { Authorization: `Bearer ${student || studentToken}` }

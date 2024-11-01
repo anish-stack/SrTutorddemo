@@ -3,6 +3,8 @@ const TeacherProfile = require("../models/TeacherProfile.model");
 const Class = require("../models/ClassModel");
 const CatchAsync = require("../utils/CatchAsync");
 const sendToken = require("../utils/SendToken");
+const universal = require("../models/UniversalSchema");
+
 const sendEmail = require("../utils/SendEmails");
 const crypto = require("crypto");
 const Mongoose = require('mongoose');
@@ -16,6 +18,7 @@ const ClassRequest = require('../models/ClassRequest')
 const axios = require('axios');
 const Request = require("../models/UniversalSchema");
 const SendWhatsAppMessage = require("../utils/SendWhatsappMeg");
+const locality = require("../models/Locality.model")
 const cron = require('node-cron');
 const sendLeadMessageToTeacher = require("../utils/SendLeadMsg");
 // Configure Cloudinary
@@ -75,6 +78,7 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
         return res.status(400).json({ message: "You are blocked For 24 Hours ,Please retry After the 24 Hours" });
       } else if (existingTeacher.hit >= 3) {
         existingTeacher.isBlockForOtp = true
+        existingTeacher.OtpBlockTime = new Date();
         await existingTeacher.save()
         return res.status(400).json({
           message: "You are blocked For 24 Hours. Please retry after 24 hours."
@@ -277,6 +281,7 @@ exports.TeacherResendOtp = CatchAsync(async (req, res) => {
     // Check if the teacher hit the limit of OTP requests
     if (Teachers.hit >= 3) { // Block if hit is 3 or more
       Teachers.isBlockForOtp = true;
+      Teachers.isBlockForOtp = new Date()
       await Teachers.save();
       return res.status(400).json({
         message: "You are blocked for 24 hours. Please retry after 24 hours.",
@@ -343,7 +348,7 @@ exports.teacherBlockForOtp = CatchAsync(async (req, res) => {
       Teachers.isBlockForOtp = true;
       Teachers.OtpBlockTime = new Date();
       await Teachers.save();
-      return res.status(200).json({ message: "Yout Are  blocked from requesting OTP for End Of The day" });
+      return res.status(200).json({ message: "You Are  blocked from requesting OTP for End Of The day" });
     }
     console.log(Teacher)
     res.status(200).json({ message: "Teacher request within limit" });
@@ -404,10 +409,14 @@ exports.TeacherLogin = CatchAsync(async (req, res) => {
 //Teacher Password Change Request
 exports.TeacherPasswordChangeRequest = CatchAsync(async (req, res) => {
   try {
-    const { Email } = req.body;
+    const { any } = req.body;
 
-    // Find the teacher by email
-    const teacher = await Teacher.findOne({ Email });
+    const teacher = await Teacher.findOne({
+      $or: [
+        { Email: any },
+        { PhoneNumber: any }
+      ]
+    })
     if (!teacher) {
       return res.status(404).json({ message: "Teacher not found. Please check the email address and try again." });
     }
@@ -441,6 +450,7 @@ exports.TeacherPasswordChangeRequest = CatchAsync(async (req, res) => {
     // Success response
     res.status(200).json({ message: "Password reset OTP has been successfully sent to your registered phone number." });
   } catch (err) {
+    console.log(err.message)
     console.error("Error in TeacherPasswordChangeRequest:", err.message);
     res.status(500).json({ message: "An error occurred while processing your request. Please try again later." });
   }
@@ -450,10 +460,14 @@ exports.TeacherPasswordChangeRequest = CatchAsync(async (req, res) => {
 // Teacher Verify Password OTP
 exports.TeacherVerifyPasswordOtp = CatchAsync(async (req, res) => {
   try {
-    const { Email, otp, newPassword } = req.body;
+    const { any, otp, newPassword } = req.body;
 
-    // Find the teacher by email
-    const teacher = await Teacher.findOne({ Email });
+    const teacher = await Teacher.findOne({
+      $or: [
+        { Email: any },
+        { PhoneNumber: any }
+      ]
+    })
     if (!teacher) {
       return res.status(404).json({ message: "Teacher not found. Please check the email address and try again." });
     }
@@ -482,10 +496,16 @@ exports.TeacherVerifyPasswordOtp = CatchAsync(async (req, res) => {
 
 //Teacher Resent Password Otp
 exports.TeacherPasswordOtpResent = CatchAsync(async (req, res) => {
-  const { Email, howManyHit } = req.body;
+  const { any, howManyHit } = req.body;
 
   // Find teacher by email
-  const teacher = await Teacher.findOne({ Email });
+  const teacher = await Teacher.findOne({
+    $or: [
+      { Email: any },
+      { PhoneNumber: any }
+    ]
+
+  });
   if (!teacher) {
     return res.status(404).json({ message: "Teacher not found." });
   }
@@ -582,17 +602,17 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
       RangeWhichWantToDoClasses,
 
     } = req.body;
-    
+
 
     const RangeableData = req.body.TeachingLocation
     console.log(RangeableData)
-    const MakeRangebaleData = RangeableData.Area && RangeableData.Area.length > 0 ? 
-    RangeableData.Area.map(item => ({
+    const MakeRangebaleData = RangeableData.Area && RangeableData.Area.length > 0 ?
+      RangeableData.Area.map(item => ({
         location: {
-            type: 'Point', 
-            coordinates: [item.lng, item.lat] 
+          type: 'Point',
+          coordinates: [item.lng, item.lat]
         }
-    })) : [];
+      })) : [];
     // console.log(MakeRangebaleData)
 
     const emptyFields = [];
@@ -648,8 +668,8 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
     const TeachingLocations = {
       State: RangeableData.State,
       City: RangeableData.City,
-      Area: RangeableData.Area.map(item => item.placename) 
-  };
+      Area: RangeableData.Area.map(item => item.placename)
+    };
 
     const teacherProfile = new TeacherProfile({
       TeacherUserId: userId,
@@ -664,7 +684,7 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
       Qualification,
       TeachingExperience,
       ExpectedFees,
-      TeachingLocation:TeachingLocations,
+      TeachingLocation: TeachingLocations,
       VehicleOwned,
       TeachingMode,
       AcademicInformation,
@@ -1292,7 +1312,7 @@ exports.GetAllTeacher = CatchAsync(async (req, res) => {
     }
 
     // Fetch Teacher from database
-    const teacher = await Teacher.find().populate('TeacherProfile');
+    const teacher = await Teacher.find().populate('TeacherProfile').sort({ "createdAt": -1 });
 
     if (!teacher) {
       return res.status(404).json({
@@ -1563,99 +1583,247 @@ exports.AdvancedQueryForFindingTeacher = CatchAsync(async (req, res) => {
   }
 });
 
+
+const acceptableCitiesAndStates = [
+  // Delhi Variations
+  'Delhi',
+  'New Delhi',
+  'Dilli',
+  'Delhi NCR',
+
+  // Uttar Pradesh Variations
+  'Uttar Pradesh',
+  'UP',
+  'U.P.',
+  'Uttar Prdesh',
+  'Uttar Pradesh NCR',
+  'Uttar Pradesh, India',
+
+  // Maharashtra Variations
+  'Maharashtra',
+  'MH',
+  'Maharashtra State',
+  'Maharashtra, India',
+
+  // Karnataka Variations
+  'Karnataka',
+  'KA',
+  'Karnataka State',
+  'Karnataka, India',
+
+  // Tamil Nadu Variations
+  'Tamil Nadu',
+  'TN',
+  'Tamil Nadu State',
+  'Tamil Nadu, India',
+
+  // West Bengal Variations
+  'West Bengal',
+  'WB',
+  'West Bengal State',
+  'West Bengal, India',
+
+  // Gujarat Variations
+  'Gujarat',
+  'GJ',
+  'Gujarat State',
+  'Gujarat, India',
+
+  // Rajasthan Variations
+  'Rajasthan',
+  'RJ',
+  'Rajasthan State',
+  'Rajasthan, India',
+
+  // Punjab Variations
+  'Punjab',
+  'PB',
+  'Punjab State',
+  'Punjab, India',
+
+  // Haryana Variations
+  'Haryana',
+  'HR',
+  'Haryana State',
+  'Haryana, India',
+
+  // Telangana Variations
+  'Telangana',
+  'TG',
+  'Telangana State',
+  'Telangana, India',
+
+  // Kerala Variations
+  'Kerala',
+  'KL',
+  'Kerala State',
+  'Kerala, India',
+
+  // Andhra Pradesh Variations
+  'Andhra Pradesh',
+  'AP',
+  'Andhra Pradesh State',
+  'Andhra Pradesh, India',
+
+  // Other States and Cities
+  'Himachal Pradesh',
+  'HP',
+  'Himachal Pradesh, India',
+  'Bihar',
+  'BR',
+  'Bihar, India',
+  'Odisha',
+  'OR',
+  'Odisha, India',
+  'Assam',
+  'AS',
+  'Assam, India',
+  'Jharkhand',
+  'JH',
+  'Jharkhand, India',
+  'Chhattisgarh',
+  'CG',
+  'Chhattisgarh, India',
+  'Madhya Pradesh',
+  'MP',
+  'Madhya Pradesh, India',
+  'Sikkim',
+  'SK',
+  'Sikkim, India',
+  'Uttarakhand',
+  'UK',
+  'Uttarakhand, India',
+  'Delhi',
+  'New Delhi',
+  'Dilli',
+  'Delhi NCR'
+];
+
+
 exports.SearchByMinimumCondition = CatchAsync(async (req, res) => {
   try {
-    const { ClassId, Subject } = req.params
-    const { lat, lng, SearchPlaceLat, SearchPlaceLng, role, ClassNameValue, locationParam } = req.query;
-    const url = `${process.env.FRONETND_URL}/Search-result?role=${role}&SearchPlaceLat=${SearchPlaceLat}&SearchPlaceLng=${SearchPlaceLng}&via-home-page&Location=Rohini-Delhi-India&ClassId=${ClassId}&ClassNameValue=${ClassNameValue}&Subject=${Subject}&lat=${lat}7&lng=${lng}&locationParam=${locationParam}`
+    const { ClassId, Subject } = req.params;
+    const { role, ClassNameValue, locationParam, result } = req.query;
+    const ParsedResult = JSON.parse(result);
+    console.log(ParsedResult)
+    const { city, area, district, lat, lng } = ParsedResult.addressDetails;
+
+    console.log("Parsed Address Details:", ParsedResult);
 
 
-    if (!lat || !lng || !SearchPlaceLat || !SearchPlaceLng) {
-      return res.status(400).json({ message: 'Latitude and longitude are required.' });
-    }
+    const areaArray = Array.isArray(area) ? area : [area]; // Ensure area is an array
 
-    const userLat = parseFloat(lat);
-    const userLng = parseFloat(lng);
-    const searchPlaceLat = parseFloat(SearchPlaceLat);
-    const searchPlaceLng = parseFloat(SearchPlaceLng);
-
-    // if (isNaN(userLat) || isNaN(userLng) || isNaN(searchPlaceLat) || isNaN(searchPlaceLng)) {
-    //   return res.status(400).json({ message: 'Valid latitude and longitude are required.' });
-    // }
-
-
-    if (!ClassId || !Subject) {
-      return res.status(400).json({ message: 'ClassId and Subject are required.' });
-    }
+    const areaWords = area.split(/\s+/); // Split the string into words based on spaces
+    const areaPrefix = area.substring(0, 3);
 
     const objectClass = new Mongoose.Types.ObjectId(ClassId);
-
-    const userLocation = {
-      type: 'Point',
-      coordinates: [searchPlaceLng, searchPlaceLat]
-    };
-
-    let finalResults = [];
-
-    if (role === 'student') {
-      // Fetch teacher profiles within the specified range
-      const locationResults = await TeacherProfile.find({
-        'RangeWhichWantToDoClasses.location': {
-          $near: {
-            $geometry: userLocation,
-            $maxDistance: 5000
-          }
-        }
-      });
-
-      finalResults = locationResults.filter(profile => {
-        const academicInfo = profile.AcademicInformation || [];
-        return academicInfo.some(item => {
-          return item.ClassId instanceof Mongoose.Types.ObjectId
-            ? item.ClassId.equals(objectClass) && item.SubjectNames.includes(Subject)
-            : false;
-        });
-      });
-
-      const lead = await sendLeadMessageToTeacher(finalResults.length, finalResults, url)
-      const redisClient = req.app.locals.redis;
-
-      if (!redisClient) {
-        throw new Error("Redis client is not available.");
-      }
-      await redisClient.del(`Teacher`);
-    } else if (role === 'tutor') {
-
-      try {
-        console.log(ClassNameValue, Subject)
-        const { data } = await axios.get('https://api.srtutorsbureau.com/api/v1/uni/get-all-universal-Request')
-        console.log(data.data[9])
-        const CombinedData = data?.data
-        const findTeacherRequest = CombinedData.filter(item => item.className === ClassNameValue.toString() && item.subjects.includes(Subject))
+    // First Search: Basic Matching
 
 
-        if (findTeacherRequest.length === 0) {
-          return res.status(404).json({ message: 'No teachers found.' });
-        }
+    if (role === 'tutor') {
 
-        finalResults = findTeacherRequest;
-      } catch (error) {
-        return res.status(403).json({
-          success: false,
-          message: "No Request Found For This LocationOops! Something went wrong"
-        })
-      }
+      const findStudents = await universal.find({ className: ClassNameValue })
+
+      const findViaSubject = findStudents.filter((item) => item.subjects.includes(Subject))
+      console.log("findViaSubject", findViaSubject)
+      // const findViaLocation = findViaSubject.filter((item)=> item.locality === ParsedResult.formatted_address )
+      // console.log(findViaSubject)
+      return res.status(200).json({ success: true, count: findViaSubject.length, results: findViaSubject });
 
     } else {
-      return res.status(400).json({ message: 'Invalid role.' });
+      const firstSearch = await TeacherProfile.find({
+        'TeachingLocation.State': city,
+        'TeachingLocation.City': district,
+        'TeachingLocation.Area': {
+          $regex: `^(${areaPrefix})`, // Matches any of the words at the start
+          $options: 'i' // Case insensitive
+        },
+      });
+
+
+      const firstSubjectFilter = firstSearch.filter(profile => {
+        const academicInfo = profile.AcademicInformation || [];
+        return academicInfo.some(item => item.ClassId instanceof Mongoose.Types.ObjectId
+          ? item.ClassId.equals(objectClass) && item.SubjectNames.includes(Subject)
+          : false);
+      });
+
+      if (firstSubjectFilter.length > 0) {
+        console.log("firstSubjectFilter.length", firstSubjectFilter.length)
+
+        return res.status(200).json({ success: true, count: firstSubjectFilter.length, results: firstSubjectFilter });
+      }
+
+      // Second Search: Alternative Matching
+      const cityFor = ParsedResult?.formatted_address.split(',').map(part => part.trim()).join('|');
+      const splitDistrict = district.split(' ').map(part => part.trim()).join('|');
+
+      const secondSearch = await TeacherProfile.find({
+        $or: [
+          {
+            'TeachingLocation.State': { $regex: cityFor, $options: 'i' },
+            'TeachingLocation.City': { $regex: splitDistrict, $options: 'i' },
+            'TeachingLocation.Area': { $in: areaArray },
+          },
+          {
+            'TeachingLocation.Area': { $in: areaArray },
+            'TeachingLocation.State': { $regex: splitDistrict, $options: 'i' },
+            'TeachingLocation.City': { $regex: cityFor, $options: 'i' },
+          },
+        ],
+      });
+      console.log("secondSearch", secondSearch.length)
+      const secondSubjectFilter = secondSearch.filter(profile => {
+        const academicInfo = profile.AcademicInformation || [];
+        return academicInfo.some(item => item.ClassId instanceof Mongoose.Types.ObjectId
+          ? item.ClassId.equals(objectClass) && item.SubjectNames.includes(Subject)
+          : false);
+      });
+
+      if (secondSubjectFilter.length > 0) {
+        console.log("secondSubjectFilter.length", secondSubjectFilter.length)
+
+        return res.status(200).json({ success: true, count: secondSubjectFilter.length, results: secondSubjectFilter });
+      }
+
+      // console.log(lng + 1)
+      const roundedLat = parseFloat(lat.toFixed(5));
+      const roundedLng = parseFloat(lng.toFixed(5));
+      // Third Search: Geolocation-Based
+      console.log("Rounded Latitude:", roundedLat);
+      console.log("Rounded Longitude:", roundedLng);
+      const thirdSearch = await TeacherProfile.find({
+        'RangeWhichWantToDoClasses.location': {
+          $near: {
+            $geometry: {
+              type: 'Point',
+              coordinates: [85.8204646, 26.3321245],
+            },
+            $maxDistance: 5000
+
+          },
+        },
+      });
+
+
+      console.log("secondSubjectFilter", thirdSearch.length)
+      const thirdSubjectFilter = thirdSearch.filter(profile => {
+        const academicInfo = profile.AcademicInformation || [];
+        return academicInfo.some(item => item.ClassId instanceof Mongoose.Types.ObjectId
+          ? item.ClassId.equals(objectClass) && item.SubjectNames.includes(Subject)
+          : false);
+      });
+
+      if (thirdSubjectFilter.length > 0) {
+        console.log("thirdSubjectFilter.length", thirdSubjectFilter.length)
+        return res.status(200).json({ success: true, count: thirdSubjectFilter.length, results: thirdSubjectFilter });
+      }
+
+      // No Results Found
+      return res.status(404).json({ success: false, message: "No teachers found matching the criteria." });
+
     }
 
-
-    res.status(200).json({
-      success: true,
-      count: finalResults.length,
-      results: finalResults,
-    });
   } catch (error) {
     console.error("Error in SearchByMinimumCondition:", error);
     res.status(500).json({
@@ -1664,6 +1832,9 @@ exports.SearchByMinimumCondition = CatchAsync(async (req, res) => {
     });
   }
 });
+
+
+
 
 exports.BrowseTutorsNearMe = CatchAsync(async (req, res) => {
   try {
@@ -2087,7 +2258,7 @@ exports.SingleAllData = CatchAsync(async (req, res) => {
 
 
 
-cron.schedule('0 0 * * *', async () => {
+cron.schedule('0 0 * * * *', async () => {
   try {
     console.log("Cron job running at:", new Date());
 

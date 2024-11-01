@@ -40,8 +40,8 @@ const ProfilePage = () => {
             State: '',
             City: '',
             Area: '',
-            lat:'',
-            lng:''
+            lat: '',
+            lng: ''
         },
         AcademicInformation: [{
             classid: '',
@@ -306,7 +306,7 @@ const ProfilePage = () => {
     const getAreasByCity = async (city) => {
         try {
             const { data } = await axios.get(`https://api.srtutorsbureau.com/api/jd/getAreasByCity?city=${city}`);
-            setAreas(data.map(area => ({ value: `${area.placename}|${area.lat}|${area.lng}`, label: area.placename }))); 
+            setAreas(data.map(area => ({ value: `${area.placename}|${area.lat}|${area.lng}`, label: area.placename })));
         } catch (error) {
             console.log(error);
         }
@@ -321,7 +321,7 @@ const ProfilePage = () => {
             ...formData,
             TeachingLocation: { ...formData.TeachingLocation, State: selectedState, City: '', Area: [] },
         });
-        setCities([]); 
+        setCities([]);
         setAreas([]);
         getCity(selectedState);
     };
@@ -337,29 +337,39 @@ const ProfilePage = () => {
         getAreasByCity(selectedCity);
     };
 
-
     const handleAreaChange = (selectedOptions) => {
-        console.log(selectedOptions);
+        console.log(selectedOptions); // For debugging purposes
     
+        // Initialize an array to hold the selected area details
         const selectedAreas = selectedOptions.map(option => {
-            const [placename, lat, lng] = option.value.split('|'); 
+            const [placename, lat, lng] = option.value.split('|');
             return {
-                placename, 
-                lat:lat,
-                lng:lng  
+                placename,
+                lat: lat || 0,
+                lng: lng || 0
             };
         });
     
+        // Update form data with selected areas
         setFormData({
             ...formData,
             TeachingLocation: {
                 ...formData.TeachingLocation,
-                Area: selectedAreas, 
+                Area: selectedAreas,
             },
         });
-    };
-    // console.log(formData)
     
+        // Check for newly created options
+        selectedOptions.forEach(option => {
+            if (option.__isNew__) {
+                // Call to add new area
+                handleAddNewArea(option.value);
+            }
+        });
+    };
+    
+    // console.log(formData)
+
 
 
     const handleSubmit = async (e, retry = false) => {
@@ -394,11 +404,24 @@ const ProfilePage = () => {
             setLoading(false);
         }
     };
-    const handleAddNewArea = (inputValue) => {
+    const handleAddNewArea = async (inputValue) => {
         const newOption = { value: inputValue, label: inputValue };
-        console.log(newOption);
-
+        // console.log(newOption.value); 
+        const data = {
+            state: formData.TeachingLocation?.State,
+            district: formData.TeachingLocation?.City,
+            areas: newOption.value
+        };
+        
+        try {
+           await axios.post('https://api.srtutorsbureau.com/api/v1/admin/AddNewArea', data);
+            // console.log("New Area:", addNewArea.data); // Log the response data
+            getAreasByCity(formData.TeachingLocation.City)
+        } catch (error) {
+            console.error("Error adding new area:", error); // Log any errors
+        }
     };
+    
 
     useEffect(() => {
         getState()
@@ -551,7 +574,7 @@ const ProfilePage = () => {
                         </div>
                         <div className="col-md-4 mb-3">
                             <label className="form-label" htmlFor="area">Select Your Area (multiple)</label>
-                            <Select
+                            <CreatableSelect
                                 isMulti
                                 options={areas}
                                 onChange={handleAreaChange}

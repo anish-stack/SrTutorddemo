@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Cookies from "js-cookie";
 import toast from 'react-hot-toast'
 import { Form, Button, Row, Col, Card } from 'react-bootstrap';
@@ -30,6 +30,8 @@ const TeacherRegistration = () => {
         QualificationDocument: null
     });
 
+    const fileInputRef = useRef(null);
+    const qualificationRef = useRef(null);
 
     const [verifyData, setVerifyData] = useState({
         PhoneNumber: '',
@@ -40,40 +42,63 @@ const TeacherRegistration = () => {
     const [modelOpen, setModelOpen] = useState(false)
     const handleClose = () => setModelOpen(false);
 
-
     const handleIdentityFileChange = (e) => {
         const file = e.target.files[0];
 
         if (file) {
-            const validFileTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+            const validFileTypes = ['image/jpeg', 'image/jpg', 'image/png', ];
+            const maxSizeInMB = 10;
+            const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
 
             if (!validFileTypes.includes(file.type)) {
-                toast.error('Invalid file type. Please upload a .jpg, .jpeg, .png, or .pdf file.');
+                toast.error('Invalid file type. Please upload a .jpg, .jpeg, .png file.');
                 setFormData({ ...formData, DocumentImage: null });
+                fileInputRef.current.value = '';
                 return;
             }
+
+            if (file.size > maxSizeInBytes) {
+                toast.error('File size exceeds 10 MB. Please upload a smaller file.');
+                setFormData({ ...formData, DocumentImage: null });
+                fileInputRef.current.value = '';
+                fileInputRef.current.nextElementSibling.textContent = "Choose file ";
+
+                return;
+            }
+
             setFormData({ ...formData, DocumentImage: file });
-            toast.success('File Selected successfully!');
+            fileInputRef.current.nextElementSibling.textContent = "Identity Document Selected";
+            toast.success('File selected successfully!');
         }
     };
+
 
     const handleQualificationFileChange = (e) => {
         const file = e.target.files[0];
 
         if (file) {
-
-            const validFileTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
-
+            const validFileTypes = ['image/jpeg', 'image/jpg', 'image/png', ];
+            const maxSizeInMB = 10;
+            const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
 
             if (!validFileTypes.includes(file.type)) {
-                toast.error('Invalid file type. Please upload a .jpg, .jpeg, .png, or .pdf file.');
+                toast.error('Invalid file type. Please upload a .jpg, .jpeg, .png,  file.');
                 setFormData({ ...formData, QualificationDocument: null });
+                qualificationRef.current.value = '';
                 return;
             }
 
+            if (file.size > maxSizeInBytes) {
+                toast.error('File size exceeds 10 MB. Please upload a smaller file.');
+                setFormData({ ...formData, QualificationDocument: null });
+                qualificationRef.current.value = '';
+                qualificationRef.current.nextElementSibling.textContent = "Choose file ";
+                return;
+            }
 
             setFormData({ ...formData, QualificationDocument: file });
-            toast.success('File Selected successfully!');
+            qualificationRef.current.nextElementSibling.textContent = "Qualification Document Selected";
+            toast.success('File selected successfully!');
         }
     };
 
@@ -125,7 +150,7 @@ const TeacherRegistration = () => {
         console.log(verifyData)
         try {
             const response = await axios.post('https://api.srtutorsbureau.com/api/v1/teacher/resent-otp', { PhoneNumber: verifyData.PhoneNumber });
-                console.log(response)
+            console.log(response)
             toast.success(response.data.message);
             setResendButtonClick(resendButtonClick + 1);
             setResendError('');
@@ -573,30 +598,62 @@ const TeacherRegistration = () => {
 
                                                     </Row>
 
-                                                    <Form.Group className="">
-                                                        <Form.Label>Upload Identity Document </Form.Label>
-                                                        <p>[Only .jpg, .jpeg, .png, .pdf files are accepted]</p>
-                                                        <Form.Control
-                                                            type="file"
-                                                            accept=".jpg, .jpeg, .png, .pdf"
-                                                            onChange={handleIdentityFileChange}
-                                                        />
+                                                    <Form.Group className="mb">
+                                                        <Form.Label className="h5">
+                                                            Upload Identity Document
+                                                            <small className="text-muted"> Max size up to 10 MB</small>
+                                                        </Form.Label>
+                                                        <p className="text-muted mb-2">
+                                                            [Only .jpg, .jpeg, .png, . files are accepted]
+                                                        </p>
+
+                                                        <div className="custom-file">
+                                                            <Form.Control
+                                                                type="file"
+                                                                ref={fileInputRef}
+                                                                accept=".jpg, .jpeg, .png"
+                                                                onChange={handleIdentityFileChange}
+                                                                className="custom-file-input"
+                                                                id="identity"
+                                                            />
+                                                            <label className="custom-file-label" htmlFor="identity">
+                                                                Choose file
+                                                            </label>
+                                                        </div>
+
                                                     </Form.Group>
+
                                                 </Card>
 
-                                                <Card className="p-3">
-                                                    <h5>Qualification Verification</h5>
-                                                    <p>[Only .jpg, .jpeg, .png, .pdf files are accepted]</p>
+                                                <Card className="px-4">
+                                                <Form.Label className="h5">
+                                                            Upload Qualification Document
+                                                            <small className="text-muted"> Max size up to 10 MB</small>
+                                                        </Form.Label>
+                                                    <p className="text-muted mb-4">[Only .jpg, .jpeg, .png,  files are accepted]</p>
 
                                                     <Form.Group className="mb-3">
-                                                        <Form.Label>Upload Your Higher Education Qualification Document</Form.Label>
-                                                        <Form.Control
-                                                            type="file"
-                                                            accept=".jpg, .jpeg, .png, .pdf"
-                                                            onChange={handleQualificationFileChange}
-                                                        />
+                                                        <Form.Label>
+                                                            Upload Your Higher Education Qualification Document
+                                                         
+                                                        </Form.Label>
+                                                        <div className="custom-file">
+                                                            <Form.Control
+                                                                type="file"
+                                                                ref={qualificationRef}
+                                                                accept=".jpg, .jpeg, .png, "
+                                                                onChange={handleQualificationFileChange}
+                                                                className="custom-file-input"
+                                                                id="qualificationFile"
+                                                            />
+                                                            <label className="custom-file-label" htmlFor="qualificationFile">
+                                                                Choose file
+                                                            </label>
+                                                        </div>
+
                                                     </Form.Group>
                                                 </Card>
+
 
                                             </div>
 

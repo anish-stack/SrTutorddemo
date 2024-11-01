@@ -267,7 +267,7 @@ exports.getCitiesByState = async (req, res) => {
     }
 
     // Fetch cities that match the provided state
-    const cities = await Locality.find({ unionterritories: state }).distinct("Districts"); // Get distinct city names for the given state
+    const cities = await Locality.find({ unionterritories: state }).distinct("Districts"); 
 
     // Check if any cities are found
     if (cities.length === 0) {
@@ -310,5 +310,70 @@ exports.getAreasByCity = async (req, res) => {
   } catch (error) {
     console.error('Error fetching areas by city:', error);
     res.status(500).json({ message: 'An error occurred while retrieving areas' });
+  }
+};
+
+exports.GetAllAreas = async (req, res) => {
+  try {
+    console.log("i am hit")
+    const redisClient = req.app.locals.redis;
+
+    // Check if the Redis client is available
+    if (!redisClient) {
+      console.error("Redis client is not available");
+      return res.status(500).json({
+        success: false,
+        message: "Redis client is not available",
+      });
+    }
+    const cachedData = await redisClient.get('placenames');
+    // console.log("Cached data:", cachedData);
+
+    // Try to get data from Redis cache
+    if (cachedData) {
+      try {
+        // If data is found in the cache, parse it and return
+        const parsedData = JSON.parse(cachedData);
+        return res.status(200).json({
+          success: true,
+          data: parsedData,
+          message: "Data retrieved from cache",
+        });
+      } catch (parseError) {
+        console.error("Error parsing cached data:", parseError);
+        return res.status(500).json({
+          success: false,
+          message: "Error parsing cached data",
+        });
+      }
+    }
+
+    // If no cache, fetch data from the database
+    const areas = await Locality.find().select('placename');
+
+    // Check if areas are found
+    if (!areas || areas.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No areas found",
+      });
+    }
+
+    // Store the data in Redis cache for future requests
+    await redisClient.set('placenames', JSON.stringify(areas), 'EX', 3600); // Set cache expiration time to 1 hour
+
+    return res.status(200).json({
+      success: true,
+      data: areas,
+      message: "Data retrieved from database",
+    });
+  } catch (error) {
+    console.error("Error fetching areas:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch areas",
+      error: error.message,
+    });
   }
 };

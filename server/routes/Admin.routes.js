@@ -5,7 +5,7 @@ const isAdmin = require('../middlewares/admin')
 const { AddTestimonial, GetAllActiveTestimonial, ToggleTestimonialStatus, DeleteTestimonial, UpdateTestimonial, AdminLogin } = require('../controllers/Student.registration')
 const { createBlog, DeleteBlog, UpdateBlog, getAllBlog, getSingleBlog } = require('../controllers/Blog.controller')
 const { createBanner, getAllBanner, deleteBanner, ChangePosition, updateBanner, AnalyticalData } = require('../controllers/WebPage.controller')
-const { createCity, getAllCities, deleteCity, updateCity } = require('../controllers/City.Controller')
+const { createCity, getAllCities, deleteCity, updateCity, AddNewArea } = require('../controllers/City.Controller')
 const { GetTopTeacher } = require('../controllers/Teacher.registration')
 const { JoinNewsLetter, getAllSubscriptions, updateSubscription, deleteSubscription, sendEmailsInBatches, getAllTemplates, editTemplate, deleteTemplate, CreateTemplate } = require('../controllers/Newsletter.controller')
 const { MakeSearch } = require('../controllers/SearchTeacher')
@@ -45,6 +45,9 @@ AdminRouter.put('/update-Banner/:id', isAdmin, singleUploadImage, updateBanner)
 //For City Banners
 AdminRouter.post('/Create-City', singleUploadImage, createCity)
 AdminRouter.get('/get-City', getAllCities)
+AdminRouter.post('/AddNewArea', AddNewArea)
+
+
 AdminRouter.delete('/delete-City/:id', deleteCity)
 AdminRouter.put('/update-City/:id', singleUploadImage, updateCity)
 

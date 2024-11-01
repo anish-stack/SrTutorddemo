@@ -3,6 +3,8 @@ const streamifier = require("streamifier");
 const Cloudinary = require("cloudinary").v2;
 require("dotenv").config();
 const { ServerError, warn } = require('../utils/Logger');
+const localities = require('../models/Locality.model');
+
 
 // Configure Cloudinary
 Cloudinary.config({
@@ -168,5 +170,32 @@ exports.getAllCities = async (req, res) => {
       success: false,
       message: "Internal Server Error",
     });
+  }
+};
+
+exports.AddNewArea = async (req, res) => {
+  try {
+    const { state, district, areas } = req.body;
+    console.log(req.body)
+
+    // Ensure state and district are provided
+    if (!state || !district || !areas) {
+      return res.status(400).json({ message: "State, district, and area are required." });
+    }
+
+    // Find the state and district
+    const findState = await localities.findOne({ unionterritories: state, Districts: district });
+
+    // Check if the district exists
+    if (!findState) {
+      return res.status(404).json({ message: "District not found." });
+    }
+    findState.placename = areas;
+    await findState.save();
+  res.status(200).json({ message: "Area added successfully.", areas: findState });
+
+  } catch (error) {
+    console.error("Error adding new area:", error);
+    res.status(500).json({ message: "Internal server error." });
   }
 };

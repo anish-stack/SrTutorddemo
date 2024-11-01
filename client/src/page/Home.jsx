@@ -14,10 +14,10 @@ import Joinus from "../Components/Joinus";
 import Marquee from "../Components/SlidingText/marquee";
 import SlidingData from "../Components/SlidingText/SlidingData";
 
-function Home(){
+function Home({data}){
     return(
         <>
-        <Slider />
+        <Slider areas={data} />
         <SlidingData/>
         <Quickaction />
         {/* <About /> */}

@@ -1,4 +1,5 @@
 
+
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ClassSearch } from "../Slices/Class.slice";
@@ -10,7 +11,8 @@ import bannerImg02 from "./banner/pngwing.com (11).png";
 import bannerImg03 from "./banner/banner_img03.png";
 import { useGeolocated } from "react-geolocated";
 
-const Slider = () => {
+
+const Slider = ({ areas }) => {
   const { data, loading, error } = useSelector((state) => state.Class);
   const dispatch = useDispatch();
   const [classes, setClasses] = useState([]);
@@ -31,37 +33,43 @@ const Slider = () => {
     dispatch(ClassSearch());
   }, [dispatch]);
 
+
   const [selectedRole, setSelectedRole] = useState('student');
   const handleRoleChange = (role) => {
     setSelectedRole(role);
+
 
   };
   useEffect(() => {
     if (data) {
       // Step 1: Filter out specific classes
       // const classRanges = ["I-V", "VI-VIII", "IX-X", "XI-XII"];
-      const filterOutClasses =["I-V", "VI-VIII", "IX-X", "XI-XII"];
+      const filterOutClasses = ["I-V", "VI-VIII", "IX-X", "XI-XII"];
       const filteredClasses = data
-      
+
         .filter(item => !filterOutClasses.includes(item.Class))
         .map(item => ({ class: item.Class, id: item._id }));
 
+
       // Step 2: Map inner classes
       const rangeClasses = data
-      
+
         .filter(item => item.InnerClasses && item.InnerClasses.length > 0)
         .flatMap(item => item.InnerClasses.map(innerClass => ({
           class: innerClass.InnerClass,
           id: innerClass._id
         })));
 
+
       // Step 3: Concatenate filtered classes and inner classes
       const concatenatedData = rangeClasses.concat(filteredClasses);
+
 
       // Update state with concatenated data
       setConcatenatedData(concatenatedData);
     }
   }, [data]);
+
 
   const fetchSubjects = async (classId) => {
     try {
@@ -74,6 +82,7 @@ const Slider = () => {
     }
   };
 
+
   const handleSubjectChange = (event) => {
     const selectedSubjectId = event.target.value;
     const selectedSubjectObj = subjects.find(
@@ -82,11 +91,16 @@ const Slider = () => {
     setSelectedSubject(selectedSubjectObj ? selectedSubjectObj.SubjectName : "");
   };
 
+
   const handleLocationFetch = async (input) => {
     setLocationInput(input);
 
+
     if (input.length > 2) {
       try {
+
+
+
 
 
 
@@ -103,6 +117,7 @@ const Slider = () => {
     }
   };
 
+
   const handleClassChange = (event) => {
     const selectedClassId = event.target.value;
     const selectedClassObj = concatenatedData.find(cls => cls.id === selectedClassId);
@@ -116,13 +131,14 @@ const Slider = () => {
     }
   };
 
+
   const handleLocationSelect = (suggestion) => {
     setLocationInput(suggestion);
     setLocationSuggestions([]);
     handleLocationLatAndLngFetch(suggestion)
   };
-  const [ClickLatitude, setClickLatitude] = useState(null)
-  const [ClickLongitude, setClickLongitude] = useState(null)
+
+  const [completeResult, setCompleteResult] = useState(null)
 
   const handleLocationLatAndLngFetch = async (address) => {
     const options = {
@@ -130,19 +146,41 @@ const Slider = () => {
       url: `https://api.srtutorsbureau.com/geocode?address=${address}`
     };
 
+
     try {
       const response = await axios.request(options);
       const result = response.data
+      console.log(result)
       if (result) {
-        setClickLatitude(result ? result.latitude : null);
-        setClickLongitude(result ? result.longitude : null)
+        setCompleteResult(result)
+
       }
-      console.log(response.data);
+
+      fetchAreaAndCity(result.latitude, result.longitude)
     } catch (error) {
       console.error(error);
     }
+  }
 
+  const fetchAreaAndCity = async (lat, lng) => {
+    try {
+      const { data } = await axios.post(`https://api.srtutorsbureau.com/Fetch-Current-Location`, {
+        lat: lat,
+        lng: lng
+      })
+      const addressDetails = data?.data?.address
+      console.log("address", addressDetails)
+      if (addressDetails) {
+        setCompleteResult((prev) => ({
+          ...prev,
+          addressDetails
+        }))
+      }
+      console.log(data.data)
+    } catch (error) {
+      console.log("i am also error", error)
 
+    }
   }
 
 
@@ -152,6 +190,7 @@ const Slider = () => {
     },
     userDecisionTimeout: 5000,
   });
+
 
   useEffect(() => {
     // Check if coords is defined
@@ -169,19 +208,22 @@ const Slider = () => {
       );
     };
 
+
     // Encode parameters for the URL
     const locationParam = cleanAndEncode(locationInput);
     const classParam = encodeURIComponent(selectedClass.classid);
     const classNameParam = encodeURIComponent(selectedClass.classNameValue);
     const subjectParam = encodeURIComponent(selectedSubject);
+    const result = JSON.stringify(completeResult)
 
-    // Default coordinates for emergency if not available
-    const latEmergency = 28.6909129;
-    const lngEmergency = 77.1518306;
+
+    window.location.href = `/Search-result?role=${selectedRole}&via-home-page&Location=${locationParam}&ClassId=${classParam}&ClassNameValue=${classNameParam}&Subject=${subjectParam}&result=${result}`;
 
     // Construct the URL with parameters
-    window.location.href = `/Search-result?role=${selectedRole}&SearchPlaceLat=${ClickLatitude || locationData.lat || latEmergency}&SearchPlaceLng=${ClickLongitude || locationData.lng || lngEmergency}&via-home-page&Location=${locationParam}&ClassId=${classParam}&ClassNameValue=${classNameParam}&Subject=${subjectParam}&lat=${locationData.lat || latEmergency}&lng=${locationData.lng || lngEmergency}`;
+    // window.location.href = `/Search-result?role=${selectedRole}&SearchPlaceLat=${ClickLatitude || locationData.lat || latEmergency}&SearchPlaceLng=${ClickLongitude || locationData.lng || lngEmergency}&via-home-page&Location=${locationParam}&ClassId=${classParam}&ClassNameValue=${classNameParam}&Subject=${subjectParam}&lat=${locationData.lat || latEmergency}&lng=${locationData.lng || lngEmergency}`;
   };
+
+
 
 
   return (
@@ -211,17 +253,32 @@ const Slider = () => {
               </h3>
               <div className="col-12 my-3">
                 <div className="row">
-                 
-
-                  <div class="form-check col-md-6 px-5 col-lg-6">
-                    <input onChange={() => handleRoleChange('student')} class="form-check-input" type="radio" name="flexRadioDefault" value={'student'} id="flexRadioDefault1" checked={selectedRole === 'student'} />
-                    <label class="form-check-label text-white" for="flexRadioDefault1">
+                  <div className="form-check col-md-6 px-5 col-lg-6">
+                    <input
+                      onChange={() => handleRoleChange('student')}
+                      className="form-check-input"
+                      type="radio"
+                      name="flexRadioDefault"
+                      value="student"
+                      id="flexRadioDefault1"
+                      checked={selectedRole === 'student'}
+                    />
+                    <label className="form-check-label text-white" htmlFor="flexRadioDefault1">
                       Tutor
                     </label>
                   </div>
-                  <div class="form-check col-md-6 px-5 col-lg-6">
-                    <input onChange={() => handleRoleChange('tutor')} class="form-check-input" type="radio" value={'tutor'} name="flexRadioDefault" id="flexRadioDefault2" checked={selectedRole === 'tutor'} />
-                    <label class="form-check-label text-white" for="flexRadioDefault2">
+
+                  <div className="form-check col-md-6 px-5 col-lg-6">
+                    <input
+                      onChange={() => handleRoleChange('tutor')}
+                      className="form-check-input"
+                      type="radio"
+                      name="flexRadioDefault"
+                      value="tutor"
+                      id="flexRadioDefault2"
+                      checked={selectedRole === 'tutor'}
+                    />
+                    <label className="form-check-label text-white" htmlFor="flexRadioDefault2">
                       Student
                     </label>
                   </div>
@@ -230,51 +287,53 @@ const Slider = () => {
               <div className="banner__search-form w-100">
                 <form action="#" className="search-form">
 
+
                   <div className="search-form__container d-flex gap-2 justify-content-between">
+
 
                     <div className="row col-12 col-lg-12 col-md-12">
 
 
 
-                      <div className="col-md-12 col-lg-4 mb-2">
-                        <div className="position-relative">
-
-
-                          <input
-                            type="text"
-                            name="Location"
-                            value={locationInput}
-                            placeholder="Location . . ."
-                            onChange={(e) => handleLocationFetch(e.target.value)}
-                            className="form-control py-3"
-                          />
-
-                          {locationSuggestions.length > 0 && (
-                            <div
-                              className="position-absolute top-100 start-0 mt-2 w-100 bg-white border border-secondary rounded shadow-lg overflow-auto"
-                              style={{ maxHeight: "200px" }}
-                            >
-                              <ul className="list-unstyled mb-0">
-                                {locationSuggestions.map((suggestion, index) => (
-                                  <li
-                                    key={index}
-                                    className="p-2 hover:bg-light cursor-pointer"
-                                    onClick={() => handleLocationSelect(suggestion.description)}
-                                  >
-                                    {suggestion.description}
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          )
-                          }
 
 
 
+                      {selectedRole === 'student' && (
+                        <div className="col-md-12 col-lg-4 mb-2">
+                          <div className="position-relative">
+                            <input
+                              type="text"
+                              name="Location"
+                              value={locationInput}
+                              placeholder="Location . . ."
+                              onChange={(e) => handleLocationFetch(e.target.value)}
+                              className="form-control py-3"
+                            />
 
-
+                            {locationSuggestions.length > 0 && (
+                              <div
+                                className="position-absolute top-100 start-0 mt-2 w-100 bg-white border border-secondary rounded shadow-lg overflow-auto"
+                                style={{ maxHeight: "200px" }}
+                              >
+                                <ul className="list-unstyled mb-0">
+                                  {locationSuggestions.map((suggestion, index) => (
+                                    <li
+                                      key={index}
+                                      className="p-2 hover:bg-light cursor-pointer"
+                                      onClick={() => handleLocationSelect(suggestion.description)}
+                                    >
+                                      {suggestion.description}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      </div>
+                      )}
+
+
+
 
 
 
@@ -292,6 +351,7 @@ const Slider = () => {
                           ))}
                         </select>
                       </div>
+
 
                       <div className="col-md-4 col-lg-4">
                         <select
@@ -328,7 +388,13 @@ const Slider = () => {
 
 
 
+
+
+
             <img src={backSvg} alt="img" />
+
+
+
 
 
 
@@ -340,4 +406,8 @@ const Slider = () => {
   );
 };
 
+
 export default Slider;
+
+
+

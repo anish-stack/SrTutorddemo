@@ -9,44 +9,8 @@ import 'swiper/css';
 import { Autoplay } from 'swiper/modules';
 const TeacherProfileModal = ({ isOpen, isClose, item, teacherClasses }) => {
 
-    const reviews = [
-        {
-            name: "Ravi Sharma",
-            class: "10th Grade",
-            review: "A fantastic tutor! His teaching methods made complex topics easy to understand.",
-            rating: 5,
-            image: "https://i.ibb.co/kHdpqDC/studentsss.png"
-        },
-        {
-            name: "Priya Gupta",
-            class: "9th Grade",
-            review: "Highly knowledgeable and patient. She takes the time to ensure every student understands the material.",
-            rating: 5,
-            image: "https://i.ibb.co/kHdpqDC/studentsss.png"
-        },
-        {
-            name: "Arjun Mehta",
-            class: "11th Grade",
-            review: "The best teacher I've had! His enthusiasm for the subject makes learning enjoyable.",
-            rating: 4,
-            image: "https://i.ibb.co/kHdpqDC/studentsss.png"
-        },
-        {
-            name: "Anjali Verma",
-            class: "12th Grade",
-            review: "An excellent tutor who provides valuable insights and support. Highly recommend!",
-            rating: 5,
-            image: "https://i.ibb.co/kHdpqDC/studentsss.png"
-        },
-        {
-            name: "Suresh Reddy",
-            class: "10th Grade",
-            review: "Great mentor! His practical examples helped me grasp the subject better.",
-            rating: 4,
-            image: "https://i.ibb.co/kHdpqDC/studentsss.png"
-        }
-    ];
-    
+    console.log("click", item)
+
 
     return (
         <div className='w-100 mt-5'>
@@ -66,15 +30,31 @@ const TeacherProfileModal = ({ isOpen, isClose, item, teacherClasses }) => {
                                     <div className='header_teacher d-block d-md-flex align-items-center'>
                                         {/* Teacher Image */}
                                         <div className='image-teacher me-4'>
-                                            <img src={item?.ProfilePic?.url || "https://i.ibb.co/8zn4h3K/no-picture-taking.png"} alt="Teacher" className=" image-cll rounded-circle" />
+                                            <img src={item?.ProfilePic?.url || item.Gender === "Female" ? 'https://i.ibb.co/N7syqWH/female.jpg':''} alt="Teacher" className=" image-cll object-cover rounded-circle" />
                                         </div>
                                         {/* Teacher Information */}
                                         <div className='information-section'>
                                             <div className='information'>
                                                 <h6 className="mb-2">Name: <span>{item.FullName}</span></h6>
                                                 <h6 className="mb-2">Gender: <span>{item.Gender}</span></h6>
-                                                <h6 className="mb-2">Verified Teacher</h6>
-                                                <h6 className="mb-2">Class: <span>{teacherClasses || "Not Disclosed"}</span></h6>
+                                                <h6 className="mb-2">Teaching Modes : {item.TeachingMode === "Both" ? 'Online , Offline':item.TeachingMode}</h6>
+                                                <h6 className="mb-2">
+                                                   
+                                                    <span className="">
+                                                        {item.AcademicInformation.length > 0 ? (
+                                                            <ul className="list-unstyled d-flex gap-2 mb-0">
+                                                                <h6> Class:</h6>
+                                                                {item.AcademicInformation.map((info, index) => (
+                                                                    <li key={index} className="small text-muted">
+                                                                        {info.className}
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                        ) : (
+                                                            <span className="text-secondary">Not Disclosed</span>
+                                                        )}
+                                                    </span>
+                                                </h6>
                                                 <p className="mb-2 fw-bold">Subjects: <span>{item.AcademicInformation.slice(0, 1).map((subject, index) => (
                                                     <span key={index}>{subject.SubjectNames + '' + '..'}  +</span>
                                                 ))}
@@ -106,7 +86,7 @@ const TeacherProfileModal = ({ isOpen, isClose, item, teacherClasses }) => {
                                     </div>
                                 </div>
                                 {/* Review Section */}
-                                <div className='teacher-review py-3 bg-light'>
+                                {/* <div className='teacher-review py-3 bg-light'>
                                     <h6 className='mb-4 text-center'>Student Reviews</h6>
                                     <div className='row'>
                                         <Swiper
@@ -159,7 +139,7 @@ const TeacherProfileModal = ({ isOpen, isClose, item, teacherClasses }) => {
 
                                         </Swiper>
                                     </div>
-                                </div>
+                                </div> */}
                             </div>
 
                         </div>
