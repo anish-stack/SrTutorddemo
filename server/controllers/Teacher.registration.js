@@ -1780,8 +1780,11 @@ exports.SearchByMinimumCondition = CatchAsync(async (req, res) => {
           : false);
       });
 
+      // console.log("thirdSubjectFilter", thirdSubjectFilter)
+
+
       if (secondSubjectFilter.length > 0) {
-        console.log("secondSubjectFilter.length", secondSubjectFilter.length)
+        // console.log("secondSubjectFilter.length", secondSubjectFilter.length)
 
         return res.status(200).json({ success: true, count: secondSubjectFilter.length, results: secondSubjectFilter });
       }
@@ -1789,33 +1792,53 @@ exports.SearchByMinimumCondition = CatchAsync(async (req, res) => {
       // console.log(lng + 1)
       const roundedLat = parseFloat(lat.toFixed(5));
       const roundedLng = parseFloat(lng.toFixed(5));
-      // Third Search: Geolocation-Based
-      console.log("Rounded Latitude:", roundedLat);
-      console.log("Rounded Longitude:", roundedLng);
+   
       const thirdSearch = await TeacherProfile.find({
         'RangeWhichWantToDoClasses.location': {
           $near: {
             $geometry: {
               type: 'Point',
-              coordinates: [85.8204646, 26.3321245],
+              coordinates: [roundedLng, roundedLat],
             },
             $maxDistance: 5000
 
           },
         },
       });
+      // console.log( thirdSearch[0]?._id)
 
-
-      console.log("secondSubjectFilter", thirdSearch.length)
       const thirdSubjectFilter = thirdSearch.filter(profile => {
         const academicInfo = profile.AcademicInformation || [];
-        return academicInfo.some(item => item.ClassId instanceof Mongoose.Types.ObjectId
-          ? item.ClassId.equals(objectClass) && item.SubjectNames.includes(Subject)
-          : false);
+        return academicInfo.some(item => {
+          // Check for ClassId match
+          const isClassIdMatch = item.ClassId instanceof Mongoose.Types.ObjectId
+            ? item.ClassId.equals(objectClass)
+            : false;
+      
+          const subjectRegex = new RegExp(`^${Subject.slice(0, 3)}`, 'i');
+          const isSubjectMatch = item.SubjectNames && item.SubjectNames.some(subject => subjectRegex.test(subject));
+     
+          // console.log("ClassId Match:", isClassIdMatch, "for ClassId:", item.ClassId);
+          // console.log("Subject Match:", isSubjectMatch, "for Subject:", Subject, "in SubjectNames:", item.SubjectNames);
+      
+          // Detailed feedback if either match condition fails
+          if (isClassIdMatch && !isSubjectMatch) {
+            console.log("ClassId matched, but Subject did not match for:", item.SubjectNames);
+          } else if (!isClassIdMatch && isSubjectMatch) {
+            console.log("Subject matched, but ClassId did not match.");
+          }
+      
+          return isClassIdMatch && isSubjectMatch;
+        });
       });
+      
+
+      // console.log("secondSubjectFilter", thirdSearch.length)
+      // console.log("thirdSubjectFilter", thirdSubjectFilter)
+
 
       if (thirdSubjectFilter.length > 0) {
-        console.log("thirdSubjectFilter.length", thirdSubjectFilter.length)
+        // console.log("thirdSubjectFilter.length", thirdSubjectFilter.length)
         return res.status(200).json({ success: true, count: thirdSubjectFilter.length, results: thirdSubjectFilter });
       }
 
