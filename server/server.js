@@ -37,31 +37,31 @@ const redisClient = redis.createClient({
 })();
 
 // CORS Configuration
-const allowedOrigins = [
-    "https://www.srtutorsbureau.com",
-    "https://www.admin.srtutorsbureau.com",
-    "https://admin.srtutorsbureau.com",
-    "https://srtutorsbureau.com",
-    "https://www.srtutors.hoverbusinessservices.com",
-    "https://www.sradmin.hoverbusinessservices.com",
-    "https://srtutors.hoverbusinessservices.com",
-    "https://sradmin.hoverbusinessservices.com",
-    'http://localhost:3001',
-    'http://localhost:3000'
-];
+// const allowedOrigins = [
+//     "https://www.srtutorsbureau.com",
+//     "https://www.admin.srtutorsbureau.com",
+//     "https://admin.srtutorsbureau.com",
+//     "https://srtutorsbureau.com",
+//     "https://www.srtutors.hoverbusinessservices.com",
+//     "https://www.sradmin.hoverbusinessservices.com",
+//     "https://srtutors.hoverbusinessservices.com",
+//     "https://sradmin.hoverbusinessservices.com",
+//     'http://localhost:3001',
+//     'http://localhost:3000'
+// ];
 
-app.use(cors({
-    origin: (origin, callback) => {
-        if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    credentials: true
-}));
-
+// app.use(cors({
+//     origin: (origin, callback) => {
+//         if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+//             callback(null, true);
+//         } else {
+//             callback(new Error('Not allowed by CORS'));
+//         }
+//     },
+//     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+//     credentials: true
+// }));
+app.use(cors())
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
