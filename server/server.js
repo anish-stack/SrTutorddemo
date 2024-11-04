@@ -37,31 +37,31 @@ const redisClient = redis.createClient({
 })();
 
 // CORS Configuration
-// const allowedOrigins = [
-//     "https://www.srtutorsbureau.com",
-//     "https://www.admin.srtutorsbureau.com",
-//     "https://admin.srtutorsbureau.com",
-//     "https://srtutorsbureau.com",
-//     "https://www.srtutors.hoverbusinessservices.com",
-//     "https://www.sradmin.hoverbusinessservices.com",
-//     "https://srtutors.hoverbusinessservices.com",
-//     "https://sradmin.hoverbusinessservices.com",
-//     'http://localhost:3001',
-//     'http://localhost:3000'
-// ];
+const allowedOrigins = [
+    "https://www.srtutorsbureau.com",
+    "https://www.admin.srtutorsbureau.com",
+    "https://admin.srtutorsbureau.com",
+    "https://srtutorsbureau.com",
+    "https://www.srtutors.hoverbusinessservices.com",
+    "https://www.sradmin.hoverbusinessservices.com",
+    "https://srtutors.hoverbusinessservices.com",
+    "https://sradmin.hoverbusinessservices.com",
+    'http://localhost:3001',
+    'http://localhost:3000'
+];
 
-// app.use(cors({
-//     origin: (origin, callback) => {
-//         if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-//             callback(null, true);
-//         } else {
-//             callback(new Error('Not allowed by CORS'));
-//         }
-//     },
-//     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-//     credentials: true
-// }));
-app.use(cors())
+app.use(cors({
+    origin: (origin, callback) => {
+        if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true
+}));
+
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -100,7 +100,7 @@ app.get("/Flush-all-Redis-Cached", async (req, res) => {
 
 app.post('/Fetch-Current-Location', async (req, res) => {
     const { lat, lng } = req.body;
-    // console.log("long_name")
+
     // Check if latitude and longitude are provided
     if (!lat || !lng) {
         return res.status(400).json({
@@ -126,28 +126,26 @@ app.post('/Fetch-Current-Location', async (req, res) => {
         // Check if any results are returned
         if (addressResponse.data.results.length > 0) {
             const addressComponents = addressResponse.data.results[0].address_components;
-        
+            // console.log(addressComponents)
+   
             let city = null;
             let area = null;
             let postalCode = null;
             let district = null;
-        
+
             // Extract necessary address components
             addressComponents.forEach(component => {
                 if (component.types.includes('locality')) {
-                    area = component.long_name; // Local area (city or locality)
-                } else if (component.types.includes('sublocality')) {
-                    area = component.long_name; // More specific area if available
-                } else if (component.types.includes('administrative_area_level_1')) {
-                    // console.log("long_name",component)
-                    city = component?.long_name;  // Generally, this is the state (e.g., "Bihar")
-                } else if (component.types.includes('administrative_area_level_3')) {
-                    district = component.long_name; // Get district
+                    city = component.long_name; 
+                } else if (component.types.includes('sublocality_level_1')) {
+                    area = component.long_name; 
                 } else if (component.types.includes('postal_code')) {
                     postalCode = component.long_name; 
+                } else if (component.types.includes('administrative_area_level_3')) {
+                    district = component.long_name; // Get district
                 }
             });
-        
+
             // Prepare the address details object
             const addressDetails = {
                 completeAddress: addressResponse.data.results[0].formatted_address,
@@ -159,9 +157,9 @@ app.post('/Fetch-Current-Location', async (req, res) => {
                 lat: addressResponse.data.results[0].geometry.location.lat,
                 lng: addressResponse.data.results[0].geometry.location.lng,
             };
-        
+
             console.log("Address Details:", addressDetails);
-        
+
             // Respond with the location and address details
             return res.status(200).json({
                 success: true,
@@ -177,7 +175,6 @@ app.post('/Fetch-Current-Location', async (req, res) => {
                 message: "No address found for the given location",
             });
         }
-        
     } catch (error) {
         console.error('Error fetching address:', error);
         return res.status(500).json({
