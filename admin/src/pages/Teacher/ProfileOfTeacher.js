@@ -10,8 +10,6 @@ const ProfileOfTeacher = () => {
     const { singleTeacher, loading, error } = useSelector((state) => state.Teacher);
 
     const [teacherData, setTeacherData] = useState(null);
-
-
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState({});
 
@@ -115,7 +113,35 @@ const ProfileOfTeacher = () => {
                     {isEditing ? (
                         <button onClick={handleUpdateClick} className="bg-green-500 text-white px-4 py-2 rounded-md">Update</button>
                     ) : (
-                        <button onClick={handleEditClick} className="bg-blue-500 text-white px-4 py-2 rounded-md">Edit</button>
+                        <div className="relative group">
+                      
+                            <a href="#">
+                                <img
+                                    src={teacherData?.ProfilePic?.url || 'https://i.ibb.co/SJn894N/user-1.png'}
+                                    alt="Profile Picture"
+                                    className="w-16 h-16 rounded-full object-cover border-2 border-gray-300"
+                                />
+                            </a>
+                     
+                    
+                        <div className="absolute bottom-25 right-0 mb-2 mr-2 opacity-0 group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                            <div className="bg-white shadow-md rounded-md w-32 py-2">
+                                <button 
+                                    onClick={handleEditClick} 
+                                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                                >
+                                    Edit
+                                </button>
+                                <button 
+                                   onClick={() => handleVerify(teacherData?.TeacherUserId?._id, true)}
+                                    className="block w-full text-left truncate px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                                >
+                                    Document Verified 
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
                     )}
                 </div>
                 <hr />
@@ -244,15 +270,26 @@ const ProfileOfTeacher = () => {
                                 name="TeachingMode"
                                 value={formData.TeachingMode}
                                 onChange={handleInputChange}
-                                disabled={!isEditing}
+
                                 className={`mt-1 py-1 px-3 block w-full bg-white border border-gray-300 rounded-md shadow-sm ${isEditing ? 'text-gray-900' : 'text-gray-500'}`}
                             >
-                                <option value="Home Tuition at Student\'s Home">Home Tuition at Student's Home</option>
-                                <option value="Home Tuition at Your Home">Home Tuition at Your Home</option>
-                                <option value="Institute or Group Tuition">Institute or Group Tuition</option>
+                                <option value="online">{formData.TeachingMode}</option>
                             </select>
 
                         </div>
+                        <div className="bg-gray-100 p-4 rounded-md">
+                            <label className="block text-sm font-medium text-gray-700">Date Of Join</label>
+                            <select
+                                name="createdAt"
+                           
+
+                                className={`mt-1 py-1 px-3 block w-full bg-white border border-gray-300 rounded-md shadow-sm ${isEditing ? 'text-gray-900' : 'text-gray-500'}`}
+                            >
+                                <option value="online">{new Date(formData.createdAt).toLocaleDateString('en-us')}</option>
+                            </select>
+
+                        </div>
+                      
                     </div>
                 </div>
                 <div className="p-6 bg-white shadow-md rounded-lg">
