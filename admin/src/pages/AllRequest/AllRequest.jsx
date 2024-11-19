@@ -62,23 +62,7 @@ const AllRequest = () => {
             );
         }
 
-        // Apply sorting
-        // Uncomment and adjust sorting if needed
-        // result = result.sort((a, b) => {
-        //     if (sort === 'createdAt') {
-        //         return new Date(b.createdAt) - new Date(a.createdAt);
-        //     }
-        //     if (sort === 'startDate') {
-        //         return new Date(b.startDate) - new Date(a.startDate);
-        //     }
-        //     if (sort === 'dealDone') {
-        //         return new Date(b.dealDone) - new Date(a.dealDone);
-        //     }
-        //     if (sort === 'statusOfRequest') {
-        //         return b.statusOfRequest.localeCompare(a.statusOfRequest);
-        //     }
-        //     return 0;
-        // });
+
 
         setFilteredData(result);
     }, [data, filter, sort]);
@@ -217,6 +201,7 @@ const AllRequest = () => {
     const indexOfLastRequest = page * perPage;
     const indexOfFirstRequest = indexOfLastRequest - perPage;
     const currentRequest = filteredData.slice(indexOfFirstRequest, indexOfLastRequest);
+    // console.log(currentRequest)
     const totalPages = Math.ceil(filteredData.length / perPage);
 
     const handlePageChange = (newPage) => {
@@ -323,6 +308,8 @@ const AllRequest = () => {
                                     <thead className="border-b border-neutral-200 font-bold dark:border-white/10">
                                         <tr>
                                             <th scope="col" className="px-6 whitespace-nowrap truncate py-4">Request Id</th>
+                                            <th scope="col" className="px-6 whitespace-nowrap truncate py-4">Date</th>
+
                                             <th scope="col" className="px-6 whitespace-nowrap truncate py-4">Request Type</th>
                                             <th scope="col" className="px-6 whitespace-nowrap truncate py-4">Student Name</th>
                                             <th scope="col" className="px-6 whitespace-nowrap truncate py-4">Student Contact Number</th>
@@ -341,25 +328,67 @@ const AllRequest = () => {
                                     <tbody>
                                         {currentRequest && currentRequest.map((request, index) => (
                                             <tr className={`border-b border-neutral-200 ${request.teacherAcceptThis === 'pending'
-                                                ? 'bg-red-50'
+                                                ? ''
                                                 : request.teacherAcceptThis === 'declined'
-                                                    ? 'bg-red-200'
+                                                    ? ''
                                                     : 'bg-green-300'
                                                 } dark:border-white/10`} key={index}>
                                                 <td className="whitespace-nowrap px-6 py-4 font-medium"><Link to={`/CompleteInfo/${request._id}`}>{request?.requestId || 'No'}</Link></td>
+                                                <td className="whitespace-nowrap px-6 py-4">
+    <span className="inline-block text-sm px-3 py-1 rounded-full bg-gray-200 text-gray-700">
+        {new Date(request.createdAt).toDateString()}
+    </span>
+</td>
+
+
                                                 <td className="whitespace-nowrap px-6 py-4">{request.requestType}</td>
                                                 <td className="whitespace-nowrap px-6 py-4">{request.studentInfo.studentName}</td>
                                                 <td className="whitespace-nowrap px-6 py-4">{request.studentInfo.contactNumber}</td>
-                                                <td className="whitespace-nowrap px-6 py-4">{request.className}</td>
+                                                <td className="whitespace-nowrap px-6 py-4">
+    <span className="inline-block text-sm px-3 py-1 rounded-full bg-blue-100 text-blue-800">
+        {request.className}
+    </span>
+</td>
+
                                                 <td className="whitespace-nowrap px-6 py-4">{request.subjects.join(', ')}</td>
                                                 <td className="whitespace-nowrap truncate w-14 px-6 py-4">
                                                     {request.locality.length > 10 ? request.locality.substring(0, 10) + '...' : request.locality}
                                                 </td>
-                                                <td className="whitespace-nowrap px-6 py-4">{request.teacherGenderPreference || 'Any'}</td>
                                                 <td className="whitespace-nowrap px-6 py-4">
-                                                    {request.teacherId && request.teacherId._id ? 'Yes' : 'No'}
+                                                    {request.teacherGenderPreference === 'Male' ? (
+                                                        <span className="inline-block text-sm px-3 py-1 rounded-full text-white bg-blue-500">
+                                                            Male
+                                                        </span>
+                                                    ) : request.teacherGenderPreference === 'Female' ? (
+                                                        <span className="inline-block text-sm px-3 py-1 rounded-full text-white bg-pink-500">
+                                                            Female
+                                                        </span>
+                                                    ) : (
+                                                        <span className="inline-block text-sm px-3 py-1 rounded-full text-gray-700 bg-gray-200">
+                                                            Any
+                                                        </span>
+                                                    )}
                                                 </td>
-                                                <td className="whitespace-nowrap px-6 py-4">{request.teacherAcceptThis}</td>
+
+                                                <td className="whitespace-nowrap px-6 py-4">
+                                                    {request.teacherId ? (
+                                                        <a
+                                                            href={`/Manage-Teacher/${request?.teacherId?.TeacherUserId}`}
+                                                            className="inline-block text-sm px-3 py-1 rounded-full text-white bg-blue-500 hover:bg-blue-600"
+                                                        >
+                                                            {request.teacherId && request.teacherId._id ? 'Yes Check Teacher' : 'No'}
+                                                        </a>
+                                                    ) : (
+                                                        <span className="inline-block text-sm px-3 py-1 rounded-full text-gray-700 bg-gray-200">
+                                                            Not Assigned
+                                                        </span>
+                                                    )}
+                                                </td>
+
+
+                                                <td> <span className="inline-block capitalize text-sm px-3 py-1 rounded-full text-white bg-green-500">
+                                                    {request.teacherAcceptThis}
+                                                </span></td>
                                                 <td className="whitespace-nowrap px-6 py-4">
                                                     <form className="max-w-sm mx-auto">
                                                         <select
