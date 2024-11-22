@@ -151,9 +151,10 @@ const RegisterTeacher = () => {
         setLoading(true);
         try {
             const response = await axios.post(`https://api.srtutorsbureau.com/api/v1/teacher/Create-teacher?DocumentType=${formData.DocumentType}&isAddedByAdmin=true`, data);
-            console.log(response.data.message);
+            console.log(response.data);
             toast.success(response.data.message);
             setLoading(false);
+            window.location.href=`/Complete-Profile/${response.data?.teacher?._id}`
         } catch (error) {
             setLoading(false);
             console.log(error.response.data.message);
