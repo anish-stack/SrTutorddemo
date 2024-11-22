@@ -9,6 +9,8 @@ const StudentRouter = require("./routes/Student.routes");
 const AdminRouter = require("./routes/Admin.routes");
 const TeacherRouter = require("./routes/Teacher.routes");
 const leadRoutes = require('./routes/Jd.routes');
+const seo = require('./routes/Seo.routes');
+
 
 const connectDb = require('./config/db');
 const { info, error } = require('./utils/Logger');
@@ -122,12 +124,12 @@ app.post('/Fetch-Current-Location', async (req, res) => {
         const addressResponse = await axios.get(
             `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${process.env.GOOGLE_MAP_KEY}`
         );
-        
+
         // Check if any results are returned
         if (addressResponse.data.results.length > 0) {
             const addressComponents = addressResponse.data.results[0].address_components;
             // console.log(addressComponents)
-   
+
             let city = null;
             let area = null;
             let postalCode = null;
@@ -136,11 +138,11 @@ app.post('/Fetch-Current-Location', async (req, res) => {
             // Extract necessary address components
             addressComponents.forEach(component => {
                 if (component.types.includes('locality')) {
-                    city = component.long_name; 
+                    city = component.long_name;
                 } else if (component.types.includes('sublocality_level_1')) {
-                    area = component.long_name; 
+                    area = component.long_name;
                 } else if (component.types.includes('postal_code')) {
-                    postalCode = component.long_name; 
+                    postalCode = component.long_name;
                 } else if (component.types.includes('administrative_area_level_3')) {
                     district = component.long_name; // Get district
                 }
@@ -192,6 +194,8 @@ app.use("/api/v1/student", StudentRouter);
 app.use("/api/v1/teacher", TeacherRouter);
 app.use("/api/v1/admin", AdminRouter);
 app.use("/api/v1/uni", universal);
+app.use("/api/v1/seo", seo);
+
 
 app.get('/autocomplete', async (req, res) => {
     try {
@@ -251,7 +255,7 @@ app.get('/nearby-places', async (req, res) => {
 });
 
 app.get('/geocode', async (req, res) => {
-    const { address } = req.query; // Get address from query parameters
+    const { address } = req.query;
 
     if (!address) {
         return res.status(400).send({ error: 'Address is required' });

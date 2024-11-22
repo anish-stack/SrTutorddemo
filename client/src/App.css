@@ -1184,6 +1184,7 @@ html {
   background-color: #f60c23;
   color: #ffffff;
   outline: none;
+  text-align: start;
   border: none;
   border-radius: 24px;
   padding: 0.4rem 2.1rem;
@@ -1191,10 +1192,12 @@ html {
 }
 
 .marquee__card {
+  margin-top: 12px;
+  margin-bottom: 35px;
   padding: 15px;
   background-color: #ffeded;
   border-radius: 10px;
-  height: 250px;
+  min-height: 250px;
   box-shadow: 0 4px 6px rgb(229 222 222 / 42%);
   min-width: 250px;
   max-width: 250px;
@@ -1319,4 +1322,106 @@ html {
 /* Optional: Add a hover effect */
 .custom-file-label:hover {
   background-color: #e2e6ea; /* Change background on hover */
+}
+
+
+.slider-container {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.slider-wrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.slider-content {
+  display: flex;
+  flex-wrap: nowrap;
+  transition: transform 0.5s ease-in-out;
+}
+
+.slider-item {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  background: #fff;
+  padding: 20px;
+  margin: 10px;
+  text-align: center;
+}
+
+/* Navigation Buttons */
+.slider-btn-left,
+.slider-btn-right {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #d64444;
+  border: none;
+  color: #fff;
+  padding: 10px 20px;
+  cursor: pointer;
+  z-index: 10;
+  border-radius: 50%;
+}
+
+.slider-btn-left {
+  left: 10px;
+}
+
+.slider-btn-right {
+  right: 10px;
+}
+
+.slider-btn-left:disabled,
+.slider-btn-right:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .slider-item {
+      flex: 0 0 100%; /* One slide per view on mobile */
+  }
+}
+
+@media (min-width: 769px) {
+  .slider-item {
+      flex: 0 0 25%; /* Four slides per view on larger screens */
+  }
+}
+
+
+.view-all-btn {
+  background-color: #003873; /* Primary button color */
+  border: none;
+  border-radius: 5px;
+  padding: 10px 65px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.view-all-btn:hover {
+  background-color: #F60C23; /* Hover effect */
+  transform: scale(1.05); /* Slightly enlarge on hover */
+}
+
+.view-all-btn:active {
+  background-color: #003873; /* Keep the primary color on click */
+  transform: scale(0.95); /* Shrink slightly */
+}
+
+.view-all-link {
+  color: #ffffff; /* Ensure text color contrasts with background */
+  text-decoration: none; /* Remove underline */
+}
+
+.view-all-link:hover {
+  text-decoration: underline; /* Optional hover effect */
 }

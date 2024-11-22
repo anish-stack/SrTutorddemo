@@ -3,24 +3,15 @@ const TeacherProfile = require("../models/TeacherProfile.model");
 const Class = require("../models/ClassModel");
 const CatchAsync = require("../utils/CatchAsync");
 const sendToken = require("../utils/SendToken");
-const universal = require("../models/UniversalSchema");
-
-const sendEmail = require("../utils/SendEmails");
 const crypto = require("crypto");
 const Mongoose = require('mongoose');
-const DocumentSchema = require("../models/Document.model");
 const Cloudinary = require('cloudinary').v2;
 require('dotenv').config();
 const streamifier = require('streamifier')
-const SubjectTeacherRequest = require('../models/SubjectRequest')
-const TeacherRequest = require('../models/TeacherRequest.model')
-const ClassRequest = require('../models/ClassRequest')
-const axios = require('axios');
 const Request = require("../models/UniversalSchema");
 const SendWhatsAppMessage = require("../utils/SendWhatsappMeg");
 const locality = require("../models/Locality.model")
 const cron = require('node-cron');
-const sendLeadMessageToTeacher = require("../utils/SendLeadMsg");
 // Configure Cloudinary
 Cloudinary.config({
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -43,9 +34,10 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
     } = req.body;
 
     const address = JSON.parse(PermanentAddress);
-    console.log(address)
-    const { DocumentType } = req.query;
 
+    const { DocumentType, isAddedByAdmin = false } = req.query;
+    const convertBoolean = Boolean(isAddedByAdmin)
+    console.log(DocumentType)
     const preDefineTypes = ["Aadhaar", "Pan", "Voter Card", "Passport"];
 
     if (!preDefineTypes.includes(DocumentType)) {
@@ -78,7 +70,6 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
         return res.status(400).json({ message: "You are blocked For 24 Hours ,Please retry After the 24 Hours" });
       } else if (existingTeacher.hit >= 3) {
         existingTeacher.isBlockForOtp = true
-        existingTeacher.OtpBlockTime = new Date();
         await existingTeacher.save()
         return res.status(400).json({
           message: "You are blocked For 24 Hours. Please retry after 24 hours."
@@ -154,44 +145,76 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
         error: error.message,
       });
     }
+    if (convertBoolean === true) {
+      const newTeacherByAdmin = await Teacher.create({
+        TeacherName,
+        PhoneNumber,
+        Email,
+        Password,
+        Age,
+        gender,
+        AltNumber,
+        isAddedByAdmin: true,
+        DOB,
+        hit: 1,
+        PermanentAddress: address,
+        identityDocument: {
+          DocumentType,
+          DocumentImageUrl: documentUploadResult.secure_url,
+          DocumentPublicId: documentUploadResult.public_id,
+        },
+        QualificationDocument: {
+          QualificationImageUrl: qualificationUploadResult?.secure_url,
+          QualificationPublicId: qualificationUploadResult?.public_id,
+        },
+        isTeacherVerified: true,
 
-    const otp = crypto.randomInt(100000, 999999);
-    const otpExpiresTime = Date.now() + 2 * 60 * 1000;
+      });
+      await newTeacherByAdmin.save()
+      res.status(201).json({
+        message: "Teacher registered successfully by admin.",
+        teacher: newTeacherByAdmin,
+      });
+    } else {
 
-    const newTeacher = await Teacher.create({
-      TeacherName,
-      PhoneNumber,
-      Email,
-      Password,
-      Age,
-      gender,
-      AltNumber,
-      DOB,
-      hit: 1,
-      PermanentAddress: address,
-      identityDocument: {
-        DocumentType,
-        DocumentImageUrl: documentUploadResult.secure_url,
-        DocumentPublicId: documentUploadResult.public_id,
-      },
-      QualificationDocument: {
-        QualificationImageUrl: qualificationUploadResult?.secure_url,
-        QualificationPublicId: qualificationUploadResult?.public_id,
-      },
-      isTeacherVerified: false,
-      SignInOtp: otp,
-      OtpExpiresTime: otpExpiresTime,
-    });
+      const otp = crypto.randomInt(100000, 999999);
+      const otpExpiresTime = Date.now() + 2 * 60 * 1000;
 
-    const NewMessage = `Dear Teacher ${newTeacher.TeacherName}, your OTP for verification is: ${newTeacher.SignInOtp}. This OTP is valid for a limited time. If you did not request this OTP, please ignore this message. Best regards, S.R. Tutors.`;
+      const newTeacher = await Teacher.create({
+        TeacherName,
+        PhoneNumber,
+        Email,
+        Password,
+        Age,
+        gender,
+        AltNumber,
+        DOB,
+        hit: 1,
+        PermanentAddress: address,
+        identityDocument: {
+          DocumentType,
+          DocumentImageUrl: documentUploadResult.secure_url,
+          DocumentPublicId: documentUploadResult.public_id,
+        },
+        QualificationDocument: {
+          QualificationImageUrl: qualificationUploadResult?.secure_url,
+          QualificationPublicId: qualificationUploadResult?.public_id,
+        },
+        isTeacherVerified: false,
+        SignInOtp: otp,
+        OtpExpiresTime: otpExpiresTime,
+      });
+
+      const NewMessage = `Dear Teacher ${newTeacher.TeacherName}, your OTP for verification is: ${newTeacher.SignInOtp}. This OTP is valid for a limited time. If you did not request this OTP, please ignore this message. Best regards, S.R. Tutors.`;
 
 
-    await SendWhatsAppMessage(NewMessage, PhoneNumber);
-    // console.log("newTeacher", newTeacher)
+      await SendWhatsAppMessage(NewMessage, PhoneNumber);
+      res.status(201).json({
+        message: "Teacher registered successfully. Please verify your Contact Number.",
+      });
 
-    res.status(201).json({
-      message: "Teacher registered successfully. Please verify your Contact Number.",
-    });
+    }
+
   } catch (error) {
     console.error("Registration error: ", error);
     res.status(500).json({
@@ -281,7 +304,6 @@ exports.TeacherResendOtp = CatchAsync(async (req, res) => {
     // Check if the teacher hit the limit of OTP requests
     if (Teachers.hit >= 3) { // Block if hit is 3 or more
       Teachers.isBlockForOtp = true;
-      Teachers.isBlockForOtp = new Date()
       await Teachers.save();
       return res.status(400).json({
         message: "You are blocked for 24 hours. Please retry after 24 hours.",
@@ -348,7 +370,7 @@ exports.teacherBlockForOtp = CatchAsync(async (req, res) => {
       Teachers.isBlockForOtp = true;
       Teachers.OtpBlockTime = new Date();
       await Teachers.save();
-      return res.status(200).json({ message: "You Are  blocked from requesting OTP for End Of The day" });
+      return res.status(200).json({ message: "Yout Are  blocked from requesting OTP for End Of The day" });
     }
     console.log(Teacher)
     res.status(200).json({ message: "Teacher request within limit" });
@@ -409,14 +431,10 @@ exports.TeacherLogin = CatchAsync(async (req, res) => {
 //Teacher Password Change Request
 exports.TeacherPasswordChangeRequest = CatchAsync(async (req, res) => {
   try {
-    const { any } = req.body;
+    const { Email } = req.body;
 
-    const teacher = await Teacher.findOne({
-      $or: [
-        { Email: any },
-        { PhoneNumber: any }
-      ]
-    })
+    // Find the teacher by email
+    const teacher = await Teacher.findOne({ Email });
     if (!teacher) {
       return res.status(404).json({ message: "Teacher not found. Please check the email address and try again." });
     }
@@ -450,7 +468,6 @@ exports.TeacherPasswordChangeRequest = CatchAsync(async (req, res) => {
     // Success response
     res.status(200).json({ message: "Password reset OTP has been successfully sent to your registered phone number." });
   } catch (err) {
-    console.log(err.message)
     console.error("Error in TeacherPasswordChangeRequest:", err.message);
     res.status(500).json({ message: "An error occurred while processing your request. Please try again later." });
   }
@@ -460,14 +477,10 @@ exports.TeacherPasswordChangeRequest = CatchAsync(async (req, res) => {
 // Teacher Verify Password OTP
 exports.TeacherVerifyPasswordOtp = CatchAsync(async (req, res) => {
   try {
-    const { any, otp, newPassword } = req.body;
+    const { Email, otp, newPassword } = req.body;
 
-    const teacher = await Teacher.findOne({
-      $or: [
-        { Email: any },
-        { PhoneNumber: any }
-      ]
-    })
+    // Find the teacher by email
+    const teacher = await Teacher.findOne({ Email });
     if (!teacher) {
       return res.status(404).json({ message: "Teacher not found. Please check the email address and try again." });
     }
@@ -496,16 +509,10 @@ exports.TeacherVerifyPasswordOtp = CatchAsync(async (req, res) => {
 
 //Teacher Resent Password Otp
 exports.TeacherPasswordOtpResent = CatchAsync(async (req, res) => {
-  const { any, howManyHit } = req.body;
+  const { Email, howManyHit } = req.body;
 
   // Find teacher by email
-  const teacher = await Teacher.findOne({
-    $or: [
-      { Email: any },
-      { PhoneNumber: any }
-    ]
-
-  });
+  const teacher = await Teacher.findOne({ Email });
   if (!teacher) {
     return res.status(404).json({ message: "Teacher not found." });
   }
@@ -738,6 +745,185 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
   }
 });
 
+exports.AddProfileDetailsOfVerifiedTeacherByAdmin = CatchAsync(async (req, res) => {
+  try {
+    const userId = req.query.id;
+
+    const CheckTeacher = await Teacher.findById(userId);
+    if (!CheckTeacher) {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorised ACtion Performed",
+      });
+    }
+
+    const FetchProfileExist = await TeacherProfile.findOne({
+      TeacherUserId: userId,
+    });
+    if (FetchProfileExist) {
+      return res.status(403).json({
+        success: false,
+        message: "Profile Already Updated",
+      });
+    }
+
+    const {
+      FullName,
+      DOB,
+      Gender,
+      ContactNumber,
+      AlternateContact,
+      PermanentAddress,
+      CurrentAddress,
+      isAddressSame,
+      Qualification,
+      TeachingLocation,
+      TeachingExperience,
+      ExpectedFees,
+      VehicleOwned,
+      TeachingMode,
+      AcademicInformation,
+      latitude,
+      longitude,
+      RangeWhichWantToDoClasses,
+
+    } = req.body;
+
+
+    const RangeableData = req.body.TeachingLocation
+   
+    const MakeRangebaleData = RangeableData.Area && RangeableData.Area.length > 0 ?
+      RangeableData.Area.map(item => ({
+        location: {
+          type: 'Point',
+          coordinates: [item.lng, item.lat]
+        }
+      })) : [];
+
+
+    const emptyFields = [];
+
+    if (!FullName) emptyFields.push('FullName');
+    if (!DOB) emptyFields.push('DOB');
+    if (!Gender) emptyFields.push('Gender');
+    if (!ContactNumber) emptyFields.push('ContactNumber');
+    if (!PermanentAddress) emptyFields.push('PermanentAddress');
+    if (!CurrentAddress) emptyFields.push('CurrentAddress');
+    if (!Qualification) emptyFields.push('Qualification');
+    if (!TeachingExperience) emptyFields.push('TeachingExperience');
+    if (!ExpectedFees) emptyFields.push('ExpectedFees');
+    if (!TeachingMode) emptyFields.push('TeachingMode');
+    if (!AcademicInformation) emptyFields.push('AcademicInformation');
+
+    if (emptyFields.length > 0) {
+      return res.status(400).json({
+        message: `Please complete the following required fields: ${emptyFields.join(', ')}`,
+      });
+    }
+
+
+    const requiredAddressFields = [
+      "streetAddress",
+      "City",
+      "LandMark",
+      "Area",
+      "Pincode",
+    ];
+
+    let missingFields = [];
+
+    for (const field of requiredAddressFields) {
+      if (!PermanentAddress[field]) {
+        missingFields.push(`Permanent Address: ${field}`);
+      }
+      if (!CurrentAddress[field]) {
+        missingFields.push(`Current Address: ${field}`);
+      }
+    }
+
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        message: "The following address fields are missing or incomplete",
+        missingFields: missingFields
+      });
+    }
+
+    const SubmitOtp = crypto.randomInt(100000, 999999);
+    const OtpExpiresTime = Date.now() + 2 * 60 * 1000;
+
+    const TeachingLocations = {
+      State: RangeableData.State,
+      City: RangeableData.City,
+      Area: RangeableData.Area.map(item => item.placename)
+    };
+
+    const teacherProfile = new TeacherProfile({
+      TeacherUserId: userId,
+      FullName,
+      DOB,
+      Gender,
+      ContactNumber,
+      AlternateContact,
+      PermanentAddress,
+      CurrentAddress,
+      isAddressSame,
+      Qualification,
+      TeachingExperience,
+      ExpectedFees,
+      TeachingLocation: TeachingLocations,
+      VehicleOwned,
+      TeachingMode,
+      AcademicInformation,
+      latitude,
+      longitude,
+      RangeWhichWantToDoClasses: MakeRangebaleData,
+      SubmitOtp,
+      OtpExpired: OtpExpiresTime,
+      isAllDetailVerified: true, // Assuming profile is not verified yet
+    });
+    CheckTeacher.TeacherProfile = teacherProfile._id;
+
+
+    const Message = `Dear Teacher ${teacherProfile?.FullName}, congratulations on successfully completing your onboarding process at S.R. Tutors! We are thrilled to have you join our team. Summary of Your Details: Teaching Experience: **${teacherProfile?.TeachingExperience}**, Expected Fee: **₹${teacherProfile?.ExpectedFees}**, Teaching Mode: **${teacherProfile?.TeachingMode}**. We are committed to supporting you every step of the way. If you have any questions or need help, our support team is here for you. Best regards, S.R. Tutors. Mobile: +91 98113 82915.`;
+
+    if (!CheckTeacher.DOB) {
+      CheckTeacher.DOB = teacherProfile.DOB
+      CheckTeacher.isTeacherVerified = true;
+    }
+    await teacherProfile.save();
+    const save = await CheckTeacher.save();
+    if (save) {
+      await SendWhatsAppMessage(Message, CheckTeacher.PhoneNumber);
+    }
+
+    const redisClient = req.app.locals.redis;
+    if (!redisClient) {
+      return res.status(402).json({
+        success: false,
+        message: "Redis No Found"
+      })
+    }
+
+    await redisClient.del('Teacher')
+
+    res.status(200).json({
+      success: true,
+      data: teacherProfile,
+      message:
+        "Profile details Saved successfully. OTP has been Sent to Your Contact Number.",
+    });
+  } catch (error) {
+    console.log(error)
+    if (error.code === 11000) {
+      // MongoDB duplicate key error code
+      return res.status(400).json({
+        success: false,
+        message: "Duplicate value error. Please ensure all fields are unique.",
+      });
+    }
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
 
 
 exports.AddProfilePic = async (req, res) => {
@@ -1311,25 +1497,29 @@ exports.GetAllTeacher = CatchAsync(async (req, res) => {
       });
     }
 
-    // Fetch Teacher from database
-    const teacher = await Teacher.find().populate('TeacherProfile').sort({ "createdAt": -1 });
+    // Fetch Teacher from database and sort by createdAt descending
+    const teacher = await Teacher.find()
+      .populate('TeacherProfile')
+      .sort({ createdAt: -1 })  // Ensures that the data is always sorted
+      .exec();
 
-    if (!teacher) {
+    if (!teacher || teacher.length === 0) {
       return res.status(404).json({
         success: false,
-        message: "teacher is not available",
+        message: "No teachers available",
       });
     }
 
-    // Cache the teacher data
+    // Cache the teacher data with a unique key for future use (e.g., using teacher's ID or a dynamic key)
     await redisClient.set(`Teacher`, JSON.stringify(teacher), "EX", 3600); // Cache for 1 hour
 
     res.status(200).json({
       success: true,
-      message: "teacher fetched successfully From Db",
-      data: teacher.reverse(),
+      message: "Teacher fetched successfully from DB",
+      data: teacher,  // Send the sorted data directly
     });
   } catch (error) {
+    console.error(error);  // Added for better debugging
     res.status(500).json({
       success: false,
       message: "Error fetching teacher",
@@ -1337,6 +1527,7 @@ exports.GetAllTeacher = CatchAsync(async (req, res) => {
     });
   }
 });
+
 
 exports.GetTeacherWithLead = CatchAsync(async (req, res) => {
   try {
@@ -1584,268 +1775,83 @@ exports.AdvancedQueryForFindingTeacher = CatchAsync(async (req, res) => {
 });
 
 
-const acceptableCitiesAndStates = [
-  // Delhi Variations
-  'Delhi',
-  'New Delhi',
-  'Dilli',
-  'Delhi NCR',
-
-  // Uttar Pradesh Variations
-  'Uttar Pradesh',
-  'UP',
-  'U.P.',
-  'Uttar Prdesh',
-  'Uttar Pradesh NCR',
-  'Uttar Pradesh, India',
-
-  // Maharashtra Variations
-  'Maharashtra',
-  'MH',
-  'Maharashtra State',
-  'Maharashtra, India',
-
-  // Karnataka Variations
-  'Karnataka',
-  'KA',
-  'Karnataka State',
-  'Karnataka, India',
-
-  // Tamil Nadu Variations
-  'Tamil Nadu',
-  'TN',
-  'Tamil Nadu State',
-  'Tamil Nadu, India',
-
-  // West Bengal Variations
-  'West Bengal',
-  'WB',
-  'West Bengal State',
-  'West Bengal, India',
-
-  // Gujarat Variations
-  'Gujarat',
-  'GJ',
-  'Gujarat State',
-  'Gujarat, India',
-
-  // Rajasthan Variations
-  'Rajasthan',
-  'RJ',
-  'Rajasthan State',
-  'Rajasthan, India',
-
-  // Punjab Variations
-  'Punjab',
-  'PB',
-  'Punjab State',
-  'Punjab, India',
-
-  // Haryana Variations
-  'Haryana',
-  'HR',
-  'Haryana State',
-  'Haryana, India',
-
-  // Telangana Variations
-  'Telangana',
-  'TG',
-  'Telangana State',
-  'Telangana, India',
-
-  // Kerala Variations
-  'Kerala',
-  'KL',
-  'Kerala State',
-  'Kerala, India',
-
-  // Andhra Pradesh Variations
-  'Andhra Pradesh',
-  'AP',
-  'Andhra Pradesh State',
-  'Andhra Pradesh, India',
-
-  // Other States and Cities
-  'Himachal Pradesh',
-  'HP',
-  'Himachal Pradesh, India',
-  'Bihar',
-  'BR',
-  'Bihar, India',
-  'Odisha',
-  'OR',
-  'Odisha, India',
-  'Assam',
-  'AS',
-  'Assam, India',
-  'Jharkhand',
-  'JH',
-  'Jharkhand, India',
-  'Chhattisgarh',
-  'CG',
-  'Chhattisgarh, India',
-  'Madhya Pradesh',
-  'MP',
-  'Madhya Pradesh, India',
-  'Sikkim',
-  'SK',
-  'Sikkim, India',
-  'Uttarakhand',
-  'UK',
-  'Uttarakhand, India',
-  'Delhi',
-  'New Delhi',
-  'Dilli',
-  'Delhi NCR'
-];
-
-
 exports.SearchByMinimumCondition = CatchAsync(async (req, res) => {
   try {
     const { ClassId, Subject } = req.params;
     const { role, ClassNameValue, locationParam, result } = req.query;
+
+    // Parse the 'result' parameter as JSON and destructure address details
     const ParsedResult = JSON.parse(result);
-    console.log(ParsedResult)
-    const { city, area, district, lat, lng } = ParsedResult.addressDetails;
+    const { city, area, district, lat, lng, completeAddress } = ParsedResult.addressDetails;
+    console.log("Parsed Address Details:", completeAddress);
 
-    console.log("Parsed Address Details:", ParsedResult);
+    // Validate required parameters
+    if (!ClassId || !Subject) {
+      return res.status(400).json({ message: 'ClassId and Subject are required.' });
+    }
 
-
-    const areaArray = Array.isArray(area) ? area : [area]; // Ensure area is an array
-
-    const areaWords = area.split(/\s+/); // Split the string into words based on spaces
-    const areaPrefix = area.substring(0, 3);
-
+    // Convert ClassId to a Mongoose ObjectId for querying
     const objectClass = new Mongoose.Types.ObjectId(ClassId);
-    // First Search: Basic Matching
+    let finalResults = [];
 
-
-    if (role === 'tutor') {
-
-      const findStudents = await universal.find({ className: ClassNameValue })
-
-      const findViaSubject = findStudents.filter((item) => item.subjects.includes(Subject))
-      console.log("findViaSubject", findViaSubject)
-      // const findViaLocation = findViaSubject.filter((item)=> item.locality === ParsedResult.formatted_address )
-      // console.log(findViaSubject)
-      return res.status(200).json({ success: true, count: findViaSubject.length, results: findViaSubject });
-
-    } else {
-      const firstSearch = await TeacherProfile.find({
+    if (role === 'student') {
+      // Initial query based on city, district, and area
+      const locationResults = await TeacherProfile.find({
         'TeachingLocation.State': city,
-        'TeachingLocation.City': district,
-        'TeachingLocation.Area': {
-          $regex: `^(${areaPrefix})`, // Matches any of the words at the start
-          $options: 'i' // Case insensitive
-        },
+        'TeachingLocation.City': { $regex: district, $options: 'i' },
+        'TeachingLocation.Area': { $in: [area] },
       });
 
-
-      const firstSubjectFilter = firstSearch.filter(profile => {
+      // Filter based on AcademicInformation within each teacher's profile
+      finalResults = locationResults.filter(profile => {
         const academicInfo = profile.AcademicInformation || [];
-        return academicInfo.some(item => item.ClassId instanceof Mongoose.Types.ObjectId
-          ? item.ClassId.equals(objectClass) && item.SubjectNames.includes(Subject)
-          : false);
-      });
 
-      if (firstSubjectFilter.length > 0) {
-        console.log("firstSubjectFilter.length", firstSubjectFilter.length)
-
-        return res.status(200).json({ success: true, count: firstSubjectFilter.length, results: firstSubjectFilter });
-      }
-
-      // Second Search: Alternative Matching
-      const cityFor = ParsedResult?.formatted_address.split(',').map(part => part.trim()).join('|');
-      const splitDistrict = district.split(' ').map(part => part.trim()).join('|');
-
-      const secondSearch = await TeacherProfile.find({
-        $or: [
-          {
-            'TeachingLocation.State': { $regex: cityFor, $options: 'i' },
-            'TeachingLocation.City': { $regex: splitDistrict, $options: 'i' },
-            'TeachingLocation.Area': { $in: areaArray },
-          },
-          {
-            'TeachingLocation.Area': { $in: areaArray },
-            'TeachingLocation.State': { $regex: splitDistrict, $options: 'i' },
-            'TeachingLocation.City': { $regex: cityFor, $options: 'i' },
-          },
-        ],
-      });
-      console.log("secondSearch", secondSearch.length)
-      const secondSubjectFilter = secondSearch.filter(profile => {
-        const academicInfo = profile.AcademicInformation || [];
-        return academicInfo.some(item => item.ClassId instanceof Mongoose.Types.ObjectId
-          ? item.ClassId.equals(objectClass) && item.SubjectNames.includes(Subject)
-          : false);
-      });
-
-      // console.log("thirdSubjectFilter", thirdSubjectFilter)
-
-
-      if (secondSubjectFilter.length > 0) {
-        // console.log("secondSubjectFilter.length", secondSubjectFilter.length)
-
-        return res.status(200).json({ success: true, count: secondSubjectFilter.length, results: secondSubjectFilter });
-      }
-
-      // console.log(lng + 1)
-      const roundedLat = parseFloat(lat.toFixed(5));
-      const roundedLng = parseFloat(lng.toFixed(5));
-   
-      const thirdSearch = await TeacherProfile.find({
-        'RangeWhichWantToDoClasses.location': {
-          $near: {
-            $geometry: {
-              type: 'Point',
-              coordinates: [roundedLng, roundedLat],
-            },
-            $maxDistance: 5000
-
-          },
-        },
-      });
-      // console.log( thirdSearch[0]?._id)
-
-      const thirdSubjectFilter = thirdSearch.filter(profile => {
-        const academicInfo = profile.AcademicInformation || [];
         return academicInfo.some(item => {
-          // Check for ClassId match
-          const isClassIdMatch = item.ClassId instanceof Mongoose.Types.ObjectId
-            ? item.ClassId.equals(objectClass)
+          return item.ClassId instanceof Mongoose.Types.ObjectId
+            ? item.ClassId.equals(objectClass) && item.SubjectNames.includes(Subject)
             : false;
-      
-          const subjectRegex = new RegExp(`^${Subject.slice(0, 3)}`, 'i');
-          const isSubjectMatch = item.SubjectNames && item.SubjectNames.some(subject => subjectRegex.test(subject));
-     
-          // console.log("ClassId Match:", isClassIdMatch, "for ClassId:", item.ClassId);
-          // console.log("Subject Match:", isSubjectMatch, "for Subject:", Subject, "in SubjectNames:", item.SubjectNames);
-      
-          // Detailed feedback if either match condition fails
-          if (isClassIdMatch && !isSubjectMatch) {
-            console.log("ClassId matched, but Subject did not match for:", item.SubjectNames);
-          } else if (!isClassIdMatch && isSubjectMatch) {
-            console.log("Subject matched, but ClassId did not match.");
-          }
-      
-          return isClassIdMatch && isSubjectMatch;
         });
       });
-      
 
-      // console.log("secondSubjectFilter", thirdSearch.length)
-      // console.log("thirdSubjectFilter", thirdSubjectFilter)
+      console.log("Filtered Final Results:", finalResults);
+
+      if (finalResults.length === 0) {
 
 
-      if (thirdSubjectFilter.length > 0) {
-        // console.log("thirdSubjectFilter.length", thirdSubjectFilter.length)
-        return res.status(200).json({ success: true, count: thirdSubjectFilter.length, results: thirdSubjectFilter });
+        const addressKeywords = completeAddress
+          .split(',')
+          .map(part => part.trim())
+          .filter(Boolean) // Remove empty elements
+          .join('|');
+
+        console.log(addressKeywords)
+
+        const fallbackResults = await TeacherProfile.find({
+          'TeachingLocation.State': city,
+          'TeachingLocation.City': { $regex: district, $options: 'i' },
+          // 'TeachingLocation.Area': { $regex: new RegExp(`\\b(${addressKeywords})\\b`, 'i') },
+          'TeachingLocation.Area': { $regex: new RegExp(`\\b(${addressKeywords})\\b`, 'i') },
+        });
+        console.log("Fallback completeAddress results:", fallbackResults);
+
+        finalResults = fallbackResults.filter(profile => {
+          const academicInfo = profile.AcademicInformation || [];
+
+          return academicInfo.some(item => {
+            return item.ClassId instanceof Mongoose.Types.ObjectId
+              ? item.ClassId.equals(objectClass) && item.SubjectNames.includes(Subject)
+              : false;
+          });
+        });
       }
-
-      // No Results Found
-      return res.status(404).json({ success: false, message: "No teachers found matching the criteria." });
-
     }
+
+    // Respond with the filtered results
+    res.status(200).json({
+      success: true,
+      count: finalResults.length,
+      results: finalResults,
+    });
 
   } catch (error) {
     console.error("Error in SearchByMinimumCondition:", error);
@@ -1855,7 +1861,6 @@ exports.SearchByMinimumCondition = CatchAsync(async (req, res) => {
     });
   }
 });
-
 
 
 
@@ -2013,10 +2018,8 @@ exports.SingleTeacher = CatchAsync(async (req, res) => {
   try {
     const { id } = req.params;
 
-
-
-    // Fetch Teacher from database
     const teacher = await Teacher.findById(id).select('-Password');
+    // console.log(teacher)
 
     if (!teacher) {
       return res.status(404).json({
@@ -2281,7 +2284,7 @@ exports.SingleAllData = CatchAsync(async (req, res) => {
 
 
 
-cron.schedule('0 0 * * * *', async () => {
+cron.schedule('0 0 * * *', async () => {
   try {
     console.log("Cron job running at:", new Date());
 

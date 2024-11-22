@@ -15,7 +15,7 @@ const SideHeader = () => {
     const [pdata, setPData] = useState([]);
 
     const token = localStorage.getItem('Sr-token');
-//chnage
+    //chnage
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -92,6 +92,10 @@ const SideHeader = () => {
                                 <a href={'/Manage-Leads'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Manage Leads(Teacher)</a>
                             </li>
                             <li className="flex items-center">
+                                <i className="fa-solid fa-user mr-3"></i>
+                                <a href={'/Create-Teacher-Profile'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Create Teacher Profile</a>
+                            </li>
+                            <li className="flex items-center">
                                 <i className="fa-solid fa-message mr-3"></i>
                                 <a href={'/Search-teacher'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Search Teacher</a>
                             </li>
@@ -102,6 +106,10 @@ const SideHeader = () => {
                             <li className="flex items-center">
                                 <i className="fa-solid fa-star mr-3"></i>
                                 <Link to={'/Manage-Reviews'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Manage Reviews</Link>
+                            </li>
+                            <li className="flex items-center">
+                                <i className="fa-solid fa-user mr-3"></i>
+                                <a href={'/Create-Teacher-Profile'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Create Teacher Profile</a>
                             </li>
                             <li className="flex items-center">
                                 <i className="fa-solid fa-image mr-3"></i>
