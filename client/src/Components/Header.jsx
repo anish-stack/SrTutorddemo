@@ -194,12 +194,12 @@ function Header() {
                             <i className="ri-arrow-down-s-line"></i>
                           </Link>
                           <ul className="sub-menu">
-                            <li>
+                            {/* <li>
                               <Link to="#">Home Tuition</Link>
                             </li>
                             <li>
                               <Link to="#">Hire a Tutor</Link>
-                            </li>
+                            </li> */}
                             <li>
                               <Link to="/Browse-Tutors?lat=28.691029628579727&lng=77.1517630851126">Tutor Section</Link>
                             </li>
@@ -233,7 +233,7 @@ function Header() {
                               fill="currentcolor"
                             />
                           </svg>
-                          Browse Tutors
+                          Tutor Section
                         </Link>
 
                       </div>
@@ -371,7 +371,7 @@ function Header() {
                           <Link to="/contact-us">Contact Us</Link>
                         </li>
                         <li>
-                          <Link to={`/Browse-Tutors?lat=${locationData.lat}&lng=${locationData.lng}`}>Browse Tutors</Link>
+                          <Link to={`/Browse-Tutors?lat=${locationData.lat}&lng=${locationData.lng}`}>Tutor Section</Link>
                         </li>
                       </ul>
                     </div>

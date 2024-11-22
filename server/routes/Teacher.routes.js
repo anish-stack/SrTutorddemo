@@ -1,5 +1,5 @@
 const express = require('express')
-const { TeacherRegister, TeacherVerifyOtp, TeacherResendOtp, TeacherPasswordChangeRequest, TeacherPasswordOtpResent, TeacherVerifyPasswordOtp, TeacherLogin, AddProfileDetailsOfVerifiedTeacher, TeacherProfileResendOtp, TeacherVerifyProfileOtp, updateTeacherProfile, GetTeacherProfileId, GetAllTeacherProfile, GetAllTeacher, AdvancedQueryForFindingTeacher, SearchByMinimumCondition, SingleTeacher, getMyClass, deleteClassOfTeacher, addMyClassMore, SubjectDelete, deleteSubjectOfTeacher, AddProfilePic, AddDocument, MarkDocumentStatus, teacherBlockForOtp, AddLocations, GetTeacherWithLead } = require('../controllers/Teacher.registration')
+const { TeacherRegister, TeacherVerifyOtp, TeacherResendOtp, TeacherPasswordChangeRequest, TeacherPasswordOtpResent, TeacherVerifyPasswordOtp, TeacherLogin, AddProfileDetailsOfVerifiedTeacher, TeacherProfileResendOtp, TeacherVerifyProfileOtp, updateTeacherProfile, GetTeacherProfileId, GetAllTeacherProfile, GetAllTeacher, AdvancedQueryForFindingTeacher, SearchByMinimumCondition, SingleTeacher, getMyClass, deleteClassOfTeacher, addMyClassMore, SubjectDelete, deleteSubjectOfTeacher, AddProfilePic, AddDocument, MarkDocumentStatus, teacherBlockForOtp, AddLocations, GetTeacherWithLead, AddProfileDetailsOfVerifiedTeacherByAdmin } = require('../controllers/Teacher.registration')
 const Protect = require('../middlewares/Auth')
 const TeacherRouter = express.Router()
 const multer = require('multer');
@@ -19,6 +19,8 @@ TeacherRouter.post('/teacher-Password-Change-Request', TeacherPasswordChangeRequ
 TeacherRouter.post('/teacher-Password-resend-otp', TeacherPasswordOtpResent)
 TeacherRouter.post('/teacher-Password-Verify-Otp', TeacherVerifyPasswordOtp)
 TeacherRouter.post('/teacher-profile', Protect, AddProfileDetailsOfVerifiedTeacher)
+TeacherRouter.post('/teacher-profile-By-Admin', AddProfileDetailsOfVerifiedTeacherByAdmin)
+
 TeacherRouter.post('/teacher-profile-pic/:teacherId', singleUploadImage, AddProfilePic)
 TeacherRouter.post('/teacher-document/:teacherId', UploadViaFieldName([{ name: 'Document', maxLength: '1' }, { name: 'Qualification', maxLength: '1' }]), AddDocument)
 TeacherRouter.post('/Add-location', Protect, AddLocations)

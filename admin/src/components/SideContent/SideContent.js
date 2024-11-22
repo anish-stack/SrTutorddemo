@@ -34,6 +34,10 @@ import JdAllLeads from '../../pages/Justdial/JdAllLeads'
 import AddRequest from '../../pages/AddRequest/AddRequest'
 import TeacherWithLead from '../../pages/Teacher/TeacherWithLead'
 import SearchTeacher from '../../pages/AdvancedSearch/SearchTeacher'
+import CreatePages from '../../pages/Seo/CreatePages'
+import ManagePages from '../../pages/Seo/ManagePages'
+import RegisterTeacher from '../../pages/Teacher-Createion/RegisterTeacher'
+import CompleteProfileDetails from '../../pages/Teacher-Createion/CompleteProfileDetails'
 const SideContent = () => {
   return (
     <Routes>
@@ -70,11 +74,15 @@ const SideContent = () => {
       <Route path='/Add-request' element={<AddRequest />} />
       <Route path='/Manage-Leads' element={<TeacherWithLead />} />
 
+      <Route path='/Create-Teacher-Profile' element={<RegisterTeacher />} />
+      <Route path='/Complete-Profile/:id' element={<CompleteProfileDetails/>} />
 
       <Route path='/Manage-All-Requests' element={<AllRequest />} />
       <Route path='/Manage-Contact' element={<AllContact />} />
       <Route path='/Manage-Profile' element={<Profile />} />
 
+      <Route path='/create-pages' element={<CreatePages />} />
+      <Route path='/manage-pages' element={<ManagePages />} />
 
 
       <Route path='/forbidden' element={<Forbidden />} />

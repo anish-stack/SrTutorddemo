@@ -7,15 +7,12 @@ import axios from "axios";
 import bannerShape03 from "./banner/banner_shape03.png";
 import backSvg from './back.svg'
 import bannerImg01 from "./banner/banner_img01.png";
-import bannerImg02 from "./banner/pngwing.com (11).png";
-import bannerImg03 from "./banner/banner_img03.png";
 import { useGeolocated } from "react-geolocated";
 
 
 const Slider = ({ areas }) => {
-  const { data, loading, error } = useSelector((state) => state.Class);
+  const { data } = useSelector((state) => state.Class);
   const dispatch = useDispatch();
-  const [classes, setClasses] = useState([]);
   const [selectedClass, setSelectedClass] = useState({
     classid: '',
     classNameValue: ''
@@ -29,6 +26,7 @@ const Slider = ({ areas }) => {
     lng: '',
     lat: '',
   })
+
   useEffect(() => {
     dispatch(ClassSearch());
   }, [dispatch]);
@@ -37,13 +35,11 @@ const Slider = ({ areas }) => {
   const [selectedRole, setSelectedRole] = useState('student');
   const handleRoleChange = (role) => {
     setSelectedRole(role);
-
-
   };
+
   useEffect(() => {
     if (data) {
-      // Step 1: Filter out specific classes
-      // const classRanges = ["I-V", "VI-VIII", "IX-X", "XI-XII"];
+
       const filterOutClasses = ["I-V", "VI-VIII", "IX-X", "XI-XII"];
       const filteredClasses = data
 
@@ -94,16 +90,8 @@ const Slider = ({ areas }) => {
 
   const handleLocationFetch = async (input) => {
     setLocationInput(input);
-
-
     if (input.length > 2) {
       try {
-
-
-
-
-
-
         const res = await axios.get(
           `https://api.srtutorsbureau.com/autocomplete?input=${input}`);
         console.log("Google", res.data)
@@ -229,7 +217,7 @@ const Slider = ({ areas }) => {
   return (
     <section className="banner-area-two banner-bg-two" data-background={bannerImg01}>
       <div className="container-fluid center">
-        <div className="row px-4 align-items-center">
+        <div className="row align-items-center">
           <div className="col-lg-6 center">
             <div className="banner__content-two hero-contact-left">
               <img
@@ -286,20 +274,11 @@ const Slider = ({ areas }) => {
               </div>
               <div className="banner__search-form w-100">
                 <form action="#" className="search-form">
-
-
                   <div className="search-form__container d-flex gap-2 justify-content-between">
-
-
                     <div className="row col-12 col-lg-12 col-md-12">
 
-
-
-
-
-
                       {selectedRole === 'student' && (
-                        <div className="col-md-12 col-lg-4 mb-2">
+                        <div className="col-md-12 col-lg-5 mb-2">
                           <div className="position-relative">
                             <input
                               type="text"
@@ -319,7 +298,8 @@ const Slider = ({ areas }) => {
                                   {locationSuggestions.map((suggestion, index) => (
                                     <li
                                       key={index}
-                                      className="p-2 hover:bg-light cursor-pointer"
+                                      style={{ fontSize: 16 }}
+                                      className="p-1 hover:bg-light cursor-pointer"
                                       onClick={() => handleLocationSelect(suggestion.description)}
                                     >
                                       {suggestion.description}
@@ -332,18 +312,13 @@ const Slider = ({ areas }) => {
                         </div>
                       )}
 
-
-
-
-
-
-                      <div className="col-md-4 col-lg-4 mb-2">
+                      <div className="col-md-4 col-lg-3 mb-2">
                         <select
                           className="search-form__input form-select py-3 select w-100 class-select"
                           onChange={handleClassChange}
                           value={selectedClass.classid}
                         >
-                          <option value="" >Select Class...</option>
+                          <option value="" >Class</option>
                           {concatenatedData.map((classItem) => (
                             <option key={classItem.id} value={classItem.id}>
                               {classItem.class}
@@ -353,13 +328,13 @@ const Slider = ({ areas }) => {
                       </div>
 
 
-                      <div className="col-md-4 col-lg-4">
+                      <div className="col-md-3 col-lg-4">
                         <select
                           className="search-form__input form-select py-3 select w-100 subject-select"
                           placeholder="Subject . . ."
                           onChange={handleSubjectChange}
                         >
-                          <option value="" >Select Subject...</option>
+                          <option value="" >Subject</option>
                           {subjects.map((subject) => (
                             <option key={subject._id} value={subject._id}>
                               {subject.SubjectName}
@@ -385,19 +360,7 @@ const Slider = ({ areas }) => {
             </div>
           </div>
           <div className="col-lg-6 center">
-
-
-
-
-
-
             <img src={backSvg} alt="img" />
-
-
-
-
-
-
           </div>
         </div>
       </div>
