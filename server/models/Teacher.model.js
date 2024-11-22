@@ -124,6 +124,10 @@ const TeacherSchema = new mongoose.Schema({
             required: true
         }
     },
+    isAddedByAdmin:{
+        type: Boolean,
+        default: false
+    },
     hit: {
         type: Number,
         default: 0
