@@ -212,6 +212,9 @@ function Header() {
                         <li className="">
                           <Link to="contact-us">Contact us</Link>
                         </li>
+                        {/* <li className="">
+                          <Link to="/frequently-asked-questions">FAQ</Link>
+                        </li> */}
                       </ul>
                     </div>
                     <div className="tgmenu__categories d-none d-md-block">

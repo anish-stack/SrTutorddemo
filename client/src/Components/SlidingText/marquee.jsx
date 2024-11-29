@@ -63,7 +63,7 @@ const Marquee = ({ data }) => {
                                 </SwiperSlide>
                             ))}
                         </Swiper>
-                        {comingData.length > 4 && (
+                        {/* {comingData.length > 4 && (
                             <div className="container d-flex align-items-center justify-content-center text-center bottom-0 end-0 px-4">
                                 <button className="view-all-btn">
                                     <a href="/View-all" className="view-all-link">
@@ -71,7 +71,7 @@ const Marquee = ({ data }) => {
                                     </a>
                                 </button>
                             </div>
-                        )}
+                        )} */}
 
 
                     </div>
