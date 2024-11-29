@@ -502,6 +502,7 @@ textarea {
 04. Breadcrumb
 ===========================*/
 .breadcrumb-bg {
+  background-repeat: no-repeat;
   position: relative;
   padding: 150px 0 155px;
   z-index: 1;

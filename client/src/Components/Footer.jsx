@@ -67,8 +67,11 @@ function Footer() {
                                             <li className="number">sachinkumarsrtb@yahoo.in</li>
                                             <li className="number">+91 9811382915 | 9899247916</li>
                                             <li className="socials">
-                                                <a  target="_blank" href="https://www.facebook.com/SRTutorsbureau">
+                                                <a  target="_blank" href="https://www.facebook.com/people/SR-Tutors-Bureau/61559623287439/">
                                                     <i className="fab fa-facebook-f" />
+                                                </a>
+                                                <a  target="_blank" href="https://www.instagram.com/s.r.tutorsbureau/">
+                                                    <i className="fab fa-instagram" />
                                                 </a>
                                                 <a  target="_blank" href="https://x.com/i/flow/login?redirect_after_login=%2FSR_TUTORS">
                                                     <i className="fab fa-twitter" />
@@ -85,9 +88,9 @@ function Footer() {
                                                 <a  target="_blank" href="https://in.linkedin.com/in/sr-tutors-bureau-b92384116">
                                                     <i className="fab fa-linkedin-in" />
                                                 </a>
-                                                <a  target="_blank" href="#">
+                                                {/* <a  target="_blank" href="#">
                                                     <i className="fab fa-youtube" />
-                                                </a>
+                                                </a> */}
                                             </li>
                                         </ul>
                                     </div>
@@ -99,6 +102,9 @@ function Footer() {
                                     <ul className="list-wrap">
                                         <li>
                                             <Link to="/about-us">About</Link>
+                                        </li>
+                                        <li>
+                                            <Link to={'/frequently-asked-questions'}>FAQ</Link>
                                         </li>
                                         <li>
                                             <Link to="/contact-us">Contact</Link>

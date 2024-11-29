@@ -13,6 +13,7 @@ import ForgetPassword from "./Components/ForgetPassword";
 import Google from "./Google";
 import Loader from "./Components/Loader";
 import axios from "axios";
+import Faq from "./page/FAQ/Faq";
 // Lazy load components
 const Home = lazy(() => import("./page/Home"));
 const Aboutus = lazy(() => import("./page/Aboutus"));
@@ -111,6 +112,8 @@ function App() {
           <Route path="/Privacy" element={<Privacypolicy />} />
           <Route path="/Term-&-Conditions" element={<PlansAndTerms />} />
           <Route path="/Refund-and-Cancellation-Policy" element={<RefundPolicy />} />
+          <Route path="/frequently-asked-questions" element={<Faq />} />
+
 
           <Route path="/Forget-Password" element={<ForgetPassword />} />
           <Route path="/Google" element={<Google />} />
