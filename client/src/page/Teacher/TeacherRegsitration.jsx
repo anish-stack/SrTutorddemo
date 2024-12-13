@@ -235,7 +235,7 @@ const TeacherRegistration = () => {
         // data.append('DocumentType', formData.DocumentType);
         setLoading(true)
         try {
-            const response = await axios.post(`http://api.srtutorsbureau.com/api/v1/teacher/Create-teacher?DocumentType=${formData.DocumentType}`, formData)
+            const response = await axios.post(`https://api.srtutorsbureau.com/api/v1/teacher/Create-teacher?DocumentType=${formData.DocumentType}`, formData)
             console.log(response.data.message)
             toast.success(response.data.message)
             setLoading(false)
@@ -297,7 +297,7 @@ const TeacherRegistration = () => {
 
     const VerifyOtp = async () => {
         try {
-            const response = await axios.post('http://api.srtutorsbureau.com/api/v1/teacher/Verify-teacher', verifyData)
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/teacher/Verify-teacher', verifyData)
 
             toast.success("Tutor Verified Successful")
             const { token, user } = response.data;

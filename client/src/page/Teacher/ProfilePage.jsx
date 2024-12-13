@@ -383,7 +383,7 @@ const ProfilePage = () => {
             setLoading(true);
 
 
-            await axios.post('http://api.srtutorsbureau.com/api/v1/teacher/teacher-profile', formData, {
+            await axios.post('https://api.srtutorsbureau.com/api/v1/teacher/teacher-profile', formData, {
                 headers: {
                     Authorization: `Bearer ${tokenQuery}`
                 }

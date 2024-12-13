@@ -45,7 +45,7 @@ const Upload = ({ teacherId }) => {
         setLoading(true);
         try {
             const response = await axios.post(
-                `http://api.srtutorsbureau.com/api/v1/teacher/teacher-document/${teacherId?.TeacherUserId?._id}?DocumentType=${formData.DocumentType}`,
+                `https://api.srtutorsbureau.com/api/v1/teacher/teacher-document/${teacherId?.TeacherUserId?._id}?DocumentType=${formData.DocumentType}`,
                 data,
                 {
                     headers: {
