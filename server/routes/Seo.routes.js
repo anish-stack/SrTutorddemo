@@ -6,6 +6,6 @@ router.post('/Create-page',createPage)
 router.get('/get-all-page',getAllPages)
 router.get('/get-page/:seoFrendilyUrl',getPageBySeoUrl)
 router.delete('/delete-page/:id',deletePage)
-router.post('/update-page',updatePage)
+router.post('/update-page/:id',updatePage)
 
 module.exports = router;

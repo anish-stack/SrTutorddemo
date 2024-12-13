@@ -114,14 +114,11 @@ const TeacherSchema = new mongoose.Schema({
             type: String,
 
         },
-        LandMark: {
-            type: String,
-            required: true
-        },
+       
 
         Pincode: {
             type: String,
-            required: true
+            
         }
     },
     isAddedByAdmin:{

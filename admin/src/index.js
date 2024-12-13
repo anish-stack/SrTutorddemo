@@ -29,7 +29,7 @@ const RootComponent = () => {
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <BrowserRouter>
+
     <Provider store={Store}>
       <PersistGate loading={null} persistor={persistor}>
         <RootComponent />
@@ -39,7 +39,7 @@ root.render(
         />
       </PersistGate>
     </Provider>
-  </BrowserRouter>
+
 );
 
 reportWebVitals();

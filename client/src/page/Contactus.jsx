@@ -3,13 +3,14 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from 'axios'
 import toast from 'react-hot-toast'
+import { Helmet } from "react-helmet-async";
 function Contactus() {
-    const [formData,setFormData] = useState({
-        Name:'',
-        Email:'',
-        Phone:'',
-        Subject:'',
-        Message:''
+    const [formData, setFormData] = useState({
+        Name: '',
+        Email: '',
+        Phone: '',
+        Subject: '',
+        Message: ''
     })
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -34,6 +35,25 @@ function Contactus() {
 
     return (
         <>
+            <Helmet>
+                <title>Contact Us - SR Tutors Bureau</title>
+
+                <meta
+                    name="description"
+                    content="Get in touch with SR Tutors Bureau to learn more about our tutoring services or to book a consultation. Our team is here to answer your questions and help you find the perfect tutor for your needs in Delhi NCR."
+                />
+
+                <meta
+                    name="keywords"
+                    content="Contact SR Tutors Bureau, tutoring services, home tutors, education, Delhi NCR, get in touch, book consultation, tutor inquiries, contact form"
+                />
+
+                <link rel="canonical" href="https://www.srtutorsbureau.com/contact-us" />
+                <meta name="robots" content="index, follow" />
+                <meta name="author" content="SR Tutors Bureau" />
+                <meta name="publisher" content="SR Tutors Bureau" />
+            </Helmet>
+
             <main className="main-area fix">
                 {/* breadcrumb-area */}
                 <section
@@ -96,7 +116,7 @@ function Contactus() {
                                                 <a href="tel:9899247916">+91 9899247916</a>
                                             </div>
                                         </li>
-                                      
+
                                         <li>
                                             <div className="icon">
                                                 <i className="flaticon-email" />
@@ -114,75 +134,75 @@ function Contactus() {
                                 </div>
                             </div>
                             <div className="col-lg-7">
-            <div className="contact-form-wrap">
-                <h4 className="title">Get in Touch</h4>
-                <form id="contact-form" onSubmit={handleSubmit}>
-                    <div className="row">
-                        <div className="col-md-6">
-                            <div className="form-grp">
-                                <input
-                                    name="Name"
-                                    type="text"
-                                    placeholder="Name *"
-                                    value={formData.Name}
-                                    onChange={handleChange}
-                                    required
-                                />
+                                <div className="contact-form-wrap">
+                                    <h4 className="title">Get in Touch</h4>
+                                    <form id="contact-form" onSubmit={handleSubmit}>
+                                        <div className="row">
+                                            <div className="col-md-6">
+                                                <div className="form-grp">
+                                                    <input
+                                                        name="Name"
+                                                        type="text"
+                                                        placeholder="Name *"
+                                                        value={formData.Name}
+                                                        onChange={handleChange}
+                                                        required
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="col-md-6">
+                                                <div className="form-grp">
+                                                    <input
+                                                        name="Email"
+                                                        type="email"
+                                                        placeholder="E-mail *"
+                                                        value={formData.Email}
+                                                        onChange={handleChange}
+                                                        required
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="col-md-6">
+                                                <div className="form-grp">
+                                                    <input
+                                                        name="Phone"
+                                                        type="number"
+                                                        placeholder="Phone *"
+                                                        value={formData.Phone}
+                                                        onChange={handleChange}
+                                                        required
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="col-md-6">
+                                                <div className="form-grp">
+                                                    <input
+                                                        name="Subject"
+                                                        type="text"
+                                                        placeholder="Your Subject *"
+                                                        value={formData.Subject}
+                                                        onChange={handleChange}
+                                                        required
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="form-grp">
+                                            <textarea
+                                                name="Message"
+                                                placeholder="Message"
+                                                value={formData.Message}
+                                                onChange={handleChange}
+                                                required
+                                            />
+                                        </div>
+                                        <button type="submit" className="btn">
+                                            Send Message
+                                        </button>
+                                    </form>
+                                    <p className="ajax-response mb-0" />
+                                </div>
                             </div>
-                        </div>
-                        <div className="col-md-6">
-                            <div className="form-grp">
-                                <input
-                                    name="Email"
-                                    type="email"
-                                    placeholder="E-mail *"
-                                    value={formData.Email}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
-                        </div>
-                        <div className="col-md-6">
-                            <div className="form-grp">
-                                <input
-                                    name="Phone"
-                                    type="number"
-                                    placeholder="Phone *"
-                                    value={formData.Phone}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
-                        </div>
-                        <div className="col-md-6">
-                            <div className="form-grp">
-                                <input
-                                    name="Subject"
-                                    type="text"
-                                    placeholder="Your Subject *"
-                                    value={formData.Subject}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
-                        </div>
-                    </div>
-                    <div className="form-grp">
-                        <textarea
-                            name="Message"
-                            placeholder="Message"
-                            value={formData.Message}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-                    <button type="submit" className="btn">
-                        Send Message
-                    </button>
-                </form>
-                <p className="ajax-response mb-0" />
-            </div>
-        </div>
                         </div>
                     </div>
                 </section>

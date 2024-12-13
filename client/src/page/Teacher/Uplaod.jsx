@@ -45,7 +45,7 @@ const Upload = ({ teacherId }) => {
         setLoading(true);
         try {
             const response = await axios.post(
-                `https://api.srtutorsbureau.com/api/v1/teacher/teacher-document/${teacherId?.TeacherUserId?._id}?DocumentType=${formData.DocumentType}`,
+                `http://api.srtutorsbureau.com/api/v1/teacher/teacher-document/${teacherId?.TeacherUserId?._id}?DocumentType=${formData.DocumentType}`,
                 data,
                 {
                     headers: {
@@ -53,7 +53,7 @@ const Upload = ({ teacherId }) => {
                     },
                 }
             );
-            console.log('Response:', response.data);
+            console.log('Response from upload:', response.data);
             toast.success("Document Upload Successful Please Wait 24 Hours For Complete Verification") 
             window.location.reload()
         } catch (error) {

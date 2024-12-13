@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { Link } from 'react-router-dom';
-import { MdVerifiedUser } from 'react-icons/md';
+import { MdVerifiedUser, MdSearch, MdNavigateNext, MdNavigateBefore, MdDelete, MdRemoveRedEye } from 'react-icons/md';
 import { IoIosCloseCircle } from 'react-icons/io';
 
 const AllStudents = () => {
@@ -11,9 +11,9 @@ const AllStudents = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [filter, setFilter] = useState('');
-    const [sort, setSort] = useState('createdAt');
-    const [page, setPage] = useState(1);
-    const [perPage] = useState(10); // Number of students per page
+    const [currentPage, setCurrentPage] = useState(1);
+    const [jumpToPage, setJumpToPage] = useState('');
+    const perPage = 10;
 
     const Token = localStorage.getItem('Sr-token');
 
@@ -21,163 +21,202 @@ const AllStudents = () => {
         const fetchStudents = async () => {
             try {
                 const response = await axios.get('https://api.srtutorsbureau.com/api/v1/student/get-all-students', {
-                    headers: {
-                        Authorization: `Bearer ${Token}`
-                    }
+                    headers: { Authorization: `Bearer ${Token}` }
                 });
                 setStudents(response.data.data);
                 setFilteredStudents(response.data.data);
             } catch (err) {
                 setError('Failed to fetch students.');
-                console.error(err);
+                toast.error('Failed to load students');
             } finally {
                 setLoading(false);
             }
         };
-
         fetchStudents();
     }, [Token]);
 
     useEffect(() => {
-        let result = students;
+        const result = students.filter(student =>
+            student.StudentName.toLowerCase().includes(filter.toLowerCase()) ||
+            student.PhoneNumber.includes(filter) ||
+            student.Email.toLowerCase().includes(filter.toLowerCase())
+        ).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-        // Apply filter
-        if (filter) {
-            result = result.filter(student =>
-                student.StudentName.toLowerCase().includes(filter.toLowerCase()) ||
-                student.PhoneNumber.includes(filter) ||
-                student.Email.toLowerCase().includes(filter.toLowerCase())
-            );
-        }
-
-        // Apply sorting
-        result = result.sort((a, b) => {
-            if (sort === 'createdAt') {
-                return new Date(b.createdAt) - new Date(a.createdAt);
-            }
-            // Implement other sorting logic if needed
-            return 0;
-        });
-
-        // Update filtered students
         setFilteredStudents(result);
-    }, [students, filter, sort]);
+        setCurrentPage(1);
+    }, [students, filter]);
 
     const handleDeleteStudent = async (studentId) => {
         try {
             await toast.promise(
                 axios.delete(`https://api.srtutorsbureau.com/api/v1/student/studentDelete/${studentId}`, {
-                    headers: {
-                        Authorization: `Bearer ${Token}`
-                    }
+                    headers: { Authorization: `Bearer ${Token}` }
                 }),
                 {
-                    loading: 'Deleting...',
+                    loading: 'Deleting student...',
                     success: 'Student deleted successfully!',
-                    error: 'Could not delete student.'
+                    error: 'Failed to delete student'
                 }
             );
-            setStudents(students.filter(student => student._id !== studentId));
-            setFilteredStudents(filteredStudents.filter(student => student._id !== studentId));
+            setStudents(prev => prev.filter(student => student._id !== studentId));
         } catch (err) {
             console.error(err);
         }
     };
 
-    const handleViewProfile = (studentId) => {
-        window.location.href = `/Student-info/${studentId}`;
+    const handleJumpToPage = (e) => {
+        e.preventDefault();
+        const pageNum = parseInt(jumpToPage);
+        if (pageNum > 0 && pageNum <= totalPages) {
+            setCurrentPage(pageNum);
+            setJumpToPage('');
+        }
     };
 
-    // Pagination logic
-    const indexOfLastStudent = page * perPage;
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="flex items-center justify-center min-h-screen text-red-500">
+                {error}
+            </div>
+        );
+    }
+
+    const indexOfLastStudent = currentPage * perPage;
     const indexOfFirstStudent = indexOfLastStudent - perPage;
     const currentStudents = filteredStudents.slice(indexOfFirstStudent, indexOfLastStudent);
     const totalPages = Math.ceil(filteredStudents.length / perPage);
-    const handlePageChange = (newPage) => {
-        if (newPage < 1 || newPage > totalPages) return;
-        setPage(newPage);
-    };
-
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>{error}</div>;
 
     return (
-        <div className="p-4">
-            <h1 className="text-xl font-bold mb-4">All Students</h1>
+        <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+            <div className="max-w-7xl mx-auto">
+                <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
+                    <h1 className="text-2xl font-bold text-gray-900 mb-4 sm:mb-0">All Students</h1>
+                    <div className="relative w-full sm:w-96">
+                        <input
+                            type="text"
+                            placeholder="Search by name, phone, or email..."
+                            value={filter}
+                            onChange={(e) => setFilter(e.target.value)}
+                            className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                        <MdSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl" />
+                    </div>
+                </div>
 
-            {/* Filtering */}
-            <div className="mb-4">
-                <input
-                    type="text"
-                    placeholder="Search by name, phone, or email"
-                    value={filter}
-                    onChange={(e) => setFilter(e.target.value)}
-                    className="p-2 border border-gray-300 rounded w-full"
-                />
-            </div>
+                <div className="bg-white rounded-lg shadow overflow-hidden">
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-gray-200">
+                            <thead className="bg-gray-50">
+                                <tr>
+                                    {['Name', 'Phone Number', 'Email', 'Verified', 'Role', 'Created At', 'Actions'].map((header) => (
+                                        <th key={header} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            {header}
+                                        </th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-gray-200">
+                                {currentStudents.map(student => (
+                                    <tr key={student._id} className="hover:bg-gray-50 transition-colors">
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <div className="text-sm font-medium text-gray-900 capitalize">
+                                                {student.StudentName}
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {student.PhoneNumber}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {student.Email}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-center">
+                                            {student.isStudentVerified ? (
+                                                <MdVerifiedUser className="inline text-2xl text-green-500" />
+                                            ) : (
+                                                <IoIosCloseCircle className="inline text-2xl text-red-500" />
+                                            )}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
+                                                {student.Role}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {new Date(student.createdAt).toLocaleDateString()}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                            <div className="flex space-x-2">
+                                                <Link
+                                                    to={`/Student-info/${student._id}`}
+                                                    className="inline-flex items-center px-3 py-1 rounded-md bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors"
+                                                >
+                                                    <MdRemoveRedEye className="mr-1" /> View
+                                                </Link>
+                                                <button
+                                                    onClick={() => handleDeleteStudent(student._id)}
+                                                    className="inline-flex items-center px-3 py-1 rounded-md bg-red-50 text-red-700 hover:bg-red-100 transition-colors"
+                                                >
+                                                    <MdDelete className="mr-1" /> 
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
-          
-           
+                {/* Pagination */}
+                <div className="mt-6 flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
+                    <div className="flex items-center space-x-2">
+                        <button
+                            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                            disabled={currentPage === 1}
+                            className="inline-flex items-center px-4 py-2 rounded-md bg-white border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <MdNavigateBefore className="mr-1" /> Previous
+                        </button>
+                        <button
+                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                            disabled={currentPage === totalPages}
+                            className="inline-flex items-center px-4 py-2 rounded-md bg-white border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            Next <MdNavigateNext className="ml-1" />
+                        </button>
+                    </div>
 
-            <table className="min-w-full text-start bg-white border border-gray-200">
-                <thead>
-                    <tr>
-                        <th className="py-2 px-4 border-b">Name</th>
-                        <th className="py-2 px-4 border-b">Phone Number</th>
-                        <th className="py-2 px-4 border-b">Email</th>
-                        <th className="py-2 px-4 border-b">Verified</th>
-                        <th className="py-2 px-4 border-b">Role</th>
-                        <th className="py-2 px-4 border-b">Created At</th>
-                        <th className="py-2 px-4 border-b">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {currentStudents.map(student => (
-                        <tr className="text-center" key={student._id}>
-                            <td className="py-2 capitalize h-11 px-4 border-b">{student.StudentName}</td>
-                            <td className="py-2 h-11 px-4 border-b">{student.PhoneNumber}</td>
-                            <td className="py-2 h-11 px-4 border-b">{student.Email}</td>
-                            <td className="h-11 px-4 border-b flex items-center justify-center">
-                                {student.isStudentVerified ? <MdVerifiedUser className="text-green-400" /> : <IoIosCloseCircle className="text-red-400" />}
-                            </td>
-                            <td className="py-2 h-11 px-4 border-b">{student.Role}</td>
-                            <td className="py-2 h-11 px-4 border-b">{new Date(student.createdAt).toLocaleDateString()}</td>
-                            <td className="py-2 h-11 px-4 flex space-x-2 justify-center">
-                                <Link
-                                    to={`/Student-info/${student._id}`}
-                                    className="text-sm flex items-center justify-center rounded border border-green-400 bg-gradient-to-r from-green-100 to-green-200 px-4 py-1 font-semibold text-green-600 hover:opacity-90 transition duration-150"
-                                >
-                                    View Profile
-                                </Link>
-                                <button
-                                    onClick={() => handleDeleteStudent(student._id)}
-                                    className="text-sm flex items-center justify-center rounded border border-red-400 bg-gradient-to-r from-red-100 to-red-200 px-4 py-1 font-semibold text-red-600 hover:opacity-90 transition duration-150"
-                                >
-                                    Delete
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-
-            {/* Pagination */}
-            <div className="flex justify-between mt-4">
-                <button
-                    onClick={() => handlePageChange(page - 1)}
-                    disabled={page === 1}
-                    className="px-4 py-2 border border-gray-300 rounded-l bg-gray-100 hover:bg-gray-200"
-                >
-                    Previous
-                </button>
-                <span className="flex items-center px-4 py-2">Page {page} of {totalPages}</span>
-                <button
-                    onClick={() => handlePageChange(page + 1)}
-                    disabled={page === totalPages}
-                    className="px-4 py-2 border border-gray-300 rounded-r bg-gray-100 hover:bg-gray-200"
-                >
-                    Next
-                </button>
+                    <div className="flex items-center space-x-4">
+                        <span className="text-sm text-gray-700">
+                            Page {currentPage} of {totalPages}
+                        </span>
+                        <form onSubmit={handleJumpToPage} className="flex items-center space-x-2">
+                            <input
+                                type="number"
+                                min="1"
+                                max={totalPages}
+                                value={jumpToPage}
+                                onChange={(e) => setJumpToPage(e.target.value)}
+                                placeholder="Jump to page"
+                                className="w-20 px-2 py-1 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            />
+                            <button
+                                type="submit"
+                                className="px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                            >
+                                Go
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     );

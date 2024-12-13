@@ -19,6 +19,212 @@ Cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME
 });
 //Teacher New Register
+// exports.TeacherRegister = CatchAsync(async (req, res) => {
+//   try {
+//     const {
+//       TeacherName,
+//       PhoneNumber,
+//       Email,
+//       Password,
+//       DOB,
+//       Age,
+//       gender,
+//       AltNumber,
+//       PermanentAddress,
+//     } = req.body;
+
+//     const address = JSON.parse(PermanentAddress);
+
+//     const { DocumentType, isAddedByAdmin = false } = req.query;
+//     const convertBoolean = Boolean(isAddedByAdmin)
+//     console.log(DocumentType)
+//     const preDefineTypes = ["Aadhaar", "Pan", "Voter Card", "Passport"];
+
+//     if (!preDefineTypes.includes(DocumentType)) {
+//       return res.status(400).json({
+//         message: "Invalid Document Type. Please provide a valid type: Aadhaar, Pan, Voter Card, or Passport.",
+//       });
+//     }
+
+//     const missingFields = [];
+//     if (!TeacherName) missingFields.push("Teacher Name");
+//     if (!PhoneNumber) missingFields.push("Phone Number");
+//     if (!Email) missingFields.push("Email");
+//     if (!Password) missingFields.push("Password");
+//     if (!DOB) missingFields.push("Date of Birth");
+//     if (!gender) missingFields.push("Gender");
+
+//     if (missingFields.length > 0) {
+//       return res.status(400).json({
+//         message: "The following fields are missing: " + missingFields.join(", "),
+//       });
+//     }
+
+//     const existingTeacher = await Teacher.findOne({
+//       $or: [{ Email }, { PhoneNumber }]
+//     });
+//     if (existingTeacher) {
+//       if (existingTeacher.isTeacherVerified) {
+//         return res.status(400).json({ message: "Teacher with this email and Phone Number already exists" });
+//       } else if (existingTeacher.isBlockForOtp === true) {
+//         return res.status(400).json({ message: "You are blocked For 24 Hours ,Please retry After the 24 Hours" });
+//       } else if (existingTeacher.hit >= 3) {
+//         existingTeacher.isBlockForOtp = true
+//         await existingTeacher.save()
+//         return res.status(400).json({
+//           message: "You are blocked For 24 Hours. Please retry after 24 hours."
+//         });
+//       }
+//       else {
+//         existingTeacher.PermanentAddress = address
+//         existingTeacher.hit = (existingTeacher.hit || 0) + 1;
+//         existingTeacher.Password = Password;
+//         existingTeacher.SignInOtp = crypto.randomInt(100000, 999999);
+//         existingTeacher.OtpExpiresTime = Date.now() + 2 * 60 * 1000;
+//         await existingTeacher.save();
+
+//         const Message = `Dear Teacher ${existingTeacher.TeacherName}, your OTP for verification is: ${existingTeacher.SignInOtp}. This OTP is valid for a limited time. If you did not request this OTP, please ignore this message. Best regards, S.R. Tutors.`;
+
+
+//         await SendWhatsAppMessage(Message, PhoneNumber);
+
+//         return res.status(200).json({
+//           message: "You are already registered. OTP has been resent via WhatsApp. Please verify your contact number.",
+//         });
+
+//       }
+//     }
+
+//     const DocumentFile = req.files?.Document?.[0];
+
+//     const QualificationFile = req.files?.Qualification?.[0];
+
+//     if (!DocumentFile) {
+//       return res.status(400).json({
+//         message: "No Document file uploaded. Please upload an identity document.",
+//       });
+//     }
+
+//     if (!QualificationFile) {
+//       return res.status(400).json({
+//         message: "No Qualification document uploaded. Please upload a qualification document.",
+//       });
+//     }
+
+//     const uploadFromBuffer = (buffer) => {
+//       return new Promise((resolve, reject) => {
+//         let stream = Cloudinary.uploader.upload_stream((error, result) => {
+//           if (error) {
+//             console.error("Cloudinary upload error: ", error);
+//             return reject(new Error("Failed to upload file to Cloudinary."));
+//           }
+//           resolve(result);
+//         });
+//         streamifier.createReadStream(buffer).pipe(stream);
+//       });
+//     };
+
+//     let documentUploadResult;
+//     try {
+//       documentUploadResult = await uploadFromBuffer(DocumentFile.buffer);
+//     } catch (error) {
+//       console.error("Error uploading identity document: ", error);
+//       return res.status(500).json({
+//         message: "Error uploading identity document to Cloudinary.",
+//         error: error.message,
+//       });
+//     }
+
+//     let qualificationUploadResult;
+//     try {
+//       qualificationUploadResult = await uploadFromBuffer(QualificationFile.buffer);
+//     } catch (error) {
+//       console.error("Error uploading qualification document: ", error);
+//       return res.status(500).json({
+//         message: "Error uploading qualification document to Cloudinary.",
+//         error: error.message,
+//       });
+//     }
+//     if (convertBoolean === true) {
+//       const newTeacherByAdmin = await Teacher.create({
+//         TeacherName,
+//         PhoneNumber,
+//         Email,
+//         Password,
+//         Age,
+//         gender,
+//         AltNumber,
+//         isAddedByAdmin: true,
+//         DOB,
+//         hit: 1,
+//         PermanentAddress: address,
+//         identityDocument: {
+//           DocumentType,
+//           DocumentImageUrl: documentUploadResult.secure_url,
+//           DocumentPublicId: documentUploadResult.public_id,
+//         },
+//         QualificationDocument: {
+//           QualificationImageUrl: qualificationUploadResult?.secure_url,
+//           QualificationPublicId: qualificationUploadResult?.public_id,
+//         },
+//         isTeacherVerified: true,
+
+//       });
+//       await newTeacherByAdmin.save()
+//       res.status(201).json({
+//         message: "Teacher registered successfully by admin.",
+//         teacher: newTeacherByAdmin,
+//       });
+//     } else {
+
+//       const otp = crypto.randomInt(100000, 999999);
+//       const otpExpiresTime = Date.now() + 2 * 60 * 1000;
+
+//       const newTeacher = await Teacher.create({
+//         TeacherName,
+//         PhoneNumber,
+//         Email,
+//         Password,
+//         Age,
+//         gender,
+//         AltNumber,
+//         DOB,
+//         hit: 1,
+//         PermanentAddress: address,
+//         identityDocument: {
+//           DocumentType,
+//           DocumentImageUrl: documentUploadResult.secure_url,
+//           DocumentPublicId: documentUploadResult.public_id,
+//         },
+//         QualificationDocument: {
+//           QualificationImageUrl: qualificationUploadResult?.secure_url,
+//           QualificationPublicId: qualificationUploadResult?.public_id,
+//         },
+//         isTeacherVerified: false,
+//         SignInOtp: otp,
+//         OtpExpiresTime: otpExpiresTime,
+//       });
+
+//       const NewMessage = `Dear Teacher ${newTeacher.TeacherName}, your OTP for verification is: ${newTeacher.SignInOtp}. This OTP is valid for a limited time. If you did not request this OTP, please ignore this message. Best regards, S.R. Tutors.`;
+
+
+//       await SendWhatsAppMessage(NewMessage, PhoneNumber);
+//       res.status(201).json({
+//         message: "Teacher registered successfully. Please verify your Contact Number.",
+//       });
+
+//     }
+
+//   } catch (error) {
+//     console.error("Registration error: ", error);
+//     res.status(500).json({
+//       message: "Error occurred during registration.",
+//       error: error.message,
+//     });
+//   }
+// });
+
+//code ad on 13 dec 2024 
 exports.TeacherRegister = CatchAsync(async (req, res) => {
   try {
     const {
@@ -32,19 +238,13 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
       AltNumber,
       PermanentAddress,
     } = req.body;
+    console.log(req.body)
+    const address = PermanentAddress
 
-    const address = JSON.parse(PermanentAddress);
-
-    const { DocumentType, isAddedByAdmin = false } = req.query;
+    const { isAddedByAdmin = false } = req.query;
     const convertBoolean = Boolean(isAddedByAdmin)
-    console.log(DocumentType)
-    const preDefineTypes = ["Aadhaar", "Pan", "Voter Card", "Passport"];
 
-    if (!preDefineTypes.includes(DocumentType)) {
-      return res.status(400).json({
-        message: "Invalid Document Type. Please provide a valid type: Aadhaar, Pan, Voter Card, or Passport.",
-      });
-    }
+
 
     const missingFields = [];
     if (!TeacherName) missingFields.push("Teacher Name");
@@ -95,56 +295,9 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
       }
     }
 
-    const DocumentFile = req.files?.Document?.[0];
 
-    const QualificationFile = req.files?.Qualification?.[0];
 
-    if (!DocumentFile) {
-      return res.status(400).json({
-        message: "No Document file uploaded. Please upload an identity document.",
-      });
-    }
 
-    if (!QualificationFile) {
-      return res.status(400).json({
-        message: "No Qualification document uploaded. Please upload a qualification document.",
-      });
-    }
-
-    const uploadFromBuffer = (buffer) => {
-      return new Promise((resolve, reject) => {
-        let stream = Cloudinary.uploader.upload_stream((error, result) => {
-          if (error) {
-            console.error("Cloudinary upload error: ", error);
-            return reject(new Error("Failed to upload file to Cloudinary."));
-          }
-          resolve(result);
-        });
-        streamifier.createReadStream(buffer).pipe(stream);
-      });
-    };
-
-    let documentUploadResult;
-    try {
-      documentUploadResult = await uploadFromBuffer(DocumentFile.buffer);
-    } catch (error) {
-      console.error("Error uploading identity document: ", error);
-      return res.status(500).json({
-        message: "Error uploading identity document to Cloudinary.",
-        error: error.message,
-      });
-    }
-
-    let qualificationUploadResult;
-    try {
-      qualificationUploadResult = await uploadFromBuffer(QualificationFile.buffer);
-    } catch (error) {
-      console.error("Error uploading qualification document: ", error);
-      return res.status(500).json({
-        message: "Error uploading qualification document to Cloudinary.",
-        error: error.message,
-      });
-    }
     if (convertBoolean === true) {
       const newTeacherByAdmin = await Teacher.create({
         TeacherName,
@@ -158,15 +311,7 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
         DOB,
         hit: 1,
         PermanentAddress: address,
-        identityDocument: {
-          DocumentType,
-          DocumentImageUrl: documentUploadResult.secure_url,
-          DocumentPublicId: documentUploadResult.public_id,
-        },
-        QualificationDocument: {
-          QualificationImageUrl: qualificationUploadResult?.secure_url,
-          QualificationPublicId: qualificationUploadResult?.public_id,
-        },
+
         isTeacherVerified: true,
 
       });
@@ -191,15 +336,7 @@ exports.TeacherRegister = CatchAsync(async (req, res) => {
         DOB,
         hit: 1,
         PermanentAddress: address,
-        identityDocument: {
-          DocumentType,
-          DocumentImageUrl: documentUploadResult.secure_url,
-          DocumentPublicId: documentUploadResult.public_id,
-        },
-        QualificationDocument: {
-          QualificationImageUrl: qualificationUploadResult?.secure_url,
-          QualificationPublicId: qualificationUploadResult?.public_id,
-        },
+
         isTeacherVerified: false,
         SignInOtp: otp,
         OtpExpiresTime: otpExpiresTime,
@@ -646,7 +783,7 @@ exports.AddProfileDetailsOfVerifiedTeacher = CatchAsync(async (req, res) => {
     const requiredAddressFields = [
       "streetAddress",
       "City",
-      "LandMark",
+    
       "Area",
       "Pincode",
     ];
@@ -791,7 +928,7 @@ exports.AddProfileDetailsOfVerifiedTeacherByAdmin = CatchAsync(async (req, res) 
 
 
     const RangeableData = req.body.TeachingLocation
-   
+
     const MakeRangebaleData = RangeableData.Area && RangeableData.Area.length > 0 ?
       RangeableData.Area.map(item => ({
         location: {

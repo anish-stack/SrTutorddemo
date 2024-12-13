@@ -1,44 +1,54 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-
+import toast from 'react-hot-toast';
+import SearchForm from './SearchForm';
+import TeacherCard from './TeacherCard';
+import SubjectFilter from './SubjectFilter';
+import { ShieldAlert } from 'lucide-react';
 const SearchTeacher = () => {
+    // State management
     const [formData, setFormData] = useState({
-        Subject: '',
-        Area: '',
-        City: '',
-        District: '',
-        Class: '',
-        ClassId: '',
-        Pincode:'',
-        Gender: '',
-        TeachingMode: '',
+        searchLocation: '',
+        classSearch: '',
+        classId: '',
+        radius: 5
     });
-
-    const [selectedClass, setSelectedClass] = useState({ classid: '', classNameValue: '' });
-    const [subjects, setSubjects] = useState([]);
-    const [cities, setCities] = useState([]);
-    const [districts, setDistricts] = useState([]);
-    const [areas, setAreas] = useState([]);
+    const [teachers, setTeachers] = useState([]);
+    const [filteredTeachers, setFilteredTeachers] = useState([]);
+    const [suggestions, setSuggestions] = useState([]);
+    const [classData, setClassData] = useState([]);
     const [concatenatedData, setConcatenatedData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [classData, setClassData] = useState([]);
-    const [results, setResults] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [selectedSubjects, setSelectedSubjects] = useState([]);
+    const teachersPerPage = 6;
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
-    };
+    // Fetch classes data
+    useEffect(() => {
+        const fetchClasses = async () => {
+            try {
+                const response = await axios.get('https://api.srtutorsbureau.com/api/v1/admin/Get-Classes');
+                const classes = response.data.data.sort((a, b) => a.position - b.position);
+                setClassData(classes);
+            } catch (err) {
+                setError('Failed to fetch classes');
+                toast.error('Error loading classes');
+            }
+        };
+        fetchClasses();
+    }, []);
 
+    // Process class data
     useEffect(() => {
         if (classData.length > 0) {
-            const filterOutClasses = ["I-V", "VI-VIII", "IX-X", "XI-XII"];
+            const filterOutClasses = ['I-V', 'VI-VIII', 'IX-X', 'XI-XII'];
             const filteredClasses = classData
                 .filter(item => !filterOutClasses.includes(item.Class))
                 .map(item => ({ class: item.Class, id: item._id }));
 
             const rangeClasses = classData
-                .filter(item => item.InnerClasses && item.InnerClasses.length > 0)
+                .filter(item => item.InnerClasses?.length > 0)
                 .flatMap(item => item.InnerClasses.map(innerClass => ({
                     class: innerClass.InnerClass,
                     id: innerClass._id
@@ -48,300 +58,157 @@ const SearchTeacher = () => {
         }
     }, [classData]);
 
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
 
-    const fetchInitialData = async () => {
+
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+
+
+        if (name === 'searchLocation') {
+            autoComplete(value);
+
+        }
+    };
+
+    // Auto-complete location
+    const autoComplete = async (query) => {
+        if (!query) {
+            setSuggestions([]);
+            return;
+        }
+        try {
+            const response = await axios.get(
+                `https://api.srtutorsbureau.com/autocomplete?input=${query}`
+            );
+            setSuggestions(response.data);
+        } catch (error) {
+            console.error('Autocomplete error:', error);
+        }
+    };
+
+    // Handle search
+    const handleSearch = async () => {
+        if (!formData.searchLocation || !formData.classSearch) {
+            toast.error('Please fill in all required fields');
+            return;
+        }
+
         setLoading(true);
         try {
-            const [fetchClass] = await Promise.all([
-                axios.get('https://api.srtutorsbureau.com/api/v1/admin/Get-Classes')
-            ]);
-
-            const classes = fetchClass.data.data.sort((a, b) => a.position - b.position);
-            setClassData(classes);
-        } catch (err) {
-            setError("Error fetching initial data");
+            const response = await axios.post('http://api.srtutorsbureau.com/api/v1/admin/make-search', formData);
+            setTeachers(response.data.data);
+            console.log(response.data);
+            setFilteredTeachers(response.data.data);
+            setCurrentPage(1);
+        } catch (error) {
+            setError('Search failed');
+            toast.error('Failed to fetch teachers');
         } finally {
             setLoading(false);
         }
     };
 
-    useEffect(() => {
-        fetchInitialData();
-    }, []);
+    // Handle subject filtering
+    const handleSubjectChange = (subject) => {
+        setSelectedSubjects(prev => {
+            const newSubjects = prev.includes(subject)
+                ? prev.filter(s => s !== subject)
+                : [...prev, subject];
 
+            const filtered = teachers.filter(teacher =>
+                teacher.AcademicInformation.some(info =>
+                    info.SubjectNames.some(s => newSubjects.length === 0 || newSubjects.includes(s))
+                )
+            );
+            console.log(filtered)
 
-    const fetchSubjects = async (classId) => {
-        setLoading(true);
-        try {
-            const response = await axios.get(`https://api.srtutorsbureau.com/api/v1/admin/Get-Class-Subject/${classId}`);
-            console.log(response.data.data.Subjects)
-            setSubjects(response.data.data.Subjects);
-        } catch (err) {
-            setError("Error fetching subjects");
-        } finally {
-            setLoading(false);
-        }
+            setFilteredTeachers(filtered);
+            setCurrentPage(1);
+            return newSubjects;
+        });
     };
 
-    const handleClassChange = (event) => {
-        const selectedClassId = event.target.value;
-        const selectedClassObj = concatenatedData.find(cls => cls.id === selectedClassId);
-        if (selectedClassObj) {
-            setSelectedClass({ classid: selectedClassObj.id, classNameValue: selectedClassObj.class });
-            setFormData((prev) => ({
-                ...prev,
-                ClassId: selectedClassObj.id,
-                Class: selectedClassObj.class,
-            }));
-            fetchSubjects(selectedClassId);
-        }
-    };
+    // Pagination
+    const indexOfLastTeacher = currentPage * teachersPerPage;
+    const indexOfFirstTeacher = indexOfLastTeacher - teachersPerPage;
+    const currentTeachers = filteredTeachers.slice(indexOfFirstTeacher, indexOfLastTeacher);
+    const totalPages = Math.ceil(teachers.length / teachersPerPage);
 
-    const getCities = async () => {
-        try {
-            const { data } = await axios.get("https://api.srtutorsbureau.com/api/jd/getStates");
-            setCities(data.map(City => ({ value: City, label: City })));
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
-    const getDistricts = async (city) => {
-        try {
-            const { data } = await axios.get(`https://api.srtutorsbureau.com/api/jd/getCitiesByState?state=${city}`);
-            setDistricts(data.map(district => ({ value: district, label: district })));
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
-    const getAreasByDistrict = async (city) => {
-        try {
-            const { data } = await axios.get(`https://api.srtutorsbureau.com/api/jd/getAreasByCity?city=${city}`);
-            setAreas(data.map(area => ({ value: area.placename, label: area.placename })));
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
-    const handleSubmit = async (e) => {
-        console.log("Form Data:", formData); // Log form data to console
-        e.preventDefault();
-        setLoading(true);
-        setError(null);
-        try {
-            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/admin/make-search', formData);
-            console.log(response.data.data)
-            if (response.data.data.length > 0) {
-                setResults(response.data.data);
-      
-
-            } else {
-                setResults([]);
-                setError("No results found for the search");
-            }
-        } catch (err) {
-            setError("Error performing search");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        getCities();
-    }, []);
+    // Loading and error states
+    if (error) {
+        return (
+            <div className="flex items-center justify-center min-h-[200px] text-red-600">
+                {error}
+            </div>
+        );
+    }
 
     return (
-        <>
-            <div className="p-4 h-screen">
-                {results ? (
-                    results.length > 0 ? (
-                        <>
-                            <button onClick={() => setResults([])} className="mb-4 py-2 px-4 bg-blue-500 text-white rounded-md">Search Again</button>
-                            <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
-                                <thead>
-                                    <tr className="bg-gray-200">
-                                        <th className="py-2 px-4 border-b">Full Name</th>
-                                        <th className="py-2 px-4 border-b">Contact Number</th>
-                                        <th className="py-2 px-4 border-b">Teaching Areas</th>
-                                        <th className="py-2 px-4 border-b">Class Name</th>
-                                        <th className="py-2 px-4 border-b">Subjects</th>
-                                        <th className="py-2 px-4 border-b">address</th>
-                                        <th className="py-2 px-4 border-b">Action</th>
+        <div className="max-w-7xl mx-auto px-4 py-8">
+            <SearchForm
+                formData={formData}
+                handleInputChange={handleInputChange}
+                suggestions={suggestions}
+                handleSearch={handleSearch}
+                concatenatedData={concatenatedData}
+            />
 
+            {loading ? (
+                <div className="flex justify-center my-8">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                </div>
+            ) : teachers.length > 0 ? (
+                <>
+                    <SubjectFilter
+                        subjects={Array.from(new Set(teachers.flatMap(t =>
+                            t.AcademicInformation.flatMap(info => info.SubjectNames)
+                        )))}
+                        selectedSubjects={selectedSubjects}
+                        onSubjectChange={handleSubjectChange}
+                    />
 
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {results.map((item, index) => (
-                                        <tr key={index} className="hover:bg-gray-100">
-                                            <td className="py-2 px-4 border-b">{item.FullName}</td>
-                                            <td className="py-2 px-4 border-b">{item.ContactNumber}</td>
-                                            <td className="py-2 px-4 border-b">
-                                                {item.TeachingLocation.Area.join(", ")}
-                                            </td>
-                                            <td className="py-2 px-4 border-b">
-                                                {item.AcademicInformation.map(info => info.className).join(", ")}
-                                            </td>
-                                            <td className="py-2 px-4 border-b">
-                                                {item.AcademicInformation.flatMap(info => info.SubjectNames).join(", ")}
-                                            </td>
-                                            <td className="py-2 px-4 border-b">
-                                                {item.PermanentAddress.streetAddress}, {item.PermanentAddress.Area}, {item.PermanentAddress.City}, {item.PermanentAddress.Pincode}
-                                            </td>
-                                            <td>
-                                                <button onClick={() => window.location.href = `/Manage-Teacher/${item.TeacherUserId}`} className="mb-4 py-2 px-4 whitespace-nowrap bg-green-500 text-white rounded-md">Show Profile</button>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                        {currentTeachers.map((teacher) => (
+                            <TeacherCard key={teacher._id} teacher={teacher} />
+                        ))}
+                    </div>
 
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </>
-                    ) : (
-                        <form
-                            className="max-w-3xl mx-auto h-full flex flex-col justify-center bg-white border rounded-lg shadow-md p-6"
-                            onSubmit={handleSubmit} // Ensure this function is defined
-                        >
-                            {error && <p className="text-red-500 mb-2">{error}</p>} {/* Ensure error is defined */}
-                            {loading && <p className="text-blue-500">Loading...</p>} {/* Ensure loading is defined */}
-
-                            <div className="space-y-4">
-                                {/* Class Selection */}
-                                <div>
-                                    <label className="block text-gray-700 font-medium">Class</label>
-                                    <select
-                                        onChange={handleClassChange}
-                                        className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-green-400"
-                                    >
-                                        <option value="">Select Class...</option>
-                                        {concatenatedData.map((cls) => (
-                                            <option key={cls.id} value={cls.id}>{cls.class}</option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                {/* Subject Selection */}
-                                <div>
-                                    <label className="block text-gray-700 font-medium">Subject</label>
-                                    <select
-                                        onChange={handleChange}
-                                        name="Subject"
-                                        className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-green-400"
-                                    >
-                                        <option value="">Select Subject...</option>
-                                        {subjects.map((subject) => (
-                                            <option key={subject._id} value={subject.SubjectName}>
-                                                {subject.SubjectName}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-
-
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    {/* City Selection */}
-                                    <div>
-                                        <label className="block text-gray-700 font-medium">City</label>
-                                        <select
-                                            onChange={(e) => { handleChange(e); getDistricts(e.target.value); }} // Ensure functions are defined
-                                            name="City"
-                                            className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-green-400"
-                                        >
-                                            <option value="">Select City...</option>
-                                            {cities.map((city, index) => (
-                                                <option key={index} value={city.value}>{city.label}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-
-                                    {/* District Selection */}
-                                    <div>
-                                        <label className="block text-gray-700 font-medium">District</label>
-                                        <select
-                                            onChange={(e) => { handleChange(e); getAreasByDistrict(e.target.value); }} // Ensure functions are defined
-                                            name="District"
-                                            className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-green-400"
-                                        >
-                                            <option value="">Select District...</option>
-                                            {districts.map((district, index) => (
-                                                <option key={index} value={district.value}>{district.label}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-
-                                    {/* Area Selection */}
-                                    <div>
-                                        <label className="block text-gray-700 font-medium">Area</label>
-                                        <select
-                                            onChange={handleChange} // Ensure this function is defined
-                                            name="Area"
-                                            className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-green-400"
-                                        >
-                                            <option value="">Select Area...</option>
-                                            {areas.map((area) => (
-                                                <option key={area.value} value={area.value}>{area.value}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                </div>
-                                <h3 className="text-2xl font-semibold text-center my-4">Or</h3>
-                                <div className="mb-4">
-                                    <label className="block text-gray-700 font-medium mb-2">Search Via Pincode</label>
-                                    <input
-                                        type="text"
-                                        onChange={handleChange} 
-                                        name="Pincode"
-                              
-                                      
-                                        placeholder="Enter Pincode"
-                                        className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-green-400"
-                                    />
-                                </div>
-
-                                {/* Gender Selection */}
-                                <div>
-                                    <label className="block text-gray-700 font-medium">Gender</label>
-                                    <select
-                                        onChange={handleChange} // Ensure this function is defined
-                                        name="Gender"
-                                        className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-green-400"
-                                    >
-                                        <option value="">Select Gender...</option>
-                                        <option value="Male">Male</option>
-                                        <option value="Female">Female</option>
-                                    </select>
-                                </div>
-
-                                {/* Teaching Mode Selection */}
-                                <div>
-                                    <label className="block text-gray-700 font-medium">Teaching Mode</label>
-                                    <select
-                                        onChange={handleChange} // Ensure this function is defined
-                                        name="TeachingMode"
-                                        className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-green-400"
-                                    >
-                                        <option value="">Select Teaching Mode...</option>
-                                        <option value="Online">Online</option>
-                                        <option value="Offline">Offline</option>
-                                        <option value="Any">Any</option>
-                                    </select>
-                                </div>
-                            </div>
-
+                    {/* Pagination */}
+                    <div className="flex justify-center gap-2 mt-6">
+                        {Array.from({ length: totalPages }, (_, i) => (
                             <button
-                                type="submit"
-                                className="mt-6 w-full py-2 bg-green-600 text-white font-bold rounded-md hover:bg-green-700 transition duration-200"
+                                key={i}
+                                onClick={() => setCurrentPage(i + 1)}
+                                className={`px-3 py-1 rounded ${currentPage === i + 1
+                                        ? 'bg-blue-600 text-white'
+                                        : 'bg-gray-200 hover:bg-gray-300'
+                                    }`}
                             >
-                                Search
+                                {i + 1}
                             </button>
-                        </form>
-                    )
-                ) : null}
-            </div>
-        </>
-    );
+                        ))}
+                    </div>
+                </>
+            ) :
 
+            <>
+            <div className="bg-red-50 border-l-4 border-red-400 p-4 my-4 rounded-lg shadow-md">
+              <div className="flex items-center space-x-4">
+                <ShieldAlert className="text-red-400" />
+                <div>
+                  <p className="text-lg font-medium text-red-600">No teachers found matching your search criteria.</p>
+                  <p className="text-sm text-gray-600 mt-1">Please try adjusting the search parameters or selecting different classes.</p>
+                </div>
+              </div>
+            </div>
+          </>
+          }
+        </div>
+    );
 };
 
 export default SearchTeacher;

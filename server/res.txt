@@ -1,65 +1,89 @@
- {
-           
-          
-            "Gender": "Female"
-            "TeachingExperience": "5",
-            "ExpectedFees": 2000,
-            "VehicleOwned": true,
-            "TeachingMode": "Home Tuition at Your Home",
-            "AcademicInformation": [
-                {
-                    "ClassId": "66c2cb9f6f6dc1eea6cd565f",
-                    "SubjectNames": [
-                        "Mathematics",
-                        "English",
-                        "Science King"
-                    ],
-                    "_id": "66d569d07995292a18b465f4"
-                },
-                {
-                    "ClassId": "66c2ccfee14938da64e9b7ff",
-                    "SubjectNames": [
-                        "Mathematics",
-                        "Physics",
-                        "Chemistry"
-                    ],
-                    "_id": "66d569d07995292a18b465f5"
-                },
-                {
-                    "ClassId": "66c2cd09e14938da64e9b805",
-                    "SubjectNames": [
-                        "Biology",
-                        "Chemistry",
-                        "Physics"
-                    ],
-                    "_id": "66d569d07995292a18b465f6"
-                },
-                {
-                    "ClassId": "66d1732924b572536959a1dc",
-                    "SubjectNames": [
-                        "Mathematics",
-                        "English",
-                        "Hindi",
-                        "Sanskrit",
-                        "Art Education",
-                        "Physical Education"
-                    ],
-                    "_id": "66d569d07995292a18b465f7"
-                },
-                {
-                    "ClassId": "66c2cd4de14938da64e9b81b",
-                    "SubjectNames": [
-                        "Mathematics",
-                        "Data Structures",
-                        "Software Engineering",
-                        "Operating Systems",
-                        "Object-Oriented Programming",
-                        "Web Technology"
-                    ],
-                    "_id": "66d569d07995292a18b465f8"
-                }
-            ],
-            "isAllDetailVerified": false,
-          
-        },
-        http://localhost:3000/Complete-profile?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6eyJpZGVudGl0eURvY3VtZW50Ijp7IkRvY3VtZW50VHlwZSI6IkFhZGhhYXIiLCJEb2N1bWVudEltYWdlVXJsIjoiaHR0cHM6Ly9yZXMuY2xvdWRpbmFyeS5jb20vZGdsaWhmd3NlL2ltYWdlL3VwbG9hZC92MTcyOTg1MzYyOC9heXVqYXdpamhybThxb2Q2ZnB0MC5wbmciLCJEb2N1bWVudFB1YmxpY0lkIjoiYXl1amF3aWpocm04cW9kNmZwdDAifSwiUXVhbGlmaWNhdGlvbkRvY3VtZW50Ijp7IlF1YWxpZmljYXRpb25JbWFnZVVybCI6Imh0dHBzOi8vcmVzLmNsb3VkaW5hcnkuY29tL2RnbGloZndzZS9pbWFnZS91cGxvYWQvdjE3Mjk4NTM2MzAveDBvY2lycGV6eTgzMWtoMm1odTYucG5nIiwiUXVhbGlmaWNhdGlvblB1YmxpY0lkIjoieDBvY2lycGV6eTgzMWtoMm1odTYifSwiUGVybWFuZW50QWRkcmVzcyI6eyJzdHJlZXRBZGRyZXNzIjoiQTk2LzFBLCBCbG9jayBBLCBXYXppcnB1ciBJbmR1c3RyaWFsIEFyZWEsIEFzaG9rIFZpaGFyLCBEZWxoaSwgMTEwMDUyLCBJbmRpYSIsIkNpdHkiOiJEZWxoaSIsIkFyZWEiOiJBc2hvayBWaWhhciIsIkxhbmRNYXJrIjoibW8iLCJQaW5jb2RlIjoiMTEwMDUyIn0sIl9pZCI6IjY3MWI3OGJlNTRjMGVjODc4ZTVhYjQwZiIsIlRlYWNoZXJOYW1lIjoiQW5pc2ggSmhhIiwiUGhvbmVOdW1iZXIiOiI3MjE3NjE5Nzk0IiwiRW1haWwiOiJoYXBweWNuZzQxQGdtYWlsLmNvbSIsIkRPQiI6IjE5NjYtMTEtMTEiLCJQYXNzd29yZCI6IiQyYiQxMCQ2SXh6Z2dmMS5PRVpKclFFc1RDMXEudzRSWEgxczRad1B5MzNDaWVFVmt5a00yL2JIT0hjQyIsImdlbmRlciI6Ik1hbGUiLCJpc1RlYWNoZXJWZXJpZmllZCI6dHJ1ZSwiUmV2aWV3cyI6W10sImlzQmxvY2tGb3JPdHAiOmZhbHNlLCJEb2N1bWVudFN0YXR1cyI6ZmFsc2UsIlJvbGUiOiJUZWFjaGVyIiwiaXNUb3BUZWFjaGVyIjpmYWxzZSwiaGl0IjowLCJMZWFkSWRzIjpbXSwiY3JlYXRlZEF0IjoiMjAyNC0xMC0yNVQxMDo1Mzo1MC41MzNaIiwidXBkYXRlZEF0IjoiMjAyNC0xMC0yNVQxMDo1NDowNS42NDNaIiwiX192IjowLCJPdHBCbG9ja1RpbWUiOm51bGx9LCJpYXQiOjE3Mjk4NTM2NDUsImV4cCI6MTczMDAyNjQ0NX0._F_pPJ5gcsVvKACpG7mttmsHOjl77bWq8qgDNbmrhAg&encoded=671b78be54c0ec878e5ab40f
+{
+  "_id": {
+    "$oid": "67596f5f92ba6a50f7a73e9f"
+  },
+  "FullName": "Rahul",
+  "DOB": "1997-10-10",
+  "Gender": "Male",
+  "ContactNumber": "7050690034",
+  "AlternateContact": "",
+  "PermanentAddress": {
+    "streetAddress": "97, Block A, Wazirpur Industrial Area, Ashok Vihar, Delhi, 110052, India",
+    "City": "Delhi",
+    "Area": "Ashok Vihar",
+    "LandMark": "Delhi",
+    "Pincode": "110052"
+  },
+  "CurrentAddress": {
+    "streetAddress": "97, Block A, Wazirpur Industrial Area, Ashok Vihar, Delhi, 110052, India",
+    "City": "Delhi",
+    "Area": "Ashok Vihar",
+    "LandMark": "Delhi",
+    "Pincode": "110052"
+  },
+  "isBlockForOtp": false,
+  "isAddressSame": false,
+  "Qualification": "MA",
+  "TeachingExperience": "5",
+  "ExpectedFees": 89000,
+  "VehicleOwned": true,
+  "TeachingLocation": {
+    "State": "Assam",
+    "City": "Bongaigaon",
+    "Area": [
+      "Bongaigaon"
+    ]
+  },
+  "AcademicInformation": [
+    {
+      "ClassId": {
+        "$oid": "6709022eaa72a455f85421f2"
+      },
+      "className": "VI",
+      "SubjectNames": [
+        "Mathematics"
+      ],
+      "_id": {
+        "$oid": "67596f5f92ba6a50f7a73ea0"
+      }
+    }
+  ],
+  "RangeWhichWantToDoClasses": [
+    {
+      "location": {
+        "type": "Point",
+        "coordinates": [
+          90.6248,
+          26.3652
+        ]
+      },
+      "_id": {
+        "$oid": "67596f5f92ba6a50f7a73ea1"
+      }
+    }
+  ],
+  "TeacherUserId": {
+    "$oid": "67596f0092ba6a50f7a72f4d"
+  },
+  "SubmitOtp": "191162",
+  "OtpExpired": {
+    "$date": "2024-12-11T10:56:23.053Z"
+  },
+  "isAllDetailVerified": true,
+  "StudentIds": [],
+  "Reviews": [],
+  "srVerifiedTag": false,
+  "LeadIds": [],
+  "TeachingMode": "Offline Class",
+  "createdAt": {
+    "$date": "2024-12-11T10:54:23.056Z"
+  },
+  "updatedAt": {
+    "$date": "2024-12-11T10:54:38.378Z"
+  },
+  "__v": 0,
+  "ProfilePic": {
+    "url": "http://res.cloudinary.com/dglihfwse/image/upload/v1733914477/nfs9qq5esmiamvxhlztf.png",
+    "publicId": "nfs9qq5esmiamvxhlztf"
+  }
+},

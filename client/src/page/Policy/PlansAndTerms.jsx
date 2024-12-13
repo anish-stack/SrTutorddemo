@@ -1,8 +1,28 @@
 import React from 'react';
+import { Helmet } from 'react-helmet-async';
 
 const PlansAndTerms = () => {
   return (
     <div className="container mt-5">
+      <Helmet>
+  <title>Terms & Conditions - SR Tutors Bureau</title>
+
+  <meta
+    name="description"
+    content="Review the Terms & Conditions for using the services provided by SR Tutors Bureau. These terms outline the rules and guidelines for using our website and tutoring services."
+  />
+
+  <meta
+    name="keywords"
+    content="terms and conditions, SR Tutors Bureau, user agreement, website terms, tutoring services, policies, rules"
+  />
+
+  <link rel="canonical" href="https://www.srtutorsbureau.com/terms-and-conditions" />
+  <meta name="robots" content="index, follow" />
+  <meta name="author" content="SR Tutors Bureau" />
+  <meta name="publisher" content="SR Tutors Bureau" />
+</Helmet>
+
       <h1 className="text-center mb-4">Membership Plans</h1>
 
       <section className="mb-5">

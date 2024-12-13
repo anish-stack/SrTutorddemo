@@ -2,14 +2,12 @@ import React, { useEffect, useState } from 'react';
 import logo from './logo.webp';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { logout } from '../../Slices/LoginSlice';
+
 import './sideHeader.css'
 import axios from 'axios';
 const SideHeader = () => {
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-    // const { isLogin } = useSelector((state) => state.login);
-
+    
+  
 
     const [data, setData] = useState([]);
     const [pdata, setPData] = useState([]);
@@ -99,10 +97,7 @@ const SideHeader = () => {
                                 <i className="fa-solid fa-message mr-3"></i>
                                 <a href={'/Search-teacher'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Search Teacher</a>
                             </li>
-                            {/* <li className="flex items-center">
-                                <i className="fa-solid fa-blog mr-3"></i>
-                                <Link to={'/Manage-Blogs'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Manage Blogs</Link>
-                            </li> */}
+
                             <li className="flex items-center">
                                 <i className="fa-solid fa-star mr-3"></i>
                                 <Link to={'/Manage-Reviews'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Manage Reviews</Link>
@@ -121,17 +116,6 @@ const SideHeader = () => {
                                 <Link to={'/Add-request'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Add Request</Link>
                             </li>
 
-                            {/* <li className="flex items-center">
-                                <i className="fa-solid fa-book-open mr-3"></i>
-                                <Link to={'/Manage-Class-teacher-request'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Manage Class Teacher Request</Link>
-                            </li> */}
-                            {/* <li className="flex items-center">
-                                <i className="fa-solid fa-user-edit mr-3"></i>
-
-                                <Link to={'/Manage-Teacher-Requests'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Manage Teacher Requests</Link>
-                                <span className='bg-red-500 text-white text-center w-5 text-sm rounded-[50%] '>{pdata || 0}</span>
-
-                            </li> */}
                             <li className="flex items-center ">
                                 <i className="fa-solid fa-user-edit  z-20 mr-3"></i>
                                 <Link to={'/Manage-All-Requests'} className="text-lg relative truncate lg:text-base hover:text-red-600 transition-colors">Manage Requests</Link>
@@ -157,14 +141,14 @@ const SideHeader = () => {
                                             <i className="fa-solid fa-envelope-open-text mr-2"></i> All Email Template
                                         </Link>
                                     </li>
-                                    {/* <li className="hover:bg-gray-100">
-                                        <Link to="/send-offers" className="flex items-center px-4 py-2 text-gray-700 hover:text-red-600 transition-colors">
-                                            <i className="fa-solid fa-paper-plane mr-2"></i> Send Offer Mails
-                                        </Link>
-                                    </li> */}
+
+
                                 </ul>
                             </li>
-
+                            <li className="flex items-center">
+                                <i className="fa-solid fa-phone mr-3"></i>
+                                <Link to={'/create-pages'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Manage SEO PAGES</Link>
+                            </li>
                             <li className="flex items-center">
                                 <i className="fa-solid fa-phone mr-3"></i>
                                 <Link to={'/Manage-Contact'} className="text-lg lg:text-base hover:text-red-600 transition-colors">Manage Contact</Link>

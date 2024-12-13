@@ -1,9 +1,29 @@
 import React from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
+import { Helmet } from 'react-helmet-async';
 
 const PrivacyPolicy = () => {
   return (
     <Container className="py-5">
+      <Helmet>
+  <title>Privacy Policy - SR Tutors Bureau</title>
+
+  <meta
+    name="description"
+    content="Read SR Tutors Bureau's Privacy Policy to understand how we collect, use, and protect your personal information when you interact with our tutoring services. We prioritize your privacy and security."
+  />
+
+  <meta
+    name="keywords"
+    content="privacy policy, SR Tutors Bureau, data protection, personal information, privacy, student data, tutoring services"
+  />
+
+  <link rel="canonical" href="https://www.srtutorsbureau.com/privacy-policy" />
+  <meta name="robots" content="index, follow" />
+  <meta name="author" content="SR Tutors Bureau" />
+  <meta name="publisher" content="SR Tutors Bureau" />
+</Helmet>
+
       <Row>
         <Col>
           <h1 className="mb-4">Privacy Policy</h1>

@@ -182,16 +182,16 @@ const Dashboard = () => {
     return (
         <div className="min-h-screen bg-gray-100">
             {/* Header */}
-            <header className="bg-white shadow-md flex justify-between items-center p-4">
+            {/* <header className="bg-white shadow-md flex justify-between items-center p-4">
                 <h1 className="text-2xl font-bold">Admin Dashboard</h1>
                 <div className="flex items-center space-x-4">
                     <PiPaintBrushHouseholdFill onClick={CleanCaches} className="text-xl cursor-pointer" />
                     <FontAwesomeIcon icon={faBell} className="text-xl cursor-pointer" />
                     <FontAwesomeIcon icon={faUser} className="text-xl cursor-pointer" />
                     <FontAwesomeIcon onClick={handleLogout} icon={faSignOutAlt} className="text-xl cursor-pointer" />
-                    {/* <FontAwesomeIcon /> */}
+                   
                 </div>
-            </header>
+            </header> */}
 
             {/* Main content */}
             <main className="p-8">

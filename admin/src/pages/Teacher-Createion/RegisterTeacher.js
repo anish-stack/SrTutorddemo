@@ -15,12 +15,10 @@ const RegisterTeacher = () => {
             streetAddress: '',
             City: '',
             Area: '',
-            LandMark: '',
+           
             Pincode: ''
         },
-        DocumentType: 'Aadhaar',
-        DocumentImage: null,
-        QualificationDocument: null
+      
     });
     const [Loading, setLoading] = useState(false);
 
@@ -128,29 +126,29 @@ const RegisterTeacher = () => {
 
     const handleRegister = async (e) => {
         e.preventDefault();
-        const isFormValid = Object.values(formData).every(value => value !== '' && value !== undefined && value !== null);
+        // const isFormValid = Object.values(formData).every(value => value !== '' && value !== undefined && value !== null);
         if (formData.PhoneNumber.length > 10) {
             toast.error('Phone number cannot exceed 10 digits.');
             return;
         }
-        if (!isFormValid) {
-            toast.error("Please fill all required fields.");
-            return;
-        }
-        const data = new FormData();
-        data.append('TeacherName', formData.TeacherName);
-        data.append('PhoneNumber', formData.PhoneNumber);
-        data.append('Email', formData.Email);
-        data.append('Password', formData.Password);
-        data.append('DOB', formData.DOB);
-        data.append('gender', formData.gender);
-        data.append('PermanentAddress', JSON.stringify(formData.PermanentAddress));
-        data.append('Document', formData.DocumentImage);
-        data.append('Qualification', formData.QualificationDocument);
-        data.append('DocumentType', formData.DocumentType);
+        // if (!isFormValid) {
+        //     toast.error("Please fill all required fields.");
+        //     return;
+        // }
+        // const data = new FormData();
+        // data.append('TeacherName', formData.TeacherName);
+        // data.append('PhoneNumber', formData.PhoneNumber);
+        // data.append('Email', formData.Email);
+        // data.append('Password', formData.Password);
+        // data.append('DOB', formData.DOB);
+        // data.append('gender', formData.gender);
+        // data.append('PermanentAddress', JSON.stringify(formData.PermanentAddress));
+        // data.append('Document', formData.DocumentImage);
+        // data.append('Qualification', formData.QualificationDocument);
+        // data.append('DocumentType', formData.DocumentType);
         setLoading(true);
         try {
-            const response = await axios.post(`https://api.srtutorsbureau.com/api/v1/teacher/Create-teacher?DocumentType=${formData.DocumentType}&isAddedByAdmin=true`, data);
+            const response = await axios.post(`https://api.srtutorsbureau.com/api/v1/teacher/Create-teacher?DocumentType=${formData.DocumentType}&isAddedByAdmin=true`, formData);
             console.log(response.data);
             toast.success(response.data.message);
             setLoading(false);
@@ -309,7 +307,7 @@ const RegisterTeacher = () => {
                         />
                     </div>
 
-                    <div className="flex flex-col">
+                    {/* <div className="flex flex-col">
                         <label htmlFor="LandMark" className="text-sm font-semibold text-gray-700">Landmark</label>
                         <input
                             type="text"
@@ -319,7 +317,7 @@ const RegisterTeacher = () => {
                             placeholder="Landmark"
                             className="border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
-                    </div>
+                    </div> */}
 
                     <div className="flex flex-col">
                         <label htmlFor="Pincode" className="text-sm font-semibold text-gray-700">Pincode</label>
@@ -334,7 +332,7 @@ const RegisterTeacher = () => {
                     </div>
                 </div>
 
-                <div className="flex flex-col mt-4">
+                {/* <div className="flex flex-col mt-4">
                     <label className="text-sm font-semibold">Select Document Type</label>
                     <div className="flex items-center space-x-6">
                         <div className="flex items-center">
@@ -389,7 +387,7 @@ const RegisterTeacher = () => {
                         className="border border-gray-300 p-2 rounded-md"
                         required
                     />
-                </div>
+                </div> */}
 
                 <div className="flex justify-center">
                     <button

@@ -14,6 +14,8 @@ import Google from "./Google";
 import Loader from "./Components/Loader";
 import axios from "axios";
 import Faq from "./page/FAQ/Faq";
+import ViewPage from "./page/SEO/ViewPage";
+// import NTeacherRegistration from "./New Resgister/NTeacherRegistration";
 // Lazy load components
 const Home = lazy(() => import("./page/Home"));
 const Aboutus = lazy(() => import("./page/Aboutus"));
@@ -104,6 +106,8 @@ function App() {
           <Route path="/Student-dashboard" element={<StudentProfile />} />
           <Route path="/Student-Post-For-Teacher" element={<PostRequirement />} />
           <Route path="/teacher-register" element={<TeacherRegsitration />} />
+          {/* <Route path="/teacher-pr" element={<NTeacherRegistration />} /> */}
+
           <Route path="/Teacher-dashboard" element={<TeacherDashboard />} />
           <Route path="/thankYou" element={<ThankYouPage />} />
           <Route path="/Teacher-Profile-Verify" element={<TeacherProfileOtp />} />
@@ -116,8 +120,9 @@ function App() {
 
 
           <Route path="/Forget-Password" element={<ForgetPassword />} />
-          <Route path="/Google" element={<Google />} />
+          <Route path="/sr-tutors/:url" element={<ViewPage />} />
 
+          <Route path="/Google" element={<Google />} />
 
 
           <Route path="/*" element={<PageNotFound />} />

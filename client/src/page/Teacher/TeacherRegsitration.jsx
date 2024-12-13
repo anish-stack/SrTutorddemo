@@ -5,6 +5,7 @@ import toast from 'react-hot-toast'
 import { Form, Button, Row, Col, Card } from 'react-bootstrap';
 import Modal from 'react-bootstrap/Modal';
 import { useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 const TeacherRegistration = () => {
     const navigate = useNavigate()
     const [resendButtonClick, setResendButtonClick] = useState(0);
@@ -22,12 +23,12 @@ const TeacherRegistration = () => {
             streetAddress: '',
             City: '',
             Area: '',
-            LandMark: '',
+            // LandMark: '',
             Pincode: ''
         },
-        DocumentType: 'Aadhaar',
-        DocumentImage: null,
-        QualificationDocument: null
+        // DocumentType: 'Aadhaar',
+        // DocumentImage: null,
+        // QualificationDocument: null
     });
 
     const fileInputRef = useRef(null);
@@ -46,7 +47,7 @@ const TeacherRegistration = () => {
         const file = e.target.files[0];
 
         if (file) {
-            const validFileTypes = ['image/jpeg', 'image/jpg', 'image/png', ];
+            const validFileTypes = ['image/jpeg', 'image/jpg', 'image/png',];
             const maxSizeInMB = 10;
             const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
 
@@ -77,7 +78,7 @@ const TeacherRegistration = () => {
         const file = e.target.files[0];
 
         if (file) {
-            const validFileTypes = ['image/jpeg', 'image/jpg', 'image/png', ];
+            const validFileTypes = ['image/jpeg', 'image/jpg', 'image/png',];
             const maxSizeInMB = 10;
             const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
 
@@ -210,31 +211,31 @@ const TeacherRegistration = () => {
 
     const handleRegister = async (e) => {
         e.preventDefault()
-        const isFormValid = Object.values(formData).every(value => value !== '' && value !== undefined && value !== null);
+        // const isFormValid = Object.values(formData).every(value => value !== '' && value !== undefined && value !== null);
         if (formData.PhoneNumber.length > 10) {
             toast.error('Phone number cannot exceed 10 digits.');
             return;
         }
-        if (!isFormValid) {
-            toast.error("Please fill all required fields.");
-            return;
-        }
-        const data = new FormData();
-        data.append('TeacherName', formData.TeacherName);
-        data.append('PhoneNumber', formData.PhoneNumber);
-        data.append('Email', formData.Email);
-        data.append('Password', formData.Password);
-        data.append('DOB', formData.DOB);
-        data.append('gender', formData.gender);
-        data.append('PermanentAddress', JSON.stringify(formData.PermanentAddress));
+        // if (!isFormValid) {
+        //     toast.error("Please fill all required fields.");
+        //     return;
+        // }
+        // const data = new FormData();
+        // data.append('TeacherName', formData.TeacherName);
+        // data.append('PhoneNumber', formData.PhoneNumber);
+        // data.append('Email', formData.Email);
+        // data.append('Password', formData.Password);
+        // data.append('DOB', formData.DOB);
+        // data.append('gender', formData.gender);
+        // data.append('PermanentAddress', JSON.stringify(formData.PermanentAddress));
 
 
-        data.append('Document', formData.DocumentImage);
-        data.append('Qualification', formData.QualificationDocument);
-        data.append('DocumentType', formData.DocumentType);
+        // data.append('Document', formData.DocumentImage);
+        // data.append('Qualification', formData.QualificationDocument);
+        // data.append('DocumentType', formData.DocumentType);
         setLoading(true)
         try {
-            const response = await axios.post(`https://api.srtutorsbureau.com/api/v1/teacher/Create-teacher?DocumentType=${formData.DocumentType}`, data)
+            const response = await axios.post(`http://api.srtutorsbureau.com/api/v1/teacher/Create-teacher?DocumentType=${formData.DocumentType}`, formData)
             console.log(response.data.message)
             toast.success(response.data.message)
             setLoading(false)
@@ -296,7 +297,7 @@ const TeacherRegistration = () => {
 
     const VerifyOtp = async () => {
         try {
-            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/teacher/Verify-teacher', verifyData)
+            const response = await axios.post('http://api.srtutorsbureau.com/api/v1/teacher/Verify-teacher', verifyData)
 
             toast.success("Tutor Verified Successful")
             const { token, user } = response.data;
@@ -315,6 +316,25 @@ const TeacherRegistration = () => {
 
     return (
         <>
+            <Helmet>
+                <title>Tutor Registration - SR Tutors Bureau</title>
+
+                <meta
+                    name="description"
+                    content="Register as a tutor at SR Tutors Bureau and become part of our expert team. We are looking for passionate and qualified tutors to help students succeed in Delhi NCR. Fill out the registration form to join our network of dedicated educators."
+                />
+
+                <meta
+                    name="keywords"
+                    content="Tutor registration, SR Tutors Bureau, become a tutor, teaching jobs, tutoring services, education, Delhi NCR, tutor network, qualified tutors"
+                />
+
+                <link rel="canonical" href="https://www.srtutorsbureau.com/teacher-register?source=home" />
+                <meta name="robots" content="index, follow" />
+                <meta name="author" content="SR Tutors Bureau" />
+                <meta name="publisher" content="SR Tutors Bureau" />
+            </Helmet>
+
             <div className="container-fluid py-5">
                 <div className="row justify-content-center align-items-center">
                     <div className="col-md-12 col-xl-10">
@@ -554,7 +574,7 @@ const TeacherRegistration = () => {
                                                     />
 
                                                 </div>
-                                                <div className="col-md-12 mb-3">
+                                                {/* <div className="col-md-12 mb-3">
                                                     <label className="form-label" htmlFor="LandMark">Landmark</label>
                                                     <input
                                                         type="text"
@@ -566,11 +586,11 @@ const TeacherRegistration = () => {
                                                         value={formData.PermanentAddress.LandMark}
                                                         onChange={(e) => handleNestedChange(e, 'PermanentAddress')}
                                                     />
-                                                </div>
+                                                </div> */}
                                             </div>
 
 
-                                            <div className="mb-4">
+                                            {/* <div className="mb-4">
                                                 <Card className="p-3">
                                                     <h5>For Identical Verification</h5>
                                                     <Row className="mb-1">
@@ -626,16 +646,16 @@ const TeacherRegistration = () => {
                                                 </Card>
 
                                                 <Card className="px-4">
-                                                <Form.Label className="h5">
-                                                            Upload Qualification Document
-                                                            <small className="text-muted"> Max size up to 10 MB</small>
-                                                        </Form.Label>
+                                                    <Form.Label className="h5">
+                                                        Upload Qualification Document
+                                                        <small className="text-muted"> Max size up to 10 MB</small>
+                                                    </Form.Label>
                                                     <p className="text-muted mb-4">[Only .jpg, .jpeg, .png,  files are accepted]</p>
 
                                                     <Form.Group className="mb-3">
                                                         <Form.Label>
                                                             Upload Your Higher Education Qualification Document
-                                                         
+
                                                         </Form.Label>
                                                         <div className="custom-file">
                                                             <Form.Control
@@ -655,7 +675,7 @@ const TeacherRegistration = () => {
                                                 </Card>
 
 
-                                            </div>
+                                            </div> */}
 
                                             <div className="d-flex justify-content-end">
                                                 <button type="submit" className="btn btn-primary">Submit</button>

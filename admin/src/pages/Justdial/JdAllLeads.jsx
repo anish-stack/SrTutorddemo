@@ -1,141 +1,120 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { isDateInRange } from './dateUtils';
+import FilterBar from './FilterBar';
+import TableHeader from './TableHeader';
+import TableRow from './TableRow';
+import Pagination from './Pagination';
+
 
 const JdAllLeads = () => {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [leadsPerPage] = useState(8);
   const [filter, setFilter] = useState('');
-
-  // Fetch leads from API
-  const fetchLeads = async () => {
-    try {
-      const response = await axios.get('https://api.srtutorsbureau.com/api/jd/get-Alllead');
-      if (response.data.success) {
-        setLeads(response.data.data);
-      } else {
-        setError('Failed to fetch leads.');
-      }
-    } catch (error) {
-      setError('Error fetching leads: ' + error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const leadsPerPage = 10;
 
   useEffect(() => {
+    const fetchLeads = async () => {
+      try {
+        const response = await axios.get('https://api.srtutorsbureau.com/api/jd/get-Alllead');
+        if (response.data.success) {
+          setLeads(response.data.data);
+        } else {
+          setError('Failed to fetch leads.');
+        }
+      } catch (error) {
+        setError('Error fetching leads: ' + error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchLeads();
   }, []);
 
-  // Pagination Logic
-  const indexOfLastLead = currentPage * leadsPerPage;
-  const indexOfFirstLead = indexOfLastLead - leadsPerPage;
-  const currentLeads = leads
-  .filter(lead => 
-    lead.name.toLowerCase().includes(filter.toLowerCase()) ||
-    lead.category.toLowerCase().includes(filter.toLowerCase()) ||
-    lead.brancharea.toLowerCase().includes(filter.toLowerCase()) ||
-    lead.pincode.toLowerCase().includes(filter.toLowerCase())
-  )
-  .slice(indexOfFirstLead, indexOfLastLead);
+  const handleDateChange = (type, value) => {
+    if (type === 'clear') {
+      setStartDate('');
+      setEndDate('');
+      setCurrentPage(1);
+    } else if (type === 'start') {
+      setStartDate(value);
+      setCurrentPage(1);
+    } else {
+      setEndDate(value);
+      setCurrentPage(1);
+    }
+  };
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const filteredLeads = leads.filter(lead => {
+    const matchesSearch = 
+      lead.name.toLowerCase().includes(filter.toLowerCase()) ||
+      lead.category.toLowerCase().includes(filter.toLowerCase()) ||
+      lead.brancharea.toLowerCase().includes(filter.toLowerCase()) ||
+      lead.pincode.toLowerCase().includes(filter.toLowerCase());
+    
+    const matchesDate = isDateInRange(lead.date, startDate, endDate);
+    
+    return matchesSearch && matchesDate;
+  });
 
-  // Total pages
-  const totalPages = Math.ceil(leads.filter(lead => 
-    lead.name.toLowerCase().includes(filter.toLowerCase()) ||
-    lead.category.toLowerCase().includes(filter.toLowerCase()) ||
-    lead.brancharea.toLowerCase().includes(filter.toLowerCase()) ||
-    lead.pincode.toLowerCase().includes(filter.toLowerCase())
-  ).length / leadsPerPage);
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>{error}</div>;
+  const totalPages = Math.ceil(filteredLeads.length / leadsPerPage);
+  const currentLeads = filteredLeads.slice(
+    (currentPage - 1) * leadsPerPage,
+    currentPage * leadsPerPage
+  );
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen text-red-500">
+        {error}
+      </div>
+    );
+  }
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">All Leads</h1>
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-2 lg:p-3">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">All Leads</h1>
+        
+        <FilterBar
+          filter={filter}
+          onFilterChange={setFilter}
+          startDate={startDate}
+          endDate={endDate}
+          onDateChange={handleDateChange}
+        />
 
-      {/* Filter Input */}
-      <input
-        type="text"
-        placeholder="Filter by name"
-        className="border border-gray-300 rounded-md p-2 mb-4 w-full"
-        value={filter}
-        onChange={(e) => setFilter(e.target.value)}
-      />
+        <div className="bg-white rounded-lg shadow overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <TableHeader />
+              <tbody className="bg-white divide-y divide-gray-200">
+                {currentLeads.map(lead => (
+                  <TableRow key={lead._id} lead={lead} />
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
 
-      {/* Table */}
-      <table className="min-w-full border border-gray-300">
-      <thead>
-  <tr className="bg-gray-200 text-sm">
-    {/* <th className="border border-gray-300 p-2">Lead ID</th> */}
-    <th className="border border-gray-300 p-1 text-left">Lead Type</th>
-    <th className="border border-gray-300 p-1 text-left">Prefix</th>
-    <th className="border border-gray-300 p-1 text-left">Name</th>
-    <th className="border border-gray-300 p-1 text-left">Mobile</th>
-    <th className="border border-gray-300 p-1 text-left">Phone</th>
-    <th className="border border-gray-300 p-1 text-left">Email</th>
-    <th className="border border-gray-300 p-1 text-left">Date</th>
-    <th className="border border-gray-300 p-1 text-left">Category</th>
-    <th className="border border-gray-300 p-1 text-left">City</th>
-    <th className="border border-gray-300 p-1 text-left">Area</th>
-    <th className="border border-gray-300 p-1 text-left">Branch Area</th>
-    {/* <th className="border border-gray-300 p-1 text-left">DNC Mobile</th> */}
-    {/* <th className="border border-gray-300 p-1 text-left">DNC Phone</th> */}
-    <th className="border border-gray-300 p-1 text-left">Company</th>
-    <th className="border border-gray-300 p-1 text-left">Pincode</th>
-    <th className="border border-gray-300 p-1 text-left">Time</th>
-    <th className="border border-gray-300 p-1 text-left">Branch Pin</th>
-    {/* <th className="border border-gray-300 p-1 text-left">Parent ID</th> */}
-  </tr>
-</thead>
-<tbody>
-  {currentLeads.length === 0 ? (
-    <tr>
-      <td colSpan="19" className="text-center p-2 text-sm text-gray-500">No leads found.</td>
-    </tr>
-  ) : (
-    currentLeads.map((lead) => (
-      <tr key={lead._id} className="hover:bg-gray-100">
-        {/* <td className="border border-gray-300 p-1">{lead.leadid || "Not-available"}</td> */}
-        <td className="border border-gray-300 p-1 text-sm">{lead.leadtype || "Not-available"}</td>
-        <td className="border border-gray-300 p-1 text-sm">{lead.prefix || "Not-available"}</td>
-        <td className="border border-gray-300 p-1 text-sm">{lead.name || "Not-available"}</td>
-        <td className="border border-gray-300 p-1 text-sm">{lead.mobile || "Not-available"}</td>
-        <td className="border border-gray-300 p-1 text-sm">{lead.phone || "Not-available"}</td>
-        <td className="border border-gray-300 p-1 text-sm">{lead.email || "Not-available"}</td>
-        <td className="border border-gray-300 p-1 text-sm">{new Date(lead.date).toLocaleDateString() || "Not-available"}</td>
-        <td className="border border-gray-300 p-1 text-sm">{lead.category || "Not-available"}</td>
-        <td className="border border-gray-300 p-1 text-sm">{lead.city || "Not-available"}</td>
-        <td className="border border-gray-300 p-1 text-sm">{lead.area || "Not-available"}</td>
-        <td className="border border-gray-300 p-1 text-sm">{lead.brancharea || "Not-available"}</td>
-        {/* <td className="border border-gray-300 p-1">{lead.dncmobile || "Not-available"}</td> */}
-        {/* <td className="border border-gray-300 p-1">{lead.dncphone || "Not-available"}</td> */}
-        <td className="border border-gray-300 p-1 text-sm">{lead.company || "Not-available"}</td>
-        <td className="border border-gray-300 p-1 text-sm">{lead.pincode || "Not-available"}</td>
-        <td className="border border-gray-300 p-1 text-sm">{lead.time || "Not-available"}</td>
-        <td className="border border-gray-300 p-1 text-sm">{lead.branchpin || "Not-available"}</td>
-        {/* <td className="border border-gray-300 p-1">{lead.parentid || "Not-available"}</td> */}
-      </tr>
-    ))
-  )}
-</tbody>
-
-      </table>
-
-      {/* Pagination Controls */}
-      <div className="mt-4 flex justify-center">
-        {Array.from({ length: totalPages }, (_, index) => (
-          <button
-            key={index + 1}
-            onClick={() => paginate(index + 1)}
-            className={`mx-1 px-3 py-1 rounded-md ${currentPage === index + 1 ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-          >
-            {index + 1}
-          </button>
-        ))}
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          onJumpToPage={setCurrentPage}
+        />
       </div>
     </div>
   );

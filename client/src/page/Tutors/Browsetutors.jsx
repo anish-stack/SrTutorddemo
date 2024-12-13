@@ -4,6 +4,7 @@ import Loader from '../../Components/Loader';
 import { Link } from 'react-router-dom'
 import './teachercard.css'
 import TeacherCard from './TeacherCard';
+import { Helmet } from 'react-helmet-async';
 const Browsetutors = () => {
     const searchQuery = new URLSearchParams(window.location.search);
     const searchQueryForlat = searchQuery.get('lat');
@@ -454,6 +455,25 @@ const Browsetutors = () => {
     );
     return (
         <div className="container-fluid">
+            <Helmet>
+  <title>Browse Tutors - SR Tutors Bureau</title>
+
+  <meta
+    name="description"
+    content="Browse through a list of experienced and qualified tutors at SR Tutors Bureau. Find the right tutor in Delhi NCR to help you achieve academic success with personalized, one-on-one lessons tailored to your needs."
+  />
+
+  <meta
+    name="keywords"
+    content="Browse tutors, SR Tutors Bureau, home tutors, find tutors, education, Delhi NCR, tutoring services, qualified tutors, personalized lessons, academic success"
+  />
+
+  <link rel="canonical" href="https://www.srtutorsbureau.com/browse-tutors" />
+  <meta name="robots" content="index, follow" />
+  <meta name="author" content="SR Tutors Bureau" />
+  <meta name="publisher" content="SR Tutors Bureau" />
+</Helmet>
+
             <div className="row">
                 <div className="col-lg-3  d-lg-block">
                     {/* Offcanvas trigger button for smaller screens */}
