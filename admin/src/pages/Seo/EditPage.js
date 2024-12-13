@@ -77,7 +77,7 @@ const EditPage = () => {
         console.log(formData)
         setLoading(true);
         try {
-            const response = await axios.post(`http://api.srtutorsbureau.com/api/v1/seo/update-page/${id}`, formData);
+            const response = await axios.post(`https://api.srtutorsbureau.com/api/v1/seo/update-page/${id}`, formData);
             toast.success('Page Edit successfully!');
             setFormData({
                 MetaTitle: '',

@@ -99,7 +99,7 @@ const SearchTeacher = () => {
 
         setLoading(true);
         try {
-            const response = await axios.post('http://api.srtutorsbureau.com/api/v1/admin/make-search', formData);
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/admin/make-search', formData);
             setTeachers(response.data.data);
             console.log(response.data);
             setFilteredTeachers(response.data.data);
