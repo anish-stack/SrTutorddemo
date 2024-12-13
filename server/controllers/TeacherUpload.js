@@ -318,7 +318,7 @@ exports.GetAllAreas = async (req, res) => {
     console.log("i am hit")
     const redisClient = req.app.locals.redis;
 
-    // Check if the Redis client is available
+  
     if (!redisClient) {
       console.error("Redis client is not available");
       return res.status(500).json({

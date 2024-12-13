@@ -173,7 +173,7 @@ function Header() {
                   <nav className="tgmenu__nav">
                     <div className="logo">
                       <Link to="/">
-                        <img src="assets/img/logo/srtutor.webp" alt="Logo" />
+                        <img src="/assets/img/logo/srtutor.webp" alt="Logo" />
                       </Link>
 
                     </div>

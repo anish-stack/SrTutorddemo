@@ -1,10 +1,10 @@
-import React, { Component, useState } from "react";
+import React, { Component, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from 'axios'
 import toast from 'react-hot-toast'
 function Footer() {
     const [email, setEmail] = useState('');
-
+    const [allPages, setPages] = useState([])
     const handleChange = (e) => {
         setEmail(e.target.value);
     };
@@ -38,16 +38,31 @@ function Footer() {
             });
     };
 
+    const fetchPages = async () => {
+
+        try {
+            const response = await axios.get('https://api.srtutorsbureau.com/api/v1/seo/get-all-page');
+            setPages(response.data);
+        } catch (error) {
+            console.error('Error fetching pages:', error);
+        }
+    };
+
+
+    useEffect(() => {
+        fetchPages()
+    }, [])
+
 
     return (
         <>
-    
+
 
             <footer className="footer-bg" style={{ backgroundColor: "#0b0505" }}>
                 <div className="footer__top-wrap">
                     <div className="container">
                         <div className="row">
-                            <div className="col-xl-3 col-lg-4 col-sm-6">
+                            <div className="col-xl-3 col-lg-3 col-sm-6">
                                 <div className="footer-widget">
                                     <div className="footer__about">
                                         <div className="footer__logo logo">
@@ -67,25 +82,25 @@ function Footer() {
                                             <li className="number">sachinkumarsrtb@yahoo.in</li>
                                             <li className="number">+91 9811382915 | 9899247916</li>
                                             <li className="socials">
-                                                <a  target="_blank" href="https://www.facebook.com/people/SR-Tutors-Bureau/61559623287439/">
+                                                <a target="_blank" href="https://www.facebook.com/people/SR-Tutors-Bureau/61559623287439/">
                                                     <i className="fab fa-facebook-f" />
                                                 </a>
-                                                <a  target="_blank" href="https://www.instagram.com/s.r.tutorsbureau/">
+                                                <a target="_blank" href="https://www.instagram.com/s.r.tutorsbureau/">
                                                     <i className="fab fa-instagram" />
                                                 </a>
-                                                <a  target="_blank" href="https://x.com/i/flow/login?redirect_after_login=%2FSR_TUTORS">
+                                                <a target="_blank" href="https://x.com/i/flow/login?redirect_after_login=%2FSR_TUTORS">
                                                     <i className="fab fa-twitter" />
                                                 </a>
                                                 <a
-                                                     target="_blank" href="https://wa.me/+9811382915" // Correct WhatsApp link format
-                                                   
+                                                    target="_blank" href="https://wa.me/+9811382915" // Correct WhatsApp link format
+
                                                     rel="noopener noreferrer"  // Improves security by preventing the new page from accessing your window object
                                                     aria-label="Chat on WhatsApp"
                                                 >
                                                     <i className="fab fa-whatsapp text-green-500 text-xl" /> {/* Optional: Add some Tailwind classes for styling */}
                                                 </a>
 
-                                                <a  target="_blank" href="https://in.linkedin.com/in/sr-tutors-bureau-b92384116">
+                                                <a target="_blank" href="https://in.linkedin.com/in/sr-tutors-bureau-b92384116">
                                                     <i className="fab fa-linkedin-in" />
                                                 </a>
                                                 {/* <a  target="_blank" href="#">
@@ -96,7 +111,7 @@ function Footer() {
                                     </div>
                                 </div>
                             </div>
-                            <div className="col-xl-3 col-lg-4 col-sm-6">
+                            <div className="col-xl-3 col-lg-3 col-sm-6">
                                 <div className="footer-widget widget_nav_menu">
                                     <h4 className="fw-title">Resources</h4>
                                     <ul className="list-wrap">
@@ -124,7 +139,21 @@ function Footer() {
                                     </ul>
                                 </div>
                             </div>
-                            <div className="col-xl-3 col-lg-4 col-sm-6">
+                            <div className="col-xl-3 col-lg-3 col-sm-6">
+                                <div className="footer-widget widget_nav_menu">
+                                    <h4 className="fw-title">Quick Links</h4>
+                                    <ul className="list-wrap">
+                                        {allPages && allPages.length > 0 ? (
+                                            allPages.map((page, index) => (
+                                                <li key={index}>
+                                                    <Link to={`/sr-tutors/${page.seoFrendilyUrl}`}>{page.MetaTitle}</Link>
+                                                </li>
+                                            ))
+                                        ) : null}
+                                    </ul>
+                                </div>
+                            </div>
+                            <div className="col-xl-3 col-lg-3 col-sm-6">
                                 <div className="footer-widget widget_nav_menu">
                                     <h4 className="fw-title">Courses</h4>
                                     <ul className="list-wrap">
@@ -149,7 +178,7 @@ function Footer() {
                                     </ul>
                                 </div>
                             </div>
-                            <div className="col-xl-3 col-lg-4 col-sm-6">
+                            <div className="col-xl-3 col-lg-3 col-sm-6">
                                 <div className="footer-widget">
                                     <h4 className="fw-title">Subscribe Newsletter</h4>
                                     <div className="footer__newsletter">

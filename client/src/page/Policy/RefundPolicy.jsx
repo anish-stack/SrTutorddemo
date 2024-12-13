@@ -1,8 +1,28 @@
 import React from 'react';
+import { Helmet } from 'react-helmet-async';
 
 const RefundPolicy = () => {
   return (
     <div className="container mt-5">
+      <Helmet>
+  <title>Refund & Cancellation Policy - SR Tutors Bureau</title>
+
+  <meta
+    name="description"
+    content="Learn about SR Tutors Bureau's Refund and Cancellation Policy. Understand our guidelines for requesting refunds, cancellations, and other related services."
+  />
+
+  <meta
+    name="keywords"
+    content="refund policy, cancellation policy, SR Tutors Bureau, refund request, tutoring services, terms, cancellation guidelines"
+  />
+
+  <link rel="canonical" href="https://www.srtutorsbureau.com/refund-and-cancellation-policy" />
+  <meta name="robots" content="index, follow" />
+  <meta name="author" content="SR Tutors Bureau" />
+  <meta name="publisher" content="SR Tutors Bureau" />
+</Helmet>
+
       <h1 className="text-center mb-4">Refund and Cancellation Policy</h1>
 
       <section className="mb-5">

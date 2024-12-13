@@ -7,7 +7,9 @@ const { UploadXlsxFileAndExtractData, UploadXlsxFileAndExtractDataStudent, Uploa
 const { singleUploadImage, UploadViaFieldName } = require('../middlewares/multer');
 const upload = multer({ dest: 'files/' });
 //User Actions With 
-TeacherRouter.post('/Create-teacher', UploadViaFieldName([{ name: 'Document', maxLength: '1' }, { name: 'Qualification', maxLength: '1' }]), TeacherRegister)
+TeacherRouter.post('/Create-teacher', TeacherRegister)
+
+// TeacherRouter.post('/Create-teacher', UploadViaFieldName([{ name: 'Document', maxLength: '1' }, { name: 'Qualification', maxLength: '1' }]), TeacherRegister)
 TeacherRouter.post('/Verify-teacher', TeacherVerifyOtp)
 TeacherRouter.post('/resent-otp', TeacherResendOtp)
 TeacherRouter.post('/Teacher-Login', TeacherLogin)

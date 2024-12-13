@@ -1,8 +1,28 @@
 import React, { Component } from "react";
+import { Helmet } from "react-helmet-async";
 
 function Aboutus() {
     return (
         <>
+        <Helmet>
+  <title>About Us - SR Tutors Bureau</title>
+
+  <meta
+    name="description"
+    content="Learn more about SR Tutors Bureau, a leading provider of personalized tutoring services in Delhi NCR. Our expert tutors are dedicated to helping students succeed by offering customized lessons, experienced guidance, and proven teaching methods."
+  />
+
+  <meta
+    name="keywords"
+    content="About SR Tutors Bureau, tutoring services, home tutors, education, Delhi NCR, school tutoring, college tutoring, experienced tutors, personalized learning, student success"
+  />
+
+  <link rel="canonical" href="https://www.srtutorsbureau.com/about-us" />
+  <meta name="robots" content="index, follow" />
+  <meta name="author" content="SR Tutors Bureau" />
+  <meta name="publisher" content="SR Tutors Bureau" />
+</Helmet>
+
             <main className="main-area fix">
                 {/* breadcrumb-area */}
                 <section

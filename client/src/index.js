@@ -10,6 +10,7 @@ import { Store, persistor } from './Store/Store';
 import { PersistGate } from 'redux-persist/integration/react';
 
 import { Toaster } from 'react-hot-toast';
+import { HelmetProvider } from 'react-helmet-async';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <BrowserRouter>
@@ -18,11 +19,15 @@ root.render(
 
       <Provider store={Store}>
         <PersistGate loading={null} persistor={persistor}>
+          <HelmetProvider>
+
+
           <App />
           <Toaster
             position="top-center"
             reverseOrder={false}
           />
+          </HelmetProvider>
         </PersistGate>
       </Provider>
     </TourProvider>

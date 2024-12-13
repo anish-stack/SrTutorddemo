@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import './faq.css'
 import axios from "axios";
 import toast from "react-hot-toast";
+import { Helmet } from "react-helmet-async";
 const Faq = () => {
     const [formData,setFormData] = useState({
         Name:'',
@@ -97,6 +98,25 @@ const Faq = () => {
 
     return (
         <>
+        <Helmet>
+  <title>Frequently Asked Questions - SR Tutors Bureau</title>
+
+  <meta
+    name="description"
+    content="Find answers to commonly asked questions about SR Tutors Bureau's tutoring services. Get insights on tutoring process, fees, registration, and more."
+  />
+
+  <meta
+    name="keywords"
+    content="frequently asked questions, FAQ, SR Tutors Bureau, tutoring services, tuition queries, tutor registration, tutoring fees, common questions"
+  />
+
+  <link rel="canonical" href="https://www.srtutorsbureau.com/frequently-asked-questions" />
+  <meta name="robots" content="index, follow" />
+  <meta name="author" content="SR Tutors Bureau" />
+  <meta name="publisher" content="SR Tutors Bureau" />
+</Helmet>
+
           <section
                     className="breadcrumb-area breadcrumb-bg"
                     data-background="https://i.ibb.co/bdJC3Wx/482.jpg"

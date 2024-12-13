@@ -60,12 +60,12 @@ const TeacherProfileSchema = new mongoose.Schema({
         },
         LandMark: {
             type: String,
-            required: true
+       
         },
 
         Pincode: {
             type: String,
-            required: true
+         
         }
     },
     CurrentAddress: {
@@ -80,14 +80,10 @@ const TeacherProfileSchema = new mongoose.Schema({
             type: String,
 
         },
-        LandMark: {
-            type: String,
-            required: true
-        },
-
+     
         Pincode: {
             type: String,
-            required: true
+           
         }
     },
     isBlockForOtp: {

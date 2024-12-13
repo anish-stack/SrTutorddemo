@@ -5,20 +5,17 @@ import './profile.css';
 import axios from 'axios';
 import CompleteProfile from './CompleteProfile'
 import MyClasses from './MyClasses'
-import MyLocations from './MyLocations';
-import EditClassModel from './EditClassModel';
+
 import ImageUploader from 'react-image-upload'
 import 'react-image-upload/dist/index.css'
 import gif from './open-gift.gif'
 import toast from 'react-hot-toast';
-import UploadDocuments from './UploadDocuments';
 import StudentRequest from './StudentRequest';
 import AcceptRequetsByYou from './AcceptRequest';
 import SubscribedStudent from './SubscribedStudent';
 import Upload from './Uplaod';
 const TeacherDashboard = () => {
     const locations = window.location.hash
-
     const [teacherToken, setTeacherToken] = useState(null);
     const [teacherUser, setTeacherUser] = useState(null);
     const [activeTab, setActiveTab] = useState('profile');
@@ -29,9 +26,7 @@ const TeacherDashboard = () => {
     const [profileFile, setProfileFile] = useState({})
     const navigate = useNavigate();
     const [showUploader, setShowUploader] = useState(false);
-    const teacherDetails = Cookies.get('teacherUser');
-    // Toggle image uploader on double-click
-    // UseEffect to handle token and user details
+  
     useEffect(() => {
         console.log("i am hit at 1st")
         const token = Cookies.get('teacherToken');
@@ -46,7 +41,7 @@ const TeacherDashboard = () => {
     }, []);
 
     useEffect(() => {
-        console.log("i am hit at 1it")
+     
 
         if (teacherToken && teacherUser) {
             const handleFetch = async () => {
@@ -57,7 +52,7 @@ const TeacherDashboard = () => {
                         },
                     });
 
-                    console.log(data.data);
+          
                     setProfileInfo(data.data);
 
                     const createdDate = new Date(data?.data?.createAt);
@@ -174,12 +169,7 @@ const TeacherDashboard = () => {
     function runAfterImageDelete(file) {
         console.log({ file })
     }
-    // Redirect to login if no token
-
-    // if (!teacherDetails.checkProfileId) {
-    //     window.location.href = `/Complete-profile?token=${teacherToken}&encoded=${teacherUser?._id}`;
-    //     return; // Exit early after redirecting
-    // }
+ 
 
 
     if (!teacherToken) {
@@ -229,24 +219,7 @@ const TeacherDashboard = () => {
                                 Show My Classes
                             </a>
                         </li>
-                        {/* <li className="nav-item">
-                            <a
-                                className={`nav-link ${activeTab === 'resetLocation' ? 'active' : ''}`}
-                                href="#resetLocation"
-                                onClick={() => setActiveTab('resetLocation')}
-                            >
-                                Location
-                            </a>
-                        </li> */}
-                        {/* <li className="nav-item">
-                            <a
-                                className={`nav-link ${activeTab === 'Documents' ? 'active' : ''}`}
-                                href="#Documents"
-                                onClick={() => setActiveTab('Documents')}
-                            >
-                                My Documents
-                            </a>
-                        </li> */}
+                       
                         <li className="nav-item">
                             <a
                                 className={`nav-link ${activeTab === 'Subscribed' ? 'active' : ''}`}
@@ -350,10 +323,10 @@ const TeacherDashboard = () => {
                                         <h1>{profileInfo?.FullName || 'N/A'}</h1>
                                         <p><strong>Email:</strong> {teacherUser?.Email || 'N/A'}</p>
                                         <p><strong>Phone Number:</strong> {profileInfo?.ContactNumber || 'N/A'}</p>
-                                        {/* <p><strong>Age:</strong> {teacherUser?.Age || 'N/A'}</p> */}
+                                      
                                         <p><strong>Date of Birth:</strong> {profileInfo?.DOB || 'N/A'}</p>
                                         <p><strong>Gender:</strong> {profileInfo?.Gender || 'N/A'}</p>
-                                        {/* <p><strong>Alternate Number:</strong> {profileInfo?.AlternateContact || 'N/A'}</p> */}
+                                    
                                         <span onClick={handleLogout} className="logout">
                                             <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
                                         </span>
@@ -378,9 +351,7 @@ const TeacherDashboard = () => {
                     {activeTab === 'Document' && (
                         <Upload teacherId={profileInfo} />
                     )}
-                    {/* {activeTab === 'resetLocation' && (
-                        <MyLocations locations={teachingLocations} />
-                    )} */}
+                    
                     {activeTab === 'editProfile' && (
                         <CompleteProfile title={"Edit"} readable={false} profileInfo={profileInfo} />
                     )}
@@ -394,9 +365,7 @@ const TeacherDashboard = () => {
                     {activeTab === 'Subscribed' && (
                         <SubscribedStudent id={profileInfo?._id} />
                     )}
-                    {/* {activeTab === 'Documents' && (
-                        <UploadDocuments Document={profileInfo?.DocumentId} Profile={profileInfo} />
-                    )} */}
+                  
                     {activeTab === 'activity' && (
                         <div className="activity-section text-center p-5 rounded shadow-lg bg-white">
 

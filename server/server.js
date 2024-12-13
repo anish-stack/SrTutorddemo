@@ -262,21 +262,20 @@ app.get('/geocode', async (req, res) => {
     }
 
     try {
-        // console.log(process.env.GOOGLE_MAP_KEY)
-        // Make a request to Google Geocoding API
+       
         const response = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
             params: {
                 address: address,
                 key: "AIzaSyCBATa-tKn2Ebm1VbQ5BU8VOqda2nzkoTU"
             },
         });
-        console.log(response.data)
+
         if (response.data.status === 'OK') {
             const location = response.data.results[0].geometry.location;
             const lat = location.lat;
             const lng = location.lng;
 
-            // Send the lat and lng back to the client
+        
             res.json({
                 latitude: lat,
                 longitude: lng,

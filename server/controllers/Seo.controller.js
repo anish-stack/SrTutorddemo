@@ -49,7 +49,7 @@ exports.createPage = async (req, res) => {
             return res.status(400).json({ message: 'PageContent is required' });
         }
 
- 
+
         const newSeoPage = new SeoPagesModel({
             MetaTitle,
             seoFrendilyUrl,
@@ -78,7 +78,7 @@ exports.createPage = async (req, res) => {
 
 exports.getAllPages = async (req, res) => {
     try {
-        const pages = await SeoPagesModel.find().sort({createdAt:-1}); 
+        const pages = await SeoPagesModel.find().sort({ createdAt: -1 });
         res.status(200).json(pages);
     } catch (error) {
         console.error('Error fetching all pages:', error);
@@ -88,14 +88,14 @@ exports.getAllPages = async (req, res) => {
 
 exports.getPageBySeoUrl = async (req, res) => {
     try {
-        const { seoFrendilyUrl } = req.params; 
-        const page = await SeoPagesModel.findOne({ seoFrendilyUrl }); 
+        const { seoFrendilyUrl } = req.params;
+        const page = await SeoPagesModel.findOne({ seoFrendilyUrl });
 
         if (!page) {
             return res.status(404).json({ message: 'Page not found' });
         }
 
-        res.status(200).json(page);  
+        res.status(200).json(page);
     } catch (error) {
         console.error('Error fetching the page:', error);
         res.status(500).json({ message: 'An error occurred while fetching the page' });
@@ -104,8 +104,8 @@ exports.getPageBySeoUrl = async (req, res) => {
 
 exports.deletePage = async (req, res) => {
     try {
-        const { id } = req.params; 
-        const page = await SeoPagesModel.findByIdAndDelete(id); 
+        const { id } = req.params;
+        const page = await SeoPagesModel.findByIdAndDelete(id);
 
         if (!page) {
             return res.status(404).json({ message: 'Page not found' });
@@ -120,15 +120,15 @@ exports.deletePage = async (req, res) => {
 
 exports.updatePage = async (req, res) => {
     try {
+        const { id } = req.params;
+        console.log(id)
         const { MetaTitle, seoFrendilyUrl, MetaDescription, MetaKeywords, PageTitle, Heading, Tag, PageContent } = req.body;
+        console.log(req.body)
 
-        if (!seoFrendilyUrl) {
-            return res.status(400).json({ message: 'SeoFriendly URL is required' });
-        }
 
         // Find the page by seoFrendilyUrl
-        const page = await SeoPagesModel.findOne({ seoFrendilyUrl });
-
+        const page = await SeoPagesModel.findById(id);
+        console.log("find page", page)
         if (!page) {
             return res.status(404).json({ message: 'Page not found' });
         }
@@ -153,8 +153,8 @@ exports.updatePage = async (req, res) => {
             page.Tag = Tag;
         }
         if (PageContent && PageContent !== page.PageContent) {
-           
-            page.PageContent = PageContent ;
+
+            page.PageContent = PageContent;
         }
 
         // Save the updated page to the database

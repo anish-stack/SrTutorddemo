@@ -227,7 +227,7 @@ const Slider = ({ areas }) => {
                 data-aos="zoom-in-right"
                 data-aos-delay={1200}
               />
-              <h3 className="title tg-svg">
+              <h1 className="title tg-svg">
                 What Are You {''}
                 <span className="position-relative">
                   <span
@@ -238,7 +238,7 @@ const Slider = ({ areas }) => {
                   looking
                 </span>{" "}
                 for
-              </h3>
+              </h1>
               <div className="col-12 my-3">
                 <div className="row">
                   <div className="form-check col-md-6 px-5 col-lg-6">
