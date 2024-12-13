@@ -42,7 +42,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
               key={item.path}
               to={item.path}
               className={({ isActive }) =>
-                `flex items-center px-4 py-2 text-sm font-medium rounded-lg ${
+                `flex items-center py-0.5 px-4 mb-2 text-sm font-medium rounded-lg ${
                   isActive
                     ? 'bg-gray-100 text-white-900'
                     : 'text-white hover:bg-gray-50 hover:text-gray-900'
@@ -50,7 +50,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
               }
               onClick={() => setIsOpen(false)}
             >
-              <item.icon className="h-5 w-5 mr-3" />
+              <item.icon className="h-5 mb-1 w-5 mr-3" />
               {item.name}
             </NavLink>
           ))}
