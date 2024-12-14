@@ -5,7 +5,7 @@
 }
 html {
   width: 100%;
-  overflow-x: hidden;
+  overflow-x: hidden!important;
 }
 .image-cll {
   width: 100% !important;
