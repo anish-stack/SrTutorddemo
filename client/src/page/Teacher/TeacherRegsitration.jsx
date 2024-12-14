@@ -335,7 +335,7 @@ const TeacherRegistration = () => {
                 <meta name="publisher" content="SR Tutors Bureau" />
             </Helmet>
 
-            <div className="container-fluid py-5">
+            <div className="container-fluid md:py-5">
                 <div className="row justify-content-center align-items-center">
                     <div className="col-md-12 col-xl-10">
                         <div className="card shadow-sm">
@@ -514,7 +514,7 @@ const TeacherRegistration = () => {
                                                 </div>
                                             </div>
                                             <div className='col-md-12 mt-2 mb-3'>
-                                                <button type='button' onClick={fetchLocation} className='btn w-100 btn-danger btn-sm'>Get Your Current Location <span className='ml-2'>🌍</span> </button>
+                                                <button type='button' onClick={fetchLocation} className='btn md:w-100 btn-danger btn-sm'>Get Your Current Location <span className='ml-2'>🌍</span> </button>
                                             </div>
                                             <h6 className=" fw-bold">Permanent Address (*) </h6>
                                             <div className="row">

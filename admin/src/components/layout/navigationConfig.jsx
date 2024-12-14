@@ -88,9 +88,9 @@ import {
       path: '/manage-contact',
       icon: Phone
     },
-    {
-      name: 'Settings',
-      path: '/settings',
-      icon: Settings
-    }
+    // {
+    //   name: 'Settings',
+    //   path: '/settings',
+    //   icon: Settings
+    // }
   ];

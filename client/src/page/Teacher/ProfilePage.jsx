@@ -452,7 +452,7 @@ const ProfilePage = () => {
 
                         </div>
                         <div className="col-md-6 mb-3">
-                            <label className="form-label" htmlFor="ExpectedFees">Expected Fees</label>
+                            <label className="form-label" htmlFor="ExpectedFees">Expected Fees ('Write in Numbers Eg: 1000')</label>
                             <input type="text" className={`form-control `} name="ExpectedFees" id="ExpectedFees" placeholder="Enter Expected Fees" value={formData.ExpectedFees} onChange={handleChange} />
 
 
