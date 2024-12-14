@@ -2818,7 +2818,7 @@ textarea.form-control-lg {
     top: 0;
     left: 0;
     height: 100%;
-    padding: 1rem .75rem;
+    padding: 0.3rem .75rem;
     pointer-events: none;
     border: 1px solid transparent;
     transform-origin: 0 0;

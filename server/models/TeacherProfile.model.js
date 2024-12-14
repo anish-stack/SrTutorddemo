@@ -106,8 +106,7 @@ const TeacherProfileSchema = new mongoose.Schema({
         required: true
     },
     ExpectedFees: {
-        type: Number,
-        required: true
+        type: String
     },
     PostForHim: {
         type: mongoose.Schema.Types.ObjectId,
