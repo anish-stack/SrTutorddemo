@@ -36,7 +36,7 @@ function Whysrtutor() {
                                         </li>
                                     </ul>
                                 </div>
-                                <img
+                                {/* <img
                                     src="assets/img/icons/online_icons.png"
                                     alt="img"
                                     className="icons position-absolute"
@@ -64,7 +64,7 @@ function Whysrtutor() {
                                     alt="shape"
                                     className="bottom-shape position-absolute tg-motion-effects3"
                                     style={{ transform: "matrix(1, 0, 0, 1, 1.73861, -1.24171)" }}
-                                />
+                                /> */}
                             </div>
                         </div>
                         <div className="col-xl-5 col-lg-5">

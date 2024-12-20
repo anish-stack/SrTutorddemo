@@ -185,21 +185,14 @@ function Header() {
                         <li className="">
                           <Link to="about-us">About Us</Link>
                         </li>
-                        {/* <li className="">
-                          <Link to="services">Services</Link>
-                        </li> */}
+                   
                         <li className="menu-item">
                           <Link to="#">
                             One-to-One Class{" "}
                             <i className="ri-arrow-down-s-line"></i>
                           </Link>
                           <ul className="sub-menu">
-                            {/* <li>
-                              <Link to="#">Home Tuition</Link>
-                            </li>
-                            <li>
-                              <Link to="#">Hire a Tutor</Link>
-                            </li> */}
+                           
                             <li>
                               <Link to="/Browse-Tutors?lat=28.691029628579727&lng=77.1517630851126">Tutor Section</Link>
                             </li>
@@ -212,9 +205,7 @@ function Header() {
                         <li className="">
                           <Link to="contact-us">Contact us</Link>
                         </li>
-                        {/* <li className="">
-                          <Link to="/frequently-asked-questions">FAQ</Link>
-                        </li> */}
+                       
                       </ul>
                     </div>
                     <div className="tgmenu__categories d-none d-md-block">
@@ -224,18 +215,7 @@ function Header() {
                           className="dropdown-toggle category-btn"
                           to={`/Browse-Tutors?lat=${locationData.lat}&lng=${locationData.lng}`}
                         >
-                          <svg
-                            width={8}
-                            height={8}
-                            viewBox="0 0 12 12"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M12 12H6.85714V6.85714H12V12ZM5.14286 12H0V6.85714H5.14286V12ZM12 5.14286H6.85714V0H12V5.14286ZM5.14286 5.14286H0V0H5.14286V5.14286Z"
-                              fill="currentcolor"
-                            />
-                          </svg>
+                       
                           Tutor Section
                         </Link>
 
@@ -263,7 +243,7 @@ function Header() {
                         Teacher Dashboard
                       </Link>
                     ) : studentToken ? (
-                      // Render button for student dashboard
+                    
                       <a
                         href={`${modalContent.student.DashboardUrl}`}
                         style={{ fontSize: "10px" }}
@@ -277,27 +257,7 @@ function Header() {
                           id="dropdownMenuButton1"
                           title={
                             <Button className="signin-btn">
-                              <svg
-                                width="15px"
-                                height="15px"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <circle
-                                  cx={12}
-                                  cy={6}
-                                  r={4}
-                                  stroke="#fff"
-                                  strokeWidth="1.5"
-                                />
-                                <path
-                                  d="M19.9975 18C20 17.8358 20 17.669 20 17.5C20 15.0147 16.4183 13 12 13C7.58172 13 4 15.0147 4 17.5C4 19.9853 4 22 12 22C14.231 22 15.8398 21.8433 17 21.5634"
-                                  stroke="#fff"
-                                  strokeWidth="1.5"
-                                  strokeLinecap="round"
-                                />
-                              </svg>
+                             
                               <span style={{ color: "#fff" }}>Sign In</span>
                             </Button>
                           }
@@ -331,14 +291,7 @@ function Header() {
                       </div>
                     </div>
 
-                    {/* <div className="tgmobile__search">
-                      <form action="#">
-                        <input type="text" placeholder="Search..." />
-                        <button type="submit">
-                          <i className="fa fa-search" />
-                        </button>
-                      </form>
-                    </div> */}
+                   
                     <div className="tgmobile__menu-outer">
                       <ul className="navigation">
                         <li className="active">
@@ -411,7 +364,7 @@ function Header() {
         </div>
       </header>
 
-      {/* React Modal */}
+
       <Modal
         isOpen={isOpen}
         onRequestClose={handleModalClose}

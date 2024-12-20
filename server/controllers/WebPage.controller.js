@@ -36,7 +36,7 @@ exports.createBanner = async (req, res) => {
             });
         }
         const checkPosition = await bannerModel.find({ Position })
-        console.log(checkPosition)
+
         if (checkPosition.length === 0) {
             // Function to upload image using buffer
             const uploadFromBuffer = (buffer) => {
@@ -325,7 +325,7 @@ exports.AnalyticalData = CatchAsync(async (req, res) => {
 
         const TeacherHaveDoneProfile = await TeacherProfile.countDocuments()
         const TeacherHaveDoneNotDoneProfile = await AllTeacher.countDocuments()
-        
+
 
 
 
