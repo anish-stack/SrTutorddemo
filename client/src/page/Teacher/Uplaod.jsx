@@ -8,8 +8,8 @@ const Upload = ({ teacherId }) => {
     console.log(teacherId)
     const [formData, setFormData] = useState({
         DocumentType: 'Aadhaar',
-        DocumentImage: null, // file for identity document
-        QualificationDocument: null // file for qualification document
+        DocumentImage: null,
+        QualificationDocument: null
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(false);
@@ -63,13 +63,13 @@ const Upload = ({ teacherId }) => {
             setLoading(false);
         }
 
-        console.log('Form Data:', formData); // Console log all form data
+       
     };
 
     return (
         <div className="mt-4">
             
-            {teacherId.TeacherUserId?.QualificationDocument?.QualificationImageUrl ? (
+            {teacherId?.TeacherUserId?.QualificationDocument?.QualificationImageUrl ? (
               <div className="container mt-4">
              
              <div className="text-center ">
@@ -120,7 +120,7 @@ const Upload = ({ teacherId }) => {
                   </div>
               </div>
             
-              {/* Document Status Badge */}
+            
              
           </div>
           
