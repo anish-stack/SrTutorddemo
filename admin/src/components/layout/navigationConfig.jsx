@@ -68,6 +68,7 @@ import {
       path: '/manage-banners',
       icon: Image
     },
+ 
     {
       name: 'Seo Pages',
       path: '/manage-pages',
