@@ -68,7 +68,11 @@ import {
       path: '/manage-banners',
       icon: Image
     },
- 
+    {
+      name: 'Add Request',
+      path: '/Add-request',
+      icon: UserPlus
+    },
     {
       name: 'Seo Pages',
       path: '/manage-pages',
