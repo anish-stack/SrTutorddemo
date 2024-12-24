@@ -43,6 +43,11 @@ import {
       icon: MessageSquare
     },
     {
+      name: 'Manage Request',
+      path: '/Manage-All-Requests',
+      icon: MessageSquare
+    },
+    {
       name: 'Manage JdLeads',
       path: '/Manage-Justdial',
       icon: BellElectric
