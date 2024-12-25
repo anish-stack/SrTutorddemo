@@ -46,6 +46,7 @@ const CompleteProfileDetails = () => {
   const fetchUser = async () => {
     try {
       const response = await axios.get(`https://api.srtutorsbureau.com/api/v1/teacher/Teacher-details/${id}`);
+      
       setUser(response.data.data);
     } catch (error) {
       console.error('Error fetching user:', error);
@@ -90,7 +91,7 @@ const CompleteProfileDetails = () => {
 
 
   }, [user]);
-
+  console.log(formData)
   const handleFetchClasses = async () => {
     try {
       const response = await axios.get('https://api.srtutorsbureau.com/api/v1/admin/Get-Classes');
@@ -227,10 +228,10 @@ const CompleteProfileDetails = () => {
       }, 2000);
 
     } catch (error) {
-      toast.success(error?.response?.data?.message);
-      setTimeout(() => {
-        window.location.reload()
-      }, 2000);
+      toast.error(error?.response?.data?.message);
+      // setTimeout(() => {
+      //   window.location.reload()
+      // }, 2000);
       console.error('Error submitting profile:', error);
     }
   };

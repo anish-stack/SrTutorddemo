@@ -15,10 +15,12 @@ const RegisterTeacher = () => {
             streetAddress: '',
             City: '',
             Area: '',
-           
             Pincode: ''
         },
-      
+        DocumentType: 'Aadhaar',
+        DocumentImage: null,
+        QualificationDocument: null
+
     });
     const [Loading, setLoading] = useState(false);
 
@@ -49,7 +51,7 @@ const RegisterTeacher = () => {
             }
 
             setFormData({ ...formData, DocumentImage: file });
-          
+
             toast.success('File selected successfully!');
         }
     };
@@ -126,33 +128,34 @@ const RegisterTeacher = () => {
 
     const handleRegister = async (e) => {
         e.preventDefault();
-        // const isFormValid = Object.values(formData).every(value => value !== '' && value !== undefined && value !== null);
+        const isFormValid = Object.values(formData).every(value => value !== '' && value !== undefined && value !== null);
         if (formData.PhoneNumber.length > 10) {
             toast.error('Phone number cannot exceed 10 digits.');
             return;
         }
-        // if (!isFormValid) {
-        //     toast.error("Please fill all required fields.");
-        //     return;
-        // }
-        // const data = new FormData();
-        // data.append('TeacherName', formData.TeacherName);
-        // data.append('PhoneNumber', formData.PhoneNumber);
-        // data.append('Email', formData.Email);
-        // data.append('Password', formData.Password);
-        // data.append('DOB', formData.DOB);
-        // data.append('gender', formData.gender);
-        // data.append('PermanentAddress', JSON.stringify(formData.PermanentAddress));
-        // data.append('Document', formData.DocumentImage);
-        // data.append('Qualification', formData.QualificationDocument);
-        // data.append('DocumentType', formData.DocumentType);
+        if (!isFormValid) {
+            toast.error("Please fill all required fields.");
+            return;
+        }
+        console.log(formData)
+        const formConverteddata = new FormData();
+        formConverteddata.append('TeacherName', formData.TeacherName);
+        formConverteddata.append('PhoneNumber', formData.PhoneNumber);
+        formConverteddata.append('Email', formData.Email);
+        formConverteddata.append('Password', formData.Password);
+        formConverteddata.append('DOB', formData.DOB);
+        formConverteddata.append('gender', formData.gender);
+        formConverteddata.append('PermanentAddress', JSON.stringify(formData.PermanentAddress));
+        formConverteddata.append('Document', formData.DocumentImage);
+        formConverteddata.append('Qualification', formData.QualificationDocument);
+        formConverteddata.append('DocumentType', formData.DocumentType);
         setLoading(true);
         try {
-            const response = await axios.post(`https://api.srtutorsbureau.com/api/v1/teacher/Create-teacher?DocumentType=${formData.DocumentType}&isAddedByAdmin=true`, formData);
+            const response = await axios.post(`https://api.srtutorsbureau.com/api/v1/teacher/Create-teacher-Admin?DocumentType=${formData.DocumentType}&isAddedByAdmin=true`, formConverteddata);
             console.log(response.data);
             toast.success(response.data.message);
             setLoading(false);
-            window.location.href=`/Complete-Profile/${response.data?.teacher?._id}`
+            window.location.href = `/Complete-Profile/${response.data?.teacher?._id}`
         } catch (error) {
             setLoading(false);
             console.log(error.response.data.message);
@@ -332,7 +335,7 @@ const RegisterTeacher = () => {
                     </div>
                 </div>
 
-                {/* <div className="flex flex-col mt-4">
+                <div className="flex flex-col mt-4">
                     <label className="text-sm font-semibold">Select Document Type</label>
                     <div className="flex items-center space-x-6">
                         <div className="flex items-center">
@@ -348,7 +351,7 @@ const RegisterTeacher = () => {
                             <label htmlFor="Aadhaar" className="text-sm">Aadhaar</label>
                         </div>
 
-                        <div className="flex items-center">
+                        {/* <div className="flex items-center">
                             <input
                                 type="radio"
                                 id="PanCard"
@@ -359,7 +362,7 @@ const RegisterTeacher = () => {
                                 className="mr-2"
                             />
                             <label htmlFor="Pan" className="text-sm">Pan Card</label>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
                 <div className="flex flex-col">
@@ -387,7 +390,7 @@ const RegisterTeacher = () => {
                         className="border border-gray-300 p-2 rounded-md"
                         required
                     />
-                </div> */}
+                </div>
 
                 <div className="flex justify-center">
                     <button
