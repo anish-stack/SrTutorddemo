@@ -1,5 +1,5 @@
 const express = require('express')
-const { TeacherRegister, TeacherVerifyOtp, TeacherResendOtp, TeacherPasswordChangeRequest, TeacherPasswordOtpResent, TeacherVerifyPasswordOtp, TeacherLogin, AddProfileDetailsOfVerifiedTeacher, TeacherProfileResendOtp, TeacherVerifyProfileOtp, updateTeacherProfile, GetTeacherProfileId, GetAllTeacherProfile, GetAllTeacher, AdvancedQueryForFindingTeacher, SearchByMinimumCondition, SingleTeacher, getMyClass, deleteClassOfTeacher, addMyClassMore, SubjectDelete, deleteSubjectOfTeacher, AddProfilePic, AddDocument, MarkDocumentStatus, teacherBlockForOtp, AddLocations, GetTeacherWithLead, AddProfileDetailsOfVerifiedTeacherByAdmin } = require('../controllers/Teacher.registration')
+const { TeacherRegister, TeacherVerifyOtp, TeacherResendOtp, TeacherPasswordChangeRequest, TeacherPasswordOtpResent, TeacherVerifyPasswordOtp, TeacherLogin, AddProfileDetailsOfVerifiedTeacher, TeacherProfileResendOtp, TeacherVerifyProfileOtp, updateTeacherProfile, GetTeacherProfileId, GetAllTeacherProfile, GetAllTeacher, AdvancedQueryForFindingTeacher, SearchByMinimumCondition, SingleTeacher, getMyClass, deleteClassOfTeacher, addMyClassMore, SubjectDelete, deleteSubjectOfTeacher, AddProfilePic, AddDocument, MarkDocumentStatus, teacherBlockForOtp, AddLocations, GetTeacherWithLead, AddProfileDetailsOfVerifiedTeacherByAdmin, TeacherRegisterByAdmin } = require('../controllers/Teacher.registration')
 const Protect = require('../middlewares/Auth')
 const TeacherRouter = express.Router()
 const multer = require('multer');
@@ -8,6 +8,9 @@ const { singleUploadImage, UploadViaFieldName } = require('../middlewares/multer
 const upload = multer({ dest: 'files/' });
 //User Actions With 
 TeacherRouter.post('/Create-teacher', TeacherRegister)
+TeacherRouter.post('/Create-teacher-Admin', UploadViaFieldName([{ name: 'Document', maxLength: '1' }, { name: 'Qualification', maxLength: '1' }]), TeacherRegisterByAdmin)
+
+
 
 // TeacherRouter.post('/Create-teacher', UploadViaFieldName([{ name: 'Document', maxLength: '1' }, { name: 'Qualification', maxLength: '1' }]), TeacherRegister)
 TeacherRouter.post('/Verify-teacher', TeacherVerifyOtp)
