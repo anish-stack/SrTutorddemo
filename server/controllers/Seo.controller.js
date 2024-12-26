@@ -12,10 +12,7 @@ exports.createPage = async (req, res) => {
             return res.status(400).json({ message: 'seoFrendilyUrl is required' });
         }
 
-        const urlPattern = /^[a-zA-Z0-9-]+$/;
-        if (!urlPattern.test(seoFrendilyUrl)) {
-            return res.status(400).json({ message: 'seoFrendilyUrl should be alphanumeric with hyphens' });
-        }
+ 
 
         if (!MetaDescription || MetaDescription.trim() === '') {
             return res.status(400).json({ message: 'MetaDescription is required' });
