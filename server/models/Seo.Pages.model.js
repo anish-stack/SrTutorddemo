@@ -15,13 +15,8 @@ const SeoPagesSchema = new mongoose.Schema(
           
         },
         MetaKeywords: {
-            type: [String],
-            validate: {
-                validator: function (v) {
-                    return Array.isArray(v) && v.length <= 10; 
-                },
-                message: 'MetaKeywords can have a maximum of 10 keywords.',
-            },
+            type: [String]
+           
         },
         PageTitle: {
             type: String,
