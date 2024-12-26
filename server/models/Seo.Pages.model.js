@@ -7,12 +7,12 @@ const SeoPagesSchema = new mongoose.Schema(
             type: String,
             required: true,
             trim: true,
-            maxlength: 70, 
+          
         },
         MetaDescription: {
             type: String,
             trim: true,
-            maxlength: 160, 
+          
         },
         MetaKeywords: {
             type: [String],
