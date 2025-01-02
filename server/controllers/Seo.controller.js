@@ -12,7 +12,7 @@ exports.createPage = async (req, res) => {
             return res.status(400).json({ message: 'seoFrendilyUrl is required' });
         }
 
- 
+
 
         if (!MetaDescription || MetaDescription.trim() === '') {
             return res.status(400).json({ message: 'MetaDescription is required' });
@@ -116,18 +116,35 @@ exports.deletePage = async (req, res) => {
 };
 
 exports.updatePage = async (req, res) => {
+    console.log("UpdatePage endpoint hit");
+
     try {
         const { id } = req.params;
         console.log(id)
         const { MetaTitle, seoFrendilyUrl, MetaDescription, MetaKeywords, PageTitle, Heading, Tag, PageContent } = req.body;
-        console.log(req.body)
 
+        // Validate `id` and request body
+        if (!id) {
+            return res.status(400).json({
+                success: false,
+                message: "Page ID is required in the request parameters.",
+            });
+        }
 
-        // Find the page by seoFrendilyUrl
+        if (!req.body || Object.keys(req.body).length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Request body is empty. Please provide fields to update.",
+            });
+        }
+
+        // Fetch page by ID
         const page = await SeoPagesModel.findById(id);
-        console.log("find page", page)
         if (!page) {
-            return res.status(404).json({ message: 'Page not found' });
+            return res.status(404).json({
+                success: false,
+                message: `Page with ID ${id} not found.`,
+            });
         }
 
         // Conditionally update fields that are provided and have changed
@@ -145,22 +162,55 @@ exports.updatePage = async (req, res) => {
         }
         if (Heading && Heading !== page.Heading) {
             page.Heading = Heading;
-        }
+        }   
         if (Tag && Tag !== page.Tag) {
             page.Tag = Tag;
         }
         if (PageContent && PageContent !== page.PageContent) {
-
-            page.PageContent = PageContent;
+            page.PageContent = PageContent.toString();
         }
 
-        // Save the updated page to the database
+        // Save the updated page
         await page.save();
 
-        res.status(200).json({ message: 'Page updated successfully', page });
-
+        return res.status(200).json({
+            success: true,
+            message: "Page updated successfully",
+            data: page,
+        });
     } catch (error) {
-        console.error('Error updating page:', error);
-        res.status(500).json({ message: 'An error occurred while updating the page' });
+        console.error("Error updating page:", error);
+
+        // Differentiating between common error types
+        if (error.name === "CastError" && error.kind === "ObjectId") {
+            return res.status(400).json({
+                success: false,
+                message: `Invalid page ID format: ${req.params.id}`,
+                error: error.message,
+            });
+        }
+
+        // Handle unexpected errors
+        return res.status(500).json({
+            success: false,
+            message: "An unexpected error occurred while updating the page.",
+            error: error.message,
+            timestamp: new Date().toISOString(),
+        });
     }
 };
+
+
+exports.IAmUpdateFunction = async (req, res) => {
+    try {
+        res.status(200).json({
+            message: "I am a dummy function for updating SEO page",
+            success: true
+        })
+    } catch (error) {
+        res.status(200).json({
+            message: error?.message,
+            success: true
+        })
+    }
+}

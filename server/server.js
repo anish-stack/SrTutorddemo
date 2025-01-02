@@ -10,7 +10,7 @@ const AdminRouter = require("./routes/Admin.routes");
 const TeacherRouter = require("./routes/Teacher.routes");
 const leadRoutes = require('./routes/Jd.routes');
 const seo = require('./routes/Seo.routes');
-
+var morgan = require('morgan')
 
 const connectDb = require('./config/db');
 const { info, error } = require('./utils/Logger');
@@ -64,6 +64,9 @@ app.use(cors({
     credentials: true
 }));
 
+morgan.token('host', (req) => req.hostname);
+
+app.use(morgan(':method :host :url :status :res[content-length] - :response-time ms'));
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

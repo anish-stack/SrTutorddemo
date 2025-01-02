@@ -23,7 +23,7 @@ const SlidingData = () => {
     };
 
     fetchData();
-  }, []); // Empty dependency array means this runs once when the component mounts
+  }, []);
 
   // Render logic
   if (loading) {

@@ -16,12 +16,12 @@ const PageCard = ({ page, onView, onEdit, onDelete }) => {
         </p>
         <div className="text-sm text-gray-600">
           <span className="font-medium">Tags:</span>
-          <span className="ml-2 inline-block bg-gray-100 px-2 py-1 rounded">
+          <span className="ml-2  w-32 truncate inline-block bg-gray-100 px-2 py-1 rounded">
             {page.Tag}
           </span>
         </div>
       </div>
-      
+
       <div className="flex justify-end gap-2 pt-4 border-t">
         <button
           onClick={onView}

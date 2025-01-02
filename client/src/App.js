@@ -15,6 +15,7 @@ import Loader from "./Components/Loader";
 import axios from "axios";
 import Faq from "./page/FAQ/Faq";
 import ViewPage from "./page/SEO/ViewPage";
+import All_Request from "./page/All_request/All_Request";
 // import NTeacherRegistration from "./New Resgister/NTeacherRegistration";
 // Lazy load components
 const Home = lazy(() => import("./page/Home"));
@@ -106,7 +107,7 @@ function App() {
           <Route path="/Student-dashboard" element={<StudentProfile />} />
           <Route path="/Student-Post-For-Teacher" element={<PostRequirement />} />
           <Route path="/teacher-register" element={<TeacherRegsitration />} />
-          {/* <Route path="/teacher-pr" element={<NTeacherRegistration />} /> */}
+          <Route path="/View-all-Request" element={<All_Request />} />
 
           <Route path="/Teacher-dashboard" element={<TeacherDashboard />} />
           <Route path="/thankYou" element={<ThankYouPage />} />
