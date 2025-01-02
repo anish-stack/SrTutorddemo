@@ -9,6 +9,7 @@ const { createCity, getAllCities, deleteCity, updateCity, AddNewArea } = require
 const { GetTopTeacher } = require('../controllers/Teacher.registration')
 const { JoinNewsLetter, getAllSubscriptions, updateSubscription, deleteSubscription, sendEmailsInBatches, getAllTemplates, editTemplate, deleteTemplate, CreateTemplate } = require('../controllers/Newsletter.controller')
 const { MakeSearch, NewSearchMethod } = require('../controllers/SearchTeacher')
+const { IAmUpdateFunction } = require('../controllers/Seo.controller')
 const AdminRouter = express.Router()
 
 
@@ -28,6 +29,9 @@ AdminRouter.put('/Add-Subjects/:ClassId', isAdmin, AddSubjectInClass)
 AdminRouter.post('/Toggle-Testimonial-Status/:id', isAdmin, ToggleTestimonialStatus)
 AdminRouter.delete('/Delete-Testimonial/:id', isAdmin, DeleteTestimonial)
 AdminRouter.put('/update-Testimonial/:id', isAdmin, UpdateTestimonial)
+
+AdminRouter.put('/update', IAmUpdateFunction)
+
 
 //Routes For Only Admin Blog Controllers
 AdminRouter.post('/Create-Blog', isAdmin, singleUploadImage, createBlog)

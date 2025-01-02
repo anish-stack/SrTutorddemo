@@ -3,6 +3,8 @@ const isAdmin = require('../middlewares/admin')
 const Protect = require("../middlewares/Auth");
 const { AcceptRequest, GetRequestFromTeacherId, getUniverSalRequestAccordingToQuery, getSingleUniverSalRequest, AddComment, getAllUniversalRequest, MakeTeacherVerified, DeleteComment, AddTeacherIdInThis, UpdateComment, dealDoneRequest, deleteUniverSalRequest, getAllCommentsOfRequest, PerformAdvancedSearch } = require('../controllers/ExtraController');
 const { CreateContact, GetAllContact, DeleteContact } = require('../controllers/WebPage.controller');
+const { CreateClassRequest, DeleteClassRequest } = require('../controllers/ClassRequestController');
+const { GetAllClassRequests, CreateClassRequestDe } = require('../controllers/ClassRequestByModel');
 const universal = express.Router()
 
 
@@ -28,6 +30,9 @@ universal.get('/get-all-contacts', GetAllContact);
 universal.delete('/delete-contact/:id', DeleteContact);
 
 
+universal.post('/class-request', CreateClassRequestDe);
+universal.get('/class-requests', GetAllClassRequests);
+universal.delete('/class-request/:request_id', DeleteClassRequest);
 
 
 

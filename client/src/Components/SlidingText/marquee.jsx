@@ -45,7 +45,7 @@ const Marquee = ({ data }) => {
 
                             className="mySwiper"
                         >
-                            {comingData.map((item, index) => (
+                            {comingData.reverse().slice(0,12).map((item, index) => (
                                 <SwiperSlide className={`  marquee__card text-start gap-2 ${item.className || ''}`} key={item._id}>
                                     <a
                                         className='text-start'
@@ -63,15 +63,15 @@ const Marquee = ({ data }) => {
                                 </SwiperSlide>
                             ))}
                         </Swiper>
-                        {/* {comingData.length > 4 && (
+                        {comingData.length > 4 && (
                             <div className="container d-flex align-items-center justify-content-center text-center bottom-0 end-0 px-4">
                                 <button className="view-all-btn">
-                                    <a href="/View-all" className="view-all-link">
+                                    <a href="/View-all-Request" className="view-all-link">
                                         View All
                                     </a>
                                 </button>
                             </div>
-                        )} */}
+                        )}
 
 
                     </div>

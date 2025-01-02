@@ -1,0 +1,61 @@
+/* Custom styling for All Request page */
+.request-card {
+    transition: transform 0.2s ease-in-out;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .request-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .filter-section {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .subjects-badge {
+    background: #e9ecef;
+    color: #495057;
+    padding: 5px 10px;
+    border-radius: 15px;
+    margin: 2px;
+    display: inline-block;
+    font-size: 0.85rem;
+  }
+ 
+  
+  .budget-range {
+    color: #198754;
+    font-weight: 600;
+  }
+  
+  .pagination-container {
+    margin-top: 2rem;
+  }
+  
+  .filter-badge {
+    background: #e7f1ff;
+    color: #0d6efd;
+    padding: 5px 12px;
+    border-radius: 15px;
+    margin: 0 5px;
+    font-size: 0.9rem;
+  }
+  
+  .location-text {
+    color: #6c757d;
+    font-size: 0.9rem;
+  }
+  
+  @media (max-width: 768px) {
+    .filter-section {
+      padding: 15px;
+    }
+    
+    .request-card {
+      margin-bottom: 15px;
+    }
+  }
