@@ -6,7 +6,7 @@ const { AddTestimonial, GetAllActiveTestimonial, ToggleTestimonialStatus, Delete
 const { createBlog, DeleteBlog, UpdateBlog, getAllBlog, getSingleBlog } = require('../controllers/Blog.controller')
 const { createBanner, getAllBanner, deleteBanner, ChangePosition, updateBanner, AnalyticalData } = require('../controllers/WebPage.controller')
 const { createCity, getAllCities, deleteCity, updateCity, AddNewArea } = require('../controllers/City.Controller')
-const { GetTopTeacher } = require('../controllers/Teacher.registration')
+const { GetTopTeacher, UpdateTeacherByAdmin } = require('../controllers/Teacher.registration')
 const { JoinNewsLetter, getAllSubscriptions, updateSubscription, deleteSubscription, sendEmailsInBatches, getAllTemplates, editTemplate, deleteTemplate, CreateTemplate } = require('../controllers/Newsletter.controller')
 const { MakeSearch, NewSearchMethod } = require('../controllers/SearchTeacher')
 const { IAmUpdateFunction } = require('../controllers/Seo.controller')
@@ -92,7 +92,7 @@ AdminRouter.delete('/delete-template/:id', deleteTemplate);
 // AdminRouter.post('/make-search', MakeSearch);
 AdminRouter.post('/make-search', NewSearchMethod);
 
-
+AdminRouter.post('/Update-Teacher/:id', UpdateTeacherByAdmin)
 
 
 

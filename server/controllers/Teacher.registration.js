@@ -559,6 +559,59 @@ exports.TeacherRegisterByAdmin = CatchAsync(async (req, res) => {
   }
 });
 
+exports.UpdateTeacherByAdmin = CatchAsync(async (req, res) => {
+  try {
+    const { id } = req.params; 
+    const {
+      TeacherName,
+      PhoneNumber,
+      Email,
+      Password,
+      DOB,
+      Age,
+      gender,
+      AltNumber,
+      PermanentAddress,
+    } = req.body;
+
+    // Find the teacher by ID
+    const teacher = await Teacher.findById(id);
+
+    if (!teacher) {
+      return res.status(404).json({
+        message: "Teacher not found. Please provide a valid ID.",
+      });
+    }
+
+    // Update the fields if they are provided
+    if (TeacherName) teacher.TeacherName = TeacherName;
+    if (PhoneNumber) teacher.PhoneNumber = PhoneNumber;
+    if (Email) teacher.Email = Email;
+    if (Password) teacher.Password = Password;
+    if (DOB) teacher.DOB = DOB;
+    if (Age) teacher.Age = Age;
+    if (gender) teacher.gender = gender;
+    if (AltNumber) teacher.AltNumber = AltNumber;
+    if (PermanentAddress) teacher.PermanentAddress =PermanentAddress ;
+
+    // Save the updated teacher document
+    await teacher.save();
+
+    res.status(200).json({
+      message: "Teacher details updated successfully.",
+      teacher,
+    });
+  } catch (error) {
+    console.error("Update error: ", error);
+    res.status(500).json({
+      message: "Error occurred while updating teacher details.",
+      error: error.message,
+    });
+  }
+});
+
+
+
 //Teacher Verify Otp
 exports.TeacherVerifyOtp = CatchAsync(async (req, res) => {
   try {

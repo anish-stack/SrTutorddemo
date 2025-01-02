@@ -205,6 +205,12 @@ const Teacher = () => {
                                                 Incomplete
                                             </span>
                                             <Link
+                                                to={`/Complete-Profile-Ist_Step/${teacher._id}`}
+                                                className="px-3 py-1 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+                                            >
+                                                Complete Ist Step
+                                            </Link>
+                                            <Link
                                                 to={`/Complete-Profile/${teacher._id}`}
                                                 className="px-3 py-1 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition-colors"
                                             >
