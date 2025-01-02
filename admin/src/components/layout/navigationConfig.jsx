@@ -94,6 +94,11 @@ import {
       icon: Mail
     },
     {
+      name: 'Post Teacher Reqests',
+      path: '/all-teacher-requests-contact',
+      icon: Activity
+    },
+    {
       name: 'Contact',
       path: '/manage-contact',
       icon: Phone
