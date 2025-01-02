@@ -4,12 +4,12 @@ const ClassRequest = require('../models/ClassRequestModel');
 exports.CreateClassRequestDe = async (req, res) => {
     try {
         const { request_id, name, email, phone, message } = req.body;
-     
+
         const newRequest = new ClassRequest({
             request_id,
-            Name:name,
-            Email:email,
-            Contact:phone,
+            Name: name,
+            Email: email,
+            Contact: phone,
             message
         });
 
@@ -24,7 +24,7 @@ exports.CreateClassRequestDe = async (req, res) => {
 
 exports.GetAllClassRequests = async (req, res) => {
     try {
-        const classRequests = await ClassRequest.find().populate('request_id', 'Name email'); 
+        const classRequests = await ClassRequest.find().populate('request_id');
         return res.status(200).json({ success: true, data: classRequests });
     } catch (error) {
         console.error(error);

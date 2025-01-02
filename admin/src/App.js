@@ -43,6 +43,7 @@ import RegisterTeacher from './pages/Teacher-Createion/RegisterTeacher'
 import CompleteProfileDetails from './pages/Teacher-Createion/CompleteProfileDetails'
 import ViewPage from './pages/Seo/ViewPage';
 import EditPage from './pages/Seo/EditPage';
+import RequestTeacherContact from './pages/Request/Request-Teacher';
 function App() {
 
   const isAuthenticated = localStorage.getItem('Sr-token');
@@ -88,7 +89,9 @@ function App() {
           <Route path='/send-offers' element={<SendOfferMails />} />
           <Route path='/Add-request' element={<AddRequest />} />
           <Route path='/Manage-Leads' element={<TeacherWithLead />} />
+          <Route path='/all-teacher-requests-contact' element={<RequestTeacherContact />} />
 
+          
           <Route path='/Create-Teacher-Profile' element={<RegisterTeacher />} />
           <Route path='/Complete-Profile/:id' element={<CompleteProfileDetails />} />
 
