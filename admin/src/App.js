@@ -44,6 +44,7 @@ import CompleteProfileDetails from './pages/Teacher-Createion/CompleteProfileDet
 import ViewPage from './pages/Seo/ViewPage';
 import EditPage from './pages/Seo/EditPage';
 import RequestTeacherContact from './pages/Request/Request-Teacher';
+import CompleteSirstStep from './pages/Teacher-Createion/CompleteSirstStep';
 function App() {
 
   const isAuthenticated = localStorage.getItem('Sr-token');
@@ -65,7 +66,7 @@ function App() {
           <Route path='/Add-New-Class' element={<AddNewsClass />} />
           <Route path='/Edit-Class/:id' element={<EditClass />} />
           <Route path='/Search-teacher' element={<SearchTeacher />} />
-
+          <Route path='/Complete-Profile-Ist_Step/:id' element={<CompleteSirstStep />} />
           <Route path='/Manage-Student' element={<AllStudents />} />
           {/* <Route path='/Manage-Blogs' element={<AllBlogs />} /> */}
           {/* <Route path='/create-blog' element={<CreateBlogs />} /> */}
@@ -91,7 +92,7 @@ function App() {
           <Route path='/Manage-Leads' element={<TeacherWithLead />} />
           <Route path='/all-teacher-requests-contact' element={<RequestTeacherContact />} />
 
-          
+
           <Route path='/Create-Teacher-Profile' element={<RegisterTeacher />} />
           <Route path='/Complete-Profile/:id' element={<CompleteProfileDetails />} />
 
