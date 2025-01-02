@@ -48,6 +48,12 @@ const StudentDetails = ({ student, teacher }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+      if(!formData.request_id){
+        setFormData({
+            ...formData,
+            request_id: data?.id
+        })
+      }
         try {
             const { data } = await axios.post('https://api.srtutorsbureau.com/api/v1/uni/class-request', formData)
             console.log(data)

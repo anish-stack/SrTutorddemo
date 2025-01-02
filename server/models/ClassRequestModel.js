@@ -8,19 +8,19 @@ const classModelSchema = new mongoose.Schema({
     },
     Name: {
         type: String,
-        required: true,
+       
     },
     Email: {
         type: String,
-        required: true,
+       
     },
     Contact: {
         type: String,
-        required: true,
+       
     },
     message: {
         type: String,
-        required: true,
+     
     },
 
 }, { timestamps: true });
