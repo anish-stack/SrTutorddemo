@@ -142,7 +142,7 @@ const Teacher = () => {
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            {['Name', 'Phone', 'Email', 'Verified', 'Added By', 'Date', 'Profile'].map((header) => (
+                            {['Name', 'Phone', 'Email', 'Verified','Address', 'Added By', 'Date', 'Profile'].map((header) => (
                                 <th key={header} className="px-6 py-3 text-left whitespace-nowrap text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     {header}
                                 </th>
@@ -167,6 +167,9 @@ const Teacher = () => {
                                     ) : (
                                         <IoIosCloseCircle className="text-2xl text-red-500 inline" />
                                     )}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {teacher.PermanentAddress?.streetAddress } ,{teacher.PermanentAddress?.City}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <span className={`px-3 py-1 rounded-full text-xs font-semibold ${teacher.isAddedByAdmin ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
