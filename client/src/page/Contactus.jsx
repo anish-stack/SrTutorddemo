@@ -2,8 +2,29 @@ import React, { Component } from "react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from 'axios'
+import ReCAPTCHA from "react-google-recaptcha";
+
 import toast from 'react-hot-toast'
 import { Helmet } from "react-helmet-async";
+const PROHIBITED_LINKS = [
+    "facebook.com", "instagram.com", "twitter.com", "linkedin.com",
+    "pinterest.com", "google.com", "youtube.com", "reddit.com", "tumblr.com",
+    "twitch.tv", "vimeo.com", "spotify.com", "github.com", "gitlab.com",
+    "stackoverflow.com", "hackerrank.com", "leetcode.com", "codewars.com",
+    "kaggle.com", "xhamster.desi", "xvideos.com", "youporn.com", "pornhub.com",
+    "redtube.com", "tube8.com", "xnxx.com", "lyase12a.com", "wearens.com",
+    "webnextlabs.com", "lyase12b.com", "lyase12c.com", "clavius12c.com"
+];
+
+const PROHIBITED_WORDS = [
+    "xxx", "xhamster", "sex", "blowjob", "fuck", "sperm", "condom",
+    "suck", "vagina", "sexy", "abuse", "xnxx", "<script>", "script",
+    "virus", "iframe"
+];
+
+const isValidEmail = (email) => /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
+const isValidPhone = (phone) => /^[0-9]{10,15}$/.test(phone);
+const isValidName = (name) => name.length >= 2 && /^[a-zA-Z\s]+$/.test(name);
 function Contactus() {
     const [formData, setFormData] = useState({
         Name: '',
@@ -12,24 +33,60 @@ function Contactus() {
         Subject: '',
         Message: ''
     })
+    const [recaptchaToken, setRecaptchaToken] = useState('')
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
+    function handleChangeCaptach(value) {
+        setRecaptchaToken(value)
+    }
+    const containsProhibitedContent = (text) => {
+        const lowerText = text.toLowerCase();
+
+        // Log detected words
+        const foundWords = PROHIBITED_WORDS.filter(word => lowerText.includes(word.toLowerCase()));
+        const foundLinks = PROHIBITED_LINKS.filter(link => lowerText.includes(link.toLowerCase()));
+
+        if (foundWords.length || foundLinks.length) {
+            console.log("Blocked Words:", foundWords);
+            console.log("Blocked Links:", foundLinks);
+            return true;
+        }
+
+        return false;
+    };
 
     const handleSubmit = async (e) => {
-        e.preventDefault(); // Prevent the default form submission
+        if (!isValidName(formData.Name)) {
+            alert("Invalid name: Must be at least 2 characters and contain only letters.");
+            return;
+        }
+        if (!isValidEmail(formData.Email)) {
+            alert("Invalid email format.");
+            return;
+        }
+        if (!isValidPhone(formData.Phone)) {
+            alert("Invalid phone number: Must contain only digits and be 10-15 characters long.");
+            return;
+        }
+        if (containsProhibitedContent(formData.Message)) {
+            alert("Your message contains prohibited words or links.");
+            return;
+        }
+
+        e.preventDefault();
         try {
-            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/uni/create-contact', formData);
+            const response = await axios.post('https://api.srtutorsbureau.com/api/v1/uni/create-contact', { ...formData, recaptchaToken });
             if (response.data.success) {
                 toast.success("Your message has been sent successfully! We will get back to you shortly.");
-                setFormData({ Name: '', Email: '', Phone: '', Subject: '', Message: '' }); // Reset form fields
+                setFormData({ Name: '', Email: '', Phone: '', Subject: '', Message: '' });
             } else {
                 toast.error("Failed to send the message.");
             }
         } catch (error) {
             console.error("Error sending message:", error);
-            toast.error("An error occurred. Please try again later.");
+            toast.error(error.response.data.message || error.response.data.error || error.message || "Please try again our server is busy ....");
         }
     };
 
@@ -196,6 +253,10 @@ function Contactus() {
                                                 required
                                             />
                                         </div>
+                                        <ReCAPTCHA
+                                            sitekey="6LfZG_MqAAAAAKtYU1tPvoz_MoHCQDUYVwy4Bhf3"
+                                            onChange={handleChangeCaptach}
+                                        />
                                         <button type="submit" className="btn">
                                             Send Message
                                         </button>

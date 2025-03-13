@@ -429,12 +429,19 @@ exports.AnalyticalData = CatchAsync(async (req, res) => {
 
 exports.CreateContact = CatchAsync(async (req, res) => {
     try {
-        const { Name, Email, Phone, Subject, Message, StudentId, TeacherId } = req.body;
-        console.log(req.body)
-        // Default QueryType if both StudentId and TeacherId are absent
+        const { Name, Email, Phone, Subject, Message, StudentId, TeacherId, recaptchaToken } = req.body;
+
         const queryType = StudentId ? "Registered Student" : TeacherId ? "Registered Teacher" : "General Inquiry";
-        console.log(queryType)
-        // Create a new contact entry
+
+        const secretKey = "6LfZG_MqAAAAAH_UENSs7CrCLQX0i748qOBmhkyQ";
+        const response = await axios.post(
+            `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${recaptchaToken}`
+        );
+
+        if (!response.data.success) {
+            return res.status(400).json({ error: "reCAPTCHA verification failed" });
+        }
+
         const newContact = await Contact.create({
             Name,
             Email,

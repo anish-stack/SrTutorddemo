@@ -1425,3 +1425,47 @@ html {
 .view-all-link:hover {
   text-decoration: underline; /* Optional hover effect */
 }
+
+.quik-pagination {
+  display: flex;
+  justify-content: center;
+}
+
+.quik-pagination-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.quik-pagination-item {
+  font-size: 12px;
+
+}
+
+.quik-pagination-link {
+  padding: 8px 12px;
+  border: 1px solid #F60002;
+  border-radius: 6px;
+  background-color: white;
+  color: #F60002;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.quik-pagination-link:hover {
+  background-color: #F60002;
+  color: white;
+}
+
+.quik-pagination-item.disabled .quik-pagination-link {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.quik-pagination-info .quik-pagination-link {
+  border: none;
+  background: transparent;
+  color: black;
+  font-weight: bold;
+}

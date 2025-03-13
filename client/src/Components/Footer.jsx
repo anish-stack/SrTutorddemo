@@ -8,7 +8,8 @@ function Footer() {
     const handleChange = (e) => {
         setEmail(e.target.value);
     };
-
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 4;
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!email) {
@@ -54,6 +55,15 @@ function Footer() {
     }, [])
 
 
+
+    // Calculate total pages
+    const totalPages = Math.ceil(allPages.length / itemsPerPage);
+
+    // Get current page items
+    const currentItems = allPages.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
     return (
         <>
 
@@ -143,14 +153,52 @@ function Footer() {
                                 <div className="footer-widget widget_nav_menu">
                                     <h4 className="fw-title">Quick Links</h4>
                                     <ul className="list-wrap">
-                                        {allPages && allPages.length > 0 ? (
-                                            allPages.map((page, index) => (
+                                        {currentItems.length > 0 ? (
+                                            currentItems.map((page, index) => (
                                                 <li key={index}>
-                                                    <Link to={`/sr-tutors/${page.seoFrendilyUrl}`}>{page.MetaTitle}</Link>
+                                                    <Link to={`/sr-tutors/${page.seoFrendilyUrl}`}>
+                                                        {page.MetaTitle}
+                                                    </Link>
                                                 </li>
                                             ))
-                                        ) : null}
+                                        ) : (
+                                            <li>No pages available</li>
+                                        )}
                                     </ul>
+                                    {totalPages > 1 && (
+                                        <nav aria-label="Page navigation" className="quik-pagination mt-3">
+                                            <ul className="quik-pagination-list d-flex justify-content-center align-items-center gap-2">
+                                                {/* Previous Button */}
+                                                <li className={`quik-pagination-item ${currentPage === 1 ? "disabled" : ""}`}>
+                                                    <button
+                                                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                                                        className="quik-pagination-link"
+                                                    >
+                                                        ◀ Prev
+                                                    </button>
+                                                </li>
+
+                                                {/* Page Number */}
+                                                <li className="quik-pagination-item quik-pagination-info">
+                                                    <span className="quik-pagination-link">
+                                                        {currentPage} / {totalPages}
+                                                    </span>
+                                                </li>
+
+                                                {/* Next Button */}
+                                                <li className={`quik-pagination-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                                                    <button
+                                                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                                                        className="quik-pagination-link"
+                                                    >
+                                                        Next ▶
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </nav>
+                                    )}
+
+
                                 </div>
                             </div>
                             <div className="col-xl-3 col-lg-3 col-sm-6">
